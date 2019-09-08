@@ -3,7 +3,7 @@ Lpp transport app
 
 Rules:
   Commits:
-    \n- Commit comments must be short and straight to the point
+    - Commit comments must be short and straight to the point
     - Commit code consistently
     
   Code:
