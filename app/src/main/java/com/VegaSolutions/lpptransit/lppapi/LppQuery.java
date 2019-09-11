@@ -4,9 +4,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Class for querying data from LPP API. All available API is saved in static Strings. Default OnCompleteListener prints out data and result code to LOG
@@ -45,9 +47,14 @@ public class LppQuery extends AsyncTask<String, Void, String> {
     public static final String BUS_LOCATION = "/bus/busLocation"; // API key required
     public static final String BUSES_IN_RANGE = "/bus/busesInRange"; // API key required
     public static final String GET_NEXT_STATION_FULL = "/bus/getNextStationFull";
-    public static final String GET_DRIVER = "/bus/getDriver"; // API ket required
+    public static final String GET_DRIVER = "/bus/getDriver"; // API key required
     public static final String GET_BUS_FUTURE_DATA = "/bus/getBusFutureData";
 
+
+
+    // Url parameters
+    private String params = "";
+    // Default onCompleteListener
     private OnCompleteListener onCompleteListener = (data, returnCode, success) -> {
         if (success) {
             Log.i(TAG, "Return Code: " + returnCode);
@@ -57,13 +64,36 @@ public class LppQuery extends AsyncTask<String, Void, String> {
         }
     };
 
+
+    /**
+     * set required parameters
+     * @param paramsMap map of parameters (String, String)
+     */
+
+    public LppQuery setParams(Map<String, String> paramsMap) {
+
+        // convert to url
+        StringBuilder builder = new StringBuilder("?");
+        for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+            builder.append(entry.getKey()).append("=").append(entry.getValue());
+            builder.append("&");
+        }
+        this.params = builder.substring(0,builder.length()-1);
+
+        return this;
+    }
+
+
     /**
      * Executed code when query completed
      * @param onCompleteListener query callback. See LppQuery.OnCompleteListener for more info
      */
-    public void addOnCompleteListener(OnCompleteListener onCompleteListener) {
+
+    public LppQuery setOnCompleteListener(OnCompleteListener onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
+        return this;
     }
+
 
     @Override
     protected String doInBackground(String... apis) {
@@ -71,10 +101,12 @@ public class LppQuery extends AsyncTask<String, Void, String> {
         for (String api : apis) {
 
             try {
-                Connection.Response r = Jsoup.connect(SERVER_URL + api).execute();
+                Connection.Response r = Jsoup.connect(SERVER_URL + api + params).ignoreContentType(true).execute();
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
-            } catch (IOException e) {
+            } catch (HttpStatusException e) {
                 e.printStackTrace();
+                onCompleteListener.onComplete(null, e.getStatusCode(), false);
+            } catch (IOException e) {
                 onCompleteListener.onComplete(null, -1, false);
             }
 
@@ -83,15 +115,16 @@ public class LppQuery extends AsyncTask<String, Void, String> {
         return null;
     }
 
+
     public interface OnCompleteListener {
 
         /**
-         * @param response String representing response body
-         * @param returnCode int equivalent to HTML response code. ReturnCode -1 means connection failed.
-         * @param success boolean if connection was successful
+         * @param response String representing response body.
+         * @param statusCode int equivalent to HTML status code. "-1" means IOException
+         * @param success boolean if connection was successful.
          */
 
-        void onComplete(String response, int returnCode, boolean success);
+        void onComplete(String response, int statusCode, boolean success);
     }
 
 }
