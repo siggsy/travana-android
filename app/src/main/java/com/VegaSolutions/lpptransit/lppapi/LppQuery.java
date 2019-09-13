@@ -3,6 +3,9 @@ package com.VegaSolutions.lpptransit.lppapi;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -21,13 +24,13 @@ public class LppQuery extends AsyncTask<String, Void, String> {
     public static final String GET_API_INFO = "/info/getApiInfo";
 
     // Route API
-    public static final String GET_ROUTE_DETAILS = "/routes/getRouteDetails";
+    public static final String GET_ROUTE_DETAILS = "/routes/getRouteDetails"; // parameters required (route_int_id=341)
     public static final String GET_ROUTE_GROUPS = "/routes/getRouteGroups";
-    public static final String GET_ROUTES = "/routes/getRoutes";
-    public static final String GET_STATIONS_ON_ROUTE = "/routes/getStationsOnRoute";
-    public static final String GET_ROUTE_PARENTS = "/routes/getRouteParents";
-    public static final String GET_GTFS = "/routes/getGTFS";
-    public static final String GET_STATION_LIST = "/routes/v2/getStationList";
+    public static final String GET_ROUTES = "/routes/getRoutes"; // 1 parameter required (route_id=11705c09-1316-4c46-a0e1-0df468d24deb) / (route_name=6)
+    public static final String GET_STATIONS_ON_ROUTE = "/routes/getStationsOnRoute"; // 1 parameter required (route_id=d532a61e-620c-4eb1-9a76-2a9e989213f5) / (route_int_id=346)
+    public static final String GET_ROUTE_PARENTS = "/routes/getRouteParents"; // 1 parameter required (route_id=d532a61e-620c-4eb1-9a76-2a9e989213f5) / (route_int_id=346)
+    private static final String GET_GTFS = "/routes/getGTFS"; // NOT USEFUL (downloads file)
+    public static final String GET_STATION_LIST = "/routes/v2/getStationList"; // unknown parameters
 
     // Stations API
     public static final String GET_ROUTES_ON_STATION = "/stations/getRoutesOnStation";
@@ -68,18 +71,30 @@ public class LppQuery extends AsyncTask<String, Void, String> {
     /**
      * set required parameters
      * @param paramsMap map of parameters (String, String)
+     * @return current instance for chaining
      */
+    public LppQuery setParams(@Nullable Map<String, String> paramsMap) {
 
-    public LppQuery setParams(Map<String, String> paramsMap) {
-
-        // convert to url
-        StringBuilder builder = new StringBuilder("?");
-        for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
-            builder.append(entry.getKey()).append("=").append(entry.getValue());
-            builder.append("&");
+        if (paramsMap != null && paramsMap.size() != 0) {
+            // convert to url
+            StringBuilder builder = new StringBuilder("?");
+            for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+                builder.append(entry.getKey()).append("=").append(entry.getValue());
+                builder.append("&");
+            }
+            this.params = builder.substring(0, builder.length() - 1);
         }
-        this.params = builder.substring(0,builder.length()-1);
+        return this;
+    }
 
+    /**
+     * set required parameter
+     * @param key value name
+     * @param value the value
+     * @return current instance for chaining
+     */
+    public LppQuery setParams(@NonNull String key, @NonNull String value) {
+        params = "?" + key + "=" + value;
         return this;
     }
 
@@ -88,8 +103,7 @@ public class LppQuery extends AsyncTask<String, Void, String> {
      * Executed code when query completed
      * @param onCompleteListener query callback. See LppQuery.OnCompleteListener for more info
      */
-
-    public LppQuery setOnCompleteListener(OnCompleteListener onCompleteListener) {
+    public LppQuery setOnCompleteListener(@NonNull OnCompleteListener onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
         return this;
     }
@@ -119,11 +133,11 @@ public class LppQuery extends AsyncTask<String, Void, String> {
     public interface OnCompleteListener {
 
         /**
+         * Executed when HTML GET completed
          * @param response String representing response body.
          * @param statusCode int equivalent to HTML status code. "-1" means IOException
          * @param success boolean if connection was successful.
          */
-
         void onComplete(String response, int statusCode, boolean success);
     }
 
