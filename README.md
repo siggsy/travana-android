@@ -8,4 +8,4 @@ Rules:
     \
   Code:\
     - Frequently add comments to your code\
-    - Code must be written with love\
+    - Code must be written with love
