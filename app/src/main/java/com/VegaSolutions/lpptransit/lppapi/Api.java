@@ -2,8 +2,10 @@ package com.VegaSolutions.lpptransit.lppapi;
 
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.AllStations;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.LiveBusArrival;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.LiveBusArrivalV2;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.NextStation;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteDetails;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteGroups;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteParents;
@@ -12,11 +14,9 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationById;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationsInRange;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationsOnRoute;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Lpp Api wrapper class
@@ -83,6 +83,18 @@ public class Api {
     public static void getRoutes_route_name(String route_name, ApiCallback<List<Routes>> callback) {
         new LppQuery()
                 .addParams("route_name", route_name)
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<List<Routes>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Routes>>>(){}.getType());
+                        callback.onComplete(data, statusCode, true);
+                    } else
+                        callback.onComplete(null, statusCode, false);
+                })
+                .execute(LppQuery.GET_ROUTES);
+    }
+
+    public static void getRoutes(ApiCallback<List<Routes>> callback) {
+        new LppQuery()
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Routes>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Routes>>>(){}.getType());
@@ -348,6 +360,103 @@ public class Api {
                         callback.onComplete(null, statusCode, false);
                 })
                 .execute(LppQuery.LIVE_BUS_ARRIVAL_V2);
+    }
+
+    /**
+     * Returns recently updated GPS coordinates of buses in specified radius of given location.
+     * @param radius Radius for searching in meters.
+     * @param lat Latitude.
+     * @param lon Longitude.
+     * @param callback callback to be triggered when finished.
+     */
+    public static void busesInRange(int radius, double lat, double lon, ApiCallback<List<Bus>> callback) {
+        new LppQuery()
+                .addParams("radius", String.valueOf(radius))
+                .addParams("lat", String.valueOf(lat))
+                .addParams("lon", String.valueOf(lon))
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<List<Bus>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Bus>>>(){}.getType());
+                        callback.onComplete(data, statusCode, true);
+                    } else
+                        callback.onComplete(null, statusCode, false);
+                })
+                .execute(LppQuery.BUSES_IN_RANGE);
+    }
+
+    /**
+     * Returns recently updated GPS coordinates of buses in specified radius of given location.
+     * @param lat Latitude.
+     * @param lon Longitude.
+     * @param callback callback to be triggered when finished.
+     * @apiNote Default radius is used (100m)
+     */
+    public static void busesInRange(double lat, double lon, ApiCallback<List<Bus>> callback) {
+        new LppQuery()
+                .addParams("lat", String.valueOf(lat))
+                .addParams("lon", String.valueOf(lon))
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<List<Bus>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Bus>>>(){}.getType());
+                        callback.onComplete(data, statusCode, true);
+                    } else
+                        callback.onComplete(null, statusCode, false);
+                })
+                .execute(LppQuery.BUSES_IN_RANGE);
+    }
+
+    /**
+     * Returns a list of buses and their locations for a specified route.
+     * @param route_int_id Integer ID of route.
+     * @param callback callback to be triggered when finished.
+     */
+    public static void busLocation(int route_int_id, ApiCallback<List<Bus>> callback) {
+
+        new LppQuery()
+                .addParams("route_int_id", String.valueOf(route_int_id))
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<List<Bus>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Bus>>>(){}.getType());
+                        callback.onComplete(data, statusCode, true);
+                    } else
+                        callback.onComplete(null, statusCode, false);
+                })
+                .execute(LppQuery.BUS_LOCATION);
+
+    }
+
+    /**
+     * Returns all buses and their locations.
+     * @param callback callback to be triggered when finished.
+     */
+    public static void busLocation(ApiCallback<List<Bus>> callback) {
+        new LppQuery()
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<List<Bus>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Bus>>>(){}.getType());
+                        callback.onComplete(data, statusCode, true);
+                    } else
+                        callback.onComplete(null, statusCode, false);
+                })
+                .execute(LppQuery.BUS_LOCATION);
+    }
+
+    /**
+     * Returns the next station a bus will arrive to, based on previous station location. If not enough data is in the DB (null route or null previous station), system will return error.
+     * @param bus_id Registration number of bus (LPP-101...). Characters are trimmed, only 3 digits are needed to identify the bus.
+     * @param callback callback to be triggered when finished.
+     */
+    public static void getNextStationFull(String bus_id, ApiCallback<NextStation> callback) {
+        new LppQuery()
+                .addParams("bus_id", bus_id)
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<NextStation> data = new Gson().fromJson(response, new TypeToken<ApiResponse<NextStation>>(){}.getType());
+                        callback.onComplete(data, statusCode, true);
+                    } else
+                        callback.onComplete(null, statusCode, false);
+                })
+                .execute(LppQuery.GET_NEXT_STATION_FULL);
     }
 
 }

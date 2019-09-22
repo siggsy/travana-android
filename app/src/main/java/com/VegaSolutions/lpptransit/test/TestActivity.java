@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit;
+package com.VegaSolutions.lpptransit.test;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 
+import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.LppQuery;
@@ -30,18 +31,17 @@ public class TestActivity extends AppCompatActivity {
         TextView log = findViewById(R.id.test_log_tv);
         log.setMovementMethod(new ScrollingMovementMethod());
 
-        /*// Query test
+        // Query test
         Map<String, String> params = new HashMap<>();
-        params.put("route_int_id", "341");
-
+        params.put("bus_id", "106");
         LppQuery lppQuery = new LppQuery();
         lppQuery.setOnCompleteListener((response, statusCode, success) -> {
             if (success) {
                 log.setText("Data: " + response + "\nStatus code: " + statusCode);
             } else
                 log.setText("Failed\nStatus code: " + statusCode);
-        }).addParams(params).execute(LppQuery.GET_ROUTE_DETAILS);
-        */
+        }).setParams(params).execute(LppQuery.GET_NEXT_STATION_FULL);
+
 
         // Api test
         // getRouteDetails
@@ -85,12 +85,12 @@ public class TestActivity extends AppCompatActivity {
                 }
             }
         });*/
-        Api.liveBusArrivalV2(1934, (apiResponse, statusCode, success) -> {
+        /*Api.liveBusArrivalV2(1934, (apiResponse, statusCode, success) -> {
             if (success) {
                 if (apiResponse.isSuccess()) {
                     log.setText(apiResponse.getData().getRoutes().get(0).getRoute_name());
                 }
             }
-        });
+        });*/
     }
 }

@@ -1,10 +1,13 @@
 package com.VegaSolutions.lpptransit.lppapi;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.VegaSolutions.lpptransit.BuildConfig;
 
 import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
@@ -119,7 +122,7 @@ public class LppQuery extends AsyncTask<String, Void, String> {
 
             try {
                 setParams(paramsMap);
-                Connection.Response r = Jsoup.connect(SERVER_URL + api + params).ignoreContentType(true).timeout(0).execute();
+                Connection.Response r = Jsoup.connect(SERVER_URL + api + params).ignoreContentType(true).timeout(0).execute(); //.header("apikey", BuildConfig.LPP_API_KEY)
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
             } catch (HttpStatusException e) {
                 e.printStackTrace();
