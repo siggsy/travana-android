@@ -2,7 +2,7 @@ package com.VegaSolutions.lpptransit.routing;
 
 import java.util.List;
 
-public class MathingsResponse {
+public class MatchingsResponse {
 
     public String code;
     public List<Route> matchings;

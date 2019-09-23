@@ -12,10 +12,9 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class RouteQuery extends AsyncTask<String, Void, Void> {
@@ -56,7 +55,7 @@ public class RouteQuery extends AsyncTask<String, Void, Void> {
             Connection.Response r = Jsoup.connect(url + coordinatesString + "?geometries=geojson&overview=full&radiuses=" + radiuses).ignoreContentType(true).execute();
             Log.e("RouteQuery", r.body());
             Gson gson = new Gson();
-            MathingsResponse route = gson.fromJson(r.body(), MathingsResponse.class);
+            MatchingsResponse route = gson.fromJson(r.body(), MatchingsResponse.class);
             routeListener.onComplete(route, r.statusCode(), true);
         } catch (HttpStatusException e) {
             e.printStackTrace();
@@ -70,7 +69,7 @@ public class RouteQuery extends AsyncTask<String, Void, Void> {
     }
 
     public interface RouteListener {
-        void onComplete(MathingsResponse routeResponse, int httpStatus, boolean success);
+        void onComplete(MatchingsResponse routeResponse, int httpStatus, boolean success);
     }
 
 }

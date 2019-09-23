@@ -1,5 +1,7 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 public class NextStation {
@@ -46,6 +48,7 @@ public class NextStation {
         return vehicle_int_id;
     }
 
+    public LatLng getLatLng() { return new LatLng(latitude, longitude); }
 
     public static class Connection {
 

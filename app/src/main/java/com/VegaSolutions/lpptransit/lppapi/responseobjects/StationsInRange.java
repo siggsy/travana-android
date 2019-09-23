@@ -1,5 +1,9 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import android.content.pm.LabeledIntent;
+
+import com.google.android.gms.maps.model.LatLng;
+
 public class StationsInRange {
 
     private String id;
@@ -69,6 +73,6 @@ public class StationsInRange {
         return latitude;
     }
 
-
+    public LatLng getLatLng() { return new LatLng(latitude, longitude); }
 
 }

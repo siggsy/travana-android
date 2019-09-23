@@ -1,5 +1,7 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Geometry {
 
     private String type;
@@ -19,5 +21,10 @@ public class Geometry {
     public double[] getCoordinates() {
         return coordinates;
     }
+
+    /**
+     * @return LatLng representing coordinates.
+     */
+    public LatLng getLatLng() { return new LatLng(coordinates[1], coordinates[0]); }
 
 }

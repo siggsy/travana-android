@@ -1,8 +1,10 @@
 package com.VegaSolutions.lpptransit.routing;
 
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Route {
@@ -27,6 +29,7 @@ public class Route {
 
         String type;
         List<double[]> coordinates;
+        List<LatLng> latLngs;
 
         public String getType() {
             return type;
@@ -34,6 +37,15 @@ public class Route {
 
         public List<double[]> getCoordinates() {
             return coordinates;
+        }
+        public List<LatLng> getLatLngList() {
+            if (latLngs == null) {
+                latLngs = new ArrayList<>();
+                for (double[] coordinate : coordinates)
+                    latLngs.add(new LatLng(coordinate[1], coordinate[0]));
+                return latLngs;
+            }
+            return latLngs;
         }
     }
 

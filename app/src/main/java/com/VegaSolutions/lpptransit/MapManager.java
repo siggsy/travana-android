@@ -1,27 +1,25 @@
 package com.VegaSolutions.lpptransit;
 
 import android.app.Activity;
-import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 
-import androidx.annotation.Nullable;
-
-import com.VegaSolutions.lpptransit.animators.RouteAnimation;
+import com.VegaSolutions.lpptransit.animators.MapAnimator;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Geometry;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Routes;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationsOnRoute;
-import com.VegaSolutions.lpptransit.routing.MathingsResponse;
 import com.VegaSolutions.lpptransit.routing.RouteQuery;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.ButtCap;
-import com.google.android.gms.maps.model.CustomCap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -29,11 +27,9 @@ import com.google.android.gms.maps.model.RoundCap;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.LogRecord;
 
 public class MapManager {
 
@@ -51,66 +47,6 @@ public class MapManager {
     private MarkerOptions stationStyle = new MarkerOptions();
     private MarkerOptions busStyle = new MarkerOptions();
 
-    /*private Runnable busUpdater = new Runnable() {
-        @Override
-        public void run() {
-            Api.busLocation(currentRoute.getInt_id(), (apiResponse, statusCode, success) -> {
-                if (success) {
-                    if (apiResponse.isSuccess()) {
-                        // remove all
-                        for (Map.Entry<Marker, Bus> entry : buses.entrySet())
-                            activity.runOnUiThread(() -> entry.getKey().remove());
-                        buses.clear();
-                        for (Bus bus : apiResponse.getData()) {
-                            double lat = bus.getGeometry().getCoordinates()[1];
-                            double lon = bus.getGeometry().getCoordinates()[0];
-                            activity.runOnUiThread(() -> buses.put(map.addMarker(busStyle.position(new LatLng(lat, lon))), bus));
-                            Log.i(bus.getReg_number(), bus.getSpeed() + "");
-                        }
-                    }
-                }
-            });
-            handler.postDelayed(this, 5000);
-        }
-    };*/
-
-
-    // Query a new set of Stations and draw a route
-    private ApiCallback<List<StationsOnRoute>> callback = ((apiResponse, statusCode, success) -> {
-        if (success) {
-            if (apiResponse.isSuccess()) {
-                List<StationsOnRoute> stationsOnRoute = apiResponse.getData();
-                Collections.sort(stationsOnRoute, (stationOnRoute, t1) -> Integer.compare(stationOnRoute.getOrder_no(), t1.getOrder_no()));
-                ArrayList<LatLng> latLngs = new ArrayList<>();
-                for (final StationsOnRoute station : stationsOnRoute) {
-                    final double[] coordinates = station.getGeometry().getCoordinates();
-                    //activity.runOnUiThread(() -> stations.put(map.addMarker(stationStyle.position(new LatLng(coordinates[1], coordinates[0])).title(station.getName())), station));
-                    LatLng latLng = new LatLng(coordinates[1], coordinates[0]);
-                    //activity.runOnUiThread(() -> map.addMarker(stationStyle.title(station.getName()).position(latLng)));
-                    latLngs.add(latLng);
-                }
-                new RouteQuery()
-                        .addCoordinates(latLngs.toArray(new LatLng[0]))
-                        .addListener((routeResponse, httpStatus, success1) -> {
-                            if (success1) {
-                                List<LatLng> route = new ArrayList<>();
-                                for (double[] coordinates : routeResponse.matchings.get(0).getGeometry().getCoordinates()) {
-                                    route.add(new LatLng(coordinates[1], coordinates[0]));
-                                }
-
-                                //activity.runOnUiThread(() -> map.addMarker(stationStyle.position(latLngs.get(latLngs.size() - 1))));
-                                activity.runOnUiThread(() -> map.addPolyline(new PolylineOptions().addAll(route).width(10).startCap(new RoundCap()).endCap(new RoundCap())));
-                            }
-                        })
-                        .execute();
-
-                //activity.runOnUiThread(() -> map.addPolyline(new PolylineOptions().addAll(asList(latLngs)).width(5f)));
-            }
-            else
-                Log.e(TAG, "API server returned success boolean as FALSE!");
-        } else
-            Log.e(TAG, "Connection to API server FAILED!\nStatus Code:" + statusCode);
-    });
 
     public MapManager(Activity activity, GoogleMap map) {
         this.activity = activity;
@@ -123,6 +59,70 @@ public class MapManager {
         handler = new Handler();
     }
 
+    private Runnable busUpdater = new Runnable() {
+        @Override
+        public void run() {
+            Api.busLocation(currentRoute.getInt_id(), (apiResponse, statusCode, success) -> {
+                if (success) {
+                    if (apiResponse.isSuccess()) {
+
+                        // remove all
+                        for (Map.Entry<Marker, Bus> entry : buses.entrySet())
+                            activity.runOnUiThread(() -> entry.getKey().remove());
+                        buses.clear();
+
+                        for (Bus bus : apiResponse.getData())
+                            activity.runOnUiThread(() -> buses.put(map.addMarker(busStyle.position(bus.getGeometry().getLatLng())), bus));
+
+                    }
+                }
+            });
+            handler.postDelayed(this, 5000);
+        }
+    };
+
+    // Query a new set of Stations and draw a route
+    private ApiCallback<List<StationsOnRoute>> callback = ((apiResponse, statusCode, success) -> {
+        if (success) {
+            if (apiResponse.isSuccess()) {
+
+                // sort stations by orderNo
+                List<StationsOnRoute> stationsOnRoute = apiResponse.getData();
+                Collections.sort(stationsOnRoute, (stationOnRoute, t1) -> Integer.compare(stationOnRoute.getOrder_no(), t1.getOrder_no()));
+
+                // Create LatLng station array
+                ArrayList<MapAnimator.StationIcon> stations = new ArrayList<>();
+                ArrayList<LatLng> latLngs = new ArrayList<>();
+                for (final StationsOnRoute station : stationsOnRoute) {
+                    LatLng latLng = station.getGeometry().getLatLng();
+                    latLngs.add(latLng);
+                    stations.add(new MapAnimator.StationIcon(new MarkerOptions().title(station.getName()).position(latLng), BitmapFactory.decodeResource(activity.getResources(), R.drawable.filled_circle), .25f));
+                }
+
+                // Query route and start animation
+                new RouteQuery()
+                        .addCoordinates(latLngs.toArray(new LatLng[0]))
+                        .addListener((routeResponse, httpStatus, success1) -> {
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            for (LatLng latLng : latLngs)
+                                builder.include(latLng);
+                            LatLngBounds bounds = builder.build();
+                            activity.runOnUiThread(() -> map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50)));
+                            List<LatLng> route;
+                            if (success1)
+                                route = routeResponse.matchings.get(0).getGeometry().getLatLngList();
+                            else
+                                route = latLngs;
+                            activity.runOnUiThread(() -> new MapAnimator(map).animateRouteWithStations(stations, new PolylineOptions().addAll(latLngs).startCap(new RoundCap()).endCap(new RoundCap()).width(10), 500, 2000));
+                        })
+                        .execute();
+            }
+            else
+                Log.e(TAG, "API server returned success boolean as FALSE!");
+        } else
+            Log.e(TAG, "Connection to API server FAILED!\nStatus Code:" + statusCode);
+    });
+
     public void setStationStyle(MarkerOptions markerOptions) {
         this.stationStyle = markerOptions;
     }
@@ -133,7 +133,6 @@ public class MapManager {
     public Bus getBus(Marker marker) {
         return buses.get(marker);
     }
-
     public StationsOnRoute getStation(Marker marker) {
         return  stations.get(marker);
     }
