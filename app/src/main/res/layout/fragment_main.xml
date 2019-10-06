@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.bottomfragments.MainFragment">
+
+    <ImageButton
+        android:id="@+id/main_fragment_in_range_btn"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="@string/todo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/circle"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/location_pin_36"
+        android:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/main_fragment_in_range_btn"
+        app:layout_constraintEnd_toEndOf="@+id/main_fragment_in_range_btn"
+        app:layout_constraintStart_toStartOf="@+id/main_fragment_in_range_btn"
+        app:layout_constraintTop_toTopOf="@+id/main_fragment_in_range_btn" />
+
+    <ImageButton
+        android:id="@+id/main_fragment_routes_btn"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="32dp"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="@string/todo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/circle"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/main_fragment_in_range_btn"
+        app:layout_constraintStart_toEndOf="@+id/main_fragment_in_range_btn"
+        app:layout_constraintTop_toTopOf="@+id/main_fragment_in_range_btn" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/ic_directions_bus_black_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/main_fragment_routes_btn"
+        app:layout_constraintEnd_toEndOf="@+id/main_fragment_routes_btn"
+        app:layout_constraintStart_toStartOf="@+id/main_fragment_routes_btn"
+        app:layout_constraintTop_toTopOf="@+id/main_fragment_routes_btn" />
+
+    <ImageButton
+        android:id="@+id/main_fragment_parking_btn"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="32dp"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="@string/todo"
+        android:scaleType="centerCrop"
+        android:src="@drawable/circle"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/main_fragment_routes_btn"
+        app:layout_constraintStart_toEndOf="@+id/main_fragment_routes_btn"
+        app:layout_constraintTop_toTopOf="@+id/main_fragment_routes_btn" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/nearby_stations"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/main_fragment_in_range_btn"
+        app:layout_constraintStart_toStartOf="@+id/main_fragment_in_range_btn"
+        app:layout_constraintTop_toBottomOf="@+id/main_fragment_in_range_btn" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/routes"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/main_fragment_routes_btn"
+        app:layout_constraintStart_toStartOf="@+id/main_fragment_routes_btn"
+        app:layout_constraintTop_toBottomOf="@+id/main_fragment_routes_btn" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/ic_local_parking_black_24dp"
+        android:tint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/main_fragment_parking_btn"
+        app:layout_constraintEnd_toEndOf="@+id/main_fragment_parking_btn"
+        app:layout_constraintStart_toStartOf="@+id/main_fragment_parking_btn"
+        app:layout_constraintTop_toTopOf="@+id/main_fragment_parking_btn" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/parking"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/main_fragment_parking_btn"
+        app:layout_constraintStart_toStartOf="@+id/main_fragment_parking_btn"
+        app:layout_constraintTop_toBottomOf="@+id/main_fragment_parking_btn" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/main_fragment_rv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorPrimary"
+        android:paddingTop="3dp"
+        android:paddingBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,49 +1,39 @@
 package com.VegaSolutions.lpptransit.test;
 
 import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.util.SparseArray;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.TextView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.VegaSolutions.lpptransit.MapManager;
+import com.VegaSolutions.lpptransit.LppApiManager;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.animators.MapAnimator;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.LiveBusArrivalV2;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Routes;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationsInRange;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationsOnRoute;
-import com.VegaSolutions.lpptransit.routing.Route;
-import com.VegaSolutions.lpptransit.routing.RouteQuery;
-import com.VegaSolutions.lpptransit.routing.RouteResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
+import com.VegaSolutions.lpptransit.ui.bottomfragments.MainFragment;
+import com.VegaSolutions.lpptransit.lppapideprecated.responseclasses.Routes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -51,36 +41,66 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-public class MapsTestActivity extends FragmentActivity implements OnMapReadyCallback {
 
+public class MapsTestActivity extends FragmentActivity implements
+        OnMapReadyCallback,
+        MainFragment.OnFragmentInteractionListener,
+        MapAnimator.MapAnimatorListener{
+
+
+    private LatLng currentLocation;
     private GoogleMap mMap;
+
+    boolean couter = false;
+
+    ImageButton back;
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+            //Log.i("locationUpdate", currentLocation.toString());
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
 
     /*SearchView search;
     ListView routeList;
     Button button;*/
 
-    LinearLayout bottom_sheet;
-
     ArrayList<String> routeName = new ArrayList<>();
     Map<String, Routes> routes = new HashMap<>();
     ArrayAdapter<String> arrayAdapter;
 
-    MapManager mapManager;
+    LppApiManager mapManager;
+    MainFragment.OnFragmentInteractionListener listener;
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,68 +112,20 @@ public class MapsTestActivity extends FragmentActivity implements OnMapReadyCall
             mapFragment.getMapAsync(this);
         }
 
-
-
-
-        bottom_sheet = findViewById(R.id.bottom_sheet_ll);
-        //search = findViewById(R.id.routeSearch);
-        //routeList = findViewById(R.id.routeList);
-        //button = findViewById(R.id.button);
-
-        /*routeList.bringToFront();
-        routeList.setOnItemClickListener((adapterView, view, i, l) -> {
-            String item = arrayAdapter.getItem(i);
-            mapManager.setRoute(routes.get(item));
-            runOnUiThread(() -> {
-                routeList.setVisibility(View.GONE);
-                search.clearFocus();
-            });
+        back = findViewById(R.id.maps_test_back_btn);
+        back.setOnClickListener(view -> {
+            switchFragment(MainFragment.newInstance());
+            new MapAnimator(this, mMap).removeMarkers(500);
         });
 
-        arrayAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, routeName);
-        routeList.setAdapter(arrayAdapter);*/
-        /*search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
+    }
 
-            @Override
-            public boolean onQueryTextChange(String s) {
-                arrayAdapter.getFilter().filter(s);
-                return true;
-            }
-        });
-        search.setOnSearchClickListener(view -> Api.getRoutes((apiResponse, statusCode, success) -> {
-            if (success) {
-                runOnUiThread(() -> {
-                    routeList.bringToFront();
-                    routeList.setVisibility(View.VISIBLE);
-                });
-                runOnUiThread(() -> arrayAdapter.clear());
-                routes = new HashMap<>();
-                for (Routes route : apiResponse.getData()) {
-                    String name = route.getGroup_name() + " " + route.getParent_name();
-                    runOnUiThread(() -> arrayAdapter.add(name));
-                    routes.put(name, route);
-                }
-            }
-        }));
-        search.setOnCloseListener(() -> {
-            runOnUiThread(() -> routeList.setVisibility(View.GONE));
-            return false;
-        });
-        search.setOnQueryTextFocusChangeListener((view, b) -> {
-            if (!b) {
-                runOnUiThread(() -> routeList.setVisibility(View.GONE));
-            } else {
-                runOnUiThread(() -> {
-                    routeList.bringToFront();
-                    routeList.setVisibility(View.VISIBLE);
-                });
-            }
-        });*/
+    private void switchFragment(Fragment fragment) {
 
+        FragmentManager manager = this.getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = manager.beginTransaction();
+        fragmentTransaction.replace(R.id.bottom_sheet_fragment, fragment);
+        fragmentTransaction.commit();
 
     }
 
@@ -170,8 +142,6 @@ public class MapsTestActivity extends FragmentActivity implements OnMapReadyCall
                     permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 mMap.setMyLocationEnabled(true);
-            } else {
-                // Permission was denied. Display an error message.
             }
         }
     }
@@ -183,82 +153,26 @@ public class MapsTestActivity extends FragmentActivity implements OnMapReadyCall
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
+            LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener);
+
+            switchFragment(MainFragment.newInstance());
         } else {
-            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 100);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+            }
         }
 
-        mMap.setOnMyLocationClickListener(location -> {
-            LatLng position = new LatLng(location.getLatitude(), location.getLongitude());//new LatLng(46.051753, 14.503238);
-            Api.stationsInRange(500, position.latitude, position.longitude, (apiResponse, statusCode, success) -> {
-                if (success) {
-                    runOnUiThread(() -> {
-                        mMap.clear();
-                        bottom_sheet.removeAllViews();
-                    });
-                    List<StationsInRange> stationsInRange = apiResponse.getData();
-                    List<MapAnimator.StationIcon> stationIcons = new ArrayList<>();
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    for (StationsInRange station : stationsInRange) {
-                        LatLng latLng = station.getGeometry().getLatLng();
-                        builder.include(latLng);
-                        if (station.getName() != null && !station.getName().equals("")) {
-                            stationIcons.add(new MapAnimator.StationIcon(new MarkerOptions().position(latLng).title(station.getName()), BitmapFactory.decodeResource(getResources(), R.drawable.filled_circle), .25f));
-                            runOnUiThread(() -> {
-                                View v = getLayoutInflater().inflate(R.layout.station_in_range, bottom_sheet, false);
-                                TextView name = v.findViewById(R.id.station_in_range_name_tv);
-                                TextView distance = v.findViewById(R.id.station_in_range_range_tv);
-                                distance.setText(Math.round(CalculationByDistance(position, latLng)* 100)  + " m");
-                                name.setText(station.getName());
-                                final LinearLayout ll = v.findViewById(R.id.station_in_range_ll);
-                                Api.liveBusArrivalV2(station.getInt_id(), (apiResponse1, statusCode1, success1) -> {
-                                    runOnUiThread(() -> {
-
-                                        LiveBusArrivalV2 arrivalV2 = apiResponse1.getData();
-
-                                        for(LiveBusArrivalV2.Route route : arrivalV2.getRoutes()) {
-                                            String routeNumber = route.getRoute_group_number();
-
-                                            for (LiveBusArrivalV2.Arrival arrival : route.getArrivals()) {
-                                                View view = getLayoutInflater().inflate(R.layout.adapter_live_arrivals, ll, false);
-                                                TextView number = view.findViewById(R.id.live_arrival_number);
-                                                TextView nameGroup = view.findViewById(R.id.live_arrival_name);
-                                                TextView minutes = view.findViewById(R.id.live_arrival_minutes);
-
-                                                number.setText(routeNumber);
-                                                nameGroup.setText(arrival.getRoute_specific_name());
-                                                minutes.setText(arrival.getEta() + " min");
-
-                                                ll.addView(view);
-
-                                            }
-                                        }
-
-
-                                    });
-                                });
-
-
-                                bottom_sheet.addView(v);
-                            });
-                        }
-                    }
-                    if (stationsInRange.size() > 0) {
-                        LatLngBounds bounds = builder.build();
-                        runOnUiThread(() -> {
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
-                            new MapAnimator(mMap).animateStations(stationIcons, 500);
-
-                        });
-                    }
-
-
-                }
-            });
+        List<LatLng> latLngs = new ArrayList<>();
+        Api.stationsOnRoute(getIntent().getStringExtra("trip_id"), (apiResponse, statusCode, success) -> {
+            for (StationOnRoute stationOnRoute : apiResponse.getData()) {
+                latLngs.add(new LatLng(stationOnRoute.getLatitude(), stationOnRoute.getLongitude()));
+            }
+            runOnUiThread(() -> mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(5f)));
         });
-
-        mapManager = new MapManager(this, mMap);
-        mapManager.setStationStyle(new MarkerOptions().anchor(0.5f, 0.5f).icon(bitmapDescriptorFromDrawable(R.drawable.circle, 20)));
-        mapManager.setBusStyle(new MarkerOptions().anchor(0.5f, 0.5f).icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_navigation_black_24dp)).zIndex(1f));
+        //mMap.setOnMyLocationChangeListener(location -> currentLocation = new LatLng(location.getLatitude(), location.getLongitude()));
+        mapManager = new LppApiManager(this, mMap);
 
 
 
@@ -266,19 +180,22 @@ public class MapsTestActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 
-    /**
-     * Convert SparseArray to List
-     * @param sparseArray array to be converted
-     * @param <C> type of the array
-     * @return List representing sparse array
-     */
-    public <C> List<C> asList(SparseArray<C> sparseArray) {
-        if (sparseArray == null) return null;
-        List<C> arrayList = new ArrayList<C>(sparseArray.size());
-        for (int i = 0; i < sparseArray.size(); i++)
-            arrayList.add(sparseArray.valueAt(i));
-        return arrayList;
+    @Override
+    public void onFragmentInteraction(int uri) {
+        if (uri == MainFragment.NEARBY_BUTTON) {
+            if (currentLocation != null) {
+            }
+            else
+                Toast.makeText(this, "Location error!", Toast.LENGTH_SHORT).show();
+        }
     }
+
+    @Override
+    public void onRemoveAnimationFinished(Marker marker) {
+        runOnUiThread(marker::remove);
+    }
+
+
 
     /**
      * Class with sole purpose for testing
@@ -352,8 +269,8 @@ public class MapsTestActivity extends FragmentActivity implements OnMapReadyCall
 
     }
 
-    public double CalculationByDistance(LatLng StartP, LatLng EndP) {
-        int Radius = 6371;// radius of earth in Km
+    public static double CalculationByDistance(LatLng StartP, LatLng EndP) {
+        int Radius = 6371;
         double lat1 = StartP.latitude;
         double lat2 = EndP.latitude;
         double lon1 = StartP.longitude;

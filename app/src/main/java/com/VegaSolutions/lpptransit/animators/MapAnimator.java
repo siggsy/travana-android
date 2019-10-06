@@ -2,35 +2,17 @@ package com.VegaSolutions.lpptransit.animators;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
-import android.animation.Keyframe;
-import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnticipateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
-
-import com.VegaSolutions.lpptransit.R;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.Projection;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -38,27 +20,45 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MapAnimator {
+
+    public static final MarkerOptions DEFAULT_OPTIONS = new MarkerOptions().anchor(0.5f, 0.5f).visible(false);
 
     private GoogleMap map;
 
     private List<AnimatorSet> runningAnimations = new ArrayList<>();
+    private List<StationIcon> markers = new ArrayList<>();
 
-    public MapAnimator(GoogleMap map) {
+    private MapAnimatorListener listener;
+
+    public MapAnimator(Activity activity, GoogleMap map) {
+        listener = (MapAnimatorListener) activity;
         this.map = map;
     }
 
 
-    public void animateStations(List<StationIcon> stations, int duration) {
+    public AnimatorSet animateStations(List<StationIcon> stations, int duration) {
 
-        cancelAllAnimations();
+        //cancelAllAnimations();
+
+        AnimatorSet removeSet = removeAll();
+        removeSet.setDuration(duration);
 
         AnimatorSet stationSet = setupStationAnimatorSet(stations);
         stationSet.setDuration(duration);
-        stationSet.start();
-        runningAnimations.add(stationSet);
+        AnimatorSet together = new AnimatorSet();
+        together.playTogether(removeSet, stationSet);
+        together.start();
+        markers = stations;
+        runningAnimations.add(together);
+        return together;
+    }
+
+    public void removeMarkers(int duration) {
+
+        removeAll().setDuration(duration).start();
+        //runningAnimations.add(removeSet);
 
     }
     public void animateRouteWithStations(List<StationIcon> stations, PolylineOptions routeOptions, int durationStation, int durationRoute) {
@@ -75,9 +75,68 @@ public class MapAnimator {
 
     }
 
+    private AnimatorSet removeAll () {
+
+        List<ValueAnimator> animators = new ArrayList<>();
+
+        Interpolator interpolator = new AccelerateInterpolator();
+        for (int i = 0, markersSize = markers.size(); i < markersSize; i++) {
+            StationIcon stationIcon = markers.get(i);
+
+            // Set marker on map
+            Marker marker = stationIcon.marker;
+
+            // Get bitmap
+            Bitmap bitmap = stationIcon.bitmap;
+            int width = (int) (bitmap.getWidth() * stationIcon.scale);
+            int height = (int) (bitmap.getHeight() * stationIcon.scale);
+
+            ValueAnimator animator = ValueAnimator.ofFloat(1f, 0.1f);
+            animator.setInterpolator(new AnticipateInterpolator());
+            long time = (long) (1500 * interpolator.getInterpolation(((float) i / (float) markersSize)));
+            animator.setStartDelay(time);
+
+            // Update scale
+            animator.addUpdateListener(valueAnimator -> {
+                float scale = (float) valueAnimator.getAnimatedValue();
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitmap, (int) (width * scale), (int) (height * scale), false)));
+                marker.setVisible(true);
+            });
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    listener.onRemoveAnimationFinished(marker);
+                    markers.remove(marker);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+            animators.add(animator);
+        }
+        AnimatorSet stationSet = new AnimatorSet();
+        if (animators.size() > 0)
+            stationSet.playTogether(animators.toArray(new Animator[0]));
+
+        return stationSet;
+
+    }
+
     private void cancelAllAnimations() {
         for (AnimatorSet animatorSet : runningAnimations) {
-            animatorSet.end();
+            animatorSet.start();
             animatorSet.cancel();
         }
         runningAnimations = new ArrayList<>();
@@ -93,7 +152,7 @@ public class MapAnimator {
             StationIcon stationIcon = stationIcons.get(i);
 
             // Set marker on map
-            Marker marker = map.addMarker(stationIcon.options.anchor(0.5f, 0.5f).visible(false));
+            Marker marker = stationIcon.marker;
 
             // Get bitmap
             Bitmap bitmap = stationIcon.bitmap;
@@ -114,9 +173,10 @@ public class MapAnimator {
             animators.add(animator);
         }
 
+
         AnimatorSet stationSet = new AnimatorSet();
-        stationSet.setInterpolator(new OvershootInterpolator());
-        stationSet.playTogether(animators.toArray(new Animator[0]));
+        if (stationIcons.size() > 0)
+            stationSet.playTogether(animators.toArray(new Animator[0]));
 
         return stationSet;
     }
@@ -135,19 +195,23 @@ public class MapAnimator {
     public static class StationIcon {
 
         public Bitmap bitmap;
-        public MarkerOptions options;
+        public Marker marker;
         public float scale;
 
-        public StationIcon(MarkerOptions options, Bitmap bitmap) {
-            this(options, bitmap, 1);
+        public StationIcon(Marker marker, Bitmap bitmap) {
+            this(marker, bitmap, 1);
         }
 
-        public StationIcon(MarkerOptions options, Bitmap bitmap, float scale) {
+        public StationIcon(Marker options, Bitmap bitmap, float scale) {
             this.bitmap = bitmap;
-            this.options = options;
+            this.marker = options;
             this.scale = scale;
         }
 
+    }
+
+    public interface MapAnimatorListener {
+        void onRemoveAnimationFinished(Marker marker);
     }
 
 }

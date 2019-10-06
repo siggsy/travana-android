@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.lppapi.responseobjects;
+package com.VegaSolutions.lpptransit.lppapideprecated.responseclasses;
 
 public class StationsOnRoute {
 
@@ -92,4 +92,5 @@ public class StationsOnRoute {
     public String getRoute_id() {
         return route_id;
     }
+
 }

@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.lppapi.responseobjects;
+package com.VegaSolutions.lpptransit.lppapideprecated.responseclasses;
 
 public class RouteDetails {
 

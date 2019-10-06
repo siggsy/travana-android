@@ -1,6 +1,5 @@
 package com.VegaSolutions.lpptransit.test;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -8,15 +7,9 @@ import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.LppQuery;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.LiveBusArrival;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.LiveBusArrivalV2;
+import com.VegaSolutions.lpptransit.lppapideprecated.LppQuery;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TestActivity extends AppCompatActivity {

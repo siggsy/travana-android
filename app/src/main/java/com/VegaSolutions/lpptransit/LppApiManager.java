@@ -1,27 +1,23 @@
 package com.VegaSolutions.lpptransit;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.VegaSolutions.lpptransit.animators.MapAnimator;
-import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Routes;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationsOnRoute;
+import com.VegaSolutions.lpptransit.lppapideprecated.Api;
+import com.VegaSolutions.lpptransit.lppapideprecated.ApiCallback;
+import com.VegaSolutions.lpptransit.lppapideprecated.responseclasses.Bus;
+import com.VegaSolutions.lpptransit.lppapideprecated.responseclasses.Routes;
+import com.VegaSolutions.lpptransit.lppapideprecated.responseclasses.StationsOnRoute;
 import com.VegaSolutions.lpptransit.routing.RouteQuery;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.RoundCap;
 
@@ -31,9 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapManager {
+public class LppApiManager {
 
-    private static final String TAG = MapManager.class.getName();
+    private static final String TAG = LppApiManager.class.getName();
 
     private GoogleMap map;
     private Activity activity;
@@ -44,11 +40,10 @@ public class MapManager {
     private Map<Marker, Bus> buses = new HashMap<>();
     private Map<Marker, StationsOnRoute> stations = new HashMap<>();
 
-    private MarkerOptions stationStyle = new MarkerOptions();
-    private MarkerOptions busStyle = new MarkerOptions();
+    BusListener busListener;
 
 
-    public MapManager(Activity activity, GoogleMap map) {
+    public LppApiManager(Activity activity, GoogleMap map) {
         this.activity = activity;
         this.map = map;
         map.setOnMarkerClickListener(marker -> {
@@ -72,7 +67,8 @@ public class MapManager {
                         buses.clear();
 
                         for (Bus bus : apiResponse.getData())
-                            activity.runOnUiThread(() -> buses.put(map.addMarker(busStyle.position(bus.getGeometry().getLatLng())), bus));
+                            busListener.onBusUpdate(bus);
+                            //activity.runOnUiThread(() -> buses.put(map.addMarker(busStyle.position(bus.getGeometry().getLatLng())), bus));
 
                     }
                 }
@@ -96,7 +92,7 @@ public class MapManager {
                 for (final StationsOnRoute station : stationsOnRoute) {
                     LatLng latLng = station.getGeometry().getLatLng();
                     latLngs.add(latLng);
-                    stations.add(new MapAnimator.StationIcon(new MarkerOptions().title(station.getName()).position(latLng), BitmapFactory.decodeResource(activity.getResources(), R.drawable.filled_circle), .25f));
+                    activity.runOnUiThread(() -> stations.add(new MapAnimator.StationIcon(map.addMarker(MapAnimator.DEFAULT_OPTIONS.title(station.getName()).position(latLng)), BitmapFactory.decodeResource(activity.getResources(), R.drawable.filled_circle), .25f)));
                 }
 
                 // Query route and start animation
@@ -113,7 +109,7 @@ public class MapManager {
                                 route = routeResponse.matchings.get(0).getGeometry().getLatLngList();
                             else
                                 route = latLngs;
-                            activity.runOnUiThread(() -> new MapAnimator(map).animateRouteWithStations(stations, new PolylineOptions().addAll(latLngs).startCap(new RoundCap()).endCap(new RoundCap()).width(10), 500, 2000));
+                            activity.runOnUiThread(() -> new MapAnimator(activity, map).animateRouteWithStations(stations, new PolylineOptions().addAll(latLngs).startCap(new RoundCap()).endCap(new RoundCap()).width(10), 500, 2000));
                         })
                         .execute();
             }
@@ -122,13 +118,6 @@ public class MapManager {
         } else
             Log.e(TAG, "Connection to API server FAILED!\nStatus Code:" + statusCode);
     });
-
-    public void setStationStyle(MarkerOptions markerOptions) {
-        this.stationStyle = markerOptions;
-    }
-    public void setBusStyle(MarkerOptions markerOptions) {
-        this.busStyle = markerOptions;
-    }
 
     public Bus getBus(Marker marker) {
         return buses.get(marker);
@@ -154,6 +143,11 @@ public class MapManager {
 
         //handler.post(busUpdater);
 
+    }
+
+
+    public interface BusListener {
+        void onBusUpdate(Bus bus);
     }
 
     /**

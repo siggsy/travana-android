@@ -1,8 +1,7 @@
-package com.VegaSolutions.lpptransit.lppapi.responseobjects;
-
-import android.content.pm.LabeledIntent;
+package com.VegaSolutions.lpptransit.lppapideprecated.responseclasses;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.GsonBuilder;
 
 public class StationsInRange {
 
@@ -74,5 +73,11 @@ public class StationsInRange {
     }
 
     public LatLng getLatLng() { return new LatLng(latitude, longitude); }
+
+    @Override
+    public String toString() {
+        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+        return builder.create().toJson(this);
+    }
 
 }

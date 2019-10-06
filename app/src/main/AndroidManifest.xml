@@ -9,6 +9,7 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -32,6 +33,15 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:name=".ui.activities.MainActivity"
+            android:label="@string/title_activity_main">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter></activity>
+        <activity android:name=".test.LiveArrival" />
+        <activity
             android:name=".test.MapsTestActivity"
             android:label="@string/title_activity_maps">
             <intent-filter>
@@ -40,8 +50,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".test.TestActivity">
-        </activity>
+        <activity android:name=".test.TestActivity" />
     </application>
 
 </manifest>

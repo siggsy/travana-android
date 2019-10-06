@@ -2,61 +2,72 @@ package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
 public class Bus {
 
-    private int int_id;
-    private String reg_number;
-    private int driver_int_id;
-    private Geometry geometry;
-    private int station_int_id;
-    private int route_int_id;
-    private String utc_timestamp;
-    private String local_timestamp;
-    private int direction;
-    private String unix_timestamp;
-    private int speed;
+    private String bus_unit_id;
+    private String name;
+    private String vin;
+    private String timestamp;
 
+    private double coordinate_x;
+    private double coordinate_y;
+    private double coordinate_z;
 
-    public int getInt_id() {
-        return int_id;
+    private float cardinal_direction;
+    private float ground_speed;
+    private boolean ignition_value;
+    private boolean engine_value;
+
+    private String driver_id;
+    private int odo;
+
+    public String getBus_unit_id() {
+        return bus_unit_id;
     }
 
-    public String getReg_number() {
-        return reg_number;
+    public String getName() {
+        return name;
     }
 
-    public int getDriver_int_id() {
-        return driver_int_id;
+    public String getVin() {
+        return vin;
     }
 
-    public Geometry getGeometry() {
-        return geometry;
+    public String getTimestamp() {
+        return timestamp;
     }
 
-    public int getStation_int_id() {
-        return station_int_id;
+    public double getCoordinate_x() {
+        return coordinate_x;
     }
 
-    public int getRoute_int_id() {
-        return route_int_id;
+    public double getCoordinate_y() {
+        return coordinate_y;
     }
 
-    public String getUtc_timestamp() {
-        return utc_timestamp;
+    public double getCoordinate_z() {
+        return coordinate_z;
     }
 
-    public String getLocal_timestamp() {
-        return local_timestamp;
+    public float getCardinal_direction() {
+        return cardinal_direction;
     }
 
-    public int getDirection() {
-        return direction;
+    public float getGround_speed() {
+        return ground_speed;
     }
 
-    public String getUnix_timestamp() {
-        return unix_timestamp;
+    public boolean isIgnition_value() {
+        return ignition_value;
     }
 
-    public int getSpeed() {
-        return speed;
+    public boolean isEngine_value() {
+        return engine_value;
     }
 
+    public String getDriver_id() {
+        return driver_id;
+    }
+
+    public int getOdo() {
+        return odo;
+    }
 }
