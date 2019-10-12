@@ -1,5 +1,7 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 public class Station {
@@ -34,4 +36,6 @@ public class Station {
     public List<String> getRoute_groups_on_station() {
         return route_groups_on_station;
     }
+
+    public LatLng getLatLng() { return new LatLng(latitude, longitude); }
 }

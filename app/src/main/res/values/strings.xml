@@ -10,4 +10,5 @@
     <string name="title_activity_main">Map</string>
     <string name="parking">Parking</string>
     <string name="todo">TODO</string>
+    <string name="into_center">CENTER</string>
 </resources>
