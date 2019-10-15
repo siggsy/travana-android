@@ -53,6 +53,7 @@
             android:textStyle="bold"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@id/station_nearby_ll"
+            app:layout_constraintEnd_toStartOf="@+id/station_nearby_favourite"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,6 +75,19 @@
             app:layout_constraintBottom_toBottomOf="@+id/station_nearby_name"
             app:layout_constraintEnd_toStartOf="@+id/station_nearby_distance"
             app:layout_constraintTop_toTopOf="@+id/station_nearby_name" />
+
+        <ImageView
+            android:id="@+id/station_nearby_favourite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            android:elevation="2dp"
+            android:tint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@+id/station_nearby_name"
+            app:layout_constraintEnd_toStartOf="@+id/station_nearby_center"
+            app:layout_constraintTop_toTopOf="@+id/station_nearby_name"
+            app:srcCompat="@drawable/ic_favorite_black_24dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

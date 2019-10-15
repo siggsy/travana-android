@@ -65,8 +65,9 @@
                 android:text="@string/into_center"
                 android:textColor="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
-                app:layout_constraintEnd_toStartOf="@+id/station_opposite_btn"
-                app:layout_constraintTop_toTopOf="@+id/station_opposite_btn" />
+                app:layout_constraintEnd_toStartOf="@+id/station_favourite"
+                app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
+                app:layout_constraintVertical_bias="0.6" />
 
             <ImageButton
                 android:id="@+id/station_opposite_btn"
@@ -78,6 +79,21 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_swap_vertical_circle_black_24dp" />
+
+            <ImageView
+                android:id="@+id/station_favourite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:tint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
+                app:layout_constraintEnd_toStartOf="@+id/station_opposite_btn"
+                app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
+                app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 

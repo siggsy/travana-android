@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.animation.LayoutTransition;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -24,10 +25,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
@@ -35,32 +38,25 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class TestActivity extends AppCompatActivity {
 
     Adapter adapter;
     Location location = null;
     String filter = "";
+    boolean fav = true;
 
     LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(final Location location) {
             TestActivity.this.location = location;
-            Collections.sort(adapter.stationsCopy, (o1, o2) -> {
-                double d1 = calculationByDistance(o1.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
-                double d2 = calculationByDistance(o2.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
-                return Double.compare(d1, d2);
-            });
-
-            runOnUiThread(() -> {
-                adapter.setStations(adapter.stationsCopy);
-                adapter.filter(filter);
-            });
         }
 
         @Override
@@ -88,6 +84,41 @@ public class TestActivity extends AppCompatActivity {
         RecyclerView rv = findViewById(R.id.test_rv);
         FrameLayout header = findViewById(R.id.header);
         TextSwitcher switcher = findViewById(R.id.station_title);
+        FloatingActionButton fab = findViewById(R.id.sort_by_location);
+
+        fab.setOnClickListener(view -> {
+            switcher.setText("Postaje");
+            if (fav) {
+                if (location != null) {
+                    Collections.sort(adapter.stationsCopy, (o1, o2) -> {
+                        double d1 = calculationByDistance(o1.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
+                        double d2 = calculationByDistance(o2.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
+                        return Double.compare(d1, d2);
+                    });
+                    runOnUiThread(() -> {
+                        adapter.setStations(adapter.stationsCopy);
+                        adapter.filter(filter);
+                    });
+                    fav = false;
+                } else
+                    Toast.makeText(this, "Lokacija se ni znana", Toast.LENGTH_SHORT).show();
+            } else {
+                fav = true;
+                SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
+                Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
+                ArrayList<StationWrapper> stationWrappers = new ArrayList<>();
+                ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
+                for (StationWrapper station : adapter.stationsCopy) {
+                    if (station.favourite) stationWrappersFav.add(station);
+                    else stationWrappers.add(station);
+                }
+                stationWrappersFav.addAll(stationWrappers);
+                runOnUiThread(() -> {
+                    adapter.setStations(stationWrappersFav);
+                    adapter.filter(filter);
+                });
+            }
+        });
 
 
         switcher.setFactory(() -> {
@@ -134,22 +165,37 @@ public class TestActivity extends AppCompatActivity {
         rv.setLayoutManager(linearLayoutManager);
         rv.setAdapter(adapter);
         rv.setNestedScrollingEnabled(false);
+        rv.setHasFixedSize(true);
+        rv.setItemViewCacheSize(20);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             rv.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
                 header.setSelected(rv.canScrollVertically(-1));
                 int i = linearLayoutManager.findFirstVisibleItemPosition();
+
                 if (i > 0) {
-                    Station station = adapter.stations.get(i);
-                    if (location != null) {
+                    if (!fav) {
+                        StationWrapper station = adapter.stations.get(i);
+                        if (location != null) {
+                            TextView tv = (TextView) switcher.getCurrentView();
+                            if (station.distance > 500) {
+                                if (tv.getText().equals("Postaje v bližini"))
+                                    switcher.setText("Postaje");
+                            } else {
+                                if (tv.getText().equals("Postaje"))
+                                    switcher.setText("Postaje v bližini");
+                            }
+                        }
+                    } else {
+                        StationWrapper station = adapter.stations.get(i);
                         TextView tv = (TextView) switcher.getCurrentView();
-                        if (calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000 > 500) {
-                            if (tv.getText().equals("Postaje v bližini"))
-                                switcher.setText("Postaje");
-                        } else {
+                        if (station.favourite) {
                             if (tv.getText().equals("Postaje"))
-                                switcher.setText("Postaje v bližini");
+                                switcher.setText("Priljibljene postaje");
+                        } else {
+                            if (tv.getText().equals("Priljibljene postaje"))
+                                switcher.setText("Postaje");
                         }
                     }
                 }
@@ -160,7 +206,21 @@ public class TestActivity extends AppCompatActivity {
         Api.stationDetails(true, (apiResponse, statusCode, success) -> {
             if (success) {
                 if (apiResponse.isSuccess()) {
-                    runOnUiThread(() -> adapter.setStations(apiResponse.getData()));
+                    SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
+                    Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
+                    ArrayList<StationWrapper> stationWrappers = new ArrayList<>();
+                    ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
+                    for (Station station : apiResponse.getData()) {
+                        Boolean f = favourites.get(station.getRef_id());
+                        if (f == null)
+                            f = false;
+                        if (f)
+                            stationWrappersFav.add(new StationWrapper(station, true));
+                        else
+                            stationWrappers.add(new StationWrapper(station, false));
+                    }
+                    stationWrappersFav.addAll(stationWrappers);
+                    runOnUiThread(() -> adapter.setStations(stationWrappersFav));
                 }
             }
         });
@@ -183,6 +243,20 @@ public class TestActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
+        Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
+        for (StationWrapper stationWrapper : adapter.stationsCopy) {
+            Boolean f = favourites.get(stationWrapper.station.getRef_id());
+            if (f == null)
+                f = false;
+            stationWrapper.favourite = f;
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
@@ -196,15 +270,15 @@ public class TestActivity extends AppCompatActivity {
 
     private class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        List<Station> stations;
-        List<Station> stationsCopy;
+        List<StationWrapper> stations;
+        List<StationWrapper> stationsCopy;
 
         public Adapter() {
             stations = new ArrayList<>();
             stationsCopy = new ArrayList<>();
         }
 
-        private void setStations(List<Station> stations) {
+        private void setStations(List<StationWrapper> stations) {
             this.stations = stations;
             this.stationsCopy = new ArrayList<>(stations);
             notifyDataSetChanged();
@@ -219,39 +293,43 @@ public class TestActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-            Station station = stations.get(position);
+            StationWrapper station = stations.get(position);
             ViewHolder viewHolder = (ViewHolder) holder;
 
             String distance;
-            if (location != null)
-                distance = Math.round(calculationByDistance(station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude())) * 1000) + " m";
+            if (location != null) {
+                if (station.distance == -1)
+                    station.distance = (int) Math.round(calculationByDistance(station.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude())) * 1000);
+                distance = station.distance + " m";
+            }
             else
                 distance = "?";
 
-            viewHolder.name.setText(station.getName());
+            viewHolder.name.setText(station.station.getName());
             viewHolder.distance.setText(distance);
             viewHolder.routes.removeAllViews();
-            for (String route : station.getRoute_groups_on_station()) {
+            for (String route : station.station.getRoute_groups_on_station()) {
 
                 String group = route.replaceAll("[^0-9]", "");
                 int color = Integer.valueOf(group);
                 View v = getLayoutInflater().inflate(R.layout.template_route_number, viewHolder.routes, false);
                 ((TextView) v.findViewById(R.id.route_station_number)).setText(route);
                 viewHolder.routes.addView(v);
-                ((ConstraintLayout)v.findViewById(R.id.route_station_circle)).getBackground().setColorFilter(new PorterDuffColorFilter(Colors.colors.get(color), PorterDuff.Mode.SRC_ATOP));
+                v.findViewById(R.id.route_station_circle).getBackground().setColorFilter(new PorterDuffColorFilter(Colors.colors.get(color), PorterDuff.Mode.SRC_ATOP));
             }
 
-            viewHolder.center.setVisibility(Integer.valueOf(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
+            viewHolder.center.setVisibility(Integer.valueOf(station.station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
 
             viewHolder.card.setOnClickListener(v -> {
-
                 Intent intent = new Intent(TestActivity.this, StationActivity.class);
-                intent.putExtra("station_code", station.getRef_id());
-                intent.putExtra("station_name", station.getName());
+                intent.putExtra("station_code", station.station.getRef_id());
+                intent.putExtra("station_name", station.station.getName());
                 intent.putExtra("station_distance", distance);
-                intent.putExtra("station_center", Integer.valueOf(station.getRef_id()) % 2 != 0);
+                intent.putExtra("station_center", Integer.valueOf(station.station.getRef_id()) % 2 != 0);
                 startActivity(intent);
             });
+
+            viewHolder.fav.setVisibility(station.favourite? View.VISIBLE : View.GONE);
 
 
         }
@@ -267,10 +345,11 @@ public class TestActivity extends AppCompatActivity {
                 stations.addAll(stationsCopy);
             } else{
                 text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
-                for(Station item: stationsCopy){
+                for(StationWrapper itemWr: stationsCopy){
+                    Station item = itemWr.station;
                     String itemName = item.getName().toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
                     if (itemName.contains(text))
-                        stations.add(item);
+                        stations.add(itemWr);
                 }
             }
             notifyDataSetChanged();
@@ -281,6 +360,7 @@ public class TestActivity extends AppCompatActivity {
 
             TextView name, distance, center;
             FlexboxLayout routes;
+            ImageView fav;
 
             LinearLayout card;
 
@@ -292,9 +372,24 @@ public class TestActivity extends AppCompatActivity {
                 routes = itemView.findViewById(R.id.station_nearby_ll);
                 card = itemView.findViewById(R.id.station_nearby_card);
                 center = itemView.findViewById(R.id.station_nearby_center);
+                fav = itemView.findViewById(R.id.station_nearby_favourite);
 
             }
         }
+    }
+
+    private class StationWrapper {
+
+        int distance;
+        boolean favourite;
+        Station station;
+
+        private StationWrapper(Station station, boolean favourite) {
+            distance = -1;
+            this.favourite = favourite;
+            this.station = station;
+        }
+
     }
 
     public static double calculationByDistance(LatLng StartP, LatLng EndP) {

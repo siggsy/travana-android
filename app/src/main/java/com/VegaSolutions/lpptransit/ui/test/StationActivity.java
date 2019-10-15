@@ -1,7 +1,6 @@
 package com.VegaSolutions.lpptransit.ui.test;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
@@ -9,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -42,10 +42,13 @@ public class StationActivity extends AppCompatActivity {
     FloatingActionButton fab;
     RecyclerView recyclerView;
     ImageButton oppositeBtn;
+    ImageView fav;
 
     String station_code;
     String station_name;
     boolean station_center;
+
+    boolean favourite;
 
     Adapter adapter;
 
@@ -67,13 +70,14 @@ public class StationActivity extends AppCompatActivity {
         station_code = getIntent().getStringExtra("station_code");
         station_name = getIntent().getStringExtra("station_name");
         station_center = getIntent().getBooleanExtra("station_center", false);
+        favourite = getSharedPreferences("station_favourites", MODE_PRIVATE).getBoolean(station_code, false);
 
         setupUI();
 
         // TODO: handle errors
         Api.arrival(station_code, (apiResponse, statusCode, success) -> {
             if (success) {
-                if (apiResponse.isSuccess()) {
+                if (apiResponse != null) {
                     ArrivalWrapper arrivalWrapper = apiResponse.getData();
                     runOnUiThread(() -> adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals())));
                 }
@@ -144,7 +148,6 @@ public class StationActivity extends AppCompatActivity {
                     default: arrival_event.setVisibility(View.GONE);
                 }
 
-
                 viewHolder.arrivals.addView(v);
             }
 
@@ -214,6 +217,17 @@ public class StationActivity extends AppCompatActivity {
         // Set header
         name.setText(station_name);
         center.setVisibility(station_center ? View.VISIBLE : View.GONE);
+        fav = findViewById(R.id.station_favourite);
+
+        fav.setImageDrawable(getDrawable(favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
+        fav.setOnClickListener(v1 -> {
+            SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(station_code, !favourite);
+            favourite = !favourite;
+            fav.setImageDrawable(getResources().getDrawable(favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
+            editor.apply();
+        });
 
         // Set opposite station button listener
         oppositeBtn.setOnClickListener(view -> {
