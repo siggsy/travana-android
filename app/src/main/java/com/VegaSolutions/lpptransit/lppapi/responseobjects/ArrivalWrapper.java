@@ -84,6 +84,10 @@ public class ArrivalWrapper {
             return depot;
         }
 
+        public Stations getStations() {
+            return stations;
+        }
+
         public class Stations {
             private String departure;
             private String arrival;

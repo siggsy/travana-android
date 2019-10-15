@@ -2,42 +2,160 @@ package com.VegaSolutions.lpptransit.ui.test;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.animation.LayoutTransition;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.Colors;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TestActivity extends AppCompatActivity {
 
-    List<Integer> colors;
+    Adapter adapter;
+    Location location = null;
+    String filter = "";
+
+    LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            TestActivity.this.location = location;
+            Collections.sort(adapter.stationsCopy, (o1, o2) -> {
+                double d1 = calculationByDistance(o1.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
+                double d2 = calculationByDistance(o2.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
+                return Double.compare(d1, d2);
+            });
+
+            runOnUiThread(() -> {
+                adapter.setStations(adapter.stationsCopy);
+                adapter.filter(filter);
+            });
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
-        Adapter adapter = new Adapter();
+        adapter = new Adapter();
 
         RecyclerView rv = findViewById(R.id.test_rv);
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        FrameLayout header = findViewById(R.id.header);
+        TextSwitcher switcher = findViewById(R.id.station_title);
+
+
+        switcher.setFactory(() -> {
+            TextView textView = new TextView(getApplicationContext());
+            textView.setTextAppearance(this, R.style.robotoBoldTitle);
+            return textView;
+        });
+        switcher.setCurrentText("Postaje");
+
+        switcher.setInAnimation(getApplicationContext(), android.R.anim.slide_in_left);
+        switcher.setOutAnimation(getApplicationContext(), android.R.anim.slide_out_right);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                return;
+            }
+        }
+        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000,
+                10, locationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
+
+        SearchView searchView = findViewById(R.id.station_search);
+        searchView.setOnSearchClickListener(v -> {
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) searchView.getLayoutParams();
+            params.width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
+            searchView.setLayoutParams(params);
+        });
+        searchView.setOnCloseListener(() -> {
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) searchView.getLayoutParams();
+            params.width = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+            searchView.setLayoutParams(params);
+            return false;
+        });
+
+
+        ConstraintLayout constraintLayout = findViewById(R.id.header_layout);
+        constraintLayout.setLayoutTransition(new LayoutTransition());
+
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        rv.setLayoutManager(linearLayoutManager);
         rv.setAdapter(adapter);
         rv.setNestedScrollingEnabled(false);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            rv.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                header.setSelected(rv.canScrollVertically(-1));
+                int i = linearLayoutManager.findFirstVisibleItemPosition();
+                if (i > 0) {
+                    Station station = adapter.stations.get(i);
+                    if (location != null) {
+                        TextView tv = (TextView) switcher.getCurrentView();
+                        if (calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000 > 500) {
+                            if (tv.getText().equals("Postaje v bližini"))
+                                switcher.setText("Postaje");
+                        } else {
+                            if (tv.getText().equals("Postaje"))
+                                switcher.setText("Postaje v bližini");
+                        }
+                    }
+                }
+            });
+        }
+
 
         Api.stationDetails(true, (apiResponse, statusCode, success) -> {
             if (success) {
@@ -47,122 +165,48 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
-        colors = new ArrayList<>();
 
-        colors.add(Color.HSVToColor(new float[] {123.064f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {96.511f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {113.118f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {101.539f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {86.082f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {128.590f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {63.331f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {133.131f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {95.947f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {108.090f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {59.818f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {117.424f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {83.369f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {61.190f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {149.889f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {58.856f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {139.150f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {74.911f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {94.721f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {133.204f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {104.606f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {86.916f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {50.519f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {102.856f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {137.366f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {92.141f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {65.918f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {54.480f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {101.223f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {83.907f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {127.487f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {117.321f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {132.022f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {62.352f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {105.308f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {63.348f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {99.404f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {134.938f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {58.938f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {102.779f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {117.037f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {138.501f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {115.415f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {129.359f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {145.784f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {105.187f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {61.708f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {114.606f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {50.624f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {108.683f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {137.593f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {53.135f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {76.974f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {61.758f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {78.538f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {145.463f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {68.549f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {100.180f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {114.768f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {55.466f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {69.098f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {50.869f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {133.828f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {97.522f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {126.700f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {62.948f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {127.947f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {93.483f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {67.696f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {52.142f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {72.412f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {103.476f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {91.236f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {102.085f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {50.723f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {90.677f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {143.682f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {119.939f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {136.312f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {58.937f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {81.891f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {144.980f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {51.706f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {129.601f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {102.981f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {69.425f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {133.657f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {77.891f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {110.629f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {122.447f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {83.349f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {123.315f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {106.969f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {123.269f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {56.037f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {76.395f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {99.571f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {132.755f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {73.408f , 20f, 20f}));
-        colors.add(Color.HSVToColor(new float[] {87.315f , 20f, 20f}));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.filter(query);
+                return true;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.filter(newText);
+                return true;
+            }
+        });
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 0) {
+            Intent i = getIntent();
+            finish();
+            startActivity(i);
+
+        }
     }
 
     private class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         List<Station> stations;
+        List<Station> stationsCopy;
 
         public Adapter() {
             stations = new ArrayList<>();
+            stationsCopy = new ArrayList<>();
         }
 
         private void setStations(List<Station> stations) {
             this.stations = stations;
+            this.stationsCopy = new ArrayList<>(stations);
             notifyDataSetChanged();
         }
 
@@ -178,22 +222,36 @@ public class TestActivity extends AppCompatActivity {
             Station station = stations.get(position);
             ViewHolder viewHolder = (ViewHolder) holder;
 
+            String distance;
+            if (location != null)
+                distance = Math.round(calculationByDistance(station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude())) * 1000) + " m";
+            else
+                distance = "?";
+
             viewHolder.name.setText(station.getName());
-            viewHolder.distance.setText(Math.round(calculationByDistance(station.getLatLng(), new LatLng(46.056319, 14.505381)) * 1000) + " m");
+            viewHolder.distance.setText(distance);
             viewHolder.routes.removeAllViews();
             for (String route : station.getRoute_groups_on_station()) {
 
                 String group = route.replaceAll("[^0-9]", "");
                 int color = Integer.valueOf(group);
-                View v = getLayoutInflater().inflate(R.layout.template_route_station, viewHolder.routes, false);
+                View v = getLayoutInflater().inflate(R.layout.template_route_number, viewHolder.routes, false);
                 ((TextView) v.findViewById(R.id.route_station_number)).setText(route);
                 viewHolder.routes.addView(v);
-                ((ImageView) v.findViewById(R.id.route_station_circle)).setColorFilter(colors.get(color));
+                ((ConstraintLayout)v.findViewById(R.id.route_station_circle)).getBackground().setColorFilter(new PorterDuffColorFilter(Colors.colors.get(color), PorterDuff.Mode.SRC_ATOP));
             }
 
-            viewHolder.centerBackg.setVisibility(Integer.valueOf(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
+            viewHolder.center.setVisibility(Integer.valueOf(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
 
-            ArrayList<Integer>[] al = new ArrayList[0];
+            viewHolder.card.setOnClickListener(v -> {
+
+                Intent intent = new Intent(TestActivity.this, StationActivity.class);
+                intent.putExtra("station_code", station.getRef_id());
+                intent.putExtra("station_name", station.getName());
+                intent.putExtra("station_distance", distance);
+                intent.putExtra("station_center", Integer.valueOf(station.getRef_id()) % 2 != 0);
+                startActivity(intent);
+            });
 
 
         }
@@ -203,23 +261,37 @@ public class TestActivity extends AppCompatActivity {
             return stations.size();
         }
 
+        void filter(String text) {
+            stations.clear();
+            if(text.isEmpty()){
+                stations.addAll(stationsCopy);
+            } else{
+                text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
+                for(Station item: stationsCopy){
+                    String itemName = item.getName().toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
+                    if (itemName.contains(text))
+                        stations.add(item);
+                }
+            }
+            notifyDataSetChanged();
+            filter = text;
+        }
+
         private class ViewHolder extends RecyclerView.ViewHolder {
 
-            TextView name, distance;
-            LinearLayout routes;
+            TextView name, distance, center;
+            FlexboxLayout routes;
 
-            ImageView centerBackg;
+            LinearLayout card;
 
-            CardView card;
-
-            public ViewHolder(@NonNull View itemView) {
+            ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 name = itemView.findViewById(R.id.station_nearby_name);
                 distance = itemView.findViewById(R.id.station_nearby_distance);
                 routes = itemView.findViewById(R.id.station_nearby_ll);
                 card = itemView.findViewById(R.id.station_nearby_card);
-                centerBackg = itemView.findViewById(R.id.station_nearby_center_background);
+                center = itemView.findViewById(R.id.station_nearby_center);
 
             }
         }
