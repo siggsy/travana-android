@@ -1,16 +1,18 @@
 package com.VegaSolutions.lpptransit.ui.test;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,11 +25,12 @@ import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
+import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -39,18 +42,26 @@ public class StationActivity extends AppCompatActivity {
 
     TextView name, center;
     FrameLayout header;
-    FloatingActionButton fab;
     RecyclerView recyclerView;
     ImageButton oppositeBtn;
     ImageView fav;
+    SwipeRefreshLayout refreshLayout;
 
     String station_code;
     String station_name;
     boolean station_center;
-
     boolean favourite;
 
     Adapter adapter;
+
+    ApiCallback<ArrivalWrapper> callback = new ApiCallback<ArrivalWrapper>() {
+        @Override
+        public void onComplete(@Nullable ApiResponse<ArrivalWrapper> apiResponse, int statusCode, boolean success) {
+            ArrivalWrapper arrivalWrapper = apiResponse.getData();
+            runOnUiThread(() -> adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals())));
+            runOnUiThread(() -> refreshLayout.setRefreshing(false));
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +70,12 @@ public class StationActivity extends AppCompatActivity {
 
 
         // Assign all UI elements
-        fab = findViewById(R.id.station_refresh);
         name = findViewById(R.id.station_title);
         header = findViewById(R.id.header);
         center = findViewById(R.id.station_center);
         recyclerView = findViewById(R.id.station_routes_rv);
         oppositeBtn = findViewById(R.id.station_opposite_btn);
+        refreshLayout = findViewById(R.id.swipe_refresh);
 
         // Get Intent data
         station_code = getIntent().getStringExtra("station_code");
@@ -75,14 +86,8 @@ public class StationActivity extends AppCompatActivity {
         setupUI();
 
         // TODO: handle errors
-        Api.arrival(station_code, (apiResponse, statusCode, success) -> {
-            if (success) {
-                if (apiResponse != null) {
-                    ArrivalWrapper arrivalWrapper = apiResponse.getData();
-                    runOnUiThread(() -> adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals())));
-                }
-            }
-        });
+
+        Api.arrival(station_code, callback);
 
     }
 
@@ -267,23 +272,19 @@ public class StationActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         // Header elevation
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            recyclerView.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
                 header.setSelected(recyclerView.canScrollVertically(-1));
-            });
-        }
-
-        fab.setOnClickListener(v -> {
-            adapter.routes.clear();
-            runOnUiThread(adapter::notifyDataSetChanged);
-            Api.arrival(station_code, (apiResponse, statusCode, success) -> {
-                if (success) {
-                    ArrivalWrapper arrivalWrapper = apiResponse.getData();
-
-                    runOnUiThread(() -> adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals())));
-                }
-            });
+            }
         });
+
+        // Swipe refresh
+        refreshLayout.setOnRefreshListener(() -> {
+            Api.arrival(station_code, callback);
+        });
+        refreshLayout.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent));
     }
 
 }

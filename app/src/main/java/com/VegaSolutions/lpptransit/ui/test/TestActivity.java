@@ -168,13 +168,14 @@ public class TestActivity extends AppCompatActivity {
         rv.setHasFixedSize(true);
         rv.setItemViewCacheSize(20);
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            rv.setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
                 header.setSelected(rv.canScrollVertically(-1));
                 int i = linearLayoutManager.findFirstVisibleItemPosition();
 
-                if (i > 0) {
+                if (i >= 0) {
                     if (!fav) {
                         StationWrapper station = adapter.stations.get(i);
                         if (location != null) {
@@ -199,8 +200,8 @@ public class TestActivity extends AppCompatActivity {
                         }
                     }
                 }
-            });
-        }
+            }
+        });
 
 
         Api.stationDetails(true, (apiResponse, statusCode, success) -> {
