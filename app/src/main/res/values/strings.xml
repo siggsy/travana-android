@@ -11,7 +11,14 @@
     <string name="parking">Parking</string>
     <string name="todo">TODO</string>
     <string name="into_center">PROTI AP</string>
-
+    <string name="sign_in_with_fb">Sign in with Facebook</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="need_help">Need help?</string>
+    <string name="contact_us"> Contact us.</string>
+    <string name="transport">Transport,</string>
+    <string name="the_way_it_was">the way it was</string>
+    <string name="meant_to_be">meant to be.</string>
+    <string name="developer_help_contact">domenkralj.sahist@gmail.com</string>
     <string name="arrival">prihod</string>
     <string name="live">v živo</string>
     <string name="detour">obvoz</string>
