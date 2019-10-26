@@ -1,17 +1,35 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import com.VegaSolutions.*;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+
+
 
 import com.VegaSolutions.lpptransit.R;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -19,6 +37,13 @@ public class SignInActivity extends AppCompatActivity {
 
     private static TextView c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18,
     c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34, c35, c36;
+
+    private FirebaseAuth mAuth;
+
+    private GoogleSignInOptions gso;
+
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +53,12 @@ public class SignInActivity extends AppCompatActivity {
         createCircleAnimation();
 
         ImageButton back_btn = (ImageButton)findViewById(R.id.sign_in_activity_back_btn);
-        back_btn.setOnClickListener(e -> {
+        back_btn.setOnClickListener(e1 -> {
             finish();
         });
 
         TextView help_contact_btn = (TextView) findViewById(R.id.textView5);
-        help_contact_btn.setOnClickListener(e ->{
+        help_contact_btn.setOnClickListener(e2 ->{
 
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                     "mailto", this.getString(R.string.developer_help_contact), null));
@@ -42,7 +67,7 @@ public class SignInActivity extends AppCompatActivity {
         });
 
         TextView help_contact_btn1 = (TextView) findViewById(R.id.textView4);
-        help_contact_btn.setOnClickListener(e ->{
+        help_contact_btn.setOnClickListener(e3 ->{
 
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                     "mailto", this.getString(R.string.developer_help_contact), null));
@@ -50,14 +75,22 @@ public class SignInActivity extends AppCompatActivity {
 
         });
 
+        mAuth = FirebaseAuth.getInstance();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
         Button fb_sign_in_btn = (Button) findViewById(R.id.facebook_btn);
-        fb_sign_in_btn.setOnClickListener(e ->{
+        fb_sign_in_btn.setOnClickListener(e4 ->{
 
         });
 
         Button google_sing_in_btn = (Button) findViewById(R.id.google_btn);
-        google_sing_in_btn.setOnClickListener(e -> {
-
+        google_sing_in_btn.setOnClickListener(e5 -> {
+            mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+            signInWithGoogle();
         });
 
     }
@@ -67,6 +100,59 @@ public class SignInActivity extends AppCompatActivity {
         super.onResume();
         createCircleAnimation();
     }
+
+
+
+    private void signInWithGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e);
+                // ...
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            //updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            //Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                            //updateUI(null);
+                        }
+
+                        // ...
+                    }
+                });
+    }
+
+    //--------------------------------------Animations
 
     private void initializeCircleTextViews(){
 

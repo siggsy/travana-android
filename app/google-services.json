@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "271997165503",
+    "firebase_url": "https://ljubljana-app.firebaseio.com",
+    "project_id": "ljubljana-app",
+    "storage_bucket": "ljubljana-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271997165503:android:e7f115338a482aedb00b0a",
+        "android_client_info": {
+          "package_name": "com.VegaSolutions.lpptransit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271997165503-islthemscam9fhp8uk8ni0ifacmvq9h4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit",
+            "certificate_hash": "ea72e2299c93949581cf077f61eefe8c8645bc84"
+          }
+        },
+        {
+          "client_id": "271997165503-vut8p6mme2hhak959r372j73gt4u8tp4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit",
+            "certificate_hash": "ec0a910acad21444db12daec7637255348b3cd25"
+          }
+        },
+        {
+          "client_id": "271997165503-0gr1injf8qiqfu7p0u42cd60ps6cklt2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDR3dcFzY3XDE9bUq_6zZU5z4D5V1qeTPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271997165503-0gr1injf8qiqfu7p0u42cd60ps6cklt2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
