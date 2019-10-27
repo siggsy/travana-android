@@ -11,6 +11,21 @@
     <color name="gray">#66000000</color>
     <color name="light_gray">#11000000</color>
 
+    <color name="color_main_green">#75E645</color>
+    <color name="color_main_blue">#45BEE6</color>
+    <color name="color_main_yellow">#F7FF00</color>
+    <color name="color_main_background">#66FFFFFF</color>
+    <color name="color_main_gray">#534F4F</color>
+    <color name="color_main_shaddow">#242424</color>
+    <color name="color_main_orange">#FFBB33</color>
+
+    <color name="color_facebook_blue">#3C5A99</color>
+    <color name="color_facebook_button_white">#FCFCFC</color>
+
+    <color name="color_google_button_white">#FFFFFF</color>
+    <color name="color_sign_in_buttons_boders">#707070</color>
+    <color name="color_black">#000000</color>
+
     <color name="event_live">#008577</color>
     <color name="event_arrival">#D81B60</color>
     <color name="event_detour">#ffff8800</color>
