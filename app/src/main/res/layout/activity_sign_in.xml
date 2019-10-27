@@ -8,31 +8,45 @@
     tools:context=".ui.activities.SignInActivity">
 
 
-    <Button
-        android:id="@+id/facebook_btn"
-        android:layout_width="270dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="376dp"
-
-        android:background="@drawable/facebook_button"
-        android:drawableLeft="@drawable/fb_btn_image"
-        android:fontFamily="@font/segoe_ui_light"
-
-        android:paddingLeft="30dp"
-
-        android:stateListAnimator="@null"
-        android:text="@string/sign_in_with_fb"
-
-        android:textAllCaps="false"
-        android:textColor="@color/color_facebook_button_white"
-        android:textSize="16dp"
-
-        android:textStyle="bold"
-
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/facebook_btn1"
+        android:layout_width="267dp"
+        android:layout_height="58dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/facebook_btn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/facebook_btn">
+
+
+    </com.facebook.login.widget.LoginButton>
+
+    <Button
+            android:id="@+id/facebook_btn"
+            android:layout_width="270dp"
+            android:layout_height="55dp"
+            android:layout_marginTop="376dp"
+
+            android:background="@drawable/facebook_button"
+            android:drawableLeft="@drawable/fb_btn_image"
+            android:fontFamily="@font/segoe_ui_light"
+
+            android:paddingLeft="30dp"
+
+            android:stateListAnimator="@null"
+            android:text="@string/sign_in_with_fb"
+
+            android:textAllCaps="false"
+            android:textColor="@color/color_facebook_button_white"
+            android:textSize="16dp"
+
+            android:textStyle="bold"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
     <Button
         android:id="@+id/google_btn"
@@ -40,20 +54,20 @@
         android:layout_height="55dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/google_button"
+
         android:drawableLeft="@drawable/google_btn_image"
 
         android:fontFamily="@font/segoe_ui_light"
-
         android:paddingLeft="30dp"
         android:stateListAnimator="@null"
         android:text="@string/sign_in_with_google"
         android:textAllCaps="false"
+
         android:textSize="16dp"
 
         android:textStyle="bold"
-
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintHorizontal_bias="0.517"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/facebook_btn" />
 

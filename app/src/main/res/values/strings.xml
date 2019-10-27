@@ -23,4 +23,12 @@
     <string name="live">v živo</string>
     <string name="detour">obvoz</string>
 
+    <string name="you_are_already_logined">You are already logged in.</string>
+    <string name="you_canceled_the_proccess">You canceled the process.</string>
+    <string name="something_went_wrong_try_again">Something went wrong, please try again or contact us.</string>
+    <string name="you_have_successfuly_logged_in">You have successfuly logged in.</string>
+    <string name="facebook_app_id">954691711564227</string>
+    <string name="fb_login_protocol_scheme">fb954691711564227</string>
+
+
 </resources>
