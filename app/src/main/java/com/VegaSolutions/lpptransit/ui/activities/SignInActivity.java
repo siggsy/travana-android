@@ -40,7 +40,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "SignInActivity";
 
-    private static TextView c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18,
+    private TextView c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18,
     c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34, c35, c36;
 
     private FirebaseAuth mAuth;
@@ -58,7 +58,6 @@ public class SignInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
 
         createCircleAnimation();
-
         ImageButton back_btn = (ImageButton)findViewById(R.id.sign_in_activity_back_btn);
         back_btn.setOnClickListener(e1 -> {
             finish();
