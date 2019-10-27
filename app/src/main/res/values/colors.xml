@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!--> not using these </!-->
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <!--> default 'white' theme </!-->
     <color name="colorRipple">#1AD81B60</color>
     <color name="gray">#66000000</color>
     <color name="light_gray">#11000000</color>

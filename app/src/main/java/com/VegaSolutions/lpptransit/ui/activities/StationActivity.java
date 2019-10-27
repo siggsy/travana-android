@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.test;
+package com.VegaSolutions.lpptransit.ui.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,7 +39,7 @@ import java.util.Map;
 
 public class StationActivity extends AppCompatActivity {
 
-
+    // Views
     TextView name, center;
     FrameLayout header;
     RecyclerView recyclerView;
@@ -47,12 +47,15 @@ public class StationActivity extends AppCompatActivity {
     ImageView fav;
     SwipeRefreshLayout refreshLayout;
 
+    Adapter adapter;
+
+    // Station data
     String station_code;
     String station_name;
     boolean station_center;
     boolean favourite;
 
-    Adapter adapter;
+
 
     ApiCallback<ArrivalWrapper> callback = new ApiCallback<ArrivalWrapper>() {
         @Override
@@ -76,6 +79,7 @@ public class StationActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.station_routes_rv);
         oppositeBtn = findViewById(R.id.station_opposite_btn);
         refreshLayout = findViewById(R.id.swipe_refresh);
+        fav = findViewById(R.id.station_favourite);
 
         // Get Intent data
         station_code = getIntent().getStringExtra("station_code");
@@ -222,8 +226,8 @@ public class StationActivity extends AppCompatActivity {
         // Set header
         name.setText(station_name);
         center.setVisibility(station_center ? View.VISIBLE : View.GONE);
-        fav = findViewById(R.id.station_favourite);
 
+        // Favourite button toggle
         fav.setImageDrawable(getDrawable(favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
         fav.setOnClickListener(v1 -> {
             SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
@@ -237,36 +241,27 @@ public class StationActivity extends AppCompatActivity {
         // Set opposite station button listener
         oppositeBtn.setOnClickListener(view -> {
             oppositeBtn.setEnabled(false);
-            if (Integer.valueOf(station_code) % 2 == 0) {
-                Api.stationDetails(Integer.valueOf(station_code) - 1, true, (apiResponse, statusCode, success) -> {
-                    if (success) {
-                        Intent intent = getIntent();
-                        Station station = apiResponse.getData();
-                        intent.putExtra("station_code", station.getRef_id());
-                        intent.putExtra("station_name", station.getName());
-                        intent.putExtra("station_center", Integer.valueOf(station.getRef_id()) % 2 != 0);
-                        finish();
-                        startActivity(intent);
-                    }
-                });
-                Log.i("station", "CENTER");
-            } else {
-                Api.stationDetails(Integer.valueOf(station_code) + 1, true, (apiResponse, statusCode, success) -> {
-                    if (success) {
-                        Intent intent = getIntent();
-                        Station station = apiResponse.getData();
-                        intent.putExtra("station_code", station.getRef_id());
-                        intent.putExtra("station_name", station.getName());
-                        intent.putExtra("station_center", Integer.valueOf(station.getRef_id()) % 2 != 0);
-                        finish();
-                        startActivity(intent);
-                    }
-                });
-                Log.i("station", "NOT CENTER");
-            }
+
+            int code;
+            if (Integer.valueOf(station_code) % 2 == 0)
+                code = Integer.valueOf(station_code) - 1;
+            else code = Integer.valueOf(station_code) + 1;
+
+            Api.stationDetails(code, true, (apiResponse, statusCode, success) -> {
+                if (success) {
+                    Intent intent = getIntent();
+                    Station station = apiResponse.getData();
+                    intent.putExtra("station_code", station.getRef_id());
+                    intent.putExtra("station_name", station.getName());
+                    intent.putExtra("station_center", Integer.valueOf(station.getRef_id()) % 2 != 0);
+                    finish();
+                    startActivity(intent);
+                }
+            });
+
         });
 
-
+        // Setup RV
         adapter = new Adapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);

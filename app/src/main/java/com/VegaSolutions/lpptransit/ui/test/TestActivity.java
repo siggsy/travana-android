@@ -3,7 +3,6 @@ package com.VegaSolutions.lpptransit.ui.test;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,9 +11,6 @@ import android.animation.LayoutTransition;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.location.Location;
@@ -25,24 +21,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SearchView;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.ui.activities.SearchActivity;
+import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -84,48 +79,13 @@ public class TestActivity extends AppCompatActivity {
         RecyclerView rv = findViewById(R.id.test_rv);
         FrameLayout header = findViewById(R.id.header);
         TextSwitcher switcher = findViewById(R.id.station_title);
-        FloatingActionButton fab = findViewById(R.id.sort_by_location);
-
-        fab.setOnClickListener(view -> {
-            switcher.setText("Postaje");
-            if (fav) {
-                if (location != null) {
-                    Collections.sort(adapter.stationsCopy, (o1, o2) -> {
-                        double d1 = calculationByDistance(o1.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
-                        double d2 = calculationByDistance(o2.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude()));
-                        return Double.compare(d1, d2);
-                    });
-                    runOnUiThread(() -> {
-                        adapter.setStations(adapter.stationsCopy);
-                        adapter.filter(filter);
-                    });
-                    fav = false;
-                } else
-                    Toast.makeText(this, "Lokacija se ni znana", Toast.LENGTH_SHORT).show();
-            } else {
-                fav = true;
-                SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
-                Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
-                ArrayList<StationWrapper> stationWrappers = new ArrayList<>();
-                ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
-                for (StationWrapper station : adapter.stationsCopy) {
-                    if (station.favourite) stationWrappersFav.add(station);
-                    else stationWrappers.add(station);
-                }
-                stationWrappersFav.addAll(stationWrappers);
-                runOnUiThread(() -> {
-                    adapter.setStations(stationWrappersFav);
-                    adapter.filter(filter);
-                });
-            }
-        });
-
 
         switcher.setFactory(() -> {
             TextView textView = new TextView(getApplicationContext());
             textView.setTextAppearance(this, R.style.robotoBoldTitle);
             return textView;
         });
+
         switcher.setCurrentText("Postaje");
 
         switcher.setInAnimation(getApplicationContext(), android.R.anim.slide_in_left);
@@ -143,17 +103,9 @@ public class TestActivity extends AppCompatActivity {
                 10, locationListener);
         mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, locationListener);
 
-        SearchView searchView = findViewById(R.id.station_search);
-        searchView.setOnSearchClickListener(v -> {
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) searchView.getLayoutParams();
-            params.width = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT;
-            searchView.setLayoutParams(params);
-        });
-        searchView.setOnCloseListener(() -> {
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) searchView.getLayoutParams();
-            params.width = ConstraintLayout.LayoutParams.WRAP_CONTENT;
-            searchView.setLayoutParams(params);
-            return false;
+        ImageButton searchView = findViewById(R.id.station_search);
+        searchView.setOnClickListener(v -> {
+           startActivity(new Intent(this, SearchActivity.class));
         });
 
 
@@ -169,6 +121,11 @@ public class TestActivity extends AppCompatActivity {
         rv.setItemViewCacheSize(20);
 
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -193,9 +150,9 @@ public class TestActivity extends AppCompatActivity {
                         TextView tv = (TextView) switcher.getCurrentView();
                         if (station.favourite) {
                             if (tv.getText().equals("Postaje"))
-                                switcher.setText("Priljibljene postaje");
+                                switcher.setText("Priljubljene postaje");
                         } else {
-                            if (tv.getText().equals("Priljibljene postaje"))
+                            if (tv.getText().equals("Priljubljene postaje"))
                                 switcher.setText("Postaje");
                         }
                     }
@@ -223,21 +180,6 @@ public class TestActivity extends AppCompatActivity {
                     stationWrappersFav.addAll(stationWrappers);
                     runOnUiThread(() -> adapter.setStations(stationWrappersFav));
                 }
-            }
-        });
-
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                adapter.filter(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.filter(newText);
-                return true;
             }
         });
 

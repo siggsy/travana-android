@@ -18,7 +18,7 @@
 
     <style name="robotoBoldTitle">
         <item name="android:fontFamily">@font/roboto_bold</item>
-        <item name="android:textSize">36sp</item>
+        <item name="android:textSize">32sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/black</item>
     </style>
