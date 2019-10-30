@@ -33,6 +33,9 @@ import com.VegaSolutions.lpptransit.ui.Colors;
 import com.google.android.flexbox.FlexboxLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,9 +63,12 @@ public class StationActivity extends AppCompatActivity {
     ApiCallback<ArrivalWrapper> callback = new ApiCallback<ArrivalWrapper>() {
         @Override
         public void onComplete(@Nullable ApiResponse<ArrivalWrapper> apiResponse, int statusCode, boolean success) {
-            ArrivalWrapper arrivalWrapper = apiResponse.getData();
-            runOnUiThread(() -> adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals())));
-            runOnUiThread(() -> refreshLayout.setRefreshing(false));
+            // TODO: handle error and no internet connection
+            if (success) {
+                ArrivalWrapper arrivalWrapper = apiResponse.getData();
+                runOnUiThread(() -> adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals())));
+                runOnUiThread(() -> refreshLayout.setRefreshing(false));
+            }
         }
     };
 
@@ -150,14 +156,16 @@ public class StationActivity extends AppCompatActivity {
                             arrival_time.setTextColor(Color.WHITE);
                             v.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_arrival, null));
                             break;
-                    case 3: arrival_event.setVisibility(View.VISIBLE);
-                            arrival_event.setText(R.string.detour);
-                            arrival_event.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
+                    case 3: arrival_event.setVisibility(View.GONE);
+                            String detour_text = getResources().getString(R.string.detour).toUpperCase();
+                            arrival_time.setText(detour_text);
+                            arrival_time.setTextColor(Color.WHITE);
+                            v.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
                             break;
                     default: arrival_event.setVisibility(View.GONE);
                 }
-
                 viewHolder.arrivals.addView(v);
+                if (arrival.getType() == 3) break;
             }
 
 
@@ -177,7 +185,7 @@ public class StationActivity extends AppCompatActivity {
             LinearLayout route;
             FlexboxLayout arrivals;
 
-            public ViewHolder(@NonNull View itemView) {
+            private ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
 
@@ -198,7 +206,16 @@ public class StationActivity extends AppCompatActivity {
         String name;
         String number;
 
-        public static List<RouteWrapper> getFromArrivals(List<ArrivalWrapper.Arrival> arrivals) {
+        private static List<RouteWrapper> getFromArrivals(List<ArrivalWrapper.Arrival> arrivals) {
+
+            Collections.sort(arrivals, (o1, o2) -> {
+                String o1S = o1.getRoute_name().replaceAll("[^0-9]", "");
+                String o2S = o2.getRoute_name().replaceAll("[^0-9]", "");
+                int o1V = Integer.valueOf(o1S);
+                int o2V = Integer.valueOf(o2S);
+                if (o1V == o2V) return o1.getRoute_name().compareTo(o2.getRoute_name());
+                return Integer.compare(o1V, o2V);
+            });
 
             Map<String, RouteWrapper> map = new LinkedHashMap<>();
 
@@ -244,7 +261,7 @@ public class StationActivity extends AppCompatActivity {
 
             int code;
             if (Integer.valueOf(station_code) % 2 == 0)
-                code = Integer.valueOf(station_code) - 1;
+                code = Integer.valueOf(station_code) - 1 ;
             else code = Integer.valueOf(station_code) + 1;
 
             Api.stationDetails(code, true, (apiResponse, statusCode, success) -> {

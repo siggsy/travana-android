@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.activities.MainActivity"
+    tools:ignore="ContentDescription"
+
+    android:layout_height="match_parent"
+    android:layout_width="match_parent" >
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageButton
+        android:id="@+id/account"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/stretched_circle"
+        android:elevation="6dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_account_circle_black_24dp"
+        android:translationZ="0dp" />
+
+    <FrameLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="90dp"
+        android:translationZ="2dp"
+        android:elevation="4dp"/>
+
+    <ImageButton
+        android:id="@+id/search"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/stretched_circle"
+        android:elevation="6dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_search_black_24dp" />
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

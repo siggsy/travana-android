@@ -1,16 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragments.StationsFragment">
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:stateListAnimator="@animator/titlebar_elevaton">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true">
+
+            <TextSwitcher
+                android:id="@+id/station_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fragment_stations_rv"
+        android:id="@+id/test_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:nestedScrollingEnabled="true" />
 
-    </androidx.recyclerview.widget.RecyclerView>
 
-</FrameLayout>
+</LinearLayout>

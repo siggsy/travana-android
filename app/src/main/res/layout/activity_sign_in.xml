@@ -22,30 +22,31 @@
     </com.facebook.login.widget.LoginButton>
 
     <Button
-            android:id="@+id/facebook_btn"
-            android:layout_width="270dp"
-            android:layout_height="55dp"
-            android:layout_marginTop="376dp"
+        android:id="@+id/facebook_btn"
+        android:layout_width="270dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="376dp"
 
-            android:background="@drawable/facebook_button"
-            android:drawableLeft="@drawable/fb_btn_image"
-            android:fontFamily="@font/segoe_ui_light"
+        android:background="@drawable/facebook_button"
+        android:drawableStart="@drawable/fb_btn_image"
+        android:fontFamily="@font/roboto_bold"
 
-            android:paddingLeft="30dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
 
-            android:stateListAnimator="@null"
-            android:text="@string/sign_in_with_fb"
+        android:stateListAnimator="@null"
+        android:text="@string/sign_in_with_fb"
 
-            android:textAllCaps="false"
-            android:textColor="@color/color_facebook_button_white"
-            android:textSize="16dp"
+        android:textAllCaps="false"
+        android:textColor="@color/color_facebook_button_white"
+        android:textSize="16sp"
 
-            android:textStyle="bold"
+        android:textStyle="bold"
 
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <Button
@@ -55,15 +56,16 @@
         android:layout_marginTop="12dp"
         android:background="@drawable/google_button"
 
-        android:drawableLeft="@drawable/google_btn_image"
+        android:drawableStart="@drawable/google_btn_image"
 
-        android:fontFamily="@font/segoe_ui_light"
-        android:paddingLeft="30dp"
+        android:fontFamily="@font/roboto_bold"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
         android:stateListAnimator="@null"
         android:text="@string/sign_in_with_google"
         android:textAllCaps="false"
 
-        android:textSize="16dp"
+        android:textSize="16sp"
 
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -76,7 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/segoe_ui_light"
+        android:fontFamily="@font/roboto_thin"
         android:text="@string/need_help"
         android:textColor="@color/color_black"
         android:textSize="12sp"
@@ -91,7 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/segoe_ui"
+        android:fontFamily="@font/roboto_bold"
         android:text="@string/contact_us"
         android:textColor="@color/color_black"
         android:textSize="12sp"
@@ -104,7 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="208dp"
         android:alpha="0.7"
-        android:fontFamily="@font/segoe_ui"
+        android:fontFamily="@font/roboto"
         android:text="@string/transport"
         android:textColor="@color/color_black"
         android:textSize="33sp"
@@ -119,7 +121,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:alpha="0.6"
-        android:fontFamily="@font/segoe_ui"
+        android:fontFamily="@font/roboto"
         android:text="@string/the_way_it_was"
         android:textColor="@color/color_black"
         android:textSize="23sp"
@@ -133,7 +135,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:alpha="0.5"
-        android:fontFamily="@font/segoe_ui"
+        android:fontFamily="@font/roboto"
         android:text="@string/meant_to_be"
         android:textColor="@color/color_black"
         android:textSize="19sp"

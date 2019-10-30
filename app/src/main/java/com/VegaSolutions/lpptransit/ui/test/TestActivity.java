@@ -267,7 +267,6 @@ public class TestActivity extends AppCompatActivity {
                 Intent intent = new Intent(TestActivity.this, StationActivity.class);
                 intent.putExtra("station_code", station.station.getRef_id());
                 intent.putExtra("station_name", station.station.getName());
-                intent.putExtra("station_distance", distance);
                 intent.putExtra("station_center", Integer.valueOf(station.station.getRef_id()) % 2 != 0);
                 startActivity(intent);
             });
