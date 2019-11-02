@@ -12,8 +12,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.BounceInterpolator;
@@ -24,8 +26,13 @@ import android.widget.ImageButton;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
+import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
+import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentLifecycleListener;
 import com.VegaSolutions.lpptransit.ui.fragments.HomeFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,8 +43,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 import java.util.Queue;
@@ -48,12 +57,11 @@ import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.BUS;
 import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.PARKING;
 import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.TRAIN;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsSubFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, FragmentLifecycleListener {
 
     private GoogleMap mMap;
 
     LatLng ljubljana = new LatLng(46.056319, 14.505381);
-    CameraUpdate default_camera = CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f);
 
     BottomSheetBehavior behavior;
 
@@ -61,6 +69,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     ImageButton account;
     ImageButton search;
+    View shadow;
+    View root;
+
+    View bottom_sheet;
+    int maxMapsPadding = 0;
+    int minMapsPadding = 0;
+    int previousTop = 0;
+
+    private ClusterManager<StationMarker> clusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,17 +86,25 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        maxMapsPadding = displayMetrics.heightPixels;
+        getWindow().getDecorView().getHeight();
+
+        root = findViewById(R.id.root);
+        maxMapsPadding = root.getHeight();
+        Log.i("root", getWindow().getDecorView().getHeight() + "");
+
         search = findViewById(R.id.search);
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
-
         account = findViewById(R.id.account);
         account.setOnClickListener(view -> startActivity(new Intent(this, SignInActivity.class)));
+        shadow = findViewById(R.id.shadow);
 
-        View a = findViewById(R.id.bottom_sheet);
 
+        bottom_sheet = findViewById(R.id.bottom_sheet);
         switchFragment(HomeFragment.newInstance());
-
-        behavior = BottomSheetBehavior.from(a);
+        behavior = BottomSheetBehavior.from(bottom_sheet);
         behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -105,8 +130,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         account.startAnimation(animation);
                     }
 
-                }
-                else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.expand);
                     animation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
@@ -127,8 +151,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     account.startAnimation(animation);
                 }
             }
+
             @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+            }
         });
 
     }
@@ -136,11 +162,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            Fragment f = fragments.pop();
-            if (f != null) switchFragment(f);
             behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
-            fragments.pop();
+            Fragment to = fragments.pop();
+            to.onDestroy();
+
             Fragment f = fragments.pop();
             if (f != null) switchFragment(f);
             else super.onBackPressed();
@@ -149,20 +175,57 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.setTrafficEnabled(true);
+        setupClusterManager();
+
+
+        behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+                if (slideOffset < 1)
+                    setMapPadding(slideOffset);
+                else setMapPadding(0);
+                Log.i("Maps", "offset -> " + slideOffset);
+
+            }
+        });
 
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
-            i.putExtra("station_code", marker.getSnippet());
-            i.putExtra("station_name", marker.getTitle());
-            i.putExtra("station_center", Integer.valueOf(marker.getSnippet()) % 2 != 0);
+            Station station = (Station) marker.getTag();
+            i.putExtra("station_code", station.getRef_id());
+            i.putExtra("station_name", station.getName());
+            i.putExtra("station_center", Integer.valueOf((station.getRef_id())) % 2 != 0);
             startActivity(i);
         });
 
         // Set camera to ljubljana
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
-        mMap.moveCamera(default_camera);
+    }
 
+    void setMapPadding(float offset) {
+        if (mMap == null) return;
+        offset *= (maxMapsPadding - 150) * .5;
+        mMap.setPadding(12, 150, 12, Math.round((offset) + minMapsPadding));
+    }
+
+    private void setupClusterManager() {
+        clusterManager = new ClusterManager<>(this, mMap);
+        CustomClusterRenderer customClusterRenderer = new CustomClusterRenderer(this, mMap, clusterManager);
+        customClusterRenderer.setMinClusterSize(10);
+        clusterManager.setRenderer(customClusterRenderer);
+        mMap.setOnCameraIdleListener(clusterManager);
+        mMap.setOnMarkerClickListener(clusterManager);
     }
 
     @Override
@@ -172,21 +235,42 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onStationsUpdated(List<Station> stations) {
-        runOnUiThread(() -> mMap.clear());
+        runOnUiThread(() -> {
+            if (mMap != null) {
+                mMap.clear();
+                mMap.setInfoWindowAdapter(new StationInfoWindow(this));
+            }
+            if (clusterManager != null) clusterManager.clearItems();
+        });
+
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        if (stations.size() > 300) {
+            for (Station station : stations) {
+                builder.include(station.getLatLng());
+                runOnUiThread(() -> clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station)));
+            }
+            runOnUiThread(() -> clusterManager.cluster());
+            return;
+        }
+
+        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
+        boolean updateNeeded = true;
         for (Station station : stations) {
             builder.include(station.getLatLng());
+            if (visibleRegion.latLngBounds.contains(station.getLatLng())) updateNeeded = false;
             runOnUiThread(() -> {
-                Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).alpha(0f).title(station.getName()).snippet(station.getRef_id()));
+                Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).alpha(0f));
+                m.setTag(station);
                 animateMarkerAlpha(m);
             });
         }
         if (stations.size() > 0) {
             LatLngBounds bounds = builder.build();
-            runOnUiThread(() -> mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150)));
-        } else {
-            runOnUiThread(() -> mMap.animateCamera(default_camera));
-        }
+            if (updateNeeded)
+                runOnUiThread(() -> mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150)));
+        } else
+            runOnUiThread(() -> mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f)));
     }
 
     private void animateMarkerPosition(final Marker marker) {
@@ -252,16 +336,57 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             case TRAIN:
             case BIKE:
             case PARKING:
-            default: Log.i("MainActivity", b + " is not yet implemented!");
+            default:
+                Log.i("MainActivity", b + " is not yet implemented!");
         }
     }
 
     private void switchFragment(Fragment fragment) {
+
+        bottom_sheet.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Log.i("Updated", "this many");
+                if (previousTop != bottom_sheet.getTop()) {
+                    previousTop = bottom_sheet.getTop();
+                    bottom_sheet.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                minMapsPadding = (int) Math.round((maxMapsPadding - bottom_sheet.getTop()) - maxMapsPadding * 0.05);
+                setMapPadding(0);
+            }
+        });
+
+        maxMapsPadding = getWindow().getDecorView().getHeight() - 50;
+
+        shadow.setVisibility(fragment instanceof HomeFragment ?View.GONE :View.VISIBLE);
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.bottom_sheet, fragment);
+        transaction.replace(R.id.bottom_sheet,fragment);
         transaction.commit();
         fragments.push(fragment);
+        fm.executePendingTransactions();
+
+
     }
 
+    @Override
+    public void fragmentOnResume() {
+
+        Log.i("Updated", "onResume");
+    }
+
+    @Override
+    public void fragmentOnPause() {
+
+    }
+
+    @Override
+    public void fragmentOnCreated() {
+
+    }
+
+    @Override
+    public void fragmentOnCreatedView() {
+
+    }
 }

@@ -6,6 +6,7 @@
     tools:context=".ui.activities.MainActivity"
     tools:ignore="ContentDescription"
 
+    android:id="@+id/root"
     android:layout_height="match_parent"
     android:layout_width="match_parent" >
 
@@ -27,13 +28,20 @@
         android:src="@drawable/ic_account_circle_black_24dp"
         android:translationZ="0dp" />
 
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@drawable/top_shadow_gradient"
+        app:layout_anchor="@id/bottom_sheet" />
+
     <FrameLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="90dp"
+        app:behavior_peekHeight="250dp"
         android:translationZ="2dp"
         android:elevation="4dp"/>
 

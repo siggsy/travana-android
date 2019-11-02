@@ -27,7 +27,7 @@
             android:fontFamily="@font/roboto_bold"
             android:text="Rudnik"
             android:textColor="@android:color/black"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
     <com.google.android.flexbox.FlexboxLayout

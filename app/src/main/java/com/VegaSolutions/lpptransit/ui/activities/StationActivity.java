@@ -180,7 +180,7 @@ public class StationActivity extends AppCompatActivity {
         private class ViewHolder extends RecyclerView.ViewHolder {
 
             TextView name, number;
-            ConstraintLayout circle;
+            View circle;
 
             LinearLayout route;
             FlexboxLayout arrivals;
@@ -224,7 +224,9 @@ public class StationActivity extends AppCompatActivity {
                 RouteWrapper route = map.get(arrival.getRoute_name());
                 if (route == null) {
                     route = new RouteWrapper();
-                    route.name = arrival.getStations().getArrival();
+                    String[] substations = arrival.getTrip_name().split(" ");
+                    route.name = arrival.getStations() != null ? arrival.getStations().getArrival() : arrival.getTrip_name();
+                    //route.name = arrival.getTrip_name();
                     route.number = arrival.getRoute_name();
                     map.put(arrival.getRoute_name(), route);
                 }
@@ -239,6 +241,8 @@ public class StationActivity extends AppCompatActivity {
     }
 
     public void setupUI() {
+
+        refreshLayout.setRefreshing(true);
 
         // Set header
         name.setText(station_name);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/route_station_circle"
     android:layout_width="wrap_content"
@@ -23,9 +23,5 @@
         android:text="19"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@id/route_station_circle"
-        app:layout_constraintEnd_toEndOf="@+id/route_station_circle"
-        app:layout_constraintStart_toStartOf="@+id/route_station_circle"
-        app:layout_constraintTop_toTopOf="@+id/route_station_circle" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:textSize="12sp" />
+</FrameLayout>
