@@ -49,12 +49,9 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
             return null;
 
         View view =  context.getLayoutInflater().inflate(R.layout.template_station_nearby,null);
-
-
         TextView name, distance, center;
         FlexboxLayout routes;
         ImageView fav;
-        LinearLayout card;
         View divider;
 
         name = view.findViewById(R.id.station_nearby_name);
@@ -62,7 +59,6 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         routes = view.findViewById(R.id.station_nearby_ll);
         center = view.findViewById(R.id.station_nearby_center);
         fav = view.findViewById(R.id.station_nearby_favourite);
-        card = view.findViewById(R.id.station_nearby_card);
         divider = view.findViewById(R.id.station_nearby_devider);
 
         divider.setVisibility(View.GONE);
@@ -81,6 +77,7 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
             routes.addView(v);
 
         }
+
         center.setVisibility(Integer.valueOf(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("station_favourites", MODE_PRIVATE);

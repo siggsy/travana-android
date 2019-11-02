@@ -60,6 +60,9 @@ import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.BUS;
 import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.PARKING;
 import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.TRAIN;
 
+
+// TODO: Clean the code, fix MapPadding remove useless callbacks and variables
+
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsSubFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, FragmentLifecycleListener {
 
     private GoogleMap mMap;

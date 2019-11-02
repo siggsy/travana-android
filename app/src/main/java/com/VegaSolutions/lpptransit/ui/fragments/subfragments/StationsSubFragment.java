@@ -45,6 +45,8 @@ import javax.security.auth.callback.Callback;
 
 import static android.content.Context.MODE_PRIVATE;
 
+// TODO: Clean code and redo api call.
+
 public class StationsSubFragment extends Fragment {
 
     private static final String TYPE = "type";

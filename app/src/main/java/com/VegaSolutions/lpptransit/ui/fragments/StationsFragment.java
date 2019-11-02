@@ -29,6 +29,9 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
 import com.google.android.material.tabs.TabLayout;
 
+
+// TODO: Clean code.
+
 public class StationsFragment extends Fragment implements StationsSubFragment.FragmentReadyCallback {
 
     private FragmentLifecycleListener callback;
