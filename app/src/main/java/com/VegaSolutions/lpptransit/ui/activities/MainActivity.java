@@ -48,9 +48,12 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
+
+import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
 import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.BIKE;
 import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.BUS;
@@ -63,7 +66,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     LatLng ljubljana = new LatLng(46.056319, 14.505381);
 
-    BottomSheetBehavior behavior;
+    ViewPagerBottomSheetBehavior behavior;
 
     Stack<Fragment> fragments = new Stack<>();
 
@@ -103,12 +106,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         bottom_sheet = findViewById(R.id.bottom_sheet);
-        switchFragment(HomeFragment.newInstance());
-        behavior = BottomSheetBehavior.from(bottom_sheet);
-        behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+        behavior = ViewPagerBottomSheetBehavior.from(bottom_sheet);
+        behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+
+                if (newState == ViewPagerBottomSheetBehavior.STATE_DRAGGING) {
                     if (account.getVisibility() == View.VISIBLE) {
                         Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shrink);
                         animation.setAnimationListener(new Animation.AnimationListener() {
@@ -130,7 +133,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         account.startAnimation(animation);
                     }
 
-                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                } else if (newState == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
                     Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.expand);
                     animation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
@@ -150,42 +153,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     });
                     account.startAnimation(animation);
                 }
-            }
 
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-            }
-        });
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else {
-            Fragment to = fragments.pop();
-            to.onDestroy();
-
-            Fragment f = fragments.pop();
-            if (f != null) switchFragment(f);
-            else super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        mMap = googleMap;
-        mMap.getUiSettings().setCompassEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.setTrafficEnabled(true);
-        setupClusterManager();
-
-
-        behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
             }
 
             @Override
@@ -198,6 +166,38 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
+        switchFragment(HomeFragment.newInstance());
+
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
+            behavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+        } else {
+            fragments.pop();
+            try {
+                Fragment f = fragments.pop();
+                if (f != null) switchFragment(f);
+                else super.onBackPressed();
+            } catch (EmptyStackException e) {
+                super.onBackPressed();
+            }
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.setTrafficEnabled(true);
+        setupClusterManager();
+
 
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
@@ -351,7 +351,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     previousTop = bottom_sheet.getTop();
                     bottom_sheet.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
-                minMapsPadding = (int) Math.round((maxMapsPadding - bottom_sheet.getTop()) - maxMapsPadding * 0.05);
+                minMapsPadding = (int) Math.round((maxMapsPadding - bottom_sheet.getTop()) - maxMapsPadding * 0.02);
                 setMapPadding(0);
             }
         });

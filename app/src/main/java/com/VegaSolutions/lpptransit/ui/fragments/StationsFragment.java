@@ -168,7 +168,7 @@ public class StationsFragment extends Fragment implements StationsSubFragment.Fr
         if (view != null) {
             RecyclerView rv = view.findViewById(R.id.stations_sub_list);
             header.setSelected(rv.canScrollVertically(-1));
-            rv.requestDisallowInterceptTouchEvent(rv.canScrollVertically(-1));
+            viewPager.invalidate();
         }
     }
 
@@ -183,6 +183,7 @@ public class StationsFragment extends Fragment implements StationsSubFragment.Fr
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     header.setSelected(recyclerView.canScrollVertically(-1));
+                    Log.i("scrilling", "dx=" + dx + " dy=" + dy);
                 }
             });
 

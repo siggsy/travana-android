@@ -173,7 +173,7 @@ public class StationsSubFragment extends Fragment {
         RecyclerView list = root.findViewById(R.id.stations_sub_list);
         list.setAdapter(adapter);
         list.setLayoutManager(new LinearLayoutManager(context));
-        list.setHasFixedSize(false);
+        list.setHasFixedSize(true);
 
 
         return root;

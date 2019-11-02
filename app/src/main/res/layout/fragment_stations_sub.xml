@@ -4,6 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/stations_sub_list"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:nestedScrollingEnabled="true"
-    tools:context=".ui.fragments.subfragments.StationsSubFragment" />
+    android:layout_height="wrap_content"
+    tools:context=".ui.fragments.subfragments.StationsSubFragment"
+    android:nestedScrollingEnabled="true"/>
