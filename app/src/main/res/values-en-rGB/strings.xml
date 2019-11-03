@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Travana</string>
+    <string name="app_slogan_welcome_activity">better public transport.</string>
+    <string name="arrival">arrival</string>
+    <string name="by_developers">By Domen Kralj, Žiga Leskovec</string>
+    <string name="detour">detour</string>
+    <string name="into_center">IN CENTER</string>
+    <string name="contact_us">" Contact us."</string>
+    <string name="meant_to_be">meant to be.</string>
+    <string name="need_help">Need help?</string>
+    <string name="nearby_stations">Nearby Stations</string>
+    <string name="parking">Parking</string>
+    <string name="routes">Routes</string>
+    <string name="sign_in_with_fb">Sign in with Facebook</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="something_went_wrong_try_again">Something went wrong, please try again or contact us.</string>
+    <string name="the_way_it_was">the way it was</string>
+    <string name="transport">Transport,</string>
+    <string name="you_are_already_logined">You are already logged in.</string>
+    <string name="you_canceled_the_proccess">You canceled the process.</string>
+    <string name="you_have_successfuly_logged_in">You have successfuly logged in.</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Travana</string>
+    <string name="app_slogan_welcome_activity">boljši javni prevoz.</string>
+    <string name="arrival">prihod</string>
+    <string name="by_developers">od Domen Kralj, Žiga Leskovec</string>
+    <string name="contact_us">Kontaktiraj nas.</string>
+    <string name="routes">Linije</string>
+    <string name="sign_in_with_fb">Prijava s Facebookom</string>
+    <string name="sign_in_with_google">Prijava z Google računom</string>
+    <string name="something_went_wrong_try_again">Nekaj je šlo narobe, poizkusi še enkrat ali pa nam piši.</string>
+    <string name="the_way_it_was">kot</string>
+    <string name="you_are_already_logined">Si že prijavljen.</string>
+    <string name="you_canceled_the_proccess">Storniral si proces.</string>
+    <string name="you_have_successfuly_logged_in">Uspešno si se prijavil</string>
+    <string name="need_help">Potrebuješ pomoč?</string>
+    <string name="nearby_stations">Postaje v bližini</string>
+    <string name="detour">obvoz</string>
+    <string name="parking">Parkirišče</string>
+    <string name="transport">Prevoz,</string>
+    <string name="into_center">V CENTER</string>
+    <string name="meant_to_be">mora biti.</string>
+</resources>
