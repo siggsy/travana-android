@@ -3,8 +3,10 @@ package com.VegaSolutions.lpptransit.lppapi;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DepartureWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
@@ -50,6 +52,18 @@ public class Api {
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .execute(LppQuery.BUS_DETAILS);
+    }
+    public static void busesOnRoute(String routeGroupNumber, ApiCallback<List<BusOnRoute>> callback) {
+        new LppQuery()
+                .addParams("route-group-number", routeGroupNumber)
+                .addParams("specific", "1")
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<List<BusOnRoute>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<BusOnRoute>>>(){}.getType());
+                        callback.onComplete(data, statusCode, true);
+                    } else callback.onComplete(null, statusCode, false);
+                })
+                .execute(LppQuery.BUSES_ON_ROUTE);
     }
 
     public static void activeRoutes(ApiCallback<List<Route>> callback) {
@@ -111,12 +125,12 @@ public class Api {
                 .execute(LppQuery.ARRIVAL);
     }
 
-    public static void routesOnStation(int station_code, ApiCallback<List<Route>> callback) {
+    public static void routesOnStation(int station_code, ApiCallback<List<RouteOnStation>> callback) {
         new LppQuery()
                 .addParams("station-code", String.valueOf(station_code))
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
-                        ApiResponse<List<Route>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Route>>>(){}.getType());
+                        ApiResponse<List<RouteOnStation>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<RouteOnStation>>>(){}.getType());
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })

@@ -23,6 +23,7 @@ public class RouteView extends View {
     private float textSize;
     private TextView name;
 
+
     public RouteView(Context context) {
         super(context);
 
@@ -63,8 +64,10 @@ public class RouteView extends View {
         invalidate();
     }
 
-    @Override
+
     public void invalidate() {
+
+
 
     }
 

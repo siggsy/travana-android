@@ -32,6 +32,7 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
@@ -64,12 +65,11 @@ public class StationsSubFragment extends Fragment {
 
     private StationsFragmentListener mListener;
     private Context context;
-    private FragmentReadyCallback callback;
+    private FragmentHeaderCallback callback;
 
-    public StationsSubFragment() {
-    }
+    private RecyclerView list;
 
-    public static StationsSubFragment newInstance(int type, FragmentReadyCallback callback) {
+    public static StationsSubFragment newInstance(int type, FragmentHeaderCallback callback) {
         StationsSubFragment fragment = new StationsSubFragment();
         fragment.callback = callback;
         Bundle args = new Bundle();
@@ -97,10 +97,7 @@ public class StationsSubFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        callback.onFragmentResume(this);
-        //mListener.onStationsUpdated(adapter.getStations());
-
-
+        callback.onHeaderChanged(list.canScrollVertically(-1));
 
         Api.stationDetails(false, (apiResponse, statusCode, success) -> {
             if (success) {
@@ -163,7 +160,6 @@ public class StationsSubFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        resumed = false;
     }
 
     @Override
@@ -172,10 +168,18 @@ public class StationsSubFragment extends Fragment {
 
 
 
-        RecyclerView list = root.findViewById(R.id.stations_sub_list);
+
+        list = root.findViewById(R.id.stations_sub_list);
         list.setAdapter(adapter);
         list.setLayoutManager(new LinearLayoutManager(context));
         list.setHasFixedSize(true);
+        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                callback.onHeaderChanged(recyclerView.canScrollVertically(-1));
+            }
+        });
 
 
         return root;
@@ -187,11 +191,6 @@ public class StationsSubFragment extends Fragment {
         mListener.onStationsUpdated(new ArrayList<>());
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        callback.onFragmentStart(this);
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -347,11 +346,6 @@ public class StationsSubFragment extends Fragment {
         int meterInDec = Integer.valueOf(newFormat.format(meter));
 
         return Radius * c;
-    }
-
-    public interface FragmentReadyCallback {
-        void onFragmentResume(Fragment fragment);
-        void onFragmentStart(Fragment fragment);
     }
 
 }

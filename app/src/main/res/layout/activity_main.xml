@@ -24,8 +24,9 @@
         android:layout_marginTop="12dp"
         android:background="@drawable/stretched_circle"
         android:elevation="6dp"
+        android:padding="6dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_account_circle_black_24dp"
+        android:src="@drawable/ic_perm_identity_black_24dp"
         android:translationZ="0dp" />
 
     <View

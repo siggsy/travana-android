@@ -9,6 +9,12 @@
     android:clickable="true"
     android:focusable="true">
 
+    <include
+        layout="@layout/template_route_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="0" />
     <ImageView
         android:id="@+id/search_item_type"
         android:layout_width="wrap_content"
@@ -16,7 +22,8 @@
         android:layout_marginStart="16dp"
         android:layout_weight="0"
         android:tint="@android:color/black"
-        app:srcCompat="@drawable/ic_directions_bus_black_24dp" />
+        app:srcCompat="@drawable/ic_directions_bus_black_24dp"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/search_item_name"
@@ -28,4 +35,20 @@
         android:fontFamily="@font/roboto"
         android:text="Bavarski dvor"
         android:textColor="@android:color/black" />
+    <TextView
+        android:id="@+id/station_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/stretched_circle"
+        android:backgroundTint="@android:color/holo_orange_light"
+        android:elevation="2dp"
+        android:fontFamily="sans-serif"
+        android:padding="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/into_center"
+        android:textColor="@android:color/white"
+        android:textSize="12sp" />
+
 </LinearLayout>

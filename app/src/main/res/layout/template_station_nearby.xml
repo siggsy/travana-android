@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?selectableItemBackground"
+    android:background="?selectableItemBackground"
     android:orientation="vertical"
     app:cardElevation="2dp">
 

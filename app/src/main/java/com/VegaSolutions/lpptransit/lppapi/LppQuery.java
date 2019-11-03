@@ -31,6 +31,7 @@ public class LppQuery extends AsyncTask<String, Void, String> {
 
     // Bus
     public static final String BUS_DETAILS = "/bus/bus-details";                    // (?bus-name=468) !| (?bus-vin=ZCFC270C305997503) !| (?bus-id=?)
+    public static final String BUSES_ON_ROUTE = "/bus/buses-on-route";
     public static final String DRIVER = "/bus/driver";                              // (?driver-id=36066995138405380)
 
     // Route

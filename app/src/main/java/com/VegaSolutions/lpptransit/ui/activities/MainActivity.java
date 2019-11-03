@@ -1,6 +1,7 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
 import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -63,7 +64,7 @@ import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.TRAIN;
 
 // TODO: Clean the code, fix MapPadding remove useless callbacks and variables
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsSubFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, FragmentLifecycleListener {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsSubFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener{
 
     private GoogleMap mMap;
 
@@ -76,12 +77,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     ImageButton account;
     ImageButton search;
     View shadow;
-    View root;
 
     View bottom_sheet;
-    int maxMapsPadding = 0;
-    int minMapsPadding = 0;
-    int previousTop = 0;
 
     private ClusterManager<StationMarker> clusterManager;
 
@@ -91,15 +88,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        maxMapsPadding = displayMetrics.heightPixels;
-        getWindow().getDecorView().getHeight();
-
-        root = findViewById(R.id.root);
-        maxMapsPadding = root.getHeight();
-        Log.i("root", getWindow().getDecorView().getHeight() + "");
 
         search = findViewById(R.id.search);
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
@@ -161,18 +149,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-                if (slideOffset < 1)
-                    setMapPadding(slideOffset);
-                else setMapPadding(0);
-                Log.i("Maps", "offset -> " + slideOffset);
-
             }
         });
 
         switchFragment(HomeFragment.newInstance());
-
-
 
     }
 
@@ -200,6 +180,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setTrafficEnabled(true);
         setupClusterManager();
+        mMap.setPadding(12, 150, 12, behavior.getPeekHeight());
 
 
         mMap.setOnInfoWindowClickListener(marker -> {
@@ -214,12 +195,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         // Set camera to ljubljana
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
-    }
 
-    void setMapPadding(float offset) {
-        if (mMap == null) return;
-        offset *= (maxMapsPadding - 150) * .5;
-        mMap.setPadding(12, 150, 12, Math.round((offset) + minMapsPadding));
     }
 
     private void setupClusterManager() {
@@ -276,36 +252,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             runOnUiThread(() -> mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f)));
     }
 
-    private void animateMarkerPosition(final Marker marker) {
-        final Handler handler = new Handler();
-
-        final long startTime = SystemClock.uptimeMillis();
-        final long duration = 300; // ms
-
-        Projection proj = mMap.getProjection();
-        final LatLng markerLatLng = marker.getPosition();
-        Point startPoint = proj.toScreenLocation(markerLatLng);
-        startPoint.offset(0, -10);
-        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
-
-        final Interpolator interpolator = new BounceInterpolator();
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - startTime;
-                float t = interpolator.getInterpolation((float) elapsed / duration);
-                double lng = t * markerLatLng.longitude + (1 - t) * startLatLng.longitude;
-                double lat = t * markerLatLng.latitude + (1 - t) * startLatLng.latitude;
-                marker.setPosition(new LatLng(lat, lng));
-
-                if (t < 1.0) {
-                    // Post again 16ms later (60fps)
-                    handler.postDelayed(this, 16);
-                }
-            }
-        });
-    }
 
     private void animateMarkerAlpha(final Marker marker) {
         final Handler handler = new Handler();
@@ -346,50 +292,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void switchFragment(Fragment fragment) {
 
-        bottom_sheet.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Log.i("Updated", "this many");
-                if (previousTop != bottom_sheet.getTop()) {
-                    previousTop = bottom_sheet.getTop();
-                    bottom_sheet.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-                minMapsPadding = (int) Math.round((maxMapsPadding - bottom_sheet.getTop()) - maxMapsPadding * 0.02);
-                setMapPadding(0);
-            }
-        });
-
-        maxMapsPadding = getWindow().getDecorView().getHeight() - 50;
-
         shadow.setVisibility(fragment instanceof HomeFragment ?View.GONE :View.VISIBLE);
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.bottom_sheet,fragment);
         transaction.commit();
         fragments.push(fragment);
-        fm.executePendingTransactions();
-
-
-    }
-
-    @Override
-    public void fragmentOnResume() {
-
-        Log.i("Updated", "onResume");
-    }
-
-    @Override
-    public void fragmentOnPause() {
-
-    }
-
-    @Override
-    public void fragmentOnCreated() {
-
-    }
-
-    @Override
-    public void fragmentOnCreatedView() {
 
     }
 }

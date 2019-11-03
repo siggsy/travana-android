@@ -1,9 +1,11 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class StationOnRoute {
 
     private String name;
-    private int code_id;
+    private int station_code;
     private int order_no;
     private double latitude;
     private double longitude;
@@ -13,7 +15,7 @@ public class StationOnRoute {
     }
 
     public int getCode_id() {
-        return code_id;
+        return station_code;
     }
 
     public int getOrder_no() {
@@ -26,5 +28,9 @@ public class StationOnRoute {
 
     public double getLongitude() {
         return longitude;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(latitude, longitude);
     }
 }

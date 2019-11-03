@@ -6,8 +6,10 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -19,6 +21,8 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,9 +136,18 @@ public class SearchActivity extends AppCompatActivity {
             ViewHolder viewHolder = (ViewHolder) holder;
 
             if (item.getType() == SearchItem.STATION) {
+
                 StationItem stationItem = (StationItem) item;
                 viewHolder.name.setText(stationItem.station.getName());
-                viewHolder.image.setImageResource(R.drawable.ic_location_on_black_24dp);
+
+                viewHolder.image.setVisibility(View.VISIBLE);
+                viewHolder.circle.setVisibility(View.GONE);
+                viewHolder.center.setVisibility(Integer.valueOf(stationItem.station.getRef_id()) % 2 != 0 ? View.VISIBLE : View.GONE);
+                viewHolder.image.setImageResource((R.drawable.ic_location_on_black_24dp));
+
+
+
+
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent i = new Intent(SearchActivity.this, StationActivity.class);
                     i.putExtra("station_code", stationItem.station.getRef_id());
@@ -142,11 +155,31 @@ public class SearchActivity extends AppCompatActivity {
                     i.putExtra("station_center", Integer.valueOf(stationItem.station.getRef_id()) % 2 != 0);
                     startActivity(i);
                 });
+
             } else if (item.getType() == SearchItem.ROUTE) {
                 RouteItem routeItem = (RouteItem) item;
+
+
+                viewHolder.image.setVisibility(View.GONE);
+                viewHolder.circle.setVisibility(View.VISIBLE);
+                viewHolder.center.setVisibility(View.GONE);
+
+                viewHolder.number.setText(routeItem.route.getRoute_number());
+
+                String group = routeItem.route.getRoute_number().replaceAll("[^0-9]", "");
+                int color = Integer.valueOf(group);
+                viewHolder.circle.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.colors.get(color));
+
                 viewHolder.name.setText(routeItem.route.getRoute_name());
-                viewHolder.image.setImageResource(R.drawable.ic_directions_bus_black_24dp);
-                viewHolder.ll.setOnClickListener(null);
+                viewHolder.ll.setOnClickListener(v -> {
+                    Intent intent = new Intent(SearchActivity.this, RouteActivity.class);
+                    intent.putExtra(RouteActivity.ROUTE_NUMBER, routeItem.route.getRoute_number());
+                    intent.putExtra(RouteActivity.ROUTE_NAME, routeItem.route.getRoute_name());
+                    intent.putExtra(RouteActivity.ROUTE_ID, routeItem.route.getRoute_id());
+                    intent.putExtra(RouteActivity.TRIP_ID, routeItem.route.getTrip_id());
+                    startActivity(intent);
+                });
+
             }
 
         }
@@ -159,7 +192,8 @@ public class SearchActivity extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
 
             ImageView image;
-            TextView name;
+            View circle;
+            TextView name, number, center;
             LinearLayout ll;
 
             private ViewHolder(@NonNull View itemView) {
@@ -167,8 +201,12 @@ public class SearchActivity extends AppCompatActivity {
                 image = itemView.findViewById(R.id.search_item_type);
                 name = itemView.findViewById(R.id.search_item_name);
                 ll = itemView.findViewById(R.id.search_item_ll);
+                circle = itemView.findViewById(R.id.route_station_circle);
+                number = itemView.findViewById(R.id.route_station_number);
+                center = itemView.findViewById(R.id.station_center);
             }
         }
+
 
     }
 

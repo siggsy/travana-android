@@ -26,7 +26,8 @@
                 android:layout_height="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:tabIndicatorColor="@color/colorAccent" />
 
             <TextSwitcher
                 android:id="@+id/station_title"

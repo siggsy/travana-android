@@ -1,12 +1,13 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
-public class Route {
+public class RouteOnStation {
 
     private String trip_id;
     private String route_id;
     private String route_number;
     private String route_name;
-    private String short_route_name;
+    private String route_group_name;
+
 
     public String getTrip_id() {
         return trip_id;
@@ -24,8 +25,8 @@ public class Route {
         return route_name;
     }
 
-    public String getRoute_short_name() {
-        return short_route_name;
+    public String getRoute_group_name() {
+        return route_group_name;
     }
 
 }

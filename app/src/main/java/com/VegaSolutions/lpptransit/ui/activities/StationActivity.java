@@ -3,52 +3,48 @@ package com.VegaSolutions.lpptransit.ui.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
-import com.VegaSolutions.lpptransit.ui.Colors;
-import com.google.android.flexbox.FlexboxLayout;
+import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
+import com.VegaSolutions.lpptransit.ui.fragments.LiveArrivalFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.RoutesOnStationFragment;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.tabs.TabLayout;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+public class StationActivity extends AppCompatActivity implements FragmentHeaderCallback {
 
-public class StationActivity extends AppCompatActivity {
+
+    public static final String STATION_CODE = "station_code";
+    public static final String STATION_NAME = "station_name";
+    public static final String STATION_CENTER = "station_center";
 
     // Views
     TextView name, center;
     FrameLayout header;
-    RecyclerView recyclerView;
     ImageButton oppositeBtn;
     ImageView fav;
-    SwipeRefreshLayout refreshLayout;
+    ViewPager viewPager;
+    TabLayout tabLayout;
 
     Adapter adapter;
 
@@ -58,19 +54,7 @@ public class StationActivity extends AppCompatActivity {
     boolean station_center;
     boolean favourite;
 
-
-
-    ApiCallback<ArrivalWrapper> callback = new ApiCallback<ArrivalWrapper>() {
-        @Override
-        public void onComplete(@Nullable ApiResponse<ArrivalWrapper> apiResponse, int statusCode, boolean success) {
-            // TODO: handle error and no internet connection
-            if (success) {
-                ArrivalWrapper arrivalWrapper = apiResponse.getData();
-                runOnUiThread(() -> adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals())));
-                runOnUiThread(() -> refreshLayout.setRefreshing(false));
-            }
-        }
-    };
+    ElevationAnimation animation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,167 +66,26 @@ public class StationActivity extends AppCompatActivity {
         name = findViewById(R.id.station_title);
         header = findViewById(R.id.header);
         center = findViewById(R.id.station_center);
-        recyclerView = findViewById(R.id.station_routes_rv);
         oppositeBtn = findViewById(R.id.station_opposite_btn);
-        refreshLayout = findViewById(R.id.swipe_refresh);
         fav = findViewById(R.id.station_favourite);
+        viewPager = findViewById(R.id.station_pager);
+        tabLayout = findViewById(R.id.station_tab_layout);
 
         // Get Intent data
-        station_code = getIntent().getStringExtra("station_code");
-        station_name = getIntent().getStringExtra("station_name");
-        station_center = getIntent().getBooleanExtra("station_center", false);
+        station_code = getIntent().getStringExtra(STATION_CODE);
+        station_name = getIntent().getStringExtra(STATION_NAME);
+        station_center = getIntent().getBooleanExtra(STATION_CENTER, false);
         favourite = getSharedPreferences("station_favourites", MODE_PRIVATE).getBoolean(station_code, false);
 
         setupUI();
 
-        // TODO: handle errors
-
-        Api.arrival(station_code, callback);
-
     }
 
-    private class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        List<RouteWrapper> routes = new ArrayList<>();
-
-        void setArrivals(List<RouteWrapper> routes) {
-            this.routes = routes;
-            notifyDataSetChanged();
-        }
-
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(getLayoutInflater().inflate(R.layout.template_live_arrival, parent, false));
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
-            RouteWrapper route = routes.get(position);
-            ViewHolder viewHolder = (ViewHolder) holder;
-
-            viewHolder.name.setText(route.name);
-            viewHolder.number.setText(route.number);
-
-            String group = route.number.replaceAll("[^0-9]", "");
-            int color = Integer.valueOf(group);
-            viewHolder.circle.getBackground().setTint(Colors.colors.get(color));
-
-            viewHolder.arrivals.removeAllViews();
-            for (ArrivalWrapper.Arrival arrival : route.arrivals) {
-                View v = getLayoutInflater().inflate(R.layout.template_arrival_time, viewHolder.arrivals, false);
-                TextView arrival_time = v.findViewById(R.id.arrival_time_time);
-                TextView arrival_event = v.findViewById(R.id.arrival_time_event);
-                v.getBackground().setTint(Color.WHITE);
-
-                arrival_time.setText(String.format("%s min", String.valueOf(arrival.getEta_min())));
-                arrival_time.setTextColor(Color.BLACK);
-
-                //(0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
-
-                switch (arrival.getType()) {
-                    case 0: arrival_event.setVisibility(View.VISIBLE);
-                            arrival_event.setText("");
-                            ViewGroup.LayoutParams params = arrival_event.getLayoutParams();
-                            params.height = 32;
-                            params.width = 32;
-                            arrival_event.setLayoutParams(params);
-                            arrival_event.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_live, null));
-                            break;
-                    case 2: arrival_event.setVisibility(View.GONE);
-                            String arrival_text = getResources().getString(R.string.arrival).toUpperCase();
-                            arrival_time.setText(arrival_text);
-                            arrival_time.setTextColor(Color.WHITE);
-                            v.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_arrival, null));
-                            break;
-                    case 3: arrival_event.setVisibility(View.GONE);
-                            String detour_text = getResources().getString(R.string.detour).toUpperCase();
-                            arrival_time.setText(detour_text);
-                            arrival_time.setTextColor(Color.WHITE);
-                            v.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
-                            break;
-                    default: arrival_event.setVisibility(View.GONE);
-                }
-                viewHolder.arrivals.addView(v);
-                if (arrival.getType() == 3) break;
-            }
-
-
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return routes.size();
-        }
-
-        private class ViewHolder extends RecyclerView.ViewHolder {
-
-            TextView name, number;
-            View circle;
-
-            LinearLayout route;
-            FlexboxLayout arrivals;
-
-            private ViewHolder(@NonNull View itemView) {
-                super(itemView);
-
-
-                name = itemView.findViewById(R.id.live_arrival_route_name);
-                number = itemView.findViewById(R.id.route_station_number);
-                circle = itemView.findViewById(R.id.route_station_circle);
-                arrivals = itemView.findViewById(R.id.live_arrival_arrivals);
-
-                route = itemView.findViewById(R.id.live_arrival_ll);
-
-            }
-        }
-    }
-
-    private static class RouteWrapper {
-
-        List<ArrivalWrapper.Arrival> arrivals = new ArrayList<>();
-        String name;
-        String number;
-
-        private static List<RouteWrapper> getFromArrivals(List<ArrivalWrapper.Arrival> arrivals) {
-
-            Collections.sort(arrivals, (o1, o2) -> {
-                String o1S = o1.getRoute_name().replaceAll("[^0-9]", "");
-                String o2S = o2.getRoute_name().replaceAll("[^0-9]", "");
-                int o1V = Integer.valueOf(o1S);
-                int o2V = Integer.valueOf(o2S);
-                if (o1V == o2V) return o1.getRoute_name().compareTo(o2.getRoute_name());
-                return Integer.compare(o1V, o2V);
-            });
-
-            Map<String, RouteWrapper> map = new LinkedHashMap<>();
-
-            for (ArrivalWrapper.Arrival arrival : arrivals) {
-
-                RouteWrapper route = map.get(arrival.getRoute_name());
-                if (route == null) {
-                    route = new RouteWrapper();
-                    String[] substations = arrival.getTrip_name().split(" ");
-                    route.name = arrival.getStations() != null ? arrival.getStations().getArrival() : arrival.getTrip_name();
-                    //route.name = arrival.getTrip_name();
-                    route.number = arrival.getRoute_name();
-                    map.put(arrival.getRoute_name(), route);
-                }
-                route.arrivals.add(arrival);
-
-            }
-
-            return new ArrayList<>(map.values());
-
-        }
-
-    }
 
     public void setupUI() {
 
-        refreshLayout.setRefreshing(true);
+        animation = new ElevationAnimation(header, 16);
 
         // Set header
         name.setText(station_name);
@@ -282,25 +125,57 @@ public class StationActivity extends AppCompatActivity {
 
         });
 
-        // Setup RV
-        adapter = new Adapter();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
+        adapter = new Adapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        viewPager.setAdapter(adapter);
 
-        // Header elevation
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                header.setSelected(recyclerView.canScrollVertically(-1));
+        tabLayout.setupWithViewPager(viewPager);
+
+    }
+
+    @Override
+    public void onHeaderChanged(boolean selected) {
+        animation.elevate(selected);
+    }
+
+    class Adapter extends FragmentPagerAdapter {
+
+        public Adapter(@NonNull FragmentManager fm, int behavior) {
+            super(fm, behavior);
+        }
+
+        @NonNull
+        @Override
+        public Fragment getItem(int position) {
+
+            switch (position) {
+                case 0:
+                    return LiveArrivalFragment.newInstance(station_code);
+                case 1:
+                    return RoutesOnStationFragment.newInstance(station_code, station_name);
+                default:
+                    return null;
             }
-        });
+        }
 
-        // Swipe refresh
-        refreshLayout.setOnRefreshListener(() -> {
-            Api.arrival(station_code, callback);
-        });
-        refreshLayout.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent));
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+
+            switch (position) {
+                case 0:
+                    return "Prihodi";
+                case 1:
+                    return "Linije";
+                default:
+                    return "";
+            }
+        }
+
     }
 
 }

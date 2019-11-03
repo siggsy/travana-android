@@ -32,9 +32,8 @@ import com.google.android.material.tabs.TabLayout;
 
 // TODO: Clean code.
 
-public class StationsFragment extends Fragment implements StationsSubFragment.FragmentReadyCallback {
+public class StationsFragment extends Fragment implements FragmentHeaderCallback {
 
-    private FragmentLifecycleListener callback;
 
     private Context context;
     private Location location;
@@ -97,24 +96,18 @@ public class StationsFragment extends Fragment implements StationsSubFragment.Fr
     @Override
     public void onResume() {
         super.onResume();
-        callback.fragmentOnResume();
     }
 
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof FragmentLifecycleListener) {
-            callback = (FragmentLifecycleListener) context;
-        } else
-            throw new RuntimeException("must implement FragmentLifecycleListener");
         this.context = context;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        callback = null;
         context = null;
     }
 
@@ -138,7 +131,6 @@ public class StationsFragment extends Fragment implements StationsSubFragment.Fr
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
@@ -166,31 +158,8 @@ public class StationsFragment extends Fragment implements StationsSubFragment.Fr
     }
 
     @Override
-    public void onFragmentResume(Fragment fragment) {
-        View view = fragment.getView();
-        if (view != null) {
-            RecyclerView rv = view.findViewById(R.id.stations_sub_list);
-            header.setSelected(rv.canScrollVertically(-1));
-            viewPager.invalidate();
-        }
-    }
-
-    @Override
-    public void onFragmentStart(Fragment fragment) {
-        View view = fragment.getView();
-        if (view != null) {
-            RecyclerView rv = view.findViewById(R.id.stations_sub_list);
-            header.setSelected(rv.canScrollVertically(-1));
-            rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    header.setSelected(recyclerView.canScrollVertically(-1));
-                    Log.i("scrilling", "dx=" + dx + " dy=" + dy);
-                }
-            });
-
-        }
+    public void onHeaderChanged(boolean selected) {
+        header.setSelected(selected);
     }
 
     private class Adapter extends FragmentPagerAdapter {
