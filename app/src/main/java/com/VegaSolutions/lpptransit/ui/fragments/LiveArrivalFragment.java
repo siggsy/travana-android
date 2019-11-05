@@ -3,6 +3,7 @@ package com.VegaSolutions.lpptransit.ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -26,7 +27,9 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -165,9 +168,9 @@ public class LiveArrivalFragment extends Fragment {
             ViewHolder viewHolder = (ViewHolder) holder;
 
             viewHolder.name.setText(route.name);
-            viewHolder.number.setText(route.number);
+            viewHolder.number.setText(route.arrivalObject.getRoute_name());
 
-            String group = route.number.replaceAll("[^0-9]", "");
+            String group = route.arrivalObject.getRoute_name().replaceAll("[^0-9]", "");
             int color = Integer.valueOf(group);
             viewHolder.circle.getBackground().setTint(Colors.colors.get(color));
 
@@ -210,6 +213,15 @@ public class LiveArrivalFragment extends Fragment {
                 if (arrival.getType() == 3) break;
             }
 
+            viewHolder.route.setOnClickListener(v -> {
+                Intent i = new Intent(context, RouteActivity.class);
+                i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
+                i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRoute_name());
+                i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRoute_id());
+                i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTrip_id());
+                startActivity(i);
+            });
+
 
 
         }
@@ -246,7 +258,7 @@ public class LiveArrivalFragment extends Fragment {
 
         List<ArrivalWrapper.Arrival> arrivals = new ArrayList<>();
         String name;
-        String number;
+        ArrivalWrapper.Arrival arrivalObject;
 
         private static List<RouteWrapper> getFromArrivals(List<ArrivalWrapper.Arrival> arrivals) {
 
@@ -267,7 +279,7 @@ public class LiveArrivalFragment extends Fragment {
                 if (route == null) {
                     route = new RouteWrapper();
                     route.name = arrival.getStations() != null ? arrival.getStations().getArrival() : arrival.getTrip_name();
-                    route.number = arrival.getRoute_name();
+                    route.arrivalObject = arrival;
                     map.put(arrival.getRoute_name(), route);
                 }
                 route.arrivals.add(arrival);

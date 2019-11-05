@@ -192,6 +192,8 @@ public class RoutesOnStationFragment extends Fragment {
 
                 container = itemView.findViewById(R.id.route_container);
 
+                number.setTextSize(16f);
+
             }
         }
 

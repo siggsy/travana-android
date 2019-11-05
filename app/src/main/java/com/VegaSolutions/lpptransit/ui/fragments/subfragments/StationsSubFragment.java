@@ -34,6 +34,7 @@ import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
+import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -52,7 +53,6 @@ public class StationsSubFragment extends Fragment {
 
     private static final String TYPE = "type";
 
-    public static final int TYPE_ALL = 0;
     public static final int TYPE_NEARBY = 1;
     public static final int TYPE_FAVOURITE = 2;
 
@@ -97,6 +97,7 @@ public class StationsSubFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         callback.onHeaderChanged(list.canScrollVertically(-1));
 
         Api.stationDetails(false, (apiResponse, statusCode, success) -> {
@@ -116,14 +117,6 @@ public class StationsSubFragment extends Fragment {
                         Boolean f = favourites.get(station.getRef_id());
                         if (f == null) f = false;
                         if (f) stationWrappersFav.add(new StationWrapper(station, true));
-                    }
-
-                } else if (type == TYPE_ALL) {
-
-                    for (Station station : apiResponse.getData()) {
-                        Boolean f = favourites.get(station.getRef_id());
-                        if (f == null) f = false;
-                        stationWrappersFav.add(new StationWrapper(station, f));
                     }
 
                 } else if (type == TYPE_NEARBY) {
@@ -165,9 +158,6 @@ public class StationsSubFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_stations_sub, container, false);
-
-
-
 
         list = root.findViewById(R.id.stations_sub_list);
         list.setAdapter(adapter);
@@ -248,7 +238,7 @@ public class StationsSubFragment extends Fragment {
             String distance;
             if (location != null) {
                 if (station.distance == -1)
-                    station.distance = (int) Math.round(calculationByDistance(station.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude())) * 1000);
+                    station.distance = (int) Math.round(MapUtility.calculationByDistance(station.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude())) * 1000);
                 distance = station.distance + " m";
             }
             else distance = "?";
@@ -323,29 +313,6 @@ public class StationsSubFragment extends Fragment {
             this.station = station;
         }
 
-    }
-
-    public static double calculationByDistance(LatLng StartP, LatLng EndP) {
-        int Radius = 6371;
-        double lat1 = StartP.latitude;
-        double lat2 = EndP.latitude;
-        double lon1 = StartP.longitude;
-        double lon2 = EndP.longitude;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1))
-                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
-                * Math.sin(dLon / 2);
-        double c = 2 * Math.asin(Math.sqrt(a));
-        double valueResult = Radius * c;
-        double km = valueResult / 1;
-        DecimalFormat newFormat = new DecimalFormat("####");
-        int kmInDec = Integer.valueOf(newFormat.format(km));
-        double meter = valueResult % 1000;
-        int meterInDec = Integer.valueOf(newFormat.format(meter));
-
-        return Radius * c;
     }
 
 }

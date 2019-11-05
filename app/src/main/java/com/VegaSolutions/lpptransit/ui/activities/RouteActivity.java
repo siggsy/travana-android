@@ -95,7 +95,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        busOptions = new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bus_24dp, null)));
+        busOptions = new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bus_24dp, null))).anchor(0.5f, 0.5f);
 
         routeName = getIntent().getStringExtra(ROUTE_NAME);
         routeNumber = getIntent().getStringExtra(ROUTE_NUMBER);

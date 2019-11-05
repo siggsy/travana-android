@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"

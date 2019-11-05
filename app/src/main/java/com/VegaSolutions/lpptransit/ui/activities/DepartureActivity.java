@@ -90,14 +90,12 @@ public class DepartureActivity extends AppCompatActivity {
 
         Api.timetable(Integer.valueOf(station_code), 100, 100, (apiResponse, statusCode, success) -> {
             if (success) {
-
                 for (TimetableWrapper.RouteGroup.Route route : apiResponse.getData().getRoute_groups().get(0).getRoutes()) {
                     if (route.getParent_name().equals(route_name)) {
                         runOnUiThread(() -> adapter.setTimetables(route.getTimetable()));
                         return;
                     }
                 }
-
             }
         }, Integer.valueOf(group));
 
