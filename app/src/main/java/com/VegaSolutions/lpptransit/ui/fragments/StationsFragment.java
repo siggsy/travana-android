@@ -1,11 +1,17 @@
 package com.VegaSolutions.lpptransit.ui.fragments;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.DataSetObserver;
+import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentFactory;
@@ -26,6 +32,7 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
 import com.google.android.material.tabs.TabLayout;
 
@@ -44,6 +51,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     private TabLayout tabLayout;
 
     private Adapter adapter;
+    ElevationAnimation animation;
     private LinearLayoutManager linearLayoutManager;
     private boolean fav = true;
 
@@ -113,6 +121,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
 
     private void setupUI() {
+        animation = new ElevationAnimation(header, 16);
 
         adapter = new Adapter(getFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
@@ -122,44 +131,60 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
             textView.setTextAppearance(context, R.style.robotoBoldTitle);
             return textView;
         });
-        switcher.setCurrentText("Priljubljene postaje");
+        switcher.setCurrentText("Postaje");
         switcher.setInAnimation(context.getApplicationContext(), android.R.anim.slide_in_left);
         switcher.setOutAnimation(context.getApplicationContext(), android.R.anim.slide_out_right);
-
-
-        // ViewPager
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-                switch (position) {
-                    case 0:
-                        switcher.setText("Priljubljene postaje");
-                        break;
-                    case 1:
-                        switcher.setText("Postaje v bližini");
-                        break;
-                }
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            switch (i) {
+                case 0:
+                    int color = ContextCompat.getColor(context, R.color.colorAccent);
+                    TabLayout.Tab tab = tabLayout.getTabAt(i);
+                    tab.setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_favorite_black_24dp, null));
+                    tab.getIcon().setTint(color);
+                    break;
+                case 1:
+                    tabLayout.getTabAt(i).setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_location_on_black_24dp, null));
+                    break;
+            }
 
+        }
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int color;
+                switch (tab.getPosition()) {
+                    case 0:
+                        color = ContextCompat.getColor(context, R.color.colorAccent);
+                        break;
+                    case 1:
+                        color = ContextCompat.getColor(context, R.color.color_main_blue_dark);
+                        break;
+                    default:
+                        color = Color.BLACK;
+                }
+                tab.getIcon().setTint(color);
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                int color = Color.BLACK;
+                tab.getIcon().setTint(color);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
     }
 
     @Override
     public void onHeaderChanged(boolean selected) {
-        header.setSelected(selected);
+        animation.elevate(selected);
     }
 
     private class Adapter extends FragmentPagerAdapter {
@@ -202,6 +227,20 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             registeredFragments.put(position, fragment);
             return fragment;
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Priljubljene";
+                case 1:
+                    return "V blizini";
+                default:
+                    return super.getPageTitle(position);
+            }
+
         }
     }
 

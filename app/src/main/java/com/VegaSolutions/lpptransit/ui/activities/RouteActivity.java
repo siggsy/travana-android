@@ -45,7 +45,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     public static final String ROUTE_ID = "route_id";
     public static final String TRIP_ID = "trip_id";
 
-    private final int UPDATE_TIME = 1000;
+    private final int UPDATE_TIME = 2000;
 
     private String routeName;
     private String routeNumber;
@@ -95,7 +95,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        busOptions = new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bus_24dp, null))).anchor(0.5f, 0.5f);
+        busOptions = new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bus_24dp, null))).anchor(0.5f, 0.5f).zIndex(1f);
 
         routeName = getIntent().getStringExtra(ROUTE_NAME);
         routeNumber = getIntent().getStringExtra(ROUTE_NUMBER);
@@ -162,7 +162,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                     });
                 }
 
-                handler.postDelayed(runnable, UPDATE_TIME);
+                handler.post(runnable);
 
             }
         });

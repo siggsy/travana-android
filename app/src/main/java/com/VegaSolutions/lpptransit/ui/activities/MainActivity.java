@@ -192,7 +192,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             startActivity(i);
         });
 
-        // Set camera to ljubljana
+        // Set camera to Ljubljana
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
 
