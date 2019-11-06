@@ -176,6 +176,7 @@ public class LiveArrivalFragment extends Fragment {
 
             viewHolder.arrivals.removeAllViews();
             for (ArrivalWrapper.Arrival arrival : route.arrivals) {
+
                 View v = getLayoutInflater().inflate(R.layout.template_arrival_time, viewHolder.arrivals, false);
                 TextView arrival_time = v.findViewById(R.id.arrival_time_time);
                 TextView arrival_event = v.findViewById(R.id.arrival_time_event);
@@ -209,8 +210,10 @@ public class LiveArrivalFragment extends Fragment {
                         break;
                     default: arrival_event.setVisibility(View.GONE);
                 }
-                viewHolder.arrivals.addView(v);
+                if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                    viewHolder.arrivals.addView(v);
                 if (arrival.getType() == 3) break;
+
             }
 
             viewHolder.route.setOnClickListener(v -> {

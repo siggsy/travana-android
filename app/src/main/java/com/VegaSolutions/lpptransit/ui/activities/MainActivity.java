@@ -1,14 +1,25 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.ViewUtils;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.coordinatorlayout.widget.ViewGroupUtils;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,9 +35,15 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.lppapi.Api;
+import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
@@ -34,6 +51,9 @@ import com.VegaSolutions.lpptransit.ui.fragments.FragmentLifecycleListener;
 import com.VegaSolutions.lpptransit.ui.fragments.HomeFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
+import com.VegaSolutions.lpptransit.utility.MapUtility;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,8 +69,10 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -69,6 +91,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     LatLng ljubljana = new LatLng(46.056319, 14.505381);
+    FusedLocationProviderClient fusedLocationProviderClient;
+    private int locationRequestCode = 1000;
 
     ViewPagerBottomSheetBehavior behavior;
 
@@ -79,6 +103,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     View shadow;
 
     View bottom_sheet;
+    BusMarkerManager markerManager;
+    Handler handler;
+    ApiCallback<List<Bus>> busCallback = new ApiCallback<List<Bus>>() {
+        @Override
+        public void onComplete(@Nullable ApiResponse<List<Bus>> apiResponse, int statusCode, boolean success) {
+            if (success) {
+                List<Bus> buses = new ArrayList<>();
+                for (Bus bus : apiResponse.getData())
+                    if (!bus.getDriver_id().equals("00000000-0000-0000-0000-000000000000")) buses.add(bus);
+                    //if (!(bus.getDriver_id().equals("00000000-0000-0000-0000-000000000000") || bus.isEngine_value())) buses.add(bus);
+                runOnUiThread(() -> markerManager.updateAll(buses));
+                handler.postDelayed(runnable, 5000);
+            }
+        }
+    };
+    Runnable runnable = () -> Api.busDetails_all(busCallback);
 
     private ClusterManager<StationMarker> clusterManager;
 
@@ -89,11 +129,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        handler = new Handler();
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    locationRequestCode);
+
+        }
+
         search = findViewById(R.id.search);
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
         account = findViewById(R.id.account);
         account.setOnClickListener(view -> startActivity(new Intent(this, SignInActivity.class)));
         shadow = findViewById(R.id.shadow);
+
 
 
         bottom_sheet = findViewById(R.id.bottom_sheet);
@@ -156,6 +208,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    public FusedLocationProviderClient getFusedLocationProviderClient() {
+        return fusedLocationProviderClient;
+    }
+
     @Override
     public void onBackPressed() {
         if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
@@ -181,7 +237,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setTrafficEnabled(true);
         setupClusterManager();
         mMap.setPadding(12, 150, 12, behavior.getPeekHeight());
+        mMap.setMyLocationEnabled(true);
 
+        markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f));
+        handler.post(runnable);
 
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
@@ -201,7 +260,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void setupClusterManager() {
         clusterManager = new ClusterManager<>(this, mMap);
         CustomClusterRenderer customClusterRenderer = new CustomClusterRenderer(this, mMap, clusterManager);
-        customClusterRenderer.setMinClusterSize(10);
         clusterManager.setRenderer(customClusterRenderer);
         mMap.setOnCameraIdleListener(clusterManager);
         mMap.setOnMarkerClickListener(clusterManager);
@@ -293,11 +351,36 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void switchFragment(Fragment fragment) {
 
         shadow.setVisibility(fragment instanceof HomeFragment ?View.GONE :View.VISIBLE);
+        if (!(fragment instanceof HomeFragment)) {
+            handler.removeCallbacks(runnable);
+            mMap.clear();
+        } else if (mMap != null) {
+            mMap.clear();
+            handler.removeCallbacks(runnable);
+            handler.post(runnable);
+            markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f));
+        }
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.bottom_sheet,fragment);
         transaction.commit();
         fragments.push(fragment);
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1000: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mMap.setMyLocationEnabled(true);
+                } else {
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+        }
     }
 }

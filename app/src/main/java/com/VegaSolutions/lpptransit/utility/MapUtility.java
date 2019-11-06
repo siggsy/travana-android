@@ -44,4 +44,10 @@ public class MapUtility {
         return Radius * c;
     }
 
+    public static double angleDifference( double angle1, double angle2 )
+    {
+        double diff = ( angle2 - angle1 + 180 ) % 360 - 180;
+        return diff < -180 ? diff + 360 : diff;
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Bus {
 
     private String bus_unit_id;
@@ -69,5 +71,9 @@ public class Bus {
 
     public int getOdo() {
         return odo;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(coordinate_y, coordinate_x);
     }
 }

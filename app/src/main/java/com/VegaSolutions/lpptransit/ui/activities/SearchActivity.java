@@ -35,6 +35,7 @@ public class SearchActivity extends AppCompatActivity {
     FrameLayout header;
 
     SearchAdapter adapter;
+    private String filter = "";
 
     List<SearchItem> items = new ArrayList<>();
 
@@ -59,12 +60,14 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 applyFilter(query);
+                filter = query;
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 applyFilter(newText);
+                filter = newText;
                 return true;
             }
         });
@@ -84,14 +87,16 @@ public class SearchActivity extends AppCompatActivity {
                 for (Station station : apiResponse.getData())
                     items.add(new StationItem(station));
             }
+            Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
+                if (success1) {
+                    for (Route route : apiResponse1.getData())
+                        items.add(new RouteItem(route));
+                    runOnUiThread(() -> applyFilter(filter));
+                }
+            });
         });
 
-        Api.activeRoutes((apiResponse, statusCode, success) -> {
-            if (success) {
-                for (Route route : apiResponse.getData())
-                    items.add(new RouteItem(route));
-            }
-        });
+
 
 
 
@@ -112,6 +117,7 @@ public class SearchActivity extends AppCompatActivity {
             adapter.setItems(items);
         }
         adapter.notifyDataSetChanged();
+
     }
 
 

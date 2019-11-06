@@ -19,6 +19,7 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -61,7 +62,8 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private Handler handler;
 
-    List<Marker> buses = new ArrayList<>();
+
+    BusMarkerManager busManager;
 
     MarkerOptions busOptions;
 
@@ -69,12 +71,12 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         @Override
         public void onComplete(@Nullable ApiResponse<List<BusOnRoute>> apiResponse, int statusCode, boolean success) {
             if (success) {
-                for (Marker marker : buses)
-                    runOnUiThread(marker::remove);
-                buses.clear();
+                List<BusOnRoute> buses = new ArrayList<>();
                 for (BusOnRoute busOnRoute : apiResponse.getData())
                     if (busOnRoute.getTrip_id().equals(tripId))
-                        runOnUiThread(() -> buses.add(mMap.addMarker(busOptions.position(busOnRoute.getLatLng()).rotation(busOnRoute.getCardinal_direction()))));
+                        runOnUiThread(() -> buses.add(busOnRoute));
+                runOnUiThread(() -> busManager.update(buses));
+                handler.postDelayed(runnable, UPDATE_TIME);
             }
         }
     };
@@ -83,7 +85,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         @Override
         public void run() {
             Api.busesOnRoute(routeNumber, busQuery);
-            handler.postDelayed(this, UPDATE_TIME);
+
         }
     };
 
@@ -124,6 +126,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         handler = new Handler();
+        busManager = new BusMarkerManager(mMap, busOptions);
 
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
@@ -134,6 +137,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         });
 
         mMap.setPadding(0, 200, 0, 0);
+        mMap.setMyLocationEnabled(true);
 
         Api.stationsOnRoute(tripId, (apiResponse, statusCode, success) -> {
             if (success) {
@@ -153,7 +157,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                 if (!apiResponse.getData().isEmpty()) {
                     LatLngBounds bounds = builder.build();
                     runOnUiThread(() -> {
-                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(7f));
+                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(11f));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
                     });
                 } else {
