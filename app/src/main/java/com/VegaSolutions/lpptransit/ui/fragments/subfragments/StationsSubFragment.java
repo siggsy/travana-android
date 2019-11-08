@@ -105,6 +105,26 @@ public class StationsSubFragment extends Fragment {
         return fragment;
     }
 
+    private void setupUI() {
+        list.setAdapter(adapter);
+        list.setLayoutManager(new LinearLayoutManager(context));
+        list.setHasFixedSize(true);
+        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                callback.onHeaderChanged(recyclerView.canScrollVertically(-1));
+            }
+        });
+    }
+
+    private void startCurrentLocationUpdates() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(10000);
+        locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,14 +147,13 @@ public class StationsSubFragment extends Fragment {
 
         callback.onHeaderChanged(list.canScrollVertically(-1));
 
-        //startCurrentLocationUpdates();
-
         Api.stationDetails(false, (apiResponse, statusCode, success) -> {
             if (success) {
 
                 SharedPreferences sharedPreferences = context.getSharedPreferences("station_favourites", MODE_PRIVATE);
                 Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
                 ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
+
                 if (type == TYPE_FAVOURITE) {
 
                     if (favourites.size() == 0) {
@@ -160,20 +179,25 @@ public class StationsSubFragment extends Fragment {
                         // TODO: handle error
                         locationProviderClient.getLastLocation().addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
+
                                 location = task.getResult();
-                                Collections.sort(apiResponse.getData(), (o1, o2) -> {
-
-                                    double o1D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o1.getLatLng());
-                                    double o2D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o2.getLatLng());
-
-                                    return Double.compare(o1D, o2D);
-
-                                });
-
-                                for (Station station : apiResponse.getData()) {
-                                    Boolean f = favourites.get(station.getRef_id());
-                                    if (f == null) f = false;
-                                    stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000)));
+                                if (location != null) {
+                                    Collections.sort(apiResponse.getData(), (o1, o2) -> {
+                                        double o1D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o1.getLatLng());
+                                        double o2D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o2.getLatLng());
+                                        return Double.compare(o1D, o2D);
+                                    });
+                                    for (Station station : apiResponse.getData()) {
+                                        Boolean f = favourites.get(station.getRef_id());
+                                        if (f == null) f = false;
+                                        stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000)));
+                                    }
+                                } else {
+                                    for (Station station : apiResponse.getData()) {
+                                        Boolean f = favourites.get(station.getRef_id());
+                                        if (f == null) f = false;
+                                        stationWrappersFav.add(new StationWrapper(station, f));
+                                    }
                                 }
                                 ((Activity) context).runOnUiThread(() -> {
                                     adapter.setStations(stationWrappersFav);
@@ -182,16 +206,12 @@ public class StationsSubFragment extends Fragment {
                                 });
                             }
                         });
-                    }else {
+                    } else {
                         Collections.sort(apiResponse.getData(), (o1, o2) -> {
-
                             double o1D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o1.getLatLng());
                             double o2D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o2.getLatLng());
-
                             return Double.compare(o1D, o2D);
-
                         });
-
                         for (Station station : apiResponse.getData()) {
                             Boolean f = favourites.get(station.getRef_id());
                             if (f == null) f = false;
@@ -217,26 +237,11 @@ public class StationsSubFragment extends Fragment {
         locationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_stations_sub, container, false);
-
         list = root.findViewById(R.id.stations_sub_list);
-        list.setAdapter(adapter);
-        list.setLayoutManager(new LinearLayoutManager(context));
-        list.setHasFixedSize(true);
-        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                callback.onHeaderChanged(recyclerView.canScrollVertically(-1));
-            }
-        });
-
-
-
-
+        setupUI();
         return root;
     }
 
@@ -271,13 +276,6 @@ public class StationsSubFragment extends Fragment {
         void onStationsUpdated(List<Station> stations);
     }
 
-    private void startCurrentLocationUpdates() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);
-        locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-    }
-
     public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public List<StationWrapper> stations;
@@ -290,7 +288,6 @@ public class StationsSubFragment extends Fragment {
             this.stations = stations;
             notifyDataSetChanged();
         }
-
         public ArrayList<Station> getStations() {
             ArrayList<Station> stations = new ArrayList<>();
             for (StationWrapper stationWrapper : this.stations)
@@ -310,6 +307,7 @@ public class StationsSubFragment extends Fragment {
             StationWrapper station = stations.get(position);
             ViewHolder viewHolder = (ViewHolder) holder;
 
+            // Set distance
             String distance;
             if (location != null) {
                 if (station.distance == -1)
@@ -321,24 +319,11 @@ public class StationsSubFragment extends Fragment {
             }
             else distance = "?";
 
+            // Update ViewHolder
             viewHolder.name.setText(station.station.getName());
             viewHolder.distance.setText(distance);
-            viewHolder.routes.removeAllViews();
-            for (String route : station.station.getRoute_groups_on_station()) {
-
-                String group = route.replaceAll("[^0-9]", "");
-                int color = Integer.valueOf(group);
-
-                View v = getLayoutInflater().inflate(R.layout.template_route_number, viewHolder.routes, false);
-                ((TextView) v.findViewById(R.id.route_station_number)).setText(route);
-
-                viewHolder.routes.addView(v);
-                v.findViewById(R.id.route_station_circle).getBackground().setColorFilter(new PorterDuffColorFilter(Colors.colors.get(color), PorterDuff.Mode.SRC_ATOP));
-
-            }
-
             viewHolder.center.setVisibility(Integer.valueOf(station.station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
-
+            viewHolder.fav.setVisibility(station.favourite ? View.VISIBLE : View.GONE);
             viewHolder.card.setOnClickListener(v -> {
                 Intent intent = new Intent(context, StationActivity.class);
                 intent.putExtra("station_code", station.station.getRef_id());
@@ -347,7 +332,14 @@ public class StationsSubFragment extends Fragment {
                 startActivity(intent);
             });
 
-            viewHolder.fav.setVisibility(station.favourite ? View.VISIBLE : View.GONE);
+            // Set all route circles
+            viewHolder.routes.removeAllViews();
+            for (String route : station.station.getRoute_groups_on_station()) {
+                View v = getLayoutInflater().inflate(R.layout.template_route_number, viewHolder.routes, false);
+                ((TextView) v.findViewById(R.id.route_station_number)).setText(route);
+                v.findViewById(R.id.route_station_circle).getBackground().setColorFilter(new PorterDuffColorFilter(Colors.getColorFromString(route), PorterDuff.Mode.SRC_ATOP));
+                viewHolder.routes.addView(v);
+            }
 
 
         }

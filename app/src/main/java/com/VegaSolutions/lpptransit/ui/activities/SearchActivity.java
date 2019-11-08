@@ -35,15 +35,10 @@ public class SearchActivity extends AppCompatActivity {
     FrameLayout header;
 
     SearchAdapter adapter;
-    private String filter = "";
-
+    String filter = "";
     List<SearchItem> items = new ArrayList<>();
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+    void setupUI() {
 
         searchList = findViewById(R.id.search_activity_rv);
         searchView = findViewById(R.id.search_activity_search);
@@ -51,27 +46,9 @@ public class SearchActivity extends AppCompatActivity {
         header = findViewById(R.id.search_activity_header);
 
         adapter = new SearchAdapter();
-
         searchList.setAdapter(adapter);
         searchList.setLayoutManager(new LinearLayoutManager(this));
         searchList.setHasFixedSize(false);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                applyFilter(query);
-                filter = query;
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                applyFilter(newText);
-                filter = newText;
-                return true;
-            }
-        });
-
         searchList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -80,8 +57,56 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                applyFilter(query);
+                filter = query;
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                applyFilter(newText);
+                filter = newText;
+                return true;
+            }
+        });
+
         back.setOnClickListener(view -> finish());
 
+    }
+
+    void applyFilter(String text) {
+
+        if(text.isEmpty()) {
+            adapter.items.clear();
+        } else {
+            ArrayList<SearchItem> items = new ArrayList<>();
+
+            // Ignore all special Slovene characters
+            text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
+
+            // Find an item and add to the list
+            for(SearchItem item : this.items) {
+                String itemName = item.searchText.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
+                if (itemName.contains(text))
+                    items.add(item);
+            }
+            adapter.setItems(items);
+        }
+        adapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
+
+        setupUI();
+
+        // Query stations and then routes.
+        // TODO: add progress indicator
         Api.stationDetails(true, (apiResponse, statusCode, success) -> {
             if (success) {
                 for (Station station : apiResponse.getData())
@@ -96,28 +121,6 @@ public class SearchActivity extends AppCompatActivity {
             });
         });
 
-
-
-
-
-    }
-
-    void applyFilter(String text) {
-
-        if(text.isEmpty()){
-            adapter.items.clear();
-        } else {
-            ArrayList<SearchItem> items = new ArrayList<>();
-            text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
-            for(SearchItem item : this.items) {
-                String itemName = item.searchText.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
-                if (itemName.contains(text))
-                    items.add(item);
-            }
-            adapter.setItems(items);
-        }
-        adapter.notifyDataSetChanged();
-
     }
 
 
@@ -125,7 +128,7 @@ public class SearchActivity extends AppCompatActivity {
 
         ArrayList<SearchItem> items = new ArrayList<>();
 
-        public void setItems(ArrayList<SearchItem> items) {
+        private void setItems(ArrayList<SearchItem> items) {
             this.items = items;
         }
 
@@ -144,16 +147,13 @@ public class SearchActivity extends AppCompatActivity {
             if (item.getType() == SearchItem.STATION) {
 
                 StationItem stationItem = (StationItem) item;
-                viewHolder.name.setText(stationItem.station.getName());
 
+                // Update ViewHolder
+                viewHolder.name.setText(stationItem.station.getName());
                 viewHolder.image.setVisibility(View.VISIBLE);
                 viewHolder.circle.setVisibility(View.GONE);
                 viewHolder.center.setVisibility(Integer.valueOf(stationItem.station.getRef_id()) % 2 != 0 ? View.VISIBLE : View.GONE);
                 viewHolder.image.setImageResource((R.drawable.ic_location_on_black_24dp));
-
-
-
-
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent i = new Intent(SearchActivity.this, StationActivity.class);
                     i.putExtra("station_code", stationItem.station.getRef_id());
@@ -163,19 +163,15 @@ public class SearchActivity extends AppCompatActivity {
                 });
 
             } else if (item.getType() == SearchItem.ROUTE) {
+
                 RouteItem routeItem = (RouteItem) item;
 
-
+                // Update ViewHolder
                 viewHolder.image.setVisibility(View.GONE);
                 viewHolder.circle.setVisibility(View.VISIBLE);
                 viewHolder.center.setVisibility(View.GONE);
-
                 viewHolder.number.setText(routeItem.route.getRoute_number());
-
-                String group = routeItem.route.getRoute_number().replaceAll("[^0-9]", "");
-                int color = Integer.valueOf(group);
-                viewHolder.circle.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.colors.get(color));
-
+                viewHolder.circle.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.getColorFromString(routeItem.route.getRoute_number()));
                 viewHolder.name.setText(routeItem.route.getRoute_name());
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent intent = new Intent(SearchActivity.this, RouteActivity.class);
@@ -213,14 +209,13 @@ public class SearchActivity extends AppCompatActivity {
             }
         }
 
-
     }
 
 
     abstract class SearchItem {
 
-        public static final int ROUTE = 0;
-        public static final int STATION = 1;
+        static final int ROUTE = 0;
+        static final int STATION = 1;
         String searchText;
 
         abstract int getType();
@@ -231,7 +226,7 @@ public class SearchActivity extends AppCompatActivity {
 
         Station station;
 
-        public StationItem(Station station) {
+        StationItem(Station station) {
             this.station = station;
             searchText = station.getName();
         }
@@ -240,14 +235,14 @@ public class SearchActivity extends AppCompatActivity {
         int getType() {
             return STATION;
         }
+
     }
 
     class RouteItem extends SearchItem {
 
         Route route;
 
-
-        public RouteItem(Route route) {
+        RouteItem(Route route) {
             this.route = route;
             searchText = route.getRoute_number() + " " + route.getRoute_name();
         }
@@ -256,9 +251,7 @@ public class SearchActivity extends AppCompatActivity {
         int getType() {
             return ROUTE;
         }
+
     }
-
-
-
 
 }

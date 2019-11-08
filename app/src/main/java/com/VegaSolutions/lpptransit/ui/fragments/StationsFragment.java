@@ -67,12 +67,64 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
+    private void setupUI() {
+        animation = new ElevationAnimation(header, 16);
+
+        adapter = new Adapter(getFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+
+        // TextSwitcher
+        switcher.setFactory(() -> {
+            TextView textView = new TextView(context);
+            textView.setTextAppearance(context, R.style.robotoBoldTitle);
+            return textView;
+        });
+        switcher.setCurrentText("Postaje");
+        switcher.setInAnimation(context.getApplicationContext(), android.R.anim.slide_in_left);
+        switcher.setOutAnimation(context.getApplicationContext(), android.R.anim.slide_out_right);
+
+        // ViewPager with TabLayout
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            switch (i) {
+                case 0:
+                    int color = ContextCompat.getColor(context, R.color.colorAccent);
+                    TabLayout.Tab tab = tabLayout.getTabAt(i);
+                    tab.setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_favorite_black_24dp, null));
+                    tab.getIcon().setTint(color);
+                    break;
+                case 1:
+                    tabLayout.getTabAt(i).setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_location_on_black_24dp, null));
+                    break;
+            }
         }
-        removeFragments();
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int color;
+                switch (tab.getPosition()) {
+                    case 0:
+                        color = ContextCompat.getColor(context, R.color.colorAccent);
+                        break;
+                    case 1:
+                        color = ContextCompat.getColor(context, R.color.color_main_blue_dark);
+                        break;
+                    default:
+                        color = Color.BLACK;
+                }
+                tab.getIcon().setTint(color);
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                int color = Color.BLACK;
+                tab.getIcon().setTint(color);
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
     }
 
     private void removeFragments() {
@@ -85,6 +137,14 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
                     fm.beginTransaction().remove(fragment).commit();
         }
 
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+        }
+        removeFragments();
     }
 
     @Override
@@ -114,72 +174,15 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        removeFragments();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         context = null;
-    }
-
-
-    private void setupUI() {
-        animation = new ElevationAnimation(header, 16);
-
-        adapter = new Adapter(getFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-
-        // TextSwitcher
-        switcher.setFactory(() -> {
-            TextView textView = new TextView(context);
-            textView.setTextAppearance(context, R.style.robotoBoldTitle);
-            return textView;
-        });
-        switcher.setCurrentText("Postaje");
-        switcher.setInAnimation(context.getApplicationContext(), android.R.anim.slide_in_left);
-        switcher.setOutAnimation(context.getApplicationContext(), android.R.anim.slide_out_right);
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            switch (i) {
-                case 0:
-                    int color = ContextCompat.getColor(context, R.color.colorAccent);
-                    TabLayout.Tab tab = tabLayout.getTabAt(i);
-                    tab.setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_favorite_black_24dp, null));
-                    tab.getIcon().setTint(color);
-                    break;
-                case 1:
-                    tabLayout.getTabAt(i).setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_location_on_black_24dp, null));
-                    break;
-            }
-
-        }
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                int color;
-                switch (tab.getPosition()) {
-                    case 0:
-                        color = ContextCompat.getColor(context, R.color.colorAccent);
-                        break;
-                    case 1:
-                        color = ContextCompat.getColor(context, R.color.color_main_blue_dark);
-                        break;
-                    default:
-                        color = Color.BLACK;
-                }
-                tab.getIcon().setTint(color);
-
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                int color = Color.BLACK;
-                tab.getIcon().setTint(color);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
     }
 
     @Override

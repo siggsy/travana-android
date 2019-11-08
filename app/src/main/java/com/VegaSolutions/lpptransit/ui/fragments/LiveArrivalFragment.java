@@ -47,9 +47,11 @@ public class LiveArrivalFragment extends Fragment {
     private Context context;
     private FragmentHeaderCallback headerCallback;
 
-    ApiCallback<ArrivalWrapper> callback = new ApiCallback<ArrivalWrapper>() {
-        @Override
-        public void onComplete(@Nullable ApiResponse<ArrivalWrapper> apiResponse, int statusCode, boolean success) {
+    private Adapter adapter;
+    private SwipeRefreshLayout refreshLayout;
+    private RecyclerView rv;
+
+    private ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
             // TODO: handle error and no internet connection
             if (success) {
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
@@ -58,65 +60,10 @@ public class LiveArrivalFragment extends Fragment {
                     refreshLayout.setRefreshing(false);
                 });
             }
-        }
+
     };
 
-
-    public LiveArrivalFragment() {
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentHeaderCallback)
-            headerCallback = (FragmentHeaderCallback) context;
-        this.context = context;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        onHeaderChanged(rv.canScrollVertically(-1));
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        headerCallback = null;
-        context = null;
-    }
-
-    public static LiveArrivalFragment newInstance(String stationId) {
-        LiveArrivalFragment fragment = new LiveArrivalFragment();
-        Bundle args = new Bundle();
-        args.putString(STATION_ID, stationId);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            stationId = getArguments().getString(STATION_ID);
-        }
-    }
-
-    private Adapter adapter;
-
-    private SwipeRefreshLayout refreshLayout;
-    private RecyclerView rv;
-
-
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
-
-        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
-        rv = root.findViewById(R.id.live_arrival_rv);
+    private void setupUI() {
 
         adapter = new Adapter();
         rv.setLayoutManager(new LinearLayoutManager(context));
@@ -130,11 +77,63 @@ public class LiveArrivalFragment extends Fragment {
         });
 
         refreshLayout.setRefreshing(true);
-        refreshLayout.setOnRefreshListener(() -> {
-            Api.arrival(stationId, callback);
-        });
+        refreshLayout.setOnRefreshListener(() -> Api.arrival(stationId, callback));
         refreshLayout.setColorSchemeColors(ContextCompat.getColor(context, R.color.colorAccent));
 
+    }
+
+    public static LiveArrivalFragment newInstance(String stationId) {
+        LiveArrivalFragment fragment = new LiveArrivalFragment();
+        Bundle args = new Bundle();
+        args.putString(STATION_ID, stationId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public LiveArrivalFragment() {
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentHeaderCallback)
+            headerCallback = (FragmentHeaderCallback) context;
+        this.context = context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        headerCallback = null;
+        context = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        onHeaderChanged(rv.canScrollVertically(-1));
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            stationId = getArguments().getString(STATION_ID);
+        }
+    }
+
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
+
+        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
+        rv = root.findViewById(R.id.live_arrival_rv);
+        setupUI();
+
+        // Query arrivals.
         Api.arrival(stationId, callback);
 
         return root;
@@ -167,13 +166,20 @@ public class LiveArrivalFragment extends Fragment {
             RouteWrapper route = routes.get(position);
             ViewHolder viewHolder = (ViewHolder) holder;
 
+            // Update ViewHolder.
             viewHolder.name.setText(route.name);
             viewHolder.number.setText(route.arrivalObject.getRoute_name());
+            viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRoute_name()));
+            viewHolder.route.setOnClickListener(v -> {
+                Intent i = new Intent(context, RouteActivity.class);
+                i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
+                i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRoute_name());
+                i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRoute_id());
+                i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTrip_id());
+                startActivity(i);
+            });
 
-            String group = route.arrivalObject.getRoute_name().replaceAll("[^0-9]", "");
-            int color = Integer.valueOf(group);
-            viewHolder.circle.getBackground().setTint(Colors.colors.get(color));
-
+            // Set live arrivals.
             viewHolder.arrivals.removeAllViews();
             for (ArrivalWrapper.Arrival arrival : route.arrivals) {
 
@@ -216,17 +222,6 @@ public class LiveArrivalFragment extends Fragment {
 
             }
 
-            viewHolder.route.setOnClickListener(v -> {
-                Intent i = new Intent(context, RouteActivity.class);
-                i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
-                i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRoute_name());
-                i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRoute_id());
-                i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTrip_id());
-                startActivity(i);
-            });
-
-
-
         }
 
         @Override
@@ -245,12 +240,10 @@ public class LiveArrivalFragment extends Fragment {
             private ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
-
                 name = itemView.findViewById(R.id.live_arrival_route_name);
                 number = itemView.findViewById(R.id.route_station_number);
                 circle = itemView.findViewById(R.id.route_station_circle);
                 arrivals = itemView.findViewById(R.id.live_arrival_arrivals);
-
                 route = itemView.findViewById(R.id.live_arrival_ll);
 
             }
@@ -265,6 +258,7 @@ public class LiveArrivalFragment extends Fragment {
 
         private static List<RouteWrapper> getFromArrivals(List<ArrivalWrapper.Arrival> arrivals) {
 
+            // Sort by route number
             Collections.sort(arrivals, (o1, o2) -> {
                 String o1S = o1.getRoute_name().replaceAll("[^0-9]", "");
                 String o2S = o2.getRoute_name().replaceAll("[^0-9]", "");
@@ -275,9 +269,7 @@ public class LiveArrivalFragment extends Fragment {
             });
 
             Map<String, RouteWrapper> map = new LinkedHashMap<>();
-
             for (ArrivalWrapper.Arrival arrival : arrivals) {
-
                 RouteWrapper route = map.get(arrival.getRoute_name());
                 if (route == null) {
                     route = new RouteWrapper();
@@ -286,9 +278,7 @@ public class LiveArrivalFragment extends Fragment {
                     map.put(arrival.getRoute_name(), route);
                 }
                 route.arrivals.add(arrival);
-
             }
-
             return new ArrayList<>(map.values());
 
         }

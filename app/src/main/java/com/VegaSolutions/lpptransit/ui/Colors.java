@@ -114,4 +114,9 @@ public class Colors {
         colors.add(Color.HSVToColor(new float[] {111.634f , 0.7f, 0.9f}));
     }
 
+    public static int getColorFromString(String s) {
+        String color = s.replaceAll("[^0-9]", "");
+        return colors.get(Integer.valueOf(color));
+    }
+
 }

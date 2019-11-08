@@ -24,7 +24,7 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<StationMarker>
 
     @Override
     protected String getClusterText(int bucket) {
-        return String.valueOf(bucket);
+        return super.getClusterText(bucket);
     }
 
     @Override

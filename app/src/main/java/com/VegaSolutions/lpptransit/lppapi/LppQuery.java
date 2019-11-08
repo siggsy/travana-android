@@ -91,7 +91,6 @@ public class LppQuery extends AsyncTask<String, Void, String> {
                 Connection.Response r = Jsoup.connect(SERVER_URL + api + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(0).execute(); //.header("apikey", BuildConfig.LPP_API_KEY)
                 Log.i(TAG, r.body());
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
-
             } catch (HttpStatusException e) {
                 e.printStackTrace();
                 onCompleteListener.onComplete(null, e.getStatusCode(), false);

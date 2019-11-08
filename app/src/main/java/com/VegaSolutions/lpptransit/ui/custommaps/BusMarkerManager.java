@@ -3,6 +3,7 @@ package com.VegaSolutions.lpptransit.ui.custommaps;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
@@ -31,11 +32,13 @@ public class BusMarkerManager {
 
     public void update(List<BusOnRoute> busesOnRoute) {
 
+        // Remove all buses not on the list.
         for (Map.Entry<String, Marker> entry : busMap.entrySet()) {
             if (!contains(busesOnRoute, entry.getKey()))
                 entry.getValue().remove();
         }
 
+        // Add or update bus markers.
         for (BusOnRoute busOnRoute : busesOnRoute) {
             Marker bus = busMap.get(busOnRoute.getBus_unit_id());
             if (bus != null)
@@ -45,14 +48,18 @@ public class BusMarkerManager {
                 busMap.put(busOnRoute.getBus_unit_id(), marker);
             }
         }
+
     }
 
     public void updateAll(List<Bus> buses) {
+
+        // Remove all buses not on the list.
         for (Map.Entry<String, Marker> entry : busMap.entrySet()) {
             if (!containsAll(buses, entry.getKey()))
                 entry.getValue().remove();
         }
 
+        // Add or update bus markers.
         for (Bus bus : buses) {
             Marker busMarker = busMap.get(bus.getBus_unit_id());
             if (busMarker != null)
@@ -79,19 +86,20 @@ public class BusMarkerManager {
     private void animateMarker(Marker marker, LatLng finalPosition, float finalCardinalDirection,  LatLngInterpolator latLngInterpolator) {
 
         final LatLng startPosition = marker.getPosition();
-        float startCardinalDirection = marker.getRotation();
+        float startCardinalDirection = marker.getRotation() % 360;
         final float beginCardinalDirection;
         final float endCardinalDirection;
 
-        // Adjust angle animation (shortest path)
-        if (finalCardinalDirection - startCardinalDirection > 180) {
-            if (startCardinalDirection < 0)
-                startCardinalDirection = startCardinalDirection + 360;
-            else finalCardinalDirection = finalCardinalDirection - 360;
+        // Adjust angle animation (shortest path).
+        if (Math.abs(finalCardinalDirection - startCardinalDirection) > 180) {
+            if (finalCardinalDirection > startCardinalDirection)
+                startCardinalDirection += 360;
+            else finalCardinalDirection += 360;
         }
 
         endCardinalDirection = finalCardinalDirection;
         beginCardinalDirection = startCardinalDirection;
+
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         final Interpolator interpolator = new AccelerateDecelerateInterpolator();

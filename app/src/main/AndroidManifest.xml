@@ -20,7 +20,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.activities.WelcomeActivity"></activity>
+
+        <activity
+            android:name=".ui.activities.WelcomeActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
         <activity
             android:name=".ui.activities.DepartureActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
@@ -64,10 +67,6 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.StationActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".ui.test.TestActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             android:screenOrientation="portrait"/>
         <activity

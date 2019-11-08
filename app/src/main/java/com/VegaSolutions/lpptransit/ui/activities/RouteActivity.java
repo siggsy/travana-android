@@ -46,8 +46,6 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     public static final String ROUTE_ID = "route_id";
     public static final String TRIP_ID = "trip_id";
 
-    private final int UPDATE_TIME = 2000;
-
     private String routeName;
     private String routeNumber;
     private String routeId;
@@ -57,37 +55,47 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private TextView name, number;
     private View circle;
 
+    private final int UPDATE_TIME = 2000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
-
     private GoogleMap mMap;
     private Handler handler;
-
-
-    BusMarkerManager busManager;
-
-    MarkerOptions busOptions;
+    private BusMarkerManager busManager;
+    private MarkerOptions busOptions;
+    private MarkerOptions stationOptions;
 
     private ApiCallback<List<BusOnRoute>> busQuery = new ApiCallback<List<BusOnRoute>>() {
         @Override
         public void onComplete(@Nullable ApiResponse<List<BusOnRoute>> apiResponse, int statusCode, boolean success) {
             if (success) {
                 List<BusOnRoute> buses = new ArrayList<>();
+
+                // Filter by trip ID.
                 for (BusOnRoute busOnRoute : apiResponse.getData())
                     if (busOnRoute.getTrip_id().equals(tripId))
                         runOnUiThread(() -> buses.add(busOnRoute));
+
+                // Update markers.
                 runOnUiThread(() -> busManager.update(buses));
                 handler.postDelayed(runnable, UPDATE_TIME);
             }
         }
     };
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            Api.busesOnRoute(routeNumber, busQuery);
+    private Runnable runnable = () -> Api.busesOnRoute(routeNumber, busQuery);
 
-        }
-    };
+    private void setupUI() {
+
+        // Get drawable resource for markers.
+        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bus_24dp, null))).flat(true);
+        stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.station_circle, null)));
+
+        // Setup views.
+        backBtn.setOnClickListener(v -> onBackPressed());
+        name.setText(routeName);
+        number.setText(routeNumber);
+        number.setTextSize(14f);
+        circle.getBackground().setTint(Colors.getColorFromString(routeNumber));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +104,6 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        busOptions = new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bus_24dp, null))).anchor(0.5f, 0.5f).zIndex(1f);
 
         routeName = getIntent().getStringExtra(ROUTE_NAME);
         routeNumber = getIntent().getStringExtra(ROUTE_NUMBER);
@@ -109,16 +115,21 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         number = findViewById(R.id.route_station_number);
         circle = findViewById(R.id.route_circle);
 
+        setupUI();
 
-        backBtn.setOnClickListener(v -> onBackPressed());
-        name.setText(routeName);
-        number.setText(routeNumber);
-        number.setTextSize(14f);
+    }
 
-        String group = routeNumber.replaceAll("[^0-9]", "");
-        int color = Integer.valueOf(group);
-        circle.getBackground().setTint(Colors.colors.get(color));
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (handler != null)
+            handler.postDelayed(runnable, UPDATE_TIME);
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(runnable);
     }
 
     @Override
@@ -128,6 +139,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         handler = new Handler();
         busManager = new BusMarkerManager(mMap, busOptions);
 
+        // Setup map.
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
             i.putExtra(StationActivity.STATION_NAME, marker.getTitle());
@@ -135,25 +147,33 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             i.putExtra(StationActivity.STATION_CENTER, Integer.valueOf(marker.getSnippet()) % 2 != 0);
             startActivity(i);
         });
-
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                return marker.getTitle() == null;
+            }
+        });
         mMap.setPadding(0, 200, 0, 0);
         mMap.setMyLocationEnabled(true);
 
+        // Query stations on route and display them on the map.
         Api.stationsOnRoute(tripId, (apiResponse, statusCode, success) -> {
             if (success) {
 
-                BitmapDescriptor stationIcon = MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.station_circle, null));
-
+                // Sort stations.
                 Collections.sort(apiResponse.getData(), (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
-
                 List<LatLng> latLngs = new ArrayList<>();
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                // Add station markers.
                 for (StationOnRoute stationOnRoute : apiResponse.getData()) {
                     LatLng latLng = stationOnRoute.getLatLng();
                     latLngs.add(latLng);
                     builder.include(latLng);
-                    runOnUiThread(() -> mMap.addMarker(new MarkerOptions().position(latLng).title(stationOnRoute.getName()).snippet(String.valueOf(stationOnRoute.getCode_id())).icon(stationIcon).anchor(0.5f, 0.5f)));
+                    runOnUiThread(() -> mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()).snippet(String.valueOf(stationOnRoute.getCode_id()))));
                 }
+
+                // Connect stations with polyline and move the camera.
                 if (!apiResponse.getData().isEmpty()) {
                     LatLngBounds bounds = builder.build();
                     runOnUiThread(() -> {
@@ -166,6 +186,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                     });
                 }
 
+                // Start bus updater.
                 handler.post(runnable);
 
             }
@@ -173,16 +194,4 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        handler.removeCallbacks(runnable);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (handler != null)
-            handler.postDelayed(runnable, UPDATE_TIME);
-    }
 }
