@@ -14,6 +14,30 @@
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:colorControlHighlight">@color/colorRipple</item>
+        <item name="android:fontFamily">@font/google_sans</item>
+        <item name="backgroundViewColor">@color/color_main_background</item>
+        <item name="android:textColor">@color/color_text</item>
+        <item name="containerBackground">@drawable/stretched_circle</item>
+        <item name="containerBorderColor">@color/transparent</item>
+        <item name="containerBorderMargin">3dp</item>
+        <item name="containerBorderPadding">0dp</item>
+        <item name="containerBorderPaddingSide">0dp</item>
+        <item name="elevation">2dp</item>
+    </style>
+
+    <style name="WhiteTheme" parent="Theme.AppCompat.Light.NoActionBar.FullScreen"/>
+
+    <style name="DarkTheme" parent="Theme.AppCompat.Light.NoActionBar.FullScreen">
+        <item name="backgroundViewColor">@color/color_main_background_dark</item>
+        <item name="android:textColor">@color/color_text_dark</item>
+        <item name="containerBackground">@drawable/stretched_circle</item>
+        <item name="containerBorderColor">@color/light_gray_2</item>
+        <item name="containerBorderMargin">0dp</item>
+        <item name="containerBorderPadding">3dp</item>
+        <item name="containerBorderPaddingSide">4dp</item>
+        <item name="android:editTextColor">@android:color/white</item>
+        <item name="android:textColorHint">@android:color/white</item>
+        <item name="elevation">0dp</item>
     </style>
 
     <style name="robotoBoldTitle">

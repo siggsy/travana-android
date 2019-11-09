@@ -5,9 +5,9 @@
     android:id="@+id/station_nearby_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:background="?selectableItemBackground"
     android:orientation="vertical"
     app:cardElevation="2dp">
 
@@ -25,9 +25,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="4dp"
             android:layout_weight="0"
-            android:fontFamily="@font/roboto_bold"
             android:text="Drama"
-            android:textColor="@android:color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -70,7 +68,6 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
-            android:fontFamily="@font/roboto_thin"
             android:text="149 m"
             android:textAlignment="textEnd" />
 

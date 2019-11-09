@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,6 +102,9 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
+        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
+        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_search);
 
         setupUI();
@@ -156,9 +160,7 @@ public class SearchActivity extends AppCompatActivity {
                 viewHolder.image.setImageResource((R.drawable.ic_location_on_black_24dp));
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent i = new Intent(SearchActivity.this, StationActivity.class);
-                    i.putExtra("station_code", stationItem.station.getRef_id());
-                    i.putExtra("station_name", stationItem.station.getName());
-                    i.putExtra("station_center", Integer.valueOf(stationItem.station.getRef_id()) % 2 != 0);
+                    i.putExtra("station", stationItem.station);
                     startActivity(i);
                 });
 

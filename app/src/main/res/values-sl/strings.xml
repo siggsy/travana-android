@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Travana</string>
     <string name="app_slogan_welcome_activity">boljši javni prevoz.</string>
-    <string name="arrival">prihod</string>
+    <string name="arrival">PRIHOD</string>
     <string name="by_developers">od Domen Kralj, Žiga Leskovec</string>
     <string name="contact_us">Kontaktiraj nas.</string>
     <string name="routes">Linije</string>
@@ -20,4 +20,16 @@
     <string name="transport">Prevoz,</string>
     <string name="into_center">V CENTER</string>
     <string name="meant_to_be">mora biti.</string>
+    <string name="stations">Postaje</string>
+    <string name="garage">garaža</string>
+    <string name="arrivals">Prihodi</string>
+    <string name="settings">Nastavitve</string>
+    <string name="dark_theme">Temna</string>
+    <string name="white_theme">Svetla</string>
+    <string name="theme">Tema</string>
+    <string name="minutes">Minute</string>
+    <string name="hours">Ure</string>
+    <string name="arrival_time">Čas prihoda</string>
+    <string name="nearby">V bližini</string>
+    <string name="favourite">Favourite</string>
 </resources>

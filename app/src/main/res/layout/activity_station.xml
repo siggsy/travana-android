@@ -1,117 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:layout_width="match_parent" >
 
-
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/station_pager"
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header"
-        app:layout_constraintVertical_bias="0.0" />
+        android:layout_height="match_parent" />
 
-    <FrameLayout
-        android:id="@+id/header"
+    <View
+        android:id="@+id/shadow"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#ffffff"
-        android:stateListAnimator="@animator/titlebar_elevaton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="16dp"
+        android:background="@drawable/top_shadow_gradient"
+        app:layout_anchor="@id/rootConstraint" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/rootConstraint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="100dp" >
+
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/station_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header"
+            app:layout_constraintVertical_bias="0.0"
+            android:nestedScrollingEnabled="true"/>
+
+        <FrameLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/backgroundViewColor"
+            android:stateListAnimator="@animator/titlebar_elevaton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/station_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Navje"
-                android:textColor="@android:color/black"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
-                app:layout_constraintEnd_toStartOf="@+id/station_center"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/station_center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/stretched_circle"
-                android:backgroundTint="@android:color/holo_orange_light"
-                android:elevation="2dp"
-                android:fontFamily="sans-serif"
-                android:padding="4dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="@string/into_center"
-                android:textColor="@android:color/white"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
-                app:layout_constraintEnd_toStartOf="@+id/station_favourite"
-                app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
-                app:layout_constraintVertical_bias="0.6" />
-
-            <ImageButton
-                android:id="@+id/station_opposite_btn"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="?selectableItemBackgroundBorderless"
-                android:elevation="2dp"
-                app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_swap_vertical_circle_black_24dp" />
-
-            <ImageView
-                android:id="@+id/station_favourite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:elevation="2dp"
-                android:focusable="true"
-                android:tint="@color/colorAccent"
-                app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
-                app:layout_constraintEnd_toStartOf="@+id/station_opposite_btn"
-                app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
-                app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/station_tab_layout"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:tabIndicatorColor="@color/colorAccent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </FrameLayout>
+                app:layout_constraintTop_toTopOf="parent">
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="50dp"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/stretched_circle"
+                    android:backgroundTint="@color/light_gray_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/station_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Navje"
+                    android:textColor="?android:textColor"
+                    android:textSize="30sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
+                    app:layout_constraintEnd_toStartOf="@+id/station_center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/station_center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/stretched_circle"
+                    android:backgroundTint="@android:color/holo_orange_light"
+                    android:elevation="2dp"
+                    android:padding="4dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="@string/into_center"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/station_favourite"
+                    app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
+                    app:layout_constraintVertical_bias="0.6" />
+
+                <ImageButton
+                    android:id="@+id/station_opposite_btn"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:elevation="2dp"
+                    app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:tint="?android:textColor"
+                    app:srcCompat="@drawable/ic_swap_vert_black_24dp" />
+
+                <ImageView
+                    android:id="@+id/station_favourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:elevation="2dp"
+                    android:focusable="true"
+                    android:tint="@color/colorAccent"
+                    app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/station_opposite_btn"
+                    app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
+                    app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/station_tab_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:tabIndicatorColor="@color/colorAccent"
+                    app:tabTextColor="?android:textColor" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

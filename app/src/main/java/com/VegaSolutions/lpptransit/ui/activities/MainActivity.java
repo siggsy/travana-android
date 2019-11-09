@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import com.VegaSolutions.lpptransit.ui.fragments.HomeFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -47,6 +49,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
@@ -104,8 +107,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private ClusterManager<StationMarker> clusterManager;
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+            if (resultCode == SettingsActivity.SETTINGS_UPDATE) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
+        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
+        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -124,7 +141,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         search = findViewById(R.id.search);
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
         account = findViewById(R.id.account);
-        account.setOnClickListener(view -> startActivity(new Intent(this, SignInActivity.class)));
+        account.setOnClickListener(view -> startActivityForResult(new Intent(this, SettingsActivity.class), 0));
         shadow = findViewById(R.id.shadow);
 
 
@@ -176,6 +193,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
                     account.startAnimation(animation);
+                } else if (newState == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
+                    account.setVisibility(View.GONE);
                 }
 
             }
@@ -201,8 +220,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             fragments.pop();
             try {
                 Fragment f = fragments.pop();
-                if (f != null) switchFragment(f);
-                else super.onBackPressed();
+                switchFragment(f);
             } catch (EmptyStackException e) {
                 super.onBackPressed();
             }
@@ -215,10 +233,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.setTrafficEnabled(true);
+        //mMap.setTrafficEnabled(true);
         setupClusterManager();
         mMap.setPadding(12, 150, 12, behavior.getPeekHeight());
         mMap.setMyLocationEnabled(true);
+
+        if (ViewGroupUtils.isDarkTheme(this))
+            mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
 
         markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f).flat(true));
         handler.post(runnable);
@@ -226,9 +247,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
             Station station = (Station) marker.getTag();
-            i.putExtra("station_code", station.getRef_id());
-            i.putExtra("station_name", station.getName());
-            i.putExtra("station_center", Integer.valueOf((station.getRef_id())) % 2 != 0);
+            i.putExtra(StationActivity.STATION, station);
             startActivity(i);
         });
 
@@ -320,6 +339,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         switch (b) {
             case BUS:
                 switchFragment(StationsFragment.newInstance());
+                behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
                 break;
             case TRAIN:
             case BIKE:

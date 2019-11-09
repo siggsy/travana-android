@@ -1,24 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!--> not using these </!-->
+    <!-- not using these -->
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
-    <!--> default 'white' theme </!-->
+    <!-- global colors -->
     <color name="colorRipple">#1AD81B60</color>
     <color name="gray">#66000000</color>
     <color name="light_gray">#11000000</color>
+    <color name="light_gray_2">#C0C0C0</color>
 
-    <color name="color_main_green">#75E645</color>
-    <color name="color_main_blue">#45BEE6</color>
-    <color name="color_main_blue_dark">#3ca1c2</color>
-    <color name="color_main_yellow">#F7FF00</color>
-    <color name="color_main_background">#66FFFFFF</color>
+    <color name="main_green">#75E645</color>
+    <color name="main_blue">#45BEE6</color>
+    <color name="main_blue_dark">#3ca1c2</color>
+    <color name="main_yellow">#F7FF00</color>
+    <color name="color_main_orange">#FFBB33</color>
+
+    <color name="event_live">#008577</color>
+    <color name="event_arrival">#D81B60</color>
+    <color name="event_detour">#ffff8800</color>
+
+    <color name="transparent">#00000000</color>
+
+
+    <!-- default 'white' theme -->
+    <color name="color_main_background">#FFFFFFFF</color>
+    <color name="color_text">#000000</color>
+
     <color name="color_main_gray">#534F4F</color>
     <color name="color_main_shaddow">#242424</color>
-    <color name="color_main_orange">#FFBB33</color>
 
     <color name="color_facebook_blue">#3C5A99</color>
     <color name="color_facebook_button_white">#FCFCFC</color>
@@ -27,8 +39,9 @@
     <color name="color_sign_in_buttons_boders">#707070</color>
     <color name="color_black">#000000</color>
 
-    <color name="event_live">#008577</color>
-    <color name="event_arrival">#D81B60</color>
-    <color name="event_detour">#ffff8800</color>
+
+    <!-- dark theme -->
+    <color name="color_main_background_dark">#202020</color>
+    <color name="color_text_dark">#FFFFFF</color>
 
 </resources>

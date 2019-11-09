@@ -1,35 +1,26 @@
 package com.VegaSolutions.lpptransit.ui.fragments;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.database.DataSetObserver;
 import android.graphics.Color;
-import android.graphics.drawable.Icon;
 import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentFactory;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextSwitcher;
-import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
@@ -46,7 +37,6 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     private Location location;
 
     private FrameLayout header;
-    private TextSwitcher switcher;
     private ViewPager viewPager;
     private TabLayout tabLayout;
 
@@ -72,16 +62,6 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
         adapter = new Adapter(getFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
-        // TextSwitcher
-        switcher.setFactory(() -> {
-            TextView textView = new TextView(context);
-            textView.setTextAppearance(context, R.style.robotoBoldTitle);
-            return textView;
-        });
-        switcher.setCurrentText("Postaje");
-        switcher.setInAnimation(context.getApplicationContext(), android.R.anim.slide_in_left);
-        switcher.setOutAnimation(context.getApplicationContext(), android.R.anim.slide_out_right);
-
         // ViewPager with TabLayout
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
@@ -94,7 +74,9 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
                     tab.getIcon().setTint(color);
                     break;
                 case 1:
-                    tabLayout.getTabAt(i).setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_location_on_black_24dp, null));
+                    tab = tabLayout.getTabAt(i);
+                    tab.setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_location_on_black_24dp, null));
+                    tab.getIcon().setTint(Color.GRAY);
                     break;
             }
         }
@@ -107,16 +89,16 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
                         color = ContextCompat.getColor(context, R.color.colorAccent);
                         break;
                     case 1:
-                        color = ContextCompat.getColor(context, R.color.color_main_blue_dark);
+                        color = ContextCompat.getColor(context, R.color.main_blue_dark);
                         break;
                     default:
-                        color = Color.BLACK;
+                        color = Color.GRAY;
                 }
                 tab.getIcon().setTint(color);
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                int color = Color.BLACK;
+                int color = Color.GRAY;
                 tab.getIcon().setTint(color);
             }
             @Override
@@ -133,8 +115,14 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
         if (fm != null) {
             for (Fragment fragment : fm.getFragments())
-                if (fragment instanceof StationsSubFragment)
-                    fm.beginTransaction().remove(fragment).commit();
+                if (fragment instanceof StationsSubFragment) {
+                    try {
+                        fm.beginTransaction().remove(fragment).commit();
+                    } catch (IllegalStateException e) {
+                        return;
+                    }
+
+                }
         }
 
     }
@@ -149,11 +137,11 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View root = inflater.inflate(R.layout.fragment_stations, container, false);
 
         viewPager = root.findViewById(R.id.station_view_pager);
         header = root.findViewById(R.id.header);
-        switcher = root.findViewById(R.id.station_title);
         tabLayout = root.findViewById(R.id.tab_layout);
 
         setupUI();
@@ -237,9 +225,9 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Priljubljene";
+                    return context.getString(R.string.favourite);
                 case 1:
-                    return "V blizini";
+                    return context.getString(R.string.nearby);
                 default:
                     return super.getPageTitle(position);
             }

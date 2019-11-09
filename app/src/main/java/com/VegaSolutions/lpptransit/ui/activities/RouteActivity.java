@@ -1,11 +1,14 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -17,10 +20,12 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,6 +34,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -86,8 +92,8 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private void setupUI() {
 
         // Get drawable resource for markers.
-        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bus_24dp, null))).flat(true);
-        stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(MapUtility.getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.station_circle, null)));
+        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.ic_bus_24dp))).flat(true);
+        stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this,R.drawable.station_circle)));
 
         // Setup views.
         backBtn.setOnClickListener(v -> onBackPressed());
@@ -100,6 +106,9 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
+        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
+        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_route);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -141,20 +150,21 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
         // Setup map.
         mMap.setOnInfoWindowClickListener(marker -> {
-            Intent i = new Intent(this, StationActivity.class);
-            i.putExtra(StationActivity.STATION_NAME, marker.getTitle());
-            i.putExtra(StationActivity.STATION_CODE, marker.getSnippet());
-            i.putExtra(StationActivity.STATION_CENTER, Integer.valueOf(marker.getSnippet()) % 2 != 0);
-            startActivity(i);
+
+            Api.stationDetails(Integer.valueOf(marker.getSnippet()), true, (apiResponse, statusCode, success) -> {
+                if (success) {
+                    Intent i = new Intent(this, StationActivity.class);
+                    i.putExtra(StationActivity.STATION, apiResponse.getData());
+                    startActivity(i);
+                }
+            });
+
         });
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                return marker.getTitle() == null;
-            }
-        });
+        mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
         mMap.setPadding(0, 200, 0, 0);
         mMap.setMyLocationEnabled(true);
+        if (ViewGroupUtils.isDarkTheme(this))
+            mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
 
         // Query stations on route and display them on the map.
         Api.stationsOnRoute(tripId, (apiResponse, statusCode, success) -> {
@@ -177,7 +187,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                 if (!apiResponse.getData().isEmpty()) {
                     LatLngBounds bounds = builder.build();
                     runOnUiThread(() -> {
-                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(11f));
+                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(11f).color(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
                     });
                 } else {

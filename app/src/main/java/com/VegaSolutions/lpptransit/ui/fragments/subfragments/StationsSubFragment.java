@@ -150,7 +150,7 @@ public class StationsSubFragment extends Fragment {
         Api.stationDetails(false, (apiResponse, statusCode, success) -> {
             if (success) {
 
-                SharedPreferences sharedPreferences = context.getSharedPreferences("station_favourites", MODE_PRIVATE);
+                SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("station_favourites", MODE_PRIVATE);
                 Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
                 ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
 
@@ -326,9 +326,7 @@ public class StationsSubFragment extends Fragment {
             viewHolder.fav.setVisibility(station.favourite ? View.VISIBLE : View.GONE);
             viewHolder.card.setOnClickListener(v -> {
                 Intent intent = new Intent(context, StationActivity.class);
-                intent.putExtra("station_code", station.station.getRef_id());
-                intent.putExtra("station_name", station.station.getName());
-                intent.putExtra("station_center", Integer.valueOf(station.station.getRef_id()) % 2 != 0);
+                intent.putExtra("station", station.station);
                 startActivity(intent);
             });
 
@@ -337,7 +335,7 @@ public class StationsSubFragment extends Fragment {
             for (String route : station.station.getRoute_groups_on_station()) {
                 View v = getLayoutInflater().inflate(R.layout.template_route_number, viewHolder.routes, false);
                 ((TextView) v.findViewById(R.id.route_station_number)).setText(route);
-                v.findViewById(R.id.route_station_circle).getBackground().setColorFilter(new PorterDuffColorFilter(Colors.getColorFromString(route), PorterDuff.Mode.SRC_ATOP));
+                v.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.getColorFromString(route));
                 viewHolder.routes.addView(v);
             }
 
@@ -387,5 +385,7 @@ public class StationsSubFragment extends Fragment {
         }
 
     }
+
+
 
 }

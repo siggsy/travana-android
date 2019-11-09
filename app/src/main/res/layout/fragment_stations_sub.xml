@@ -6,4 +6,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".ui.fragments.subfragments.StationsSubFragment"
-    android:nestedScrollingEnabled="true"/>
+    android:nestedScrollingEnabled="true"
+    android:background="?backgroundViewColor"/>

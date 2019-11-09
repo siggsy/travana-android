@@ -4,10 +4,12 @@
     android:id="@+id/live_arrival_swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.LiveArrivalFragment">
+    tools:context=".ui.fragments.LiveArrivalFragment"
+    >
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/live_arrival_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="?attr/backgroundViewColor"/>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

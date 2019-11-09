@@ -28,15 +28,20 @@ import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.LiveArrivalFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.RoutesOnStationFragment;
-import com.google.android.material.appbar.AppBarLayout;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
 
-public class StationActivity extends AppCompatActivity implements FragmentHeaderCallback {
+public class StationActivity extends AppCompatActivity implements FragmentHeaderCallback, OnMapReadyCallback {
 
 
-    public static final String STATION_CODE = "station_code";
-    public static final String STATION_NAME = "station_name";
-    public static final String STATION_CENTER = "station_center";
+    public static final String STATION = "station";
 
     // Views
     TextView name, center;
@@ -45,21 +50,33 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
     ImageView fav;
     ViewPager viewPager;
     TabLayout tabLayout;
+    BottomSheetBehavior bottomSheetBehavior;
 
     Adapter adapter;
 
     // Station data
-    String station_code;
-    String station_name;
-    boolean station_center;
+    Station station;
     boolean favourite;
+
+    GoogleMap mMap;
 
     ElevationAnimation animation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
+        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
+        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_station);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        View root = findViewById(R.id.rootConstraint);
+
+        bottomSheetBehavior = BottomSheetBehavior.from(root);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
 
         // Assign all UI elements
@@ -72,31 +89,40 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
         tabLayout = findViewById(R.id.station_tab_layout);
 
         // Get Intent data
-        station_code = getIntent().getStringExtra(STATION_CODE);
-        station_name = getIntent().getStringExtra(STATION_NAME);
-        station_center = getIntent().getBooleanExtra(STATION_CENTER, false);
-        favourite = getSharedPreferences("station_favourites", MODE_PRIVATE).getBoolean(station_code, false);
+        station = getIntent().getParcelableExtra(STATION);
+        favourite = getSharedPreferences("station_favourites", MODE_PRIVATE).getBoolean(station.getRef_id(), false);
 
         setupUI();
 
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
 
+        mMap.addMarker(new MarkerOptions().position(station.getLatLng()));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(station.getLatLng(), 12.5f));
+        mMap.setMyLocationEnabled(true);
+        mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
+        if (ViewGroupUtils.isDarkTheme(this))
+            mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
+
+    }
 
     public void setupUI() {
 
         animation = new ElevationAnimation(header, 16);
 
         // Set header
-        name.setText(station_name);
-        center.setVisibility(station_center ? View.VISIBLE : View.GONE);
+        name.setText(station.getName());
+        center.setVisibility(station.isCenter() ? View.VISIBLE : View.GONE);
 
         // Favourite button toggle
         fav.setImageDrawable(getDrawable(favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
         fav.setOnClickListener(v1 -> {
             SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(station_code, !favourite);
+            editor.putBoolean(station.getRef_id(), !favourite);
             favourite = !favourite;
             fav.setImageDrawable(getResources().getDrawable(favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
             editor.apply();
@@ -107,17 +133,15 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
             oppositeBtn.setEnabled(false);
 
             int code;
-            if (Integer.valueOf(station_code) % 2 == 0)
-                code = Integer.valueOf(station_code) - 1 ;
-            else code = Integer.valueOf(station_code) + 1;
+            if (Integer.valueOf(station.getRef_id()) % 2 == 0)
+                code = Integer.valueOf(station.getRef_id()) - 1 ;
+            else code = Integer.valueOf(station.getRef_id()) + 1;
 
             Api.stationDetails(code, true, (apiResponse, statusCode, success) -> {
                 if (success) {
                     Intent intent = getIntent();
                     Station station = apiResponse.getData();
-                    intent.putExtra("station_code", station.getRef_id());
-                    intent.putExtra("station_name", station.getName());
-                    intent.putExtra("station_center", Integer.valueOf(station.getRef_id()) % 2 != 0);
+                    intent.putExtra("station", station);
                     finish();
                     startActivity(intent);
                 }
@@ -149,9 +173,9 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
 
             switch (position) {
                 case 0:
-                    return LiveArrivalFragment.newInstance(station_code);
+                    return LiveArrivalFragment.newInstance(station.getRef_id());
                 case 1:
-                    return RoutesOnStationFragment.newInstance(station_code, station_name);
+                    return RoutesOnStationFragment.newInstance(station.getRef_id(), station.getName());
                 default:
                     return null;
             }
@@ -168,9 +192,9 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
 
             switch (position) {
                 case 0:
-                    return "Prihodi";
+                    return getString(R.string.arrivals);
                 case 1:
-                    return "Linije";
+                    return getString(R.string.routes);
                 default:
                     return "";
             }

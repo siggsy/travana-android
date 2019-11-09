@@ -1,51 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginStart="4dp"
-    android:layout_marginTop="2dp"
-    android:layout_marginEnd="4dp"
-    android:layout_marginBottom="3dp"
-    android:background="@drawable/stretched_circle"
-    android:elevation="2dp"
-    android:orientation="vertical"
-    android:padding="4dp"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp">
+    android:layout_marginStart="?containerBorderPaddingSide"
+    android:layout_marginTop="?containerBorderPadding"
+    android:layout_marginEnd="?containerBorderPaddingSide"
+    android:layout_marginBottom="?containerBorderPadding"
+    android:padding="2dp"
 
-    <TextView
-        android:id="@+id/arrival_time_time"
+    android:background="@drawable/stretched_circle_container">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/arrival_time_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto"
-        android:text="11:15"
-        android:textColor="@android:color/black"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_margin="?containerBorderMargin"
+        android:background="?containerBackground"
+        android:elevation="?elevation"
+        android:orientation="vertical"
+        android:padding="2dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
 
-    <TextView
-        android:id="@+id/arrival_time_event"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:background="@drawable/stretched_circle"
-        android:backgroundTint="@color/colorAccent"
-        android:fontFamily="@font/roboto"
-        android:paddingStart="6dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="6dp"
-        android:paddingBottom="2dp"
-        android:text="v živo"
-        android:textAllCaps="true"
-        android:textColor="@android:color/white"
-        android:textSize="12sp"
-        android:tint="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="@+id/arrival_time_time"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/arrival_time_time"
-        app:layout_constraintTop_toTopOf="@+id/arrival_time_time" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/arrival_time_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="11:15"
+            android:textColor="?android:textColor"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/arrival_time_event"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/stretched_circle"
+            android:backgroundTint="@color/colorAccent"
+            android:paddingStart="6dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="6dp"
+            android:paddingBottom="2dp"
+            android:text="v živo"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:tint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@+id/arrival_time_time"
+            app:layout_constraintStart_toEndOf="@+id/arrival_time_time"
+            app:layout_constraintTop_toTopOf="@+id/arrival_time_time" />
+
+        <ImageView
+            android:id="@+id/arrival_time_event_rss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/ic_rss_feed_24px"
+            android:tint="?android:textColor"
+            app:layout_constraintBottom_toBottomOf="@+id/arrival_time_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/arrival_time_event"
+            app:layout_constraintTop_toTopOf="@+id/arrival_time_time" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

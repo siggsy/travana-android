@@ -7,7 +7,11 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -22,8 +26,12 @@ import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
 import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
+import org.joda.time.DateTime;
+
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,10 +55,25 @@ public class DepartureActivity extends AppCompatActivity {
 
     private Adapter adapter;
 
+    private int textColor;
+    private int backGroundColor;
+
+    boolean hour;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
+        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
+        hour = sharedPreferences.getBoolean("hour", false);
+        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_departure);
+
+        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
+        TypedArray array = obtainStyledAttributes(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
+        textColor = array.getColor(0, Color.BLACK);
+        backGroundColor = array.getColor(1, Color.WHITE);
+        array.recycle();
 
         station_code = getIntent().getStringExtra(STATION_CODE);
         station_name = getIntent().getStringExtra(STATION_NAME);
@@ -72,8 +95,7 @@ public class DepartureActivity extends AppCompatActivity {
         stationCenter.setVisibility(Integer.valueOf(station_code) % 2 != 0 ? View.VISIBLE : View.GONE);
 
         String group = route_number.replaceAll("[^0-9]", "");
-        int color = Integer.valueOf(group);
-        routeNumberCircle.getBackground().setTint(Colors.colors.get(color));
+        routeNumberCircle.getBackground().setTint(Colors.getColorFromString(route_number));
 
         adapter = new Adapter();
 
@@ -127,7 +149,7 @@ public class DepartureActivity extends AppCompatActivity {
             for (int min : timetable.getMinutes()) {
                 TextView textView = (TextView) getLayoutInflater().inflate(R.layout.template_departure_min, holder.minutes, false);
                 textView.setText(String.valueOf(min));
-                textView.setTextColor(timetable.isIs_current() ? Color.WHITE : Color.GRAY);
+                textView.setTextColor(timetable.isIs_current() ? Color.WHITE : textColor);
                 holder.minutes.addView(textView);
             }
 
@@ -135,10 +157,10 @@ public class DepartureActivity extends AppCompatActivity {
                 holder.hour.setTextColor(Color.WHITE);
             }
             else {
-                holder.hour.setTextColor(Color.BLACK);
+                holder.hour.setTextColor(textColor);
             }
 
-            holder.container.getBackground().setTint(timetable.isIs_current() ? ResourcesCompat.getColor(getResources(), R.color.colorAccent, null) : Color.WHITE);
+            holder.container.getBackground().setTint(timetable.isIs_current() ? ResourcesCompat.getColor(getResources(), R.color.colorAccent, null) : backGroundColor);
 
 
 

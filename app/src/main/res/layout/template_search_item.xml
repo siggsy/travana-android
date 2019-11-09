@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_weight="0"
-        android:tint="@android:color/black"
+        android:tint="?android:textColor"
         app:srcCompat="@drawable/ic_directions_bus_black_24dp"
         android:visibility="gone"/>
 
@@ -32,9 +32,8 @@
         android:layout_gravity="center|center_horizontal"
         android:layout_marginStart="32dp"
         android:layout_weight="4"
-        android:fontFamily="@font/roboto"
         android:text="Bavarski dvor"
-        android:textColor="@android:color/black" />
+        android:textStyle="bold" />
     <TextView
         android:id="@+id/station_center"
         android:layout_width="wrap_content"

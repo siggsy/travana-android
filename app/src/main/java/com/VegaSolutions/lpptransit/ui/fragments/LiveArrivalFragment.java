@@ -1,14 +1,17 @@
 package com.VegaSolutions.lpptransit.ui.fragments;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -19,25 +22,31 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
-import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
+import org.joda.time.DateTime;
+
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class LiveArrivalFragment extends Fragment {
 
@@ -50,6 +59,8 @@ public class LiveArrivalFragment extends Fragment {
     private Adapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private RecyclerView rv;
+
+    private boolean hour;
 
     private ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
             // TODO: handle error and no internet connection
@@ -117,6 +128,10 @@ public class LiveArrivalFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
+        hour = sharedPreferences.getBoolean("hour", false);
+
         if (getArguments() != null) {
             stationId = getArguments().getString(STATION_ID);
         }
@@ -186,38 +201,57 @@ public class LiveArrivalFragment extends Fragment {
                 View v = getLayoutInflater().inflate(R.layout.template_arrival_time, viewHolder.arrivals, false);
                 TextView arrival_time = v.findViewById(R.id.arrival_time_time);
                 TextView arrival_event = v.findViewById(R.id.arrival_time_event);
-                v.getBackground().setTint(Color.WHITE);
+                ImageView arrival_event_icon = v.findViewById(R.id.arrival_time_event_rss);
+                View back = v.findViewById(R.id.arrival_time_back);
 
-                arrival_time.setText(String.format("%s min", String.valueOf(arrival.getEta_min())));
-                arrival_time.setTextColor(Color.BLACK);
+                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
+                int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
+                TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
+                @SuppressLint("ResourceType")
+                int backColor = array.getColor(1, Color.WHITE);
+                int color = array.getColor(0, Color.BLACK);
+                arrival_time.setTextColor(color);
+                back.getBackground().setTint(backColor);
+                array.recycle();
 
                 //(0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
 
                 switch (arrival.getType()) {
-                    case 0: arrival_event.setVisibility(View.VISIBLE);
-                        arrival_event.setText("");
-                        ViewGroup.LayoutParams params = arrival_event.getLayoutParams();
-                        params.height = 32;
-                        params.width = 32;
-                        arrival_event.setLayoutParams(params);
-                        arrival_event.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_live, null));
+                    case 0:
+                        arrival_event_icon.setVisibility(View.VISIBLE);
                         break;
-                    case 2: arrival_event.setVisibility(View.GONE);
+                    case 2:
+                        arrival_event.setVisibility(View.GONE);
+                        arrival_event_icon.setVisibility(View.GONE);
                         String arrival_text = getResources().getString(R.string.arrival).toUpperCase();
                         arrival_time.setText(arrival_text);
                         arrival_time.setTextColor(Color.WHITE);
-                        v.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_arrival, null));
+                        back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_arrival, null));
                         break;
-                    case 3: arrival_event.setVisibility(View.GONE);
-                        String detour_text = getResources().getString(R.string.detour).toUpperCase();
-                        arrival_time.setText(detour_text);
+                    case 3:
+                        arrival_event.setVisibility(View.GONE);
+                        arrival_event_icon.setVisibility(View.GONE);
+                        arrival_time.setText(getString(R.string.detour));
                         arrival_time.setTextColor(Color.WHITE);
-                        v.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
+                        back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
                         break;
-                    default: arrival_event.setVisibility(View.GONE);
+                    default:
+                        arrival_event.setVisibility(View.GONE);
+                        arrival_event_icon.setVisibility(View.GONE);
                 }
                 if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
                     viewHolder.arrivals.addView(v);
+                if (arrival.getDepot() == 1) {
+                    arrival_event.setText(getString(R.string.garage));
+                    arrival_event.setTextColor(color);
+                    arrival_event.getBackground().setTint(backColor);
+                    arrival_event.setVisibility(View.VISIBLE);
+                } else {
+                    arrival_event.setText("");
+                    arrival_event.getBackground().setTint(backColor);
+                    arrival_event.setVisibility(View.GONE);
+                }
                 if (arrival.getType() == 3) break;
 
             }

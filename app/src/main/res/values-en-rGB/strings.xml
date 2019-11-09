@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Travana</string>
     <string name="app_slogan_welcome_activity">better public transport.</string>
-    <string name="arrival">arrival</string>
+    <string name="arrival">ARRIVAL</string>
     <string name="by_developers">By Domen Kralj, Žiga Leskovec</string>
     <string name="detour">detour</string>
     <string name="into_center">CENTER</string>
@@ -20,4 +20,16 @@
     <string name="you_are_already_logined">You are already logged in.</string>
     <string name="you_canceled_the_proccess">You canceled the process.</string>
     <string name="you_have_successfuly_logged_in">You have successfuly logged in.</string>
+    <string name="stations">Stations</string>
+    <string name="garage">garage</string>
+    <string name="arrivals">Arrivals</string>
+    <string name="settings">Settings</string>
+    <string name="dark_theme">Dark</string>
+    <string name="white_theme">White</string>
+    <string name="theme">Theme</string>
+    <string name="minutes">Minutes</string>
+    <string name="hours">Hours</string>
+    <string name="arrival_time">Arrival time</string>
+    <string name="nearby">Nearby</string>
+    <string name="favourite">Favourite</string>
 </resources>

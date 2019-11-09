@@ -3,6 +3,8 @@ package com.VegaSolutions.lpptransit.ui.custommaps;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.location.Location;
@@ -14,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
@@ -21,6 +25,7 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -61,6 +66,7 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         FlexboxLayout routes;
         ImageView fav;
         View divider;
+        LinearLayout root;
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("station_favourites", MODE_PRIVATE);
         Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
@@ -73,9 +79,11 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         center = view.findViewById(R.id.station_nearby_center);
         fav = view.findViewById(R.id.station_nearby_favourite);
         divider = view.findViewById(R.id.station_nearby_devider);
+        root = view.findViewById(R.id.station_nearby_card);
 
         divider.setVisibility(View.GONE);
         name.setText(station.getName());
+        name.setTextColor(Color.BLACK);
         distance.setText("");
         center.setVisibility(Integer.valueOf(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
         fav.setVisibility(f ? View.VISIBLE : View.GONE);
@@ -83,8 +91,10 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         for (String route : station.getRoute_groups_on_station()) {
 
             View v = context.getLayoutInflater().inflate(R.layout.template_route_number, routes, false);
-            ((TextView) v.findViewById(R.id.route_station_number)).setText(route);
-            v.findViewById(R.id.route_station_circle).getBackground().setColorFilter(new PorterDuffColorFilter(Colors.getColorFromString(route), PorterDuff.Mode.SRC_ATOP));
+            TextView textView =  v.findViewById(R.id.route_station_number);
+            textView.setText(route);
+            textView.setTextColor(Color.WHITE);
+            v.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.getColorFromString(route));
             routes.addView(v);
 
         }

@@ -16,12 +16,11 @@
         android:id="@+id/route_station_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto"
         android:minEms="2"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:text="19"
         android:textAlignment="center"
-        android:textColor="@android:color/white"
+        android:textColor="?backgroundViewColor"
         android:textSize="12sp" />
 </FrameLayout>

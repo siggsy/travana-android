@@ -1,8 +1,16 @@
 package com.VegaSolutions.lpptransit.utility;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.VegaSolutions.lpptransit.R;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ViewGroupUtils {
 
@@ -28,6 +36,13 @@ public class ViewGroupUtils {
         removeView(currentView);
         removeView(newView);
         parent.addView(newView, index);
+    }
+
+    public static boolean isDarkTheme(Context activity) {
+
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("settings", MODE_PRIVATE);
+        return sharedPreferences.getBoolean("app_theme", false);
+
     }
 
 }

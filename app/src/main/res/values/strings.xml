@@ -17,7 +17,7 @@
     <string name="the_way_it_was">the way it was</string>
     <string name="meant_to_be">meant to be.</string>
     <string name="developer_help_contact" translatable="false">domenkralj.sahist@gmail.com</string>
-    <string name="arrival">prihod</string>
+    <string name="arrival">ARRIVAL</string>
     <string name="detour">detour</string>
     <string name="by_developers">By Domen Kralj, Žiga Leskovec</string>
     <string name="app_slogan_welcome_activity">better public transport.</string>
@@ -28,6 +28,18 @@
     <string name="you_have_successfuly_logged_in">You have successfuly logged in.</string>
     <string name="facebook_app_id" translatable="false">954691711564227</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb954691711564227</string>
+    <string name="stations">Stations</string>
+    <string name="garage">garage</string>
+    <string name="arrivals">Arrivals</string>
+    <string name="settings">Settings</string>
+    <string name="dark_theme">Dark</string>
+    <string name="white_theme">White</string>
+    <string name="theme">Theme</string>
+    <string name="minutes">Minutes</string>
+    <string name="hours">Hours</string>
+    <string name="arrival_time">Arrival time</string>
+    <string name="nearby">Nearby</string>
+    <string name="favourite">Favourite</string>
 
 
 </resources>

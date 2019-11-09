@@ -4,4 +4,12 @@
         <attr name="line_color" format="color"/>
         <attr name="station_name_size" format="dimension"/>
     </declare-styleable>
+
+    <attr name="containerBackground" format="reference" />
+    <attr name="backgroundViewColor" format="reference" />
+    <attr name="containerBorderColor" format="reference" />
+    <attr name="containerBorderMargin" format="dimension" />
+    <attr name="containerBorderPadding" format="dimension" />
+    <attr name="containerBorderPaddingSide" format="dimension" />
+    <attr name="elevation" format="dimension" />
 </resources>
