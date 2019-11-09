@@ -242,7 +242,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
 
         markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f).flat(true));
-        handler.post(runnable);
+        //handler.post(runnable);
 
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
@@ -357,8 +357,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.clear();
         } else if (mMap != null) {
             mMap.clear();
-            handler.removeCallbacks(runnable);
-            handler.post(runnable);
             markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f));
         }
         FragmentManager fm = getSupportFragmentManager();
@@ -383,5 +381,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(runnable);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 }
