@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.VegaSolutions.lpptransit.BuildConfig;
 
@@ -73,12 +72,7 @@ public class LppQuery extends AsyncTask<String, Void, String> {
         return this;
     }
 
-
-    /**
-     * Executed code when query completed
-     * @param onCompleteListener query callback. See LppQuery.OnCompleteListener for more info
-     */
-    public LppQuery setOnCompleteListener(@NonNull OnCompleteListener onCompleteListener) {
+    public LppQuery setOnCompleteListener(@NonNull LppQuery.OnCompleteListener onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
         return this;
     }
