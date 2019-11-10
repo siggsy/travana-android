@@ -193,7 +193,8 @@ public class StationsSubFragment extends Fragment {
         if (type == TYPE_FAVOURITE && stations != null) {
             adapter.setStations(new ArrayList<>());
             setFavouriteStations(stations);
-        }
+        } else
+            adapter.notifyDataSetChanged();
     }
 
     @Override
