@@ -6,8 +6,8 @@
     <string name="by_developers">od Domen Kralj, Žiga Leskovec</string>
     <string name="contact_us">Kontaktiraj nas.</string>
     <string name="routes">Linije</string>
-    <string name="sign_in_with_fb">Prijava s Facebookom</string>
-    <string name="sign_in_with_google">Prijava z Google računom</string>
+    <string name="sign_in_with_fb">Prijava s Facebook</string>
+    <string name="sign_in_with_google">Prijava z Google</string>
     <string name="something_went_wrong_try_again">Nekaj je šlo narobe, poizkusi še enkrat ali pa nam piši.</string>
     <string name="the_way_it_was">kot</string>
     <string name="you_are_already_logined">Si že prijavljen.</string>

@@ -14,6 +14,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalRequest;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -24,8 +33,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-
-import com.VegaSolutions.lpptransit.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,8 +41,17 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import okhttp3.Credentials;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -50,16 +66,20 @@ public class SignInActivity extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 123;
-
     CallbackManager mCallbackManager;
+
+    private static String uidToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
         boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
         setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_sign_in);
+
+        getwarnings();
 
         createCircleAnimation();
         ImageButton back_btn = (ImageButton)findViewById(R.id.sign_in_activity_back_btn);
@@ -127,6 +147,8 @@ public class SignInActivity extends AppCompatActivity {
             fb_sign_in_btn.performClick();
         });
 
+
+
     }
 
     @Override
@@ -157,12 +179,15 @@ public class SignInActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {                                                            //Google sign in
+        if (requestCode == RC_SIGN_IN) {
+            //Google sign in
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
+
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
+
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
@@ -190,7 +215,6 @@ public class SignInActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(getApplicationContext(), getString(R.string.you_have_successfuly_logged_in), Toast.LENGTH_LONG).show();
                             finish();
-                            //updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -230,6 +254,151 @@ public class SignInActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    //after updates user is added in database by server
+
+    private void addTravanaUser(){
+
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
+            return;
+
+
+        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        mUser.getIdToken(true)
+                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+
+                            uidToken = idToken;
+
+                            UserData user = new UserData(mUser.getUid(), mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl().toString());
+
+                            RequestBody rbody = RequestBody.create(
+                                    MediaType.parse("application/json; charset=utf-8"), new Gson().toJson(user));
+
+                            TravanaAPI.addUser(idToken, rbody, (data, statusCode, success) ->{
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                        } else {
+
+                            Log.e(TAG, task.getException().getMessage());
+                            Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong_try_again), Toast.LENGTH_LONG).show();
+                            mAuth.signOut();
+
+                        }
+                    }
+                });
+    }
+
+    private void getwarnings(){
+
+        /*
+        if(FirebaseAuth.getInstance().getCurrentUser() == null)
+            return;
+
+        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        mUser.getIdToken(true)
+                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+
+                            TravanaAPI.warnings(idToken, (data, statusCode, success) ->{
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                        } else {
+
+                            Log.e(TAG, task.getException().getMessage());
+                            Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong_try_again), Toast.LENGTH_LONG).show();
+                            mAuth.signOut();
+
+                        }
+                    }
+                });
+                */
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        String[] tags = {"bus", "lpp", "3g"};
+
+        LiveUpdateMessage message = new LiveUpdateMessage(user.getDisplayName(), new Date(), "spremenjena5555", tags, 10);
+
+        System.out.println(message);
+
+        LiveUpdateComment comment = new LiveUpdateComment(user.getDisplayName(), "vsebinavTHEKING50444444444");
+
+        /*
+        TravanaAPI.editComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", "comm_genVegaSolutionsSunNov1019:04:20GMT01:002019", comment, (data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+        });
+
+         */
+
+        ArrayList<MessagesApprovalRequest> list = new ArrayList<>();
+        list.add(new MessagesApprovalRequest("mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", false));
+
+        TravanaAPI.approveMessages("token",list, (data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+        });
+
+        /*
+        TravanaAPI.removeComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", "comm_genVegaSolutionsSunNov1019:02:33GMT01:002019", (data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+        });
+        */
+        /*
+        LiveUpdateComment comment = new LiveUpdateComment(user.getDisplayName(), "vsebinavKRALJ");
+
+        TravanaAPI.addComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", comment ,(data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+        });
+        */
+        /*
+        TravanaAPI.addMessage("token", message, (data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+        });
+        */
     }
 
     //--------------------------------------Animations
