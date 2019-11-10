@@ -3,6 +3,7 @@ package com.VegaSolutions.lpptransit.ui.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -25,15 +26,18 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
+import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.LiveArrivalFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.RoutesOnStationFragment;
+import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
@@ -99,8 +103,10 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        mMap.addMarker(new MarkerOptions().position(station.getLatLng()));
+        mMap.setInfoWindowAdapter(new StationInfoWindow(this));
+        Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
+        m.setTag(station);
+        m.showInfoWindow();
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(station.getLatLng(), 12.5f));
         mMap.setMyLocationEnabled(true);
         mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());

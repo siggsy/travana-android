@@ -260,6 +260,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void setupClusterManager() {
         clusterManager = new ClusterManager<>(this, mMap);
         CustomClusterRenderer customClusterRenderer = new CustomClusterRenderer(this, mMap, clusterManager);
+        //customClusterRenderer.setMinClusterSize(10);
         clusterManager.setRenderer(customClusterRenderer);
         mMap.setOnCameraIdleListener(clusterManager);
         mMap.setOnMarkerClickListener(clusterManager);
@@ -297,7 +298,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             builder.include(station.getLatLng());
             if (visibleRegion.latLngBounds.contains(station.getLatLng())) updateNeeded = false;
             runOnUiThread(() -> {
-                Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).alpha(0f));
+                Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).alpha(0f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
                 m.setTag(station);
                 animateMarkerAlpha(m);
             });

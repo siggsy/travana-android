@@ -109,7 +109,8 @@ public class RoutesOnStationFragment extends Fragment {
 
         Api.routesOnStation(Integer.valueOf(stationId), (apiResponse, statusCode, success) -> {
             if (success) {
-                ((Activity)context).runOnUiThread(() -> adapter.setRoutes(apiResponse.getData()));
+                if (context != null)
+                    ((Activity)context).runOnUiThread(() -> adapter.setRoutes(apiResponse.getData()));
             }
         });
 

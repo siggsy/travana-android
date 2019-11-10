@@ -66,10 +66,11 @@ public class LiveArrivalFragment extends Fragment {
             // TODO: handle error and no internet connection
             if (success) {
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
-                ((Activity)context).runOnUiThread(() -> {
-                    adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
-                    refreshLayout.setRefreshing(false);
-                });
+                if (context != null)
+                    ((Activity)context).runOnUiThread(() -> {
+                        adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
+                        refreshLayout.setRefreshing(false);
+                    });
             }
 
     };

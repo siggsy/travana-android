@@ -187,7 +187,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                 if (!apiResponse.getData().isEmpty()) {
                     LatLngBounds bounds = builder.build();
                     runOnUiThread(() -> {
-                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(11f).color(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK));
+                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(12f).color(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
                     });
                 } else {

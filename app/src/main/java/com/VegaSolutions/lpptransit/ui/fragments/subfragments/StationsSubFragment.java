@@ -149,6 +149,7 @@ public class StationsSubFragment extends Fragment {
 
         Api.stationDetails(false, (apiResponse, statusCode, success) -> {
             if (success) {
+                if (context == null) return;
 
                 SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("station_favourites", MODE_PRIVATE);
                 Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
