@@ -70,7 +70,7 @@ import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.TRAIN;
 
 // TODO: Clean the code, fix MapPadding remove useless callbacks and variables
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsSubFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener{
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener {
 
     private GoogleMap mMap;
 
@@ -204,7 +204,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        switchFragment(HomeFragment.newInstance());
+        switchFragment(StationsFragment.newInstance());
 
     }
 
@@ -311,6 +311,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             runOnUiThread(() -> mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f)));
     }
 
+    @Override
+    public void onTabClicked() {
+        behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+    }
+
 
     private void animateMarkerAlpha(final Marker marker) {
         final Handler handler = new Handler();
@@ -355,7 +360,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         shadow.setVisibility(fragment instanceof HomeFragment ?View.GONE :View.VISIBLE);
         if (!(fragment instanceof HomeFragment)) {
             handler.removeCallbacks(runnable);
-            mMap.clear();
+            if (mMap != null)
+                mMap.clear();
         } else if (mMap != null) {
             mMap.clear();
             markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f));

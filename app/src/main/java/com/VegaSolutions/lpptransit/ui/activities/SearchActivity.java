@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
@@ -34,6 +35,7 @@ public class SearchActivity extends AppCompatActivity {
     ImageView back;
     SearchView searchView;
     FrameLayout header;
+    ProgressBar progressBar;
 
     SearchAdapter adapter;
     String filter = "";
@@ -45,6 +47,7 @@ public class SearchActivity extends AppCompatActivity {
         searchView = findViewById(R.id.search_activity_search);
         back = findViewById(R.id.search_activity_back);
         header = findViewById(R.id.search_activity_header);
+        progressBar = findViewById(R.id.progressBar);
 
         adapter = new SearchAdapter();
         searchList.setAdapter(adapter);
@@ -58,6 +61,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        searchView.requestFocusFromTouch();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -122,6 +126,7 @@ public class SearchActivity extends AppCompatActivity {
                         items.add(new RouteItem(route));
                     runOnUiThread(() -> applyFilter(filter));
                 }
+                runOnUiThread(() -> progressBar.setVisibility(View.GONE));
             });
         });
 

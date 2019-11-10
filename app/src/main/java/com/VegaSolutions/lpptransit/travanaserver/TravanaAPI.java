@@ -46,7 +46,7 @@ public class TravanaAPI {
                 }).execute();
     }
 
-    public static void play_stote_link(TravanaApiCallback callback){
+    public static void play_store_link(TravanaApiCallback callback){
 
         new TravanaQuery(TravanaQuery.PLAY_STORE_LINK)
                 .setOnCompleteListener((response, statusCode, success) -> {

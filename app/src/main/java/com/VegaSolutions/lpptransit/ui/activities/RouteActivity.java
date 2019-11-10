@@ -59,7 +59,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
     private ImageButton backBtn;
     private TextView name, number;
-    private View circle;
+    private View circle, route_loading, bus_loading;
 
     private final int UPDATE_TIME = 2000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
@@ -69,11 +69,14 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private MarkerOptions busOptions;
     private MarkerOptions stationOptions;
 
+
     private ApiCallback<List<BusOnRoute>> busQuery = new ApiCallback<List<BusOnRoute>>() {
         @Override
         public void onComplete(@Nullable ApiResponse<List<BusOnRoute>> apiResponse, int statusCode, boolean success) {
             if (success) {
                 List<BusOnRoute> buses = new ArrayList<>();
+
+                runOnUiThread(() -> bus_loading.setVisibility(View.GONE));
 
                 // Filter by trip ID.
                 for (BusOnRoute busOnRoute : apiResponse.getData())
@@ -123,6 +126,8 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         name = findViewById(R.id.route_name);
         number = findViewById(R.id.route_station_number);
         circle = findViewById(R.id.route_circle);
+        bus_loading = findViewById(R.id.bus_loading);
+        route_loading = findViewById(R.id.route_loading);
 
         setupUI();
 
@@ -168,6 +173,10 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
         // Query stations on route and display them on the map.
         Api.stationsOnRoute(tripId, (apiResponse, statusCode, success) -> {
+            runOnUiThread(() -> {
+                route_loading.setVisibility(View.GONE);
+                bus_loading.setVisibility(View.VISIBLE);
+            });
             if (success) {
 
                 // Sort stations.
@@ -187,7 +196,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                 if (!apiResponse.getData().isEmpty()) {
                     LatLngBounds bounds = builder.build();
                     runOnUiThread(() -> {
-                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(12f).color(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK));
+                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
                     });
                 } else {

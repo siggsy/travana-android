@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
@@ -59,6 +60,7 @@ public class LiveArrivalFragment extends Fragment {
     private Adapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private RecyclerView rv;
+    private View no_arr_err;
 
     private boolean hour;
 
@@ -68,6 +70,10 @@ public class LiveArrivalFragment extends Fragment {
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
                 if (context != null)
                     ((Activity)context).runOnUiThread(() -> {
+                        if (apiResponse.getData().getArrivals().isEmpty())
+                            no_arr_err.setVisibility(View.VISIBLE);
+                        else
+                            no_arr_err.setVisibility(View.GONE);
                         adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
                         refreshLayout.setRefreshing(false);
                     });
@@ -147,6 +153,7 @@ public class LiveArrivalFragment extends Fragment {
 
         refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
         rv = root.findViewById(R.id.live_arrival_rv);
+        no_arr_err = root.findViewById(R.id.live_arrival_no_arrivals_error);
         setupUI();
 
         // Query arrivals.

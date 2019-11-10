@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
@@ -52,6 +53,8 @@ public class DepartureActivity extends AppCompatActivity {
     private View routeNumberCircle;
     private RecyclerView rv;
     private FrameLayout header;
+    private View dep_err;
+    private ProgressBar progressBar;
 
     private Adapter adapter;
 
@@ -87,6 +90,8 @@ public class DepartureActivity extends AppCompatActivity {
         routeNumberCircle = findViewById(R.id.include);
         rv = findViewById(R.id.departure_rv);
         header = findViewById(R.id.header);
+        dep_err = findViewById(R.id.departure_no_departures_error);
+        progressBar = findViewById(R.id.progressBar);
 
         routeName.setText(route_name);
         routeNumber.setText(route_number);
@@ -111,14 +116,28 @@ public class DepartureActivity extends AppCompatActivity {
         });
 
         Api.timetable(Integer.valueOf(station_code), 100, 100, (apiResponse, statusCode, success) -> {
+            runOnUiThread(() -> progressBar.setVisibility(View.GONE));
             if (success) {
+                if (apiResponse.getData().getRoute_groups().get(0).getRoutes().isEmpty())
+                    dep_err.setVisibility(View.VISIBLE);
                 for (TimetableWrapper.RouteGroup.Route route : apiResponse.getData().getRoute_groups().get(0).getRoutes()) {
                     if (route.getParent_name().equals(route_name)) {
-                        runOnUiThread(() -> adapter.setTimetables(route.getTimetable()));
+                        runOnUiThread(() -> {
+                            adapter.setTimetables(route.getTimetable());
+                            if (adapter.timetables.isEmpty())
+                                dep_err.setVisibility(View.VISIBLE);
+                        });
                         return;
                     }
                 }
+
+                runOnUiThread(() -> {
+                    dep_err.setVisibility(View.VISIBLE);
+                });
+
+
             }
+
         }, Integer.valueOf(group));
 
     }

@@ -1,55 +1,46 @@
 package com.VegaSolutions.lpptransit.ui.fragments.subfragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
-import android.net.Uri;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
-import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -67,6 +58,10 @@ public class StationsSubFragment extends Fragment {
     public static final int TYPE_NEARBY = 1;
     public static final int TYPE_FAVOURITE = 2;
 
+    private int minTime = 10000;
+    private float minDistance = 15;
+    private String bestProvider;
+
     private boolean resumed = false;
 
     private int type;
@@ -74,27 +69,65 @@ public class StationsSubFragment extends Fragment {
     private Location location;
     private Adapter adapter = new Adapter();
 
-    private StationsFragmentListener mListener;
     private Context context;
     private FragmentHeaderCallback callback;
-    private FusedLocationProviderClient locationProviderClient;
-    private LocationCallback locationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            super.onLocationResult(locationResult);
-            if (locationResult.getLastLocation() == null)
-                return;
-            location = locationResult.getLastLocation();
-            Collections.sort(adapter.stations, (o1, o2) -> Double.compare(o1.distance, o2.distance));
+    private LocationManager locationManager;
+    private List<Station> stations;
+    private boolean firstTime = true;
 
-            ((Activity) context).runOnUiThread(() -> {
-                adapter.notifyDataSetChanged();
-                Log.i("Substation " + type, "updated");
+
+    private LocationListener myLocListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (context == null) return;
+
+            StationsSubFragment.this.location = location;
+            if (firstTime) {
+                firstTime = false;
+                setNearbyStations(stations);
+                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                return;
+            }
+            Snackbar snackbar = Snackbar.make(root, R.string.location_changed, Snackbar.LENGTH_INDEFINITE).setAction(R.string.update, v -> {
+                setNearbyStations(stations);
+                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+            }).setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+            View view = snackbar.getView();
+            TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+            tv.setTextColor(Color.WHITE);
+            snackbar.show();
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+            ((Activity)context).runOnUiThread(() -> {
+                progressBar.setVisibility(View.VISIBLE);
+                loc_err.setVisibility(View.GONE);
+                if (location != null)
+                    onLocationChanged(location);
+            });
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+            firstTime = true;
+            ((Activity)context).runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                loc_err.setVisibility(View.VISIBLE);
+                adapter.setStations(new ArrayList<>());
             });
         }
     };
 
     private RecyclerView list;
+    private View fav_err, loc_err, progressBar;
+    View root;
 
     public static StationsSubFragment newInstance(int type, FragmentHeaderCallback callback) {
         StationsSubFragment fragment = new StationsSubFragment();
@@ -118,11 +151,19 @@ public class StationsSubFragment extends Fragment {
         });
     }
 
-    private void startCurrentLocationUpdates() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10000);
-        locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+    private void setupCurrentLocationUpdates() {
+        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        // Get the criteria you would like to use
+        Criteria criteria = new Criteria();
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setSpeedRequired(false);
+        // Get the best provider from the criteria specified, and false to say it can turn the provider on if it isn't already
+
+        bestProvider = locationManager.getBestProvider(criteria, false);
     }
 
     @Override
@@ -132,6 +173,8 @@ public class StationsSubFragment extends Fragment {
             type = getArguments().getInt(TYPE);
         }
         Log.i("SubStationFragment", "created");
+        if (type == TYPE_NEARBY)
+            setupCurrentLocationUpdates();
 
     }
 
@@ -139,142 +182,146 @@ public class StationsSubFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.i("SubStationFragment", "view destroyed");
+        if (type == TYPE_NEARBY)
+            locationManager.removeUpdates(myLocListener);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         callback.onHeaderChanged(list.canScrollVertically(-1));
-
-        Api.stationDetails(false, (apiResponse, statusCode, success) -> {
-            if (success) {
-                if (context == null) return;
-
-                SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("station_favourites", MODE_PRIVATE);
-                Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
-                ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
-
-                if (type == TYPE_FAVOURITE) {
-
-                    if (favourites.size() == 0) {
-                        // TODO: write msg "no favourites added yet"
-                        return;
-                    }
-
-                    for (Station station : apiResponse.getData()) {
-                        Boolean f = favourites.get(station.getRef_id());
-                        if (f == null) f = false;
-                        if (f) stationWrappersFav.add(new StationWrapper(station, true));
-                    }
-
-                    ((Activity) context).runOnUiThread(() -> {
-                        adapter.setStations(stationWrappersFav);
-                        mListener.onStationsUpdated(adapter.getStations());
-                        Log.i("Substation " + type, "updated " + resumed);
-                    });
-
-                } else if (type == TYPE_NEARBY) {
-
-                    if (location == null) {
-                        // TODO: handle error
-                        locationProviderClient.getLastLocation().addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-
-                                location = task.getResult();
-                                if (location != null) {
-                                    Collections.sort(apiResponse.getData(), (o1, o2) -> {
-                                        double o1D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o1.getLatLng());
-                                        double o2D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o2.getLatLng());
-                                        return Double.compare(o1D, o2D);
-                                    });
-                                    for (Station station : apiResponse.getData()) {
-                                        Boolean f = favourites.get(station.getRef_id());
-                                        if (f == null) f = false;
-                                        stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000)));
-                                    }
-                                } else {
-                                    for (Station station : apiResponse.getData()) {
-                                        Boolean f = favourites.get(station.getRef_id());
-                                        if (f == null) f = false;
-                                        stationWrappersFav.add(new StationWrapper(station, f));
-                                    }
-                                }
-                                ((Activity) context).runOnUiThread(() -> {
-                                    adapter.setStations(stationWrappersFav);
-                                    mListener.onStationsUpdated(adapter.getStations());
-                                    Log.i("Substation " + type, "updated " + resumed);
-                                });
-                            }
-                        });
-                    } else {
-                        Collections.sort(apiResponse.getData(), (o1, o2) -> {
-                            double o1D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o1.getLatLng());
-                            double o2D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o2.getLatLng());
-                            return Double.compare(o1D, o2D);
-                        });
-                        for (Station station : apiResponse.getData()) {
-                            Boolean f = favourites.get(station.getRef_id());
-                            if (f == null) f = false;
-                            stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000)));
-                        }
-                        ((Activity) context).runOnUiThread(() -> {
-                            adapter.setStations(stationWrappersFav);
-                            mListener.onStationsUpdated(adapter.getStations());
-                            Log.i("Substation " + type, "updated " + resumed);
-                        });
-                    }
-
-                }
-
-            }
-        });
-
+        if (type == TYPE_FAVOURITE && stations != null) {
+            adapter.setStations(new ArrayList<>());
+            setFavouriteStations(stations);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        locationProviderClient.removeLocationUpdates(locationCallback);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_stations_sub, container, false);
+
+        root = inflater.inflate(R.layout.fragment_stations_sub, container, false);
         list = root.findViewById(R.id.stations_sub_list);
+        loc_err = root.findViewById(R.id.stations_sub_list_nearby_error);
+        fav_err = root.findViewById(R.id.stations_sub_list_favourite_error);
+        progressBar = root.findViewById(R.id.stations_sub_progress);
+
         setupUI();
+
+        Api.stationDetails(false, (apiResponse, statusCode, success) -> {
+            if (success) {
+
+                stations = apiResponse.getData();
+                if (context == null)
+                    return;
+
+                // Get favourites
+                if (type == TYPE_FAVOURITE) {
+                    setFavouriteStations(apiResponse.getData());
+                    ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                } else if (type == TYPE_NEARBY) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            loc_err.setVisibility(View.VISIBLE);
+                            return;
+                        }
+                    }
+                    ((Activity)context).runOnUiThread(() -> locationManager.requestLocationUpdates(bestProvider, minTime, minDistance, myLocListener));
+                }
+
+            }
+        });
+
         return root;
     }
 
+    private void setFavouriteStations(List<Station> stations) {
+
+        Map<String, Boolean> favourites = getFavourite();
+
+        ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
+
+        // Filter by favourites
+        for (Station station : stations) {
+            Boolean f = favourites.get(station.getRef_id());
+            if (f == null) f = false;
+            if (f) stationWrappersFav.add(new StationWrapper(station, true));
+        }
+
+        if (stationWrappersFav.size() == 0) {
+            ((Activity)context).runOnUiThread(() -> {
+                loc_err.setVisibility(View.GONE);
+                fav_err.setVisibility(View.VISIBLE);
+            });
+        } else {
+            ((Activity)context).runOnUiThread(() -> {
+                fav_err.setVisibility(View.GONE);
+                loc_err.setVisibility(View.GONE);
+                adapter.setStations(stationWrappersFav);
+            });
+        }
+
+    }
+
+    private void setNearbyStations(List<Station> stations) {
+        Map<String, Boolean> favourites = getFavourite();
+
+        ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
+
+
+        if (location == null) {
+            ((Activity)context).runOnUiThread(() -> {
+                fav_err.setVisibility(View.GONE);
+                loc_err.setVisibility(View.VISIBLE);
+            });
+        } else {
+
+            Collections.sort(stations, (o1, o2) -> {
+                double o1D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o1.getLatLng());
+                double o2D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o2.getLatLng());
+                return Double.compare(o1D, o2D);
+            });
+            for (Station station : stations) {
+                Boolean f = favourites.get(station.getRef_id());
+                if (f == null) f = false;
+                stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000)));
+            }
+
+            ((Activity)context).runOnUiThread(() -> {
+                fav_err.setVisibility(View.GONE);
+                loc_err.setVisibility(View.GONE);
+
+                adapter.setStations(stationWrappersFav.subList(0, 100));
+            });
+        }
+    }
+
+    private Map<String, Boolean> getFavourite() {
+        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("station_favourites", MODE_PRIVATE);
+        return (Map<String, Boolean>) sharedPreferences.getAll();
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mListener.onStationsUpdated(new ArrayList<>());
-        locationProviderClient.removeLocationUpdates(locationCallback);
+        if (type == TYPE_NEARBY)
+            locationManager.removeUpdates(myLocListener);
     }
 
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof StationsFragmentListener) {
-            mListener = (StationsFragmentListener) context;
-            this.context = context;
-            locationProviderClient = LocationServices.getFusedLocationProviderClient(context);
-        } else throw new RuntimeException(context.toString() + " must implement StationsFragmentListener");
+        this.context = context;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
         context = null;
-        locationProviderClient  = null;
-    }
-
-    public interface StationsFragmentListener {
-        void onFragmentInteraction(Uri uri);
-        void onStationsUpdated(List<Station> stations);
     }
 
     public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -310,7 +357,9 @@ public class StationsSubFragment extends Fragment {
 
             // Set distance
             String distance;
-            if (location != null) {
+            if (type != TYPE_NEARBY)
+                distance = "";
+            else if (location != null) {
                 if (station.distance == -1)
                     station.distance = (int) Math.round(MapUtility.calculationByDistance(station.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude())) * 1000);
                 if (station.distance < 900)

@@ -3,6 +3,7 @@ package com.VegaSolutions.lpptransit.ui.fragments;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -23,9 +24,16 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.lppapi.Api;
+import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.List;
 
 
 // TODO: Clean code.
@@ -34,16 +42,15 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
 
     private Context context;
-    private Location location;
 
     private FrameLayout header;
     private ViewPager viewPager;
     private TabLayout tabLayout;
 
     private Adapter adapter;
-    ElevationAnimation animation;
-    private LinearLayoutManager linearLayoutManager;
-    private boolean fav = true;
+    private ElevationAnimation animation;
+
+    private StationsFragmentListener mListener;
 
 
     public StationsFragment() {
@@ -95,6 +102,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
                         color = Color.GRAY;
                 }
                 tab.getIcon().setTint(color);
+                mListener.onTabClicked();
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
@@ -103,7 +111,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
+                mListener.onTabClicked();
             }
         });
 
@@ -146,6 +154,12 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
         setupUI();
 
+        Api.stationDetails(false, (apiResponse, statusCode, success) -> {
+            if (success) {
+                mListener.onStationsUpdated(apiResponse.getData());
+            }
+        });
+
         return root;
     }
 
@@ -158,7 +172,10 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.context = context;
+        if (context instanceof StationsFragmentListener) {
+            mListener = (StationsFragmentListener) context;
+            this.context = context;
+        } else throw new RuntimeException(context.toString() + " must implement StationsFragmentListener");
     }
 
     @Override
@@ -233,6 +250,12 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
             }
 
         }
+    }
+
+    public interface StationsFragmentListener {
+        void onFragmentInteraction(Uri uri);
+        void onStationsUpdated(List<Station> stations);
+        void onTabClicked();
     }
 
 }

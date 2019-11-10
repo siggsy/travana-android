@@ -22,6 +22,7 @@
         <item name="containerBorderMargin">3dp</item>
         <item name="containerBorderPadding">0dp</item>
         <item name="containerBorderPaddingSide">0dp</item>
+        <item name="android:textColorHint">@color/text_hint</item>
         <item name="elevation">2dp</item>
     </style>
 

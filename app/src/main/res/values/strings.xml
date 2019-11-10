@@ -40,6 +40,13 @@
     <string name="arrival_time">Arrival time</string>
     <string name="nearby">Nearby</string>
     <string name="favourite">Favourite</string>
+    <string name="favourite_error">No favourites added yet.</string>
+    <string name="location_error">Location not enabled.</string>
+    <string name="location_changed">Location changed</string>
+    <string name="update">Update</string>
+    <string name="no_arrival_error">No upcoming arrivals.</string>
+    <string name="no_departures">No scheduled arrivals for today.</string>
+    <string name="loading_buses">Loading buses</string>
 
 
 </resources>

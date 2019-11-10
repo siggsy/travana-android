@@ -4,10 +4,10 @@
     android:shape="oval">
 
     <solid android:color="?backgroundViewColor" />
-    <stroke android:width="2dp"
+    <stroke android:width="3dp"
         android:color="?android:textColor"/>
 
     <size
-        android:width="10dp"
-        android:height="10dp"/>
+        android:width="14dp"
+        android:height="14dp"/>
 </shape>

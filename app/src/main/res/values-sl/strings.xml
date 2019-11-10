@@ -31,5 +31,12 @@
     <string name="hours">Ure</string>
     <string name="arrival_time">Čas prihoda</string>
     <string name="nearby">V bližini</string>
-    <string name="favourite">Favourite</string>
+    <string name="favourite">Priljubljene</string>
+    <string name="favourite_error">Ni priljubljenih postaj.</string>
+    <string name="location_error">Lokacija ni vklopljena.</string>
+    <string name="location_changed">Lokacija spremenjena</string>
+    <string name="update">Posodobi</string>
+    <string name="no_arrival_error">Ni bližnjih prihodov.</string>
+    <string name="no_departures">Za danes ni napovedanih prihodov.</string>
+    <string name="loading_buses">Nalaganje avtobusov</string>
 </resources>

@@ -11,6 +11,7 @@
     <color name="gray">#66000000</color>
     <color name="light_gray">#11000000</color>
     <color name="light_gray_2">#C0C0C0</color>
+    <color name="text_hint">#888888</color>
 
     <color name="main_green">#75E645</color>
     <color name="main_blue">#45BEE6</color>
