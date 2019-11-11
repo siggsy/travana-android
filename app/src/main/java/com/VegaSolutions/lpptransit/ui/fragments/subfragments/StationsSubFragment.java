@@ -155,8 +155,8 @@ public class StationsSubFragment extends Fragment {
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         // Get the criteria you would like to use
         Criteria criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);
         criteria.setCostAllowed(true);
