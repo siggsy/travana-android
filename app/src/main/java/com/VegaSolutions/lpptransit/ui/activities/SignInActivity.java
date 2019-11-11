@@ -18,10 +18,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalRequest;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -46,6 +48,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import okhttp3.Credentials;
@@ -301,10 +304,11 @@ public class SignInActivity extends AppCompatActivity {
 
     private void getwarnings(){
 
-        /*
+
         if(FirebaseAuth.getInstance().getCurrentUser() == null)
             return;
 
+        /*
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         mUser.getIdToken(true)
@@ -313,7 +317,7 @@ public class SignInActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             String idToken = task.getResult().getToken();
 
-                            TravanaAPI.warnings(idToken, (data, statusCode, success) ->{
+                            TravanaAPI.messagesAdmin(idToken, (data, statusCode, success) ->{
 
                                 if(success){
                                     Log.e(TAG, data + "");
@@ -331,17 +335,97 @@ public class SignInActivity extends AppCompatActivity {
                         }
                     }
                 });
-                */
+*/
 
+        /*
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         String[] tags = {"bus", "lpp", "3g"};
 
-        LiveUpdateMessage message = new LiveUpdateMessage(user.getDisplayName(), new Date(), "spremenjena5555", tags, 10);
+        //LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() ,user.getDisplayName(), user.getPhotoUrl().toString(),  new Date(), "spremenjena5555", tags, 10);
 
+        LiveUpdateComment comment = new LiveUpdateComment(user.getUid() ,user.getDisplayName(), user.getPhotoUrl().toString(), "spremenjena5555");
+
+        TravanaAPI.addComment("token", "mess_genVegaSolutionsMonNov1116:37:21GMT01:002019", comment, (data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+
+        });
+        */
+
+
+        FirebaseManager.getFirebaseToken((token, ex, success) -> {
+
+            Log.e(TAG, token);
+
+            if(success){
+
+                TravanaAPI.messagesAdmin(token, (data1, e, success1) ->{
+
+                    if(success1){
+
+                        Log.e(TAG, data1.toString());
+
+                    }else{
+                        Log.e(TAG, "error" + e);
+                    }
+
+                });
+
+            }else{
+                Log.e(TAG, "error" + ex.getMessage());
+            }
+
+        });
+
+        /*
+        TravanaAPI.warnings((data, statusCode, success) -> {
+
+            if(success){
+
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+
+        });
+
+         */
+
+        /*
+        TravanaAPI.addMessage("token", message, (data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+
+        });
+
+         */
+        /*
         System.out.println(message);
 
         LiveUpdateComment comment = new LiveUpdateComment(user.getDisplayName(), "vsebinavTHEKING50444444444");
+        /*
+
+
+         */
+        /*
+        TravanaAPI.banUser("token", "2CPPj3qcIsPOOyHueenh6WZsX922", (data, statusCode, success) -> {
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+        });
+        */
 
         /*
         TravanaAPI.editComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", "comm_genVegaSolutionsSunNov1019:04:20GMT01:002019", comment, (data, statusCode, success) -> {
@@ -355,6 +439,7 @@ public class SignInActivity extends AppCompatActivity {
 
          */
 
+        /*
         ArrayList<MessagesApprovalRequest> list = new ArrayList<>();
         list.add(new MessagesApprovalRequest("mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", false));
 
@@ -366,7 +451,7 @@ public class SignInActivity extends AppCompatActivity {
                 Log.e(TAG, "error" + statusCode);
             }
         });
-
+        */
         /*
         TravanaAPI.removeComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", "comm_genVegaSolutionsSunNov1019:02:33GMT01:002019", (data, statusCode, success) -> {
 

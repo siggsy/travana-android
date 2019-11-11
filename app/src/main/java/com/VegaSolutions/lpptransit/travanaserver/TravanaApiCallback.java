@@ -10,5 +10,5 @@ public interface TravanaApiCallback<T> {
      * @param statusCode HTML status code
      * @param success boolean if it was successfully executed
      */
-    void onComplete(@Nullable String apiResponse, int statusCode, boolean success);
+    void onComplete(@Nullable T apiResponse, int statusCode, boolean success);
 }

@@ -8,7 +8,9 @@ import java.util.List;
 public class LiveUpdateMessage {
 
     private String _id;
+    private String user_id;
     private String name;
+    private String user_photo_url;
     //private String photo_path;
     private Date created_time;
     private Date expire_date;
@@ -18,19 +20,18 @@ public class LiveUpdateMessage {
     private int likes;
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
 
-    private boolean checked_by_admin = false;
-
-    private boolean is_visible = false;
     //private String[] photos_paths;
 
     public LiveUpdateMessage(){
 
     }
 
-    public LiveUpdateMessage(String name, Date expire_date,
+    public LiveUpdateMessage(String user_id, String name, String user_photo_url, Date expire_date,
                              String message_content, String[] tags, int importance) {
 
+        this.user_id = user_id;
         this.name = name;
+        this.user_photo_url = user_photo_url;
         this.created_time = new Date();
         this.expire_date = expire_date;
         this.message_content = message_content;
@@ -116,27 +117,30 @@ public class LiveUpdateMessage {
         this.comments = comments;
     }
 
-    public boolean isChecked_by_admin() {
-        return checked_by_admin;
+
+    public String getUser_id() {
+        return user_id;
     }
 
-    public void setChecked_by_admin(boolean checked_by_admin) {
-        this.checked_by_admin = checked_by_admin;
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
-    public boolean isIs_visible() {
-        return is_visible;
+    public String getUser_photo_url() {
+        return user_photo_url;
     }
 
-    public void setIs_visible(boolean is_visible) {
-        this.is_visible = is_visible;
+    public void setUser_photo_url(String user_photo_url) {
+        this.user_photo_url = user_photo_url;
     }
 
     @Override
     public String toString() {
         return "LiveUpdateMessage{" +
                 "_id='" + _id + '\'' +
+                ", user_id='" + user_id + '\'' +
                 ", name='" + name + '\'' +
+                ", user_photo_url='" + user_photo_url + '\'' +
                 ", created_time=" + created_time +
                 ", expire_date=" + expire_date +
                 ", message_content='" + message_content + '\'' +
@@ -144,8 +148,6 @@ public class LiveUpdateMessage {
                 ", importance=" + importance +
                 ", likes=" + likes +
                 ", comments=" + comments +
-                ", checked_by_admin=" + checked_by_admin +
-                ", is_visible=" + is_visible +
                 '}';
     }
 }

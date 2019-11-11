@@ -4,21 +4,22 @@ import java.util.Date;
 
 public class LiveUpdateComment {
 
+    private String user_id;
     private String name;
+    private String user_photo_url;
     //private String photo_path;
-
     private String comment_id;
     private String comment_content;
     private Date created_date;
-    private boolean is_visible = false;
-    private boolean checked_by_admin = false;
 
     public LiveUpdateComment() {
 
     }
 
-    public LiveUpdateComment(String name, String comment_content) {
+    public LiveUpdateComment(String user_id, String name, String user_photo_url, String comment_content) {
+        this.user_id = user_id;
         this.name = name;
+        this.user_photo_url = user_photo_url;
         this.comment_content = comment_content;
         this.created_date = new Date();
 
@@ -29,12 +30,28 @@ public class LiveUpdateComment {
         this.comment_id = _id;
     }
 
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUser_photo_url() {
+        return user_photo_url;
+    }
+
+    public void setUser_photo_url(String user_photo_url) {
+        this.user_photo_url = user_photo_url;
     }
 
     public String getComment_id() {
@@ -61,27 +78,13 @@ public class LiveUpdateComment {
         this.created_date = created_date;
     }
 
-    public boolean isVisible() {
-        return is_visible;
-    }
-
-    public void setVisible(boolean is_visible) {
-        this.is_visible = is_visible;
-    }
-
-    public boolean isChecked_by_admin() {
-        return checked_by_admin;
-    }
-
-    public void setChecked_by_admin(boolean checked_by_admin) {
-        this.checked_by_admin = checked_by_admin;
-    }
-
     @Override
     public String toString() {
-        return "LiveUpdateComment [name=" + name + ", comment_id=" + comment_id + ", comment_content=" + comment_content
-                + ", created_date=" + created_date + ", is_visible=" + is_visible + ", checked_by_admin="
-                + checked_by_admin + "]";
+        return "LiveUpdateComment{" +
+                "name='" + name + '\'' +
+                ", comment_id='" + comment_id + '\'' +
+                ", comment_content='" + comment_content + '\'' +
+                ", created_date=" + created_date +
+                '}';
     }
-
 }
