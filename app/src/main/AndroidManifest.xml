@@ -19,7 +19,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".ui.activities.SettingsActivity"></activity>
-        <activity android:name=".ui.activities.WelcomeActivity" />
+        <activity android:name=".ui.activities.WelcomeActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.DepartureActivity"
             android:screenOrientation="portrait" />
