@@ -36,6 +36,12 @@ import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -71,6 +77,8 @@ public class StationsSubFragment extends Fragment {
 
     private Context context;
     private FragmentHeaderCallback callback;
+    private FusedLocationProviderClient locationClient;
+    private LocationRequest locationRequest;
     private LocationManager locationManager;
     private List<Station> stations;
     private boolean firstTime = true;
@@ -79,23 +87,7 @@ public class StationsSubFragment extends Fragment {
     private LocationListener myLocListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            if (context == null) return;
 
-            StationsSubFragment.this.location = location;
-            if (firstTime) {
-                firstTime = false;
-                setNearbyStations(stations);
-                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-                return;
-            }
-            Snackbar snackbar = Snackbar.make(root, R.string.location_changed, Snackbar.LENGTH_INDEFINITE).setAction(R.string.update, v -> {
-                setNearbyStations(stations);
-                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-            }).setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-            View view = snackbar.getView();
-            TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
-            tv.setTextColor(Color.WHITE);
-            snackbar.show();
 
         }
 
@@ -122,6 +114,58 @@ public class StationsSubFragment extends Fragment {
                 loc_err.setVisibility(View.VISIBLE);
                 adapter.setStations(new ArrayList<>());
             });
+        }
+    };
+
+    LocationCallback locationCallback = new LocationCallback(){
+
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            Location newLoc = locationResult.getLastLocation();
+
+            if (location == null || MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(newLoc.getLatitude(), newLoc.getLongitude())) * 1000 > 30) {
+                if (location != null)
+                    Log.i("distance", String.valueOf(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(newLoc.getLatitude(), newLoc.getLongitude())) * 1000));
+                location = newLoc;
+            } else return;
+
+            if (context == null) return;
+
+            if (firstTime) {
+                firstTime = false;
+                setNearbyStations(stations);
+                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                return;
+            }
+
+            Snackbar snackbar = Snackbar.make(root, R.string.location_changed, Snackbar.LENGTH_INDEFINITE).setAction(R.string.update, v -> {
+                setNearbyStations(stations);
+                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+            }).setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+            View view = snackbar.getView();
+            TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+            tv.setTextColor(Color.WHITE);
+            snackbar.show();
+
+        }
+
+        @Override
+        public void onLocationAvailability(LocationAvailability locationAvailability) {
+            super.onLocationAvailability(locationAvailability);
+            if (locationAvailability.isLocationAvailable()) {
+                ((Activity)context).runOnUiThread(() -> {
+                    loc_err.setVisibility(View.GONE);
+                    Log.i("location", "available");
+                    setNearbyStations(stations);
+                });
+            } else {
+                ((Activity)context).runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    loc_err.setVisibility(View.VISIBLE);
+                    adapter.setStations(new ArrayList<>());
+                });
+            }
         }
     };
 
@@ -152,6 +196,14 @@ public class StationsSubFragment extends Fragment {
     }
 
     private void setupCurrentLocationUpdates() {
+
+        locationClient = LocationServices.getFusedLocationProviderClient(context);
+
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(20 * 1000);
+        locationRequest.setFastestInterval(10 * 1000);
+
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         // Get the criteria you would like to use
         Criteria criteria = new Criteria();
@@ -173,8 +225,7 @@ public class StationsSubFragment extends Fragment {
             type = getArguments().getInt(TYPE);
         }
         Log.i("SubStationFragment", "created");
-        if (type == TYPE_NEARBY)
-            setupCurrentLocationUpdates();
+
 
     }
 
@@ -193,13 +244,18 @@ public class StationsSubFragment extends Fragment {
         if (type == TYPE_FAVOURITE && stations != null) {
             adapter.setStations(new ArrayList<>());
             setFavouriteStations(stations);
-        } else
+        } else {
+            if (locationRequest != null)
+                locationClient.requestLocationUpdates(locationRequest, locationCallback, null);
             adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if (locationClient != null)
+            locationClient.removeLocationUpdates(locationCallback);
     }
 
     @Override
@@ -227,11 +283,15 @@ public class StationsSubFragment extends Fragment {
                 } else if (type == TYPE_NEARBY) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            loc_err.setVisibility(View.VISIBLE);
+                            ((Activity)context).runOnUiThread(() -> {
+                                loc_err.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.GONE);
+                            });
                             return;
                         }
                     }
-                    ((Activity)context).runOnUiThread(() -> locationManager.requestLocationUpdates(bestProvider, minTime, minDistance, myLocListener));
+                    setupCurrentLocationUpdates();
+                    ((Activity)context).runOnUiThread(() -> locationClient.requestLocationUpdates(locationRequest, locationCallback, null));
                 }
 
             }
