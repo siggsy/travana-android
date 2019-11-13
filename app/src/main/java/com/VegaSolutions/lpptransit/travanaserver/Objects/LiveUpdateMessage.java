@@ -9,8 +9,7 @@ public class LiveUpdateMessage {
 
     private String _id;
     private String user_id;
-    private String name;
-    private String user_photo_url;
+    private UserData user;
     //private String photo_path;
     private Date created_time;
     private Date expire_date;
@@ -22,23 +21,17 @@ public class LiveUpdateMessage {
 
     //private String[] photos_paths;
 
-    public LiveUpdateMessage(){
-
-    }
-
-    public LiveUpdateMessage(String user_id, String name, String user_photo_url, Date expire_date,
+    public LiveUpdateMessage(String user_id, Date expire_date,
                              String message_content, String[] tags, int importance) {
 
         this.user_id = user_id;
-        this.name = name;
-        this.user_photo_url = user_photo_url;
         this.created_time = new Date();
         this.expire_date = expire_date;
         this.message_content = message_content;
         this.tags = tags;
         this.importance = importance;
 
-        String _id = "mess_gen" + name + created_time;
+        String _id = "mess_gen" + user_id + created_time;
         _id = _id.replaceAll(" ", "");
         _id = _id.replace("+", "");
 
@@ -51,14 +44,6 @@ public class LiveUpdateMessage {
 
     public void set_id(String _id) {
         this._id = _id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Date getCreated_time() {
@@ -126,12 +111,12 @@ public class LiveUpdateMessage {
         this.user_id = user_id;
     }
 
-    public String getUser_photo_url() {
-        return user_photo_url;
+    public UserData getUser() {
+        return user;
     }
 
-    public void setUser_photo_url(String user_photo_url) {
-        this.user_photo_url = user_photo_url;
+    public void setUser(UserData user) {
+        this.user = user;
     }
 
     @Override
@@ -139,8 +124,6 @@ public class LiveUpdateMessage {
         return "LiveUpdateMessage{" +
                 "_id='" + _id + '\'' +
                 ", user_id='" + user_id + '\'' +
-                ", name='" + name + '\'' +
-                ", user_photo_url='" + user_photo_url + '\'' +
                 ", created_time=" + created_time +
                 ", expire_date=" + expire_date +
                 ", message_content='" + message_content + '\'' +

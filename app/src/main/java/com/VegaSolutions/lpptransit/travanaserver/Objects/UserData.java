@@ -6,6 +6,8 @@ public class UserData {
     private String name;
     private String email;
     private String user_photo_url;
+    private UserTag tag;
+
 
     public UserData(String _id, String name, String email, String user_photo_url) {
         this._id = _id;
@@ -46,6 +48,14 @@ public class UserData {
         this.user_photo_url = user_photo_url;
     }
 
+    public UserTag getTag() {
+        return tag;
+    }
+
+    public void setTag(UserTag tag) {
+        this.tag = tag;
+    }
+
     @Override
     public String toString() {
         return "UserData{" +
@@ -53,6 +63,8 @@ public class UserData {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", user_photo_url='" + user_photo_url + '\'' +
+                ", tag='" + tag + '\'' +
                 '}';
     }
+
 }

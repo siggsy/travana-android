@@ -5,8 +5,7 @@ import java.util.Date;
 public class LiveUpdateComment {
 
     private String user_id;
-    private String name;
-    private String user_photo_url;
+
     //private String photo_path;
     private String comment_id;
     private String comment_content;
@@ -16,14 +15,12 @@ public class LiveUpdateComment {
 
     }
 
-    public LiveUpdateComment(String user_id, String name, String user_photo_url, String comment_content) {
+    public LiveUpdateComment(String user_id, String comment_content) {
         this.user_id = user_id;
-        this.name = name;
-        this.user_photo_url = user_photo_url;
         this.comment_content = comment_content;
         this.created_date = new Date();
 
-        String _id = "comm_gen" + name + created_date;
+        String _id = "comm_gen" + user_id+ created_date;
         _id = _id.replaceAll(" ", "");
         _id = _id.replace("+", "");
 
@@ -36,22 +33,6 @@ public class LiveUpdateComment {
 
     public void setUser_id(String user_id) {
         this.user_id = user_id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUser_photo_url() {
-        return user_photo_url;
-    }
-
-    public void setUser_photo_url(String user_photo_url) {
-        this.user_photo_url = user_photo_url;
     }
 
     public String getComment_id() {
@@ -81,7 +62,7 @@ public class LiveUpdateComment {
     @Override
     public String toString() {
         return "LiveUpdateComment{" +
-                "name='" + name + '\'' +
+                "user_id='" + user_id + '\'' +
                 ", comment_id='" + comment_id + '\'' +
                 ", comment_content='" + comment_content + '\'' +
                 ", created_date=" + created_date +

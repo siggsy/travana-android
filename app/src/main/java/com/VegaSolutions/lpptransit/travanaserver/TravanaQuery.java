@@ -25,10 +25,13 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static OkHttpClient client = new OkHttpClient();
 
+    //public static final String SERVER_URL = "http://192.168.1.20:8080/ljubljana_app_server2/api";
+
     public static final String SERVER_URL = "http://192.168.1.7:8081/ljubljana_app_server/api";
 
-    public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
+    //public static final String SERVER_IP_ADDRESS = "192.168.1.20:8080";
 
+    public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
 
     public static final String WARNINGS_URL = "/alerts/warnings";                                   //returns warnings alerts. ex. "{"content": "vsebina","created_date": "10.12.2001","expire_date": "1.1.2020",...
 

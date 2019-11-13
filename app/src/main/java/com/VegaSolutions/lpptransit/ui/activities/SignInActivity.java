@@ -364,14 +364,19 @@ public class SignInActivity extends AppCompatActivity {
 
             if(success){
 
-                TravanaAPI.messagesAdmin(token, (data1, e, success1) ->{
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+                String[] tags = {"bus", "lpp", "3g"};
+
+                LiveUpdateMessage message = new LiveUpdateMessage(user.getUid(), new Date(), "spremenjena5555", tags, 10);
+
+                TravanaAPI.addMessage(token, message, (data, statusCode, success1) -> {
 
                     if(success1){
-
-                        Log.e(TAG, data1.toString());
-
+                        Log.e(TAG, data + "");
                     }else{
-                        Log.e(TAG, "error" + e);
+                        Log.e(TAG, "error" + statusCode);
                     }
 
                 });
@@ -396,19 +401,21 @@ public class SignInActivity extends AppCompatActivity {
 
          */
 
+        //LiveUpdateMessage message = new LiveUpdateMessage("id", "name", "url", new Date(), "content", null, 10);
+
+
         /*
-        TravanaAPI.addMessage("token", message, (data, statusCode, success) -> {
+        LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "vsebinavKRALJ");
+
+        TravanaAPI.addComment("token","mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1315:17:26GMT01:002019", comment ,(data, statusCode, success) -> {
 
             if(success){
                 Log.e(TAG, data + "");
             }else{
                 Log.e(TAG, "error" + statusCode);
             }
-
         });
 
-         */
-        /*
         System.out.println(message);
 
         LiveUpdateComment comment = new LiveUpdateComment(user.getDisplayName(), "vsebinavTHEKING50444444444");
