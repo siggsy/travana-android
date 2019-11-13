@@ -14,16 +14,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalRequest;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;

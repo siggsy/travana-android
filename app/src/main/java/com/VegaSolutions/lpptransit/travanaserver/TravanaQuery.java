@@ -53,6 +53,8 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String BAN_USER = "/users/banUser";
 
+    public static final String MESSAGE_LIKE = "/live_updates/like_message";
+
     // Url parameters
     private StringBuilder params = new StringBuilder();
     private String URL;
@@ -109,8 +111,9 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
      * @param key value name
      * @param value the value
      */
-    public void addHeaderValues(@NonNull String key, @NonNull String value) {
+    public TravanaQuery addHeaderValues(@NonNull String key, @NonNull String value) {
         header_hashmap.put(key, value);
+        return this;
     }
 
 

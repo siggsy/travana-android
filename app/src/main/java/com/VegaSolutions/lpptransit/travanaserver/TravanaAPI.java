@@ -78,7 +78,6 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).execute();
-
     }
 
     public static void messages(TravanaApiCallback callback) {
@@ -265,6 +264,21 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addParams("_id", user_id)
+                .execute();
+    }
+
+    public static void messagesLike(String token,String mess_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+
+        new TravanaQuery(TravanaQuery.MESSAGE_LIKE, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("mess_id", mess_id)
+                .addHeaderValues("liked", like + "")
                 .execute();
     }
 
