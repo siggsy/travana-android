@@ -18,10 +18,13 @@
         android:theme="@style/DarkTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.activities.SettingsActivity"></activity>
-        <activity android:name=".ui.activities.WelcomeActivity"
+        <activity android:name=".ui.activities.PostActivity"></activity>
+        <activity android:name=".ui.activities.ForumActivity" />
+        <activity android:name=".ui.activities.SettingsActivity" />
+        <activity
+            android:name=".ui.activities.WelcomeActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.DepartureActivity"
             android:screenOrientation="portrait" />

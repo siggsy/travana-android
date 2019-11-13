@@ -35,8 +35,7 @@ public class Api {
                 .addParams("bus-vin", bus_vin)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
-                        ApiResponse<Bus> data = new Gson().fromJson(response, new TypeToken<ApiResponse<Bus>>() {
-                        }.getType());
+                        ApiResponse<Bus> data = new Gson().fromJson(response, new TypeToken<ApiResponse<Bus>>(){}.getType());
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })

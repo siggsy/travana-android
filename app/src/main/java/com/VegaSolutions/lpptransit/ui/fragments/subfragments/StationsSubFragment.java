@@ -43,6 +43,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -83,6 +86,23 @@ public class StationsSubFragment extends Fragment {
     private List<Station> stations;
     private boolean firstTime = true;
 
+    private RecyclerView list;
+    private View fav_err, loc_err, progressBar;
+    private FloatingActionButton locationRefresh;
+    View root;
+
+    private OnCompleteListener<Location> onCompleteListener = task -> {
+        Location location = task.getResult();
+        progressBar.setVisibility(View.GONE);
+        if (location != null) {
+            this.location = location;
+            setNearbyStations(stations);
+            loc_err.setVisibility(View.GONE);
+        } else
+            loc_err.setVisibility(View.VISIBLE);
+
+    };
+
 
     private LocationListener myLocListener = new LocationListener() {
         @Override
@@ -117,61 +137,7 @@ public class StationsSubFragment extends Fragment {
         }
     };
 
-    LocationCallback locationCallback = new LocationCallback(){
 
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            super.onLocationResult(locationResult);
-            Location newLoc = locationResult.getLastLocation();
-
-            if (location == null || MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(newLoc.getLatitude(), newLoc.getLongitude())) * 1000 > 30) {
-                if (location != null)
-                    Log.i("distance", String.valueOf(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(newLoc.getLatitude(), newLoc.getLongitude())) * 1000));
-                location = newLoc;
-            } else return;
-
-            if (context == null) return;
-
-            if (firstTime) {
-                firstTime = false;
-                setNearbyStations(stations);
-                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-                return;
-            }
-
-            Snackbar snackbar = Snackbar.make(root, R.string.location_changed, Snackbar.LENGTH_INDEFINITE).setAction(R.string.update, v -> {
-                setNearbyStations(stations);
-                ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-            }).setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-            View view = snackbar.getView();
-            TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
-            tv.setTextColor(Color.WHITE);
-            snackbar.show();
-
-        }
-
-        @Override
-        public void onLocationAvailability(LocationAvailability locationAvailability) {
-            super.onLocationAvailability(locationAvailability);
-            if (locationAvailability.isLocationAvailable()) {
-                ((Activity)context).runOnUiThread(() -> {
-                    loc_err.setVisibility(View.GONE);
-                    Log.i("location", "available");
-                    setNearbyStations(stations);
-                });
-            } else {
-                ((Activity)context).runOnUiThread(() -> {
-                    progressBar.setVisibility(View.GONE);
-                    loc_err.setVisibility(View.VISIBLE);
-                    adapter.setStations(new ArrayList<>());
-                });
-            }
-        }
-    };
-
-    private RecyclerView list;
-    private View fav_err, loc_err, progressBar;
-    View root;
 
     public static StationsSubFragment newInstance(int type, FragmentHeaderCallback callback) {
         StationsSubFragment fragment = new StationsSubFragment();
@@ -193,29 +159,22 @@ public class StationsSubFragment extends Fragment {
                 callback.onHeaderChanged(recyclerView.canScrollVertically(-1));
             }
         });
+
+        locationRefresh.setVisibility(View.GONE);
+        if (type == TYPE_NEARBY) {
+            locationRefresh.setOnClickListener((v) -> {
+                loc_err.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
+                adapter.setStations(new ArrayList<>());
+                locationClient.getLastLocation().addOnCompleteListener(onCompleteListener);
+            });
+        }
     }
 
     private void setupCurrentLocationUpdates() {
 
         locationClient = LocationServices.getFusedLocationProviderClient(context);
 
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setInterval(20 * 1000);
-        locationRequest.setFastestInterval(10 * 1000);
-
-        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        // Get the criteria you would like to use
-        Criteria criteria = new Criteria();
-        criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setSpeedRequired(false);
-        // Get the best provider from the criteria specified, and false to say it can turn the provider on if it isn't already
-
-        bestProvider = locationManager.getBestProvider(criteria, false);
     }
 
     @Override
@@ -233,8 +192,6 @@ public class StationsSubFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.i("SubStationFragment", "view destroyed");
-        if (type == TYPE_NEARBY)
-            locationManager.removeUpdates(myLocListener);
     }
 
     @Override
@@ -242,20 +199,13 @@ public class StationsSubFragment extends Fragment {
         super.onResume();
         callback.onHeaderChanged(list.canScrollVertically(-1));
         if (type == TYPE_FAVOURITE && stations != null) {
-            adapter.setStations(new ArrayList<>());
             setFavouriteStations(stations);
-        } else {
-            if (locationRequest != null)
-                locationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-            adapter.notifyDataSetChanged();
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (locationClient != null)
-            locationClient.removeLocationUpdates(locationCallback);
     }
 
     @Override
@@ -266,6 +216,7 @@ public class StationsSubFragment extends Fragment {
         loc_err = root.findViewById(R.id.stations_sub_list_nearby_error);
         fav_err = root.findViewById(R.id.stations_sub_list_favourite_error);
         progressBar = root.findViewById(R.id.stations_sub_progress);
+        locationRefresh = root.findViewById(R.id.location_refresh_fab);
 
         setupUI();
 
@@ -291,7 +242,10 @@ public class StationsSubFragment extends Fragment {
                         }
                     }
                     setupCurrentLocationUpdates();
-                    ((Activity)context).runOnUiThread(() -> locationClient.requestLocationUpdates(locationRequest, locationCallback, null));
+                    loc_err.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.VISIBLE);
+                    locationClient.getLastLocation().addOnCompleteListener(onCompleteListener);
+                    ((Activity)context).runOnUiThread(() -> locationRefresh.setVisibility(View.VISIBLE));
                 }
 
             }
@@ -356,7 +310,7 @@ public class StationsSubFragment extends Fragment {
                 fav_err.setVisibility(View.GONE);
                 loc_err.setVisibility(View.GONE);
 
-                adapter.setStations(stationWrappersFav.subList(0, 100));
+                adapter.setStations(stationWrappersFav.subList(0, 30));
             });
         }
     }

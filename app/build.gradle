@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'biz.laenger.android:vpbs:0.0.5'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'de.hdodenhof:circleimageview:3.0.1'
 
 
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
