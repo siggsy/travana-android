@@ -236,7 +236,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.setTrafficEnabled(true);
         setupClusterManager();
         mMap.setPadding(12, 150, 12, behavior.getPeekHeight());
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
 
         if (ViewGroupUtils.isDarkTheme(this))
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
@@ -256,6 +256,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
 
     private void setupClusterManager() {
         clusterManager = new ClusterManager<>(this, mMap);

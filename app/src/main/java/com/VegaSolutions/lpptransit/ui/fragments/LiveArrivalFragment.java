@@ -232,15 +232,14 @@ public class LiveArrivalFragment extends Fragment {
                     case 2:
                         arrival_event.setVisibility(View.GONE);
                         arrival_event_icon.setVisibility(View.GONE);
-                        String arrival_text = getResources().getString(R.string.arrival).toUpperCase();
-                        arrival_time.setText(arrival_text);
+                        arrival_time.setText(getString(R.string.arrival).toUpperCase());
                         arrival_time.setTextColor(Color.WHITE);
                         back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_arrival, null));
                         break;
                     case 3:
                         arrival_event.setVisibility(View.GONE);
                         arrival_event_icon.setVisibility(View.GONE);
-                        arrival_time.setText(getString(R.string.detour));
+                        arrival_time.setText(getString(R.string.detour).toUpperCase());
                         arrival_time.setTextColor(Color.WHITE);
                         back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
                         break;
@@ -312,12 +311,12 @@ public class LiveArrivalFragment extends Fragment {
 
             Map<String, RouteWrapper> map = new LinkedHashMap<>();
             for (ArrivalWrapper.Arrival arrival : arrivals) {
-                RouteWrapper route = map.get(arrival.getRoute_name());
+                RouteWrapper route = map.get(arrival.getTrip_id());
                 if (route == null) {
                     route = new RouteWrapper();
                     route.name = arrival.getStations() != null ? arrival.getStations().getArrival() : arrival.getTrip_name();
                     route.arrivalObject = arrival;
-                    map.put(arrival.getRoute_name(), route);
+                    map.put(arrival.getTrip_id(), route);
                 }
                 route.arrivals.add(arrival);
             }

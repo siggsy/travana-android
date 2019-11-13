@@ -108,7 +108,7 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
         m.setTag(station);
         m.showInfoWindow();
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(station.getLatLng(), 12.5f));
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
         mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
         if (ViewGroupUtils.isDarkTheme(this))
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));

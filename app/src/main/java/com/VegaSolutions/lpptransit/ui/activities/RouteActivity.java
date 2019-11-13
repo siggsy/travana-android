@@ -167,7 +167,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         });
         mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
         mMap.setPadding(0, 200, 0, 0);
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
         if (ViewGroupUtils.isDarkTheme(this))
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
 
