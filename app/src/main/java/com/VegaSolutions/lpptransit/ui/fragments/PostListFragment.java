@@ -23,10 +23,6 @@ import com.google.android.flexbox.FlexboxLayout;
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
 
-import java.util.Date;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class PostListFragment extends Fragment {
 
     public static final int TYPE_FOLLOWING = 1;

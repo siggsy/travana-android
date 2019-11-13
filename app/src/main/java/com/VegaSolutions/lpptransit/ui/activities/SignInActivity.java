@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
@@ -302,6 +303,16 @@ public class SignInActivity extends AppCompatActivity {
         if(FirebaseAuth.getInstance().getCurrentUser() == null)
             return;
 
+
+        TravanaAPI.tags((data, statusCode, success) ->{
+
+            if(success){
+                Log.e(TAG, data + "");
+            }else{
+                Log.e(TAG, "error" + statusCode);
+            }
+        });
+
         /*
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -351,7 +362,7 @@ public class SignInActivity extends AppCompatActivity {
         });
         */
 
-
+        /*
         FirebaseManager.getFirebaseToken((token, ex, success) -> {
 
             Log.e(TAG, token);
@@ -379,7 +390,17 @@ public class SignInActivity extends AppCompatActivity {
                 Log.e(TAG, "error" + ex.getMessage());
             }
 
-        });
+            */
+            TravanaAPI.messagesLike("tokne", "mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1315:47:50GMT01:002019", true, (data, statusCode, success1) -> {
+
+                if(success1){
+                    Log.e(TAG, data + "");
+                }else{
+                    Log.e(TAG, "error" + statusCode);
+                }
+
+            });
+
 
         /*
         TravanaAPI.warnings((data, statusCode, success) -> {
@@ -397,39 +418,12 @@ public class SignInActivity extends AppCompatActivity {
 
         //LiveUpdateMessage message = new LiveUpdateMessage("id", "name", "url", new Date(), "content", null, 10);
 
-
         /*
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "vsebinavKRALJ");
 
-        TravanaAPI.addComment("token","mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1315:17:26GMT01:002019", comment ,(data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-        });
-
-        System.out.println(message);
-
-        LiveUpdateComment comment = new LiveUpdateComment(user.getDisplayName(), "vsebinavTHEKING50444444444");
-        /*
-
-
-         */
-        /*
-        TravanaAPI.banUser("token", "2CPPj3qcIsPOOyHueenh6WZsX922", (data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-        });
-        */
-
-        /*
-        TravanaAPI.editComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", "comm_genVegaSolutionsSunNov1019:04:20GMT01:002019", comment, (data, statusCode, success) -> {
+        TravanaAPI.commentLike("token","mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1315:47:50GMT01:002019", "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1318:35:46GMT01:002019", false ,(data, statusCode, success) -> {
 
             if(success){
                 Log.e(TAG, data + "");
@@ -440,11 +434,9 @@ public class SignInActivity extends AppCompatActivity {
 
          */
 
-        /*
-        ArrayList<MessagesApprovalRequest> list = new ArrayList<>();
-        list.add(new MessagesApprovalRequest("mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", false));
+        String[] ids = {"becool#115678"};
 
-        TravanaAPI.approveMessages("token",list, (data, statusCode, success) -> {
+        TravanaAPI.followedMessages("token", ids,(data, statusCode, success) -> {
 
             if(success){
                 Log.e(TAG, data + "");
@@ -452,39 +444,6 @@ public class SignInActivity extends AppCompatActivity {
                 Log.e(TAG, "error" + statusCode);
             }
         });
-        */
-        /*
-        TravanaAPI.removeComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", "comm_genVegaSolutionsSunNov1019:02:33GMT01:002019", (data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-        });
-        */
-        /*
-        LiveUpdateComment comment = new LiveUpdateComment(user.getDisplayName(), "vsebinavKRALJ");
-
-        TravanaAPI.addComment("token","mess_genVegaSolutionsSunNov1018:46:15GMT01:002019", comment ,(data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-        });
-        */
-        /*
-        TravanaAPI.addMessage("token", message, (data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-        });
-        */
     }
 
     //--------------------------------------Animations

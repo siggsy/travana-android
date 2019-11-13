@@ -283,6 +283,52 @@ public class TravanaAPI {
                 .execute();
     }
 
+    public static void commentLike(String token,String mess_id, String comm_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+
+        new TravanaQuery(TravanaQuery.MESSAGE_COMMENT_LIKE, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("mess_id", mess_id)
+                .addHeaderValues("comm_id", comm_id)
+                .addHeaderValues("liked", like + "")
+                .execute();
+    }
+
+    public static void followedMessages(String token, String[] tags_ids, TravanaApiCallback callback){
+
+        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_FOLLOWED, TRAVANA_API_KEY, token, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .execute();
+    }
+
+    public static void tags(TravanaApiCallback callback){
+
+        new TravanaQuery(TravanaQuery.MESSAGE_TAGS)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .execute();
+    }
+
 }
 
 

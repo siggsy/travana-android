@@ -42,6 +42,8 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
 
     public static final String MESSAGES_EDIT_COMMENT = "/live_updates/messages/edit_comment";
 
+    public static final String MESSAGES_FOLLOWED = "/live_updates/followed_messages";
+
     private StringBuilder params = new StringBuilder();
 
     private String URL;

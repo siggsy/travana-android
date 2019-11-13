@@ -55,6 +55,10 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String MESSAGE_LIKE = "/live_updates/like_message";
 
+    public static final String MESSAGE_COMMENT_LIKE = "/live_updates/like_comment";
+
+    public static final String MESSAGE_TAGS = "/live_updates/tags";
+
     // Url parameters
     private StringBuilder params = new StringBuilder();
     private String URL;

@@ -14,7 +14,7 @@ public class LiveUpdateMessage {
     private Date created_time;
     private Date expire_date;
     private String message_content;
-    private String[] tags;
+    private MessageTag[] tags;
     private int importance;									// 10 - it is shown on the top of the list.
     private int likes;
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
@@ -22,7 +22,7 @@ public class LiveUpdateMessage {
     //private String[] photos_paths;
 
     public LiveUpdateMessage(String user_id, Date expire_date,
-                             String message_content, String[] tags, int importance) {
+                             String message_content, MessageTag[] tags, int importance) {
 
         this.user_id = user_id;
         this.created_time = new Date();
@@ -70,11 +70,11 @@ public class LiveUpdateMessage {
         this.message_content = message_content;
     }
 
-    public String[] getTags() {
+    public MessageTag[] getTags() {
         return tags;
     }
 
-    public void setTags(String[] tags) {
+    public void setTags(MessageTag[] tags) {
         this.tags = tags;
     }
 
@@ -124,6 +124,7 @@ public class LiveUpdateMessage {
         return "LiveUpdateMessage{" +
                 "_id='" + _id + '\'' +
                 ", user_id='" + user_id + '\'' +
+                ", user=" + user +
                 ", created_time=" + created_time +
                 ", expire_date=" + expire_date +
                 ", message_content='" + message_content + '\'' +
