@@ -18,6 +18,7 @@ public class LiveUpdateMessage {
     private int importance;									// 10 - it is shown on the top of the list.
     private int likes;
     private int comments_int;
+    private boolean liked;
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
 
     //private String[] photos_paths;
@@ -126,6 +127,14 @@ public class LiveUpdateMessage {
 
     public void setComments_int(int comments_int) {
         this.comments_int = comments_int;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
     }
 
     @Override

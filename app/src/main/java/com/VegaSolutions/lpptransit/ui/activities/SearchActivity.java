@@ -106,9 +106,7 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
-        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
-        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_search);
 
         setupUI();

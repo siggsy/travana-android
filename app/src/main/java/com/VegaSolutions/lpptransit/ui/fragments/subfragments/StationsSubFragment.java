@@ -81,8 +81,6 @@ public class StationsSubFragment extends Fragment {
     private Context context;
     private FragmentHeaderCallback callback;
     private FusedLocationProviderClient locationClient;
-    private LocationRequest locationRequest;
-    private LocationManager locationManager;
     private List<Station> stations;
     private boolean firstTime = true;
 
@@ -104,41 +102,6 @@ public class StationsSubFragment extends Fragment {
     };
 
 
-    private LocationListener myLocListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-
-
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-            ((Activity)context).runOnUiThread(() -> {
-                progressBar.setVisibility(View.VISIBLE);
-                loc_err.setVisibility(View.GONE);
-                if (location != null)
-                    onLocationChanged(location);
-            });
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-            firstTime = true;
-            ((Activity)context).runOnUiThread(() -> {
-                progressBar.setVisibility(View.GONE);
-                loc_err.setVisibility(View.VISIBLE);
-                adapter.setStations(new ArrayList<>());
-            });
-        }
-    };
-
-
-
     public static StationsSubFragment newInstance(int type, FragmentHeaderCallback callback) {
         StationsSubFragment fragment = new StationsSubFragment();
         fragment.callback = callback;
@@ -151,6 +114,7 @@ public class StationsSubFragment extends Fragment {
     private void setupUI() {
         list.setAdapter(adapter);
         list.setLayoutManager(new LinearLayoutManager(context));
+        list.setItemViewCacheSize(30);
         list.setHasFixedSize(true);
         list.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -172,9 +136,7 @@ public class StationsSubFragment extends Fragment {
     }
 
     private void setupCurrentLocationUpdates() {
-
         locationClient = LocationServices.getFusedLocationProviderClient(context);
-
     }
 
     @Override
@@ -183,23 +145,16 @@ public class StationsSubFragment extends Fragment {
         if (getArguments() != null) {
             type = getArguments().getInt(TYPE);
         }
-        Log.i("SubStationFragment", "created");
-
-
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.i("SubStationFragment", "view destroyed");
-    }
 
     @Override
     public void onResume() {
         super.onResume();
         callback.onHeaderChanged(list.canScrollVertically(-1));
-        if (type == TYPE_FAVOURITE && stations != null) {
-            setFavouriteStations(stations);
+        if (stations != null) {
+            if (type == TYPE_FAVOURITE) setFavouriteStations(stations);
+            else adapter.notifyDataSetChanged();
         }
     }
 
@@ -229,9 +184,12 @@ public class StationsSubFragment extends Fragment {
 
                 // Get favourites
                 if (type == TYPE_FAVOURITE) {
+
                     setFavouriteStations(apiResponse.getData());
                     ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+
                 } else if (type == TYPE_NEARBY) {
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                             ((Activity)context).runOnUiThread(() -> {
@@ -246,8 +204,8 @@ public class StationsSubFragment extends Fragment {
                     progressBar.setVisibility(View.VISIBLE);
                     locationClient.getLastLocation().addOnCompleteListener(onCompleteListener);
                     ((Activity)context).runOnUiThread(() -> locationRefresh.setVisibility(View.VISIBLE));
-                }
 
+                }
             }
         });
 
@@ -319,13 +277,6 @@ public class StationsSubFragment extends Fragment {
         SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("station_favourites", MODE_PRIVATE);
         return (Map<String, Boolean>) sharedPreferences.getAll();
     }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (type == TYPE_NEARBY)
-            locationManager.removeUpdates(myLocListener);
-    }
-
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -372,22 +323,15 @@ public class StationsSubFragment extends Fragment {
 
             // Set distance
             String distance;
-            if (type != TYPE_NEARBY)
-                distance = "";
-            else if (location != null) {
-                if (station.distance == -1)
-                    station.distance = (int) Math.round(MapUtility.calculationByDistance(station.station.getLatLng(), new LatLng(location.getLatitude(), location.getLongitude())) * 1000);
-                if (station.distance < 900)
-                    distance = station.distance + " m";
-                else
-                    distance = String.format(Locale.getDefault(), "%.2f km", station.distance / 1000f);
-            }
-            else distance = "?";
+            if (type != TYPE_NEARBY) distance = "";
+            else
+                if (station.distance < 900) distance = station.distance + " m";
+                else distance = String.format(Locale.getDefault(), "%.2f km", station.distance / 1000f);
 
             // Update ViewHolder
             viewHolder.name.setText(station.station.getName());
             viewHolder.distance.setText(distance);
-            viewHolder.center.setVisibility(Integer.valueOf(station.station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
+            viewHolder.center.setVisibility(station.station.isCenter()? View.VISIBLE : View.GONE);
             viewHolder.fav.setVisibility(station.favourite ? View.VISIBLE : View.GONE);
             viewHolder.card.setOnClickListener(v -> {
                 Intent intent = new Intent(context, StationActivity.class);

@@ -59,6 +59,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
+                <ImageView
+                    android:id="@+id/back"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="12dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:backgroundTint="?backgroundViewColor"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_arrow_back_black_24dp"
+                    android:tint="?android:textColor"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <View
                     android:id="@+id/view"
                     android:layout_width="50dp"
@@ -74,16 +88,16 @@
                     android:id="@+id/station_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="8dp"
                     android:text="Navje"
                     android:textColor="?android:textColor"
-                    android:textSize="30sp"
+                    android:textSize="24sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
                     app:layout_constraintEnd_toStartOf="@+id/station_center"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/back"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -113,10 +127,10 @@
                     android:layout_marginEnd="16dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:elevation="2dp"
+                    android:tint="?android:textColor"
                     app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    android:tint="?android:textColor"
                     app:srcCompat="@drawable/ic_swap_vert_black_24dp" />
 
                 <ImageView

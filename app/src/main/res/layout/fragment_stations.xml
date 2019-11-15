@@ -37,7 +37,6 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="4dp"
-                android:fontFamily="@font/google_sans"
                 android:text="@string/stations"
                 android:textSize="30sp"
                 android:textStyle="bold"

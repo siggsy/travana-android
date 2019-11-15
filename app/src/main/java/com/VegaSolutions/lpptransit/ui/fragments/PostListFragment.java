@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.google.android.flexbox.FlexboxLayout;
@@ -23,9 +25,11 @@ import com.google.android.flexbox.FlexboxLayout;
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class PostListFragment extends Fragment {
 
-    /*
+
     public static final int TYPE_FOLLOWING = 1;
     public static final int TYPE_ALL = 0;
 
@@ -63,7 +67,7 @@ public class PostListFragment extends Fragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-        TravanaAPI.messages((apiResponse, statusCode, success) -> {
+        TravanaAPI.messagesMeta((apiResponse, statusCode, success) -> {
             if (success) {
                 LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
                 adapter.setMessages(messages);
@@ -110,21 +114,29 @@ public class PostListFragment extends Fragment {
 
 
             viewHolder.postLikes.setText(String.valueOf(message.getLikes()));
-            viewHolder.postComments.setText(getString(R.string.post_comments, message.getComments().size()));
+            viewHolder.postComments.setText(getString(R.string.post_comments, message.getComments_int()));
             viewHolder.postTime.setText(getString(R.string.posted_time, Hours.hoursBetween(new DateTime(message.getCreated_time()), DateTime.now()).getHours()));
             viewHolder.postContent.setText(message.getMessage_content());
 
             viewHolder.postTags.removeAllViews();
-            for (String tag : message.getTags()) {
+            for (MessageTag tag : message.getTags()) {
                 TextView v = (TextView) getLayoutInflater().inflate(R.layout.template_tag, viewHolder.postTags, false);
-                v.getBackground().setTint(Colors.getColorFromString(String.valueOf(tag.length())));
-                v.setText("#" + tag);
+                v.getBackground().setTint(Color.parseColor(tag.getColor()));
+                v.setText("#" + tag.getTag());
                 viewHolder.postTags.addView(v);
             }
 
-            viewHolder.likeContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            viewHolder.likeContainer.setOnClickListener(v -> {
+                if (!message.isLiked()) {
+                    v.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.stretched_circle));
+                    v.getBackground().setTint(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                    viewHolder.postLikes.setTextColor(Color.WHITE);
+                    message.setLiked(true);
+                } else {
+                    v.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.stretched_circle));
+                    v.getBackground().setTint(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                    viewHolder.postLikes.setTextColor(Color.WHITE);
+                    message.setLiked(false);
                 }
             });
 
@@ -156,10 +168,12 @@ public class PostListFragment extends Fragment {
                 likeContainer = itemView.findViewById(R.id.post_like_container);
 
             }
+
+
+
         }
 
     }
 
-     */
 
 }

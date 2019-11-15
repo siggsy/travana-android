@@ -66,10 +66,7 @@ public class DepartureActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
-        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
-        hour = sharedPreferences.getBoolean("hour", false);
-        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_departure);
 
         int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };

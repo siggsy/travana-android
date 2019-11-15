@@ -63,6 +63,7 @@ public class LiveArrivalFragment extends Fragment {
     private View no_arr_err;
 
     private boolean hour;
+    private int color, backColor;
 
     private ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
             // TODO: handle error and no internet connection
@@ -86,6 +87,7 @@ public class LiveArrivalFragment extends Fragment {
         adapter = new Adapter();
         rv.setLayoutManager(new LinearLayoutManager(context));
         rv.setAdapter(adapter);
+        rv.setItemViewCacheSize(30);
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -98,6 +100,11 @@ public class LiveArrivalFragment extends Fragment {
         refreshLayout.setOnRefreshListener(() -> Api.arrival(stationId, callback));
         refreshLayout.setColorSchemeColors(ContextCompat.getColor(context, R.color.colorAccent));
 
+        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
+        TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
+        backColor = array.getColor(1, Color.WHITE);
+        color = array.getColor(0, Color.BLACK);
+        array.recycle();
     }
 
     public static LiveArrivalFragment newInstance(String stationId) {
@@ -214,14 +221,8 @@ public class LiveArrivalFragment extends Fragment {
 
                 SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
                 arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
-                int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
-                TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
-                @SuppressLint("ResourceType")
-                int backColor = array.getColor(1, Color.WHITE);
-                int color = array.getColor(0, Color.BLACK);
                 arrival_time.setTextColor(color);
                 back.getBackground().setTint(backColor);
-                array.recycle();
 
                 //(0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
 

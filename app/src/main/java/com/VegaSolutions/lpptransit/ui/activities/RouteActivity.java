@@ -2,17 +2,15 @@ package com.VegaSolutions.lpptransit.ui.activities;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
@@ -20,7 +18,7 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
@@ -30,8 +28,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -41,7 +37,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class RouteActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -57,9 +52,10 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private String routeId;
     private String tripId;
 
-    private ImageButton backBtn;
+    private ImageView backBtn;
+    private ImageButton oppositeBtn;
     private TextView name, number;
-    private View circle, route_loading, bus_loading;
+    private View circle, route_loading;
 
     private final int UPDATE_TIME = 2000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
@@ -76,7 +72,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             if (success) {
                 List<BusOnRoute> buses = new ArrayList<>();
 
-                runOnUiThread(() -> bus_loading.setVisibility(View.GONE));
+                runOnUiThread(() -> route_loading.setSelected(true));
 
                 // Filter by trip ID.
                 for (BusOnRoute busOnRoute : apiResponse.getData())
@@ -104,14 +100,23 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         number.setText(routeNumber);
         number.setTextSize(14f);
         circle.getBackground().setTint(Colors.getColorFromString(routeNumber));
+        route_loading.postOnAnimationDelayed(() -> route_loading.setVisibility(route_loading.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE), 200);
+
+        oppositeBtn.setOnClickListener(v -> {
+            Api.routes(routeId, (apiResponse, statusCode, success) -> {
+                if (success) {
+
+                }
+            });
+        });
+
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
-        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
-        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_route);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -126,8 +131,9 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         name = findViewById(R.id.route_name);
         number = findViewById(R.id.route_station_number);
         circle = findViewById(R.id.route_circle);
-        bus_loading = findViewById(R.id.bus_loading);
-        route_loading = findViewById(R.id.route_loading);
+        route_loading = findViewById(R.id.route_progress);
+        oppositeBtn = findViewById(R.id.route_opposite_btn);
+
 
         setupUI();
 
@@ -156,7 +162,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         // Setup map.
         mMap.setOnInfoWindowClickListener(marker -> {
 
-            Api.stationDetails(Integer.valueOf(marker.getSnippet()), true, (apiResponse, statusCode, success) -> {
+            Api.stationDetails(Integer.valueOf((String) marker.getTag()), true, (apiResponse, statusCode, success) -> {
                 if (success) {
                     Intent i = new Intent(this, StationActivity.class);
                     i.putExtra(StationActivity.STATION, apiResponse.getData());
@@ -173,10 +179,6 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
         // Query stations on route and display them on the map.
         Api.stationsOnRoute(tripId, (apiResponse, statusCode, success) -> {
-            runOnUiThread(() -> {
-                route_loading.setVisibility(View.GONE);
-                bus_loading.setVisibility(View.VISIBLE);
-            });
             if (success) {
 
                 // Sort stations.
@@ -189,7 +191,10 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                     LatLng latLng = stationOnRoute.getLatLng();
                     latLngs.add(latLng);
                     builder.include(latLng);
-                    runOnUiThread(() -> mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()).snippet(String.valueOf(stationOnRoute.getCode_id()))));
+                    runOnUiThread(() -> {
+                        Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
+                        marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
+                    });
                 }
 
                 // Connect stations with polyline and move the camera.
@@ -208,6 +213,8 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                 // Start bus updater.
                 handler.post(runnable);
 
+            } else {
+                runOnUiThread(() -> route_loading.setSelected(true));
             }
         });
 

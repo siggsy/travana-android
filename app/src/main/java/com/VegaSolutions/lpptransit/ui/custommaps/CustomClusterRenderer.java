@@ -36,6 +36,7 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<StationMarker>
         return super.getClusterText(bucket);
     }
 
+
     @Override
     protected void onBeforeClusterItemRendered(StationMarker item, MarkerOptions markerOptions) {
         super.onBeforeClusterItemRendered(item, markerOptions.icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(context, R.drawable.station_circle))).anchor(0.5f, 0.5f));

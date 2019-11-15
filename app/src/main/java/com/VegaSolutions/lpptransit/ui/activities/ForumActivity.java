@@ -18,6 +18,7 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.PostListFragment;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.material.tabs.TabLayout;
 
 public class ForumActivity extends AppCompatActivity {
@@ -43,6 +44,7 @@ public class ForumActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_forum);
 
         header = findViewById(R.id.header);
@@ -65,8 +67,7 @@ public class ForumActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            //return PostListFragment.newInstance(position);
-            return null;
+            return PostListFragment.newInstance(position);
         }
 
         @Override

@@ -52,6 +52,7 @@
     <string name="all">all</string>
     <string name="posted_time">posted • %1$dh</string>
     <string name="post_comments">%1$d • comments</string>
+    <string name="loading">loading</string>
 
 
 </resources>

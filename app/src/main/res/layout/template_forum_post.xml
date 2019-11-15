@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:backgroundTint="?backgroundViewColor"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -77,9 +78,9 @@
             android:id="@+id/post_tags"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             app:alignItems="flex_start"
             app:flexWrap="wrap"
-            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="@+id/post_content"
             app:layout_constraintStart_toStartOf="@+id/post_content"
             app:layout_constraintTop_toBottomOf="@+id/post_content" />

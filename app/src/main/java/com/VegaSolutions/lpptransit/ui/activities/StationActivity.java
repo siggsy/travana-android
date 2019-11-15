@@ -51,7 +51,7 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
     TextView name, center;
     FrameLayout header;
     ImageButton oppositeBtn;
-    ImageView fav;
+    ImageView fav, back;
     ViewPager viewPager;
     TabLayout tabLayout;
     BottomSheetBehavior bottomSheetBehavior;
@@ -69,9 +69,7 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
-        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
-        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_station);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -91,6 +89,7 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
         fav = findViewById(R.id.station_favourite);
         viewPager = findViewById(R.id.station_pager);
         tabLayout = findViewById(R.id.station_tab_layout);
+        back = findViewById(R.id.back);
 
         // Get Intent data
         station = getIntent().getParcelableExtra(STATION);
@@ -107,6 +106,9 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
         Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
         m.setTag(station);
         m.showInfoWindow();
+        mMap.setOnInfoWindowClickListener(marker -> {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        });
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(station.getLatLng(), 12.5f));
         mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
         mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
@@ -157,8 +159,9 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
 
         adapter = new Adapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(adapter);
-
         tabLayout.setupWithViewPager(viewPager);
+
+        back.setOnClickListener(v -> onBackPressed());
 
     }
 

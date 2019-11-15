@@ -43,4 +43,5 @@
     <string name="all">vse</string>
     <string name="posted_time">objavljeno • %1$dh</string>
     <string name="post_comments">%1$d • komentarjev</string>
+    <string name="loading">nalaganje</string>
 </resources>

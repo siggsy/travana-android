@@ -43,6 +43,7 @@ import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -53,6 +54,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.VisibleRegion;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
@@ -85,25 +87,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     ImageButton account;
     ImageButton search;
     View shadow;
+    View loading;
 
     View bottom_sheet;
     BusMarkerManager markerManager;
-    Handler handler;
-    ApiCallback<List<Bus>> busCallback = new ApiCallback<List<Bus>>() {
-        @Override
-        public void onComplete(@Nullable ApiResponse<List<Bus>> apiResponse, int statusCode, boolean success) {
-            if (success) {
-                List<Bus> buses = new ArrayList<>();
-                for (Bus bus : apiResponse.getData())
-                    if (!bus.getDriver_id().equals("00000000-0000-0000-0000-000000000000")) buses.add(bus);
-
-                runOnUiThread(() -> markerManager.updateAll(buses));
-                handler.postDelayed(runnable, 5000);
-            }
-        }
-    };
-    Runnable runnable = () -> Api.busDetails_all(busCallback);
-
     private ClusterManager<StationMarker> clusterManager;
 
     @Override
@@ -120,14 +107,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
-        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
-        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        handler = new Handler();
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -143,6 +126,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         account = findViewById(R.id.account);
         account.setOnClickListener(view -> startActivityForResult(new Intent(this, SettingsActivity.class), 0));
         shadow = findViewById(R.id.shadow);
+        loading = findViewById(R.id.maps_progress_bar);
+        loading.postOnAnimationDelayed(() -> loading.setVisibility(loading.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE), 200);
 
 
 
@@ -208,9 +193,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public FusedLocationProviderClient getFusedLocationProviderClient() {
-        return fusedLocationProviderClient;
-    }
 
     @Override
     public void onBackPressed() {
@@ -241,9 +223,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         if (ViewGroupUtils.isDarkTheme(this))
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
 
-        markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f).flat(true));
-        //handler.post(runnable);
-
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
             Station station = (Station) marker.getTag();
@@ -261,8 +240,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void setupClusterManager() {
         clusterManager = new ClusterManager<>(this, mMap);
         CustomClusterRenderer customClusterRenderer = new CustomClusterRenderer(this, mMap, clusterManager);
-        //customClusterRenderer.setMinClusterSize(10);
         clusterManager.setRenderer(customClusterRenderer);
+        clusterManager.setOnClusterClickListener(cluster -> {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cluster.getPosition(), mMap.getCameraPosition().zoom + 2f));
+            return true;
+        });
         mMap.setOnCameraIdleListener(clusterManager);
         mMap.setOnMarkerClickListener(clusterManager);
     }
@@ -274,42 +256,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onStationsUpdated(List<Station> stations) {
+
         runOnUiThread(() -> {
+            loading.setSelected(true);
             if (mMap != null) {
                 mMap.clear();
                 mMap.setInfoWindowAdapter(new StationInfoWindow(this));
+                if (clusterManager != null) {
+                    clusterManager.clearItems();
+                    for (Station station : stations)
+                        clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station));
+                    clusterManager.cluster();
+                }
             }
-            if (clusterManager != null) clusterManager.clearItems();
+
         });
 
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-        if (stations.size() > 300) {
-            for (Station station : stations) {
-                builder.include(station.getLatLng());
-                runOnUiThread(() -> clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station)));
-            }
-            runOnUiThread(() -> clusterManager.cluster());
-            return;
-        }
-
-        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
-        boolean updateNeeded = true;
-        for (Station station : stations) {
-            builder.include(station.getLatLng());
-            if (visibleRegion.latLngBounds.contains(station.getLatLng())) updateNeeded = false;
-            runOnUiThread(() -> {
-                Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).alpha(0f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
-                m.setTag(station);
-                animateMarkerAlpha(m);
-            });
-        }
-        if (stations.size() > 0) {
-            LatLngBounds bounds = builder.build();
-            if (updateNeeded)
-                runOnUiThread(() -> mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150)));
-        } else
-            runOnUiThread(() -> mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f)));
     }
 
     @Override
@@ -360,7 +322,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         shadow.setVisibility(fragment instanceof HomeFragment ?View.GONE :View.VISIBLE);
         if (!(fragment instanceof HomeFragment)) {
-            handler.removeCallbacks(runnable);
             if (mMap != null)
                 mMap.clear();
         } else if (mMap != null) {
@@ -394,12 +355,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onPause() {
         super.onPause();
-        handler.removeCallbacks(runnable);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 }

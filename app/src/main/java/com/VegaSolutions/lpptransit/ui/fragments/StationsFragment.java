@@ -30,6 +30,7 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.tabs.TabLayout;
 
@@ -145,7 +146,6 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View root = inflater.inflate(R.layout.fragment_stations, container, false);
 
         viewPager = root.findViewById(R.id.station_view_pager);
