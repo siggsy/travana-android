@@ -17,6 +17,7 @@ public class LiveUpdateMessage {
     private MessageTag[] tags;
     private int importance;									// 10 - it is shown on the top of the list.
     private int likes;
+    private int comments_int;
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
 
     //private String[] photos_paths;
@@ -119,6 +120,14 @@ public class LiveUpdateMessage {
         this.user = user;
     }
 
+    public int getComments_int() {
+        return comments_int;
+    }
+
+    public void setComments_int(int comments_int) {
+        this.comments_int = comments_int;
+    }
+
     @Override
     public String toString() {
         return "LiveUpdateMessage{" +
@@ -131,6 +140,7 @@ public class LiveUpdateMessage {
                 ", tags=" + Arrays.toString(tags) +
                 ", importance=" + importance +
                 ", likes=" + likes +
+                ", comments_int=" + comments_int +
                 ", comments=" + comments +
                 '}';
     }

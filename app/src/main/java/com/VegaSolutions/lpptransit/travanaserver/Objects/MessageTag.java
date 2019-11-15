@@ -6,6 +6,13 @@ public class MessageTag {
     private String tag;
     private String color;
 
+
+    public MessageTag(String _id, String tag, String color) {
+        this._id = _id;
+        this.tag = tag;
+        this.color = color;
+    }
+
     public String get_id() {
         return _id;
     }

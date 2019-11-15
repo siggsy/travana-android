@@ -94,6 +94,84 @@ public class TravanaAPI {
                 }).execute();
     }
 
+    public static void messages(String user_id, TravanaApiCallback callback) {                                  //can be null
+
+        new TravanaQuery(TravanaQuery.MESSAGES)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addHeaderValues("user_id", user_id)
+                .execute();
+    }
+
+    public static void messagesMeta(TravanaApiCallback callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_META)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).execute();
+    }
+
+    public static void messagesMeta(String user_id, TravanaApiCallback callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_META)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("user_id", user_id)
+                .execute();
+    }
+
+    public static void messageid(String mess_id, TravanaApiCallback callback) {                                  //can be null
+
+        new TravanaQuery(TravanaQuery.MESSAGES_ID)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        LiveUpdateMessage messages = new Gson().fromJson(response, LiveUpdateMessage.class);
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("mess_id",mess_id)
+                .execute();
+    }
+
+    public static void messageid(String mess_id, String user_id, TravanaApiCallback callback) {                                  //can be null
+
+        new TravanaQuery(TravanaQuery.MESSAGES_ID)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        LiveUpdateMessage messages = new Gson().fromJson(response, LiveUpdateMessage.class);
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("mess_id",mess_id)
+                .addHeaderValues("user_id", user_id)
+                .execute();
+    }
+
     public static void messagesAdmin(String token, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_ADMIN, TRAVANA_API_KEY, token)
@@ -190,7 +268,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void removeMessage(String token, String _id, TravanaApiCallback callback){
+    public static void removeMessage(String token, String mess_id, TravanaApiCallback callback){
 
         new TravanaQuery(TravanaQuery.MESSAGES_REMOVE, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -200,7 +278,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).addParams("_id", _id)
+                }).addParams("_id", mess_id)
                 .execute();
 
     }
@@ -280,6 +358,7 @@ public class TravanaAPI {
                     }
                 }).addHeaderValues("mess_id", mess_id)
                 .addHeaderValues("liked", like + "")
+                //.addHeaderValues("user_id", user_id)
                 .execute();
     }
 

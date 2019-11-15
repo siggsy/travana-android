@@ -53,8 +53,6 @@ public class ForumActivity extends AppCompatActivity {
 
         setupUI();
 
-
-
     }
 
 
@@ -67,7 +65,8 @@ public class ForumActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            return PostListFragment.newInstance(position);
+            //return PostListFragment.newInstance(position);
+            return null;
         }
 
         @Override

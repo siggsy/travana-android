@@ -25,6 +25,7 @@ import org.joda.time.Hours;
 
 public class PostListFragment extends Fragment {
 
+    /*
     public static final int TYPE_FOLLOWING = 1;
     public static final int TYPE_ALL = 0;
 
@@ -158,5 +159,7 @@ public class PostListFragment extends Fragment {
         }
 
     }
+
+     */
 
 }

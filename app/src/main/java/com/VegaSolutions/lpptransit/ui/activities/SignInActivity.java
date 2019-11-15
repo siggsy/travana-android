@@ -18,6 +18,7 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.facebook.AccessToken;
@@ -313,7 +314,7 @@ public class SignInActivity extends AppCompatActivity {
             }
         });
 
-        /*
+
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         mUser.getIdToken(true)
@@ -322,7 +323,89 @@ public class SignInActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             String idToken = task.getResult().getToken();
 
-                            TravanaAPI.messagesAdmin(idToken, (data, statusCode, success) ->{
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            /*
+                            MessageTag[] tags = new MessageTag[1];
+                            tags[0] = new MessageTag("becool#115678", "becool", "#115678");
+
+                            LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() , new Date(), "spremenjena5555", tags, 10);
+
+                            //LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
+
+                            TravanaAPI.addMessage(idToken, message, (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            });
+
+                             */
+
+                            /*
+                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
+
+                            TravanaAPI.addComment(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", comment, (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
+                            /*
+                            TravanaAPI.messagesMeta((data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
+
+                            TravanaAPI.messageid(user.getUid(),"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019" , (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                            /*
+                            TravanaAPI.messagesLike(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1420:19:55GMT01:002019",true,  (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
+
+                            /*
+                            TravanaAPI.removeMessage(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1420:19:55GMT01:002019", (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
+
+                            /*
+                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "vsebinavKRALJ");
+
+                            TravanaAPI.addComment(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", comment, (data, statusCode, success) -> {
 
                                 if(success){
                                     Log.e(TAG, data + "");
@@ -331,67 +414,26 @@ public class SignInActivity extends AppCompatActivity {
                                 }
                             });
 
+                             */
+
                         } else {
 
                             Log.e(TAG, task.getException().getMessage());
                             Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong_try_again), Toast.LENGTH_LONG).show();
                             mAuth.signOut();
 
+
                         }
                     }
                 });
-*/
+
+
 
         /*
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        String[] tags = {"bus", "lpp", "3g"};
-
-        //LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() ,user.getDisplayName(), user.getPhotoUrl().toString(),  new Date(), "spremenjena5555", tags, 10);
-
-        LiveUpdateComment comment = new LiveUpdateComment(user.getUid() ,user.getDisplayName(), user.getPhotoUrl().toString(), "spremenjena5555");
-
-        TravanaAPI.addComment("token", "mess_genVegaSolutionsMonNov1116:37:21GMT01:002019", comment, (data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-
-        });
-        */
-
-        /*
-        FirebaseManager.getFirebaseToken((token, ex, success) -> {
-
-            Log.e(TAG, token);
-
-            if(success){
-
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-
-                String[] tags = {"bus", "lpp", "3g"};
-
-                LiveUpdateMessage message = new LiveUpdateMessage(user.getUid(), new Date(), "spremenjena5555", tags, 10);
-
-                TravanaAPI.addMessage(token, message, (data, statusCode, success1) -> {
-
-                    if(success1){
-                        Log.e(TAG, data + "");
-                    }else{
-                        Log.e(TAG, "error" + statusCode);
-                    }
-
-                });
-
-            }else{
-                Log.e(TAG, "error" + ex.getMessage());
-            }
-
-            */
-            TravanaAPI.messagesLike("tokne", "mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1315:47:50GMT01:002019", true, (data, statusCode, success1) -> {
+            TravanaAPI.messagesLike("tokne", "mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1417:28:01GMT01:002019", true, user.getUid(),(data, statusCode, success1) -> {
 
                 if(success1){
                     Log.e(TAG, data + "");
@@ -401,6 +443,8 @@ public class SignInActivity extends AppCompatActivity {
 
             });
 
+
+         */
 
         /*
         TravanaAPI.warnings((data, statusCode, success) -> {
@@ -433,7 +477,7 @@ public class SignInActivity extends AppCompatActivity {
         });
 
          */
-
+        /*
         String[] ids = {"becool#115678"};
 
         TravanaAPI.followedMessages("token", ids,(data, statusCode, success) -> {
@@ -444,6 +488,8 @@ public class SignInActivity extends AppCompatActivity {
                 Log.e(TAG, "error" + statusCode);
             }
         });
+
+         */
     }
 
     //--------------------------------------Animations
