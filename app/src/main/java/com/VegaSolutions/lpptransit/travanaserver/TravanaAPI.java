@@ -28,9 +28,7 @@ public class TravanaAPI {
 
             if(success){
 
-                Gson gson = new Gson();
-
-                Warning[] warnings = gson.fromJson(response, Warning[].class);
+                Warning[] warnings = new Gson().fromJson(response, Warning[].class);
 
                 callback.onComplete(warnings, statusCode, true);
             }else{
@@ -139,7 +137,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void messageid(String mess_id, TravanaApiCallback callback) {                                  //can be null
+    public static void messageid(String message_id, TravanaApiCallback callback) {                                  //can be null
 
         new TravanaQuery(TravanaQuery.MESSAGES_ID)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -151,11 +149,11 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .addParams("mess_id",mess_id)
+                .addParams("mess_id", message_id)
                 .execute();
     }
 
-    public static void messageid(String mess_id, String user_id, TravanaApiCallback callback) {                                  //can be null
+    public static void messageid(String message_id, String user_id, TravanaApiCallback callback) {                                  //can be null
 
         new TravanaQuery(TravanaQuery.MESSAGES_ID)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -167,7 +165,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .addParams("mess_id",mess_id)
+                .addParams("mess_id", message_id)
                 .addHeaderValues("user_id", user_id)
                 .execute();
     }
@@ -178,6 +176,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
+
                         callback.onComplete(response, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -252,7 +251,7 @@ public class TravanaAPI {
     }
      */
 
-    public static void addComment(String token, String ms_id, LiveUpdateComment comment, TravanaApiCallback callback){
+    public static void addComment(String token, String message_id, LiveUpdateComment comment, TravanaApiCallback callback){
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
 
@@ -264,7 +263,24 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).addParams("_id", ms_id)
+                }).addParams("_id", message_id)
+                .execute();
+    }
+
+    public static void addCommentComment(String token, String message_id, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback){
+
+        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_ADD_COMMENT_COMMENT, TRAVANA_API_KEY, token, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addParams("mess_id", message_id)
+                .addParams("comm_id", comment_id)
                 .execute();
     }
 
@@ -295,6 +311,21 @@ public class TravanaAPI {
                     }
                 }).addParams("_id", message_id)
                 .addParams("comment_id", comment_id)
+                .execute();
+    }
+
+    public static void removeCommentComment(String token, String subcomment_id, TravanaApiCallback callback){
+
+        new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT_COMMENT, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("subcomm_id", subcomment_id)
                 .execute();
     }
 
@@ -378,14 +409,32 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void followedMessages(String token, String[] tags_ids, TravanaApiCallback callback){
+    public static void followedMessages(String user_id, String[] tags_ids, TravanaApiCallback callback){
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
 
-        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_FOLLOWED, TRAVANA_API_KEY, token, rbody)
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_FOLLOWED, rbody)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .execute();
+    }
+
+    public static void followedMessagesMeta(String user_id, String[] tags_ids, TravanaApiCallback callback){
+
+        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_FOLLOWED_META, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        //LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
                         callback.onComplete(response, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);

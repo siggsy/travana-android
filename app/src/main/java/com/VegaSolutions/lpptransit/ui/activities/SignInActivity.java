@@ -357,6 +357,17 @@ public class SignInActivity extends AppCompatActivity {
                             });
 
                              */
+
+                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
+
+                            TravanaAPI.removeCommentComment(idToken,"comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3FriNov1521:59:43GMT01:002019", (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }});
+
                             /*
                             TravanaAPI.messagesMeta((data, statusCode, success) -> {
 
@@ -368,8 +379,8 @@ public class SignInActivity extends AppCompatActivity {
                             });
 
                              */
-
-                            TravanaAPI.messageid(user.getUid(),"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019" , (data, statusCode, success) -> {
+                            /*
+                            TravanaAPI.removeComment(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3FriNov1520:13:01GMT01:002019",(data, statusCode, success) -> {
 
                                 if(success){
                                     Log.e(TAG, data + "");
@@ -377,6 +388,34 @@ public class SignInActivity extends AppCompatActivity {
                                     Log.e(TAG, "error" + statusCode);
                                 }
                             });
+                            */
+
+
+                            /*
+                            TravanaAPI.messageid("mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019" , user.getUid(),(data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
+
+                            /*
+                            String[] tags = {"becool#115678"};
+
+                            TravanaAPI.followedMessagesMeta(user.getUid(), tags, (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
 
                             /*
                             TravanaAPI.messagesLike(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1420:19:55GMT01:002019",true,  (data, statusCode, success) -> {
@@ -413,8 +452,19 @@ public class SignInActivity extends AppCompatActivity {
                                     Log.e(TAG, "error" + statusCode);
                                 }
                             });
+                            */
 
-                             */
+
+                            /*
+                            TravanaAPI.commentLike(idToken, "mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:18:52GMT01:002019", true,(data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+                            */
 
                         } else {
 
@@ -426,70 +476,6 @@ public class SignInActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
-
-        /*
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-            TravanaAPI.messagesLike("tokne", "mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1417:28:01GMT01:002019", true, user.getUid(),(data, statusCode, success1) -> {
-
-                if(success1){
-                    Log.e(TAG, data + "");
-                }else{
-                    Log.e(TAG, "error" + statusCode);
-                }
-
-            });
-
-
-         */
-
-        /*
-        TravanaAPI.warnings((data, statusCode, success) -> {
-
-            if(success){
-
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-
-        });
-
-         */
-
-        //LiveUpdateMessage message = new LiveUpdateMessage("id", "name", "url", new Date(), "content", null, 10);
-
-        /*
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "vsebinavKRALJ");
-
-        TravanaAPI.commentLike("token","mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1315:47:50GMT01:002019", "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3WedNov1318:35:46GMT01:002019", false ,(data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-        });
-
-         */
-        /*
-        String[] ids = {"becool#115678"};
-
-        TravanaAPI.followedMessages("token", ids,(data, statusCode, success) -> {
-
-            if(success){
-                Log.e(TAG, data + "");
-            }else{
-                Log.e(TAG, "error" + statusCode);
-            }
-        });
-
-         */
     }
 
     //--------------------------------------Animations

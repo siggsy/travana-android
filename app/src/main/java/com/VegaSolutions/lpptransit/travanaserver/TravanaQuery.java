@@ -51,6 +51,8 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String MESSAGES_REMOVE_COMMENT = "/live_updates/messages/remove_comment";
 
+    public static final String MESSAGES_REMOVE_COMMENT_COMMENT = "/live_updates/messages/remove_comment_comment";
+
     public static final String BAN_USER = "/users/banUser";
 
     public static final String MESSAGE_LIKE = "/live_updates/like_message";

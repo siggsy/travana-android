@@ -40,14 +40,18 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
 
     public static final String MESSAGES_ADD_COMMENT = "/live_updates/messages/add_comment";
 
+    public static final String MESSAGES_ADD_COMMENT_COMMENT = "/live_updates/messages/add_comment_comment";
+
     public static final String MESSAGES_EDIT_COMMENT = "/live_updates/messages/edit_comment";
 
     public static final String MESSAGES_FOLLOWED = "/live_updates/followed_messages";
 
+    public static final String MESSAGES_FOLLOWED_META = "/live_updates/followed_messages_meta";
+
     private StringBuilder params = new StringBuilder();
 
     private String URL;
-    private String basic_token;
+    private String basic_token = "";
     private RequestBody rbody;
 
     public TravanaPOSTQuery(String URL, String key, String token, RequestBody rbody){
@@ -55,6 +59,13 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
 
         if(key != null && token != null)
             this.basic_token = Credentials.basic(key, token);
+
+        this.rbody = rbody;
+
+    }
+
+    public TravanaPOSTQuery(String URL, RequestBody rbody){
+        this.URL = URL;
 
         this.rbody = rbody;
 
