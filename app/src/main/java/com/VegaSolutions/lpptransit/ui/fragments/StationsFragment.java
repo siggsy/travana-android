@@ -154,12 +154,6 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
         setupUI();
 
-        Api.stationDetails(false, (apiResponse, statusCode, success) -> {
-            if (success) {
-                mListener.onStationsUpdated(apiResponse.getData());
-            }
-        });
-
         return root;
     }
 
@@ -254,7 +248,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
     public interface StationsFragmentListener {
         void onFragmentInteraction(Uri uri);
-        void onStationsUpdated(List<Station> stations);
+        void onStationsUpdated(List<Station> stations, boolean success, int responseCode);
         void onTabClicked();
     }
 

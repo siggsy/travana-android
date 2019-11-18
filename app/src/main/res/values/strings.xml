@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Travana</string>
     <string name="title_activity_maps" translatable="false">Map</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="nearby_stations">Nearby Stations</string>
     <string name="routes">Routes</string>
     <string name="title_activity_main" translatable="false">Map</string>
@@ -19,7 +17,7 @@
     <string name="developer_help_contact" translatable="false">domenkralj.sahist@gmail.com</string>
     <string name="arrival">arrival</string>
     <string name="detour">detour</string>
-    <string name="by_developers">By Domen Kralj, Žiga Leskovec</string>
+    <string name="by_developers">Avtorja Domen Kralj, Žiga Leskovec</string>
     <string name="app_slogan_welcome_activity">better public transport.</string>
 
     <string name="you_are_already_logined">You are already logged in.</string>
@@ -53,6 +51,10 @@
     <string name="posted_time">posted • %1$dh</string>
     <string name="post_comments">%1$d • comments</string>
     <string name="loading">loading</string>
-
-
+    <string name="opposite_error">Opposite station does not exist.</string>
+    <string name="network_error">No internet connection.</string>
+    <string name="timed_out_error">Connection timed out.</string>
+    <string name="unknown_error">Something went wrong. Please contact developers.</string>
+    <string name="refresh">Refresh</string>
+    <string name="create_a_new_post">Create a new post</string>
 </resources>

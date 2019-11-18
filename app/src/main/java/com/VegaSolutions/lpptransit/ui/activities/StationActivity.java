@@ -9,24 +9,24 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.LiveArrivalFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.RoutesOnStationFragment;
@@ -152,8 +152,24 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
                     intent.putExtra("station", station);
                     finish();
                     startActivity(intent);
+                } else {
+                    runOnUiThread(() -> {
+                        CustomToast toast = new CustomToast(StationActivity.this);
+                        if (statusCode == 500) {
+                            toast
+                                .setBackgroundColor(ContextCompat.getColor(StationActivity.this, R.color.colorAccent))
+                                .setTextColor(Color.WHITE)
+                                .setIconColor(Color.WHITE)
+                                .setText(getString(R.string.opposite_error))
+                                .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap_vert_black_24dp))
+                                .show(Toast.LENGTH_SHORT);
+                        }
+                        else toast.showDefault(this, statusCode);
+                    });
                 }
+                runOnUiThread(() -> oppositeBtn.setEnabled(true));
             });
+
 
         });
 

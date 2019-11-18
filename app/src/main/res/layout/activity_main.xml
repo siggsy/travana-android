@@ -62,45 +62,11 @@
         android:src="@drawable/ic_search_black_24dp"
         android:tint="?android:textColor" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/maps_progress_bar"
-        android:layout_width="wrap_content"
+    <com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage
+        android:id="@+id/top_message"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/stretched_circle"
-        android:backgroundTint="?backgroundViewColor"
-        android:elevation="6dp"
-        android:padding="4dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:stateListAnimator="@animator/loading_show"
-        android:visibility="gone"
-        app:layout_anchorGravity="end|center">
-
-        <ProgressBar
-            android:id="@+id/progressBar4"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:indeterminateTint="?android:textColor"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView44"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/loading"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/progressBar4"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+        android:layout_marginTop="57dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

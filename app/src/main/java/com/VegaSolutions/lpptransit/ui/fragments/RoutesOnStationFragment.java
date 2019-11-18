@@ -4,10 +4,12 @@ package com.VegaSolutions.lpptransit.ui.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,7 +20,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
@@ -26,6 +30,7 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.DepartureActivity;
 import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +86,7 @@ public class RoutesOnStationFragment extends Fragment {
     }
 
     private RecyclerView rv;
+    private ProgressBar progressBar;
     private Adapter adapter;
 
     @Override
@@ -97,6 +103,7 @@ public class RoutesOnStationFragment extends Fragment {
         adapter = new Adapter();
 
         rv = root.findViewById(R.id.routes_on_station_rv);
+        progressBar = root.findViewById(R.id.progressBar);
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(context));
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -108,10 +115,34 @@ public class RoutesOnStationFragment extends Fragment {
         });
 
         Api.routesOnStation(Integer.valueOf(stationId), (apiResponse, statusCode, success) -> {
-            if (success) {
-                if (context != null)
-                    ((Activity)context).runOnUiThread(() -> adapter.setRoutes(apiResponse.getData()));
-            }
+            if (context == null)
+                return;
+            ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+            if (success)
+                ((Activity)context).runOnUiThread(() -> adapter.setRoutes(apiResponse.getData()));
+            else
+                ((Activity)context).runOnUiThread(() -> {
+                    CustomToast toast = new CustomToast(context);
+                    toast
+                        .setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
+                        .setIconColor(Color.WHITE)
+                        .setTextColor(Color.WHITE);
+
+                    switch (statusCode) {
+                        case -2:
+                            toast.setText(getString(R.string.timed_out_error));
+                            toast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                            break;
+                        case -1:
+                            toast.setText(getString(R.string.network_error));
+                            toast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px));
+                            break;
+                        default:
+                            toast.setText(getString(R.string.unknown_error));
+                            toast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                    }
+                    toast.show(Toast.LENGTH_SHORT);
+                });
         });
 
         return root;

@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/departure_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/stretched_circle_container"
-    android:layout_marginStart="?containerBorderPaddingSide"
-    android:layout_marginTop="?containerBorderPadding"
-    android:layout_marginEnd="?containerBorderPaddingSide"
-    android:layout_marginBottom="?containerBorderPadding"
-    android:padding="2dp">
+    android:layout_marginStart="12dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="2dp"
+    android:padding="2dp"
+    app:cardBackgroundColor="?backgroundViewColor"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="?elevation">
 
     <LinearLayout
         android:id="@+id/departure_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
         android:layout_margin="?containerBorderMargin"
-        android:background="?containerBackground"
+        android:layout_marginStart="8dp"
         android:elevation="?elevation"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:paddingStart="16dp"
+        android:paddingStart="8dp"
         android:paddingEnd="16dp">
 
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/stretched_circle_container"
             android:layout_marginStart="?containerBorderPaddingSide"
             android:layout_marginTop="?containerBorderPadding"
             android:layout_marginEnd="?containerBorderPaddingSide"
             android:layout_marginBottom="?containerBorderPadding"
+            android:background="@drawable/stretched_circle_container"
             android:padding="2dp">
+
             <TextView
                 android:id="@+id/departure_hour_hour"
                 android:layout_width="wrap_content"
@@ -59,4 +60,4 @@
 
     </LinearLayout>
 
-</FrameLayout>
+</androidx.cardview.widget.CardView>

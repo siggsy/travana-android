@@ -22,14 +22,13 @@ public class LiveUpdateMessage {
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
 
     public LiveUpdateMessage(String user_id, Date expire_date,
-                             String message_content, MessageTag[] tags, String[] photo_links, int importance) {
+                             String message_content, MessageTag[] tags, String[] photo_links) {
 
         this.user_id = user_id;
         this.created_time = new Date();
         this.expire_date = expire_date;
         this.message_content = message_content;
         this.tags = tags;
-        this.importance = importance;
         this.photo_links = photo_links;
 
         String _id = "mess_gen" + user_id + created_time;

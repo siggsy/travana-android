@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,10 +17,11 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -53,9 +53,10 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private String tripId;
 
     private ImageView backBtn;
-    private ImageButton oppositeBtn;
-    private TextView name, number;
-    private View circle, route_loading;
+    private TextView number;
+    private TextView name;
+    private View circle;
+    private TopMessage route_loading;
 
     private final int UPDATE_TIME = 2000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
@@ -72,7 +73,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             if (success) {
                 List<BusOnRoute> buses = new ArrayList<>();
 
-                runOnUiThread(() -> route_loading.setSelected(true));
+                runOnUiThread(() -> route_loading.showLoading(false));
 
                 // Filter by trip ID.
                 for (BusOnRoute busOnRoute : apiResponse.getData())
@@ -83,10 +84,60 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                 runOnUiThread(() -> busManager.update(buses));
                 handler.postDelayed(runnable, UPDATE_TIME);
             }
+            else {
+                handler.removeCallbacks(runnable);
+                runOnUiThread(() -> route_loading.showMsgDefault(RouteActivity.this, statusCode));
+            }
         }
     };
 
     private Runnable runnable = () -> Api.busesOnRoute(routeNumber, busQuery);
+
+    private ApiCallback<List<StationOnRoute>> callback = (apiResponse, statusCode, success) -> {
+
+
+        if (success) {
+            runOnUiThread(() -> route_loading.showLoading(false));
+            // Sort stations.
+            Collections.sort(apiResponse.getData(), (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
+            List<LatLng> latLngs = new ArrayList<>();
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+            // Add station markers.
+            for (StationOnRoute stationOnRoute : apiResponse.getData()) {
+                LatLng latLng = stationOnRoute.getLatLng();
+                latLngs.add(latLng);
+                builder.include(latLng);
+                runOnUiThread(() -> {
+                    Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
+                    marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
+                });
+            }
+
+            // Connect stations with polyline and move the camera.
+            if (!apiResponse.getData().isEmpty()) {
+                LatLngBounds bounds = builder.build();
+                runOnUiThread(() -> {
+                    mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
+                });
+            } else {
+                runOnUiThread(() -> {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
+                });
+            }
+
+            // Start bus updater.
+            handler.post(runnable);
+
+        } else {
+            runOnUiThread(() -> {
+                route_loading.showMsgDefault(RouteActivity.this, statusCode);
+            });
+        }
+    };
+
+
 
     private void setupUI() {
 
@@ -96,19 +147,19 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
         // Setup views.
         backBtn.setOnClickListener(v -> onBackPressed());
-        name.setText(routeName);
+        //names.setText(routeName);
         number.setText(routeNumber);
         number.setTextSize(14f);
         circle.getBackground().setTint(Colors.getColorFromString(routeNumber));
-        route_loading.postOnAnimationDelayed(() -> route_loading.setVisibility(route_loading.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE), 200);
-
-        oppositeBtn.setOnClickListener(v -> {
-            Api.routes(routeId, (apiResponse, statusCode, success) -> {
-                if (success) {
-
-                }
-            });
+        route_loading.showLoading(true);
+        route_loading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+        route_loading.setErrorMsgColor(Color.WHITE);
+        route_loading.setErrorIconColor(Color.WHITE);
+        route_loading.setRefreshClickEvent(v -> {
+            route_loading.showLoading(true);
+            Api.stationsOnRoute(tripId, callback);
         });
+        name.setText(routeName);
 
 
     }
@@ -131,8 +182,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         name = findViewById(R.id.route_name);
         number = findViewById(R.id.route_station_number);
         circle = findViewById(R.id.route_circle);
-        route_loading = findViewById(R.id.route_progress);
-        oppositeBtn = findViewById(R.id.route_opposite_btn);
+        route_loading = findViewById(R.id.loading_msg);
 
 
         setupUI();
@@ -155,18 +205,28 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.clear();
 
         handler = new Handler();
         busManager = new BusMarkerManager(mMap, busOptions);
 
         // Setup map.
         mMap.setOnInfoWindowClickListener(marker -> {
-
             Api.stationDetails(Integer.valueOf((String) marker.getTag()), true, (apiResponse, statusCode, success) -> {
                 if (success) {
                     Intent i = new Intent(this, StationActivity.class);
                     i.putExtra(StationActivity.STATION, apiResponse.getData());
                     startActivity(i);
+                } else {
+                    runOnUiThread(() -> {
+                        CustomToast customToast = new CustomToast(this);
+                        customToast
+                                .setTextColor(Color.WHITE)
+                                .setIconColor(Color.WHITE)
+                                .setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+                        customToast.showDefault(this, statusCode);
+                    });
+
                 }
             });
 
@@ -178,46 +238,9 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
 
         // Query stations on route and display them on the map.
-        Api.stationsOnRoute(tripId, (apiResponse, statusCode, success) -> {
-            if (success) {
-
-                // Sort stations.
-                Collections.sort(apiResponse.getData(), (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
-                List<LatLng> latLngs = new ArrayList<>();
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-                // Add station markers.
-                for (StationOnRoute stationOnRoute : apiResponse.getData()) {
-                    LatLng latLng = stationOnRoute.getLatLng();
-                    latLngs.add(latLng);
-                    builder.include(latLng);
-                    runOnUiThread(() -> {
-                        Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
-                        marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
-                    });
-                }
-
-                // Connect stations with polyline and move the camera.
-                if (!apiResponse.getData().isEmpty()) {
-                    LatLngBounds bounds = builder.build();
-                    runOnUiThread(() -> {
-                        mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
-                    });
-                } else {
-                    runOnUiThread(() -> {
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
-                    });
-                }
-
-                // Start bus updater.
-                handler.post(runnable);
-
-            } else {
-                runOnUiThread(() -> route_loading.setSelected(true));
-            }
-        });
+        Api.stationsOnRoute(tripId, callback);
 
     }
+
 
 }

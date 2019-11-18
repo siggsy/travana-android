@@ -5,6 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/stations_sub_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?backgroundViewColor"
+        android:nestedScrollingEnabled="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:context=".ui.fragments.subfragments.StationsSubFragment" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stations_sub_list_favourite_error"
         android:layout_width="wrap_content"
@@ -38,20 +52,6 @@
             app:layout_constraintEnd_toEndOf="@+id/textView41"
             app:layout_constraintStart_toStartOf="@+id/textView41" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/stations_sub_list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="?backgroundViewColor"
-        android:nestedScrollingEnabled="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:context=".ui.fragments.subfragments.StationsSubFragment" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stations_sub_list_nearby_error"
@@ -105,11 +105,11 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
+        android:focusable="true"
         android:tint="@android:color/white"
         app:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_refresh_black_24dp"
-        android:focusable="true" />
+        app:srcCompat="@drawable/ic_refresh_black_24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

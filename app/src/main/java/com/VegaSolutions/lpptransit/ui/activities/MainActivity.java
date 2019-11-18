@@ -13,6 +13,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +37,7 @@ import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.ui.fragments.HomeFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
@@ -87,11 +89,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     ImageButton account;
     ImageButton search;
     View shadow;
-    View loading;
+    TopMessage loading;
 
     View bottom_sheet;
     BusMarkerManager markerManager;
     private ClusterManager<StationMarker> clusterManager;
+
+    private ApiCallback<List<Station>> callback = (apiResponse, statusCode, success) -> {
+        if (success) {
+            onStationsUpdated(apiResponse.getData(), true, statusCode);
+        } else {
+            onStationsUpdated(null, false, statusCode);
+        }
+    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -126,10 +136,16 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         account = findViewById(R.id.account);
         account.setOnClickListener(view -> startActivityForResult(new Intent(this, SettingsActivity.class), 0));
         shadow = findViewById(R.id.shadow);
-        loading = findViewById(R.id.maps_progress_bar);
-        loading.postOnAnimationDelayed(() -> loading.setVisibility(loading.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE), 200);
-
-
+        loading = findViewById(R.id.top_message);
+        loading.showLoading(true);
+        loading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+        loading.setErrorMsgColor(Color.WHITE);
+        loading.setErrorIconColor(Color.WHITE);
+        loading.setRefreshClickEvent(v -> {
+            loading.showLoading(true);
+            Api.stationDetails(false, callback);
+            switchFragment(StationsFragment.newInstance());
+        });
 
         bottom_sheet = findViewById(R.id.bottom_sheet);
         behavior = ViewPagerBottomSheetBehavior.from(bottom_sheet);
@@ -233,6 +249,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         // Set camera to Ljubljana
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
+        Api.stationDetails(false, callback);
+
 
     }
 
@@ -255,22 +273,38 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onStationsUpdated(List<Station> stations) {
+    public void onStationsUpdated(List<Station> stations, boolean success, int responseCode) {
 
-        runOnUiThread(() -> {
-            loading.setSelected(true);
-            if (mMap != null) {
-                mMap.clear();
-                mMap.setInfoWindowAdapter(new StationInfoWindow(this));
-                if (clusterManager != null) {
-                    clusterManager.clearItems();
-                    for (Station station : stations)
-                        clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station));
-                    clusterManager.cluster();
+        if (success) {
+            runOnUiThread(() -> {
+                loading.showLoading(false);
+                if (mMap != null) {
+                    mMap.clear();
+                    mMap.setInfoWindowAdapter(new StationInfoWindow(this));
+                    if (clusterManager != null) {
+                        clusterManager.clearItems();
+                        for (Station station : stations)
+                            clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station));
+                        clusterManager.cluster();
+                    }
                 }
-            }
 
-        });
+            });
+        } else {
+            runOnUiThread(() -> {
+                switch (responseCode) {
+                    case -2:
+                        loading.showMsg(getString(R.string.timed_out_error), ContextCompat.getDrawable(this, R.drawable.ic_error_outline_black_24dp));
+                        break;
+                    case -1:
+                        loading.showMsg(getString(R.string.network_error), ContextCompat.getDrawable(this, R.drawable.ic_wifi_off_24px));
+                        break;
+                    default:
+                        loading.showMsg(getString(R.string.unknown_error), ContextCompat.getDrawable(this, R.drawable.ic_error_outline_black_24dp));
+                        break;
+                }
+            });
+        }
 
     }
 

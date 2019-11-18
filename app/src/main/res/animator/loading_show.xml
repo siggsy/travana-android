@@ -4,7 +4,7 @@
     <item android:state_selected="true">
         <objectAnimator
             android:duration="200"
-            android:propertyName="translationY"
+            android:propertyName="alpha"
             android:valueTo="-200dp"
             android:valueType="floatType" />
     </item>
@@ -12,7 +12,7 @@
     <item>
         <objectAnimator
             android:duration="200"
-            android:propertyName="translationY"
+            android:propertyName="alpha"
             android:valueTo="0dp"
             android:valueType="floatType" />
     </item>

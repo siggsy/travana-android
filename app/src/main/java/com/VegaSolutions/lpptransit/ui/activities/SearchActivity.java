@@ -24,6 +24,7 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 import java.util.ArrayList;
@@ -118,13 +119,20 @@ public class SearchActivity extends AppCompatActivity {
                 for (Station station : apiResponse.getData())
                     items.add(new StationItem(station));
             }
+            else {
+                runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
+            }
             Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
                 if (success1) {
                     for (Route route : apiResponse1.getData())
                         items.add(new RouteItem(route));
                     runOnUiThread(() -> applyFilter(filter));
                 }
+                else {
+                    runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
+                }
                 runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+
             });
         });
 

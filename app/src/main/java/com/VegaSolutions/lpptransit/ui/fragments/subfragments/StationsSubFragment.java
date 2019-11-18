@@ -176,37 +176,38 @@ public class StationsSubFragment extends Fragment {
         setupUI();
 
         Api.stationDetails(false, (apiResponse, statusCode, success) -> {
-            if (success) {
+            if (context == null)
+                return;
+            ((Activity)context).runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                if (success) {
+                    stations = apiResponse.getData();
+                    // Get favourites
+                    if (type == TYPE_FAVOURITE) {
 
-                stations = apiResponse.getData();
-                if (context == null)
-                    return;
+                        setFavouriteStations(apiResponse.getData());
+                        ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
 
-                // Get favourites
-                if (type == TYPE_FAVOURITE) {
+                    } else if (type == TYPE_NEARBY) {
 
-                    setFavouriteStations(apiResponse.getData());
-                    ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-
-                } else if (type == TYPE_NEARBY) {
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                            ((Activity)context).runOnUiThread(() -> {
-                                loc_err.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                            });
-                            return;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                ((Activity)context).runOnUiThread(() -> {
+                                    loc_err.setVisibility(View.VISIBLE);
+                                    progressBar.setVisibility(View.GONE);
+                                });
+                                return;
+                            }
                         }
-                    }
-                    setupCurrentLocationUpdates();
-                    loc_err.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.VISIBLE);
-                    locationClient.getLastLocation().addOnCompleteListener(onCompleteListener);
-                    ((Activity)context).runOnUiThread(() -> locationRefresh.setVisibility(View.VISIBLE));
+                        setupCurrentLocationUpdates();
+                        loc_err.setVisibility(View.GONE);
+                        locationClient.getLastLocation().addOnCompleteListener(onCompleteListener);
+                        locationRefresh.setVisibility(View.VISIBLE);
 
+                    }
                 }
-            }
+            });
+
         });
 
         return root;

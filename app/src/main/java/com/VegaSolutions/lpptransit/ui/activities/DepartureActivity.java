@@ -3,6 +3,7 @@ package com.VegaSolutions.lpptransit.ui.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +28,7 @@ import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
 import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -92,7 +94,7 @@ public class DepartureActivity extends AppCompatActivity {
 
         routeName.setText(route_name);
         routeNumber.setText(route_number);
-        routeNumber.setTextSize(18f);
+        routeNumber.setTextSize(16f);
         stationName.setText(station_name);
         stationCenter.setVisibility(Integer.valueOf(station_code) % 2 != 0 ? View.VISIBLE : View.GONE);
 
@@ -133,6 +135,8 @@ public class DepartureActivity extends AppCompatActivity {
                 });
 
 
+            } else {
+                runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
             }
 
         }, Integer.valueOf(group));
@@ -192,14 +196,14 @@ public class DepartureActivity extends AppCompatActivity {
             TextView hour;
             FlexboxLayout minutes;
 
-            LinearLayout container;
+            CardView container;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 hour = itemView.findViewById(R.id.departure_hour_hour);
                 minutes = itemView.findViewById(R.id.departure_hour_minutes);
-                container = itemView.findViewById(R.id.departure_container);
+                container = itemView.findViewById(R.id.departure_root);
 
             }
         }

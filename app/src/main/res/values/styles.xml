@@ -23,6 +23,7 @@
         <item name="containerBorderPadding">0dp</item>
         <item name="containerBorderPaddingSide">0dp</item>
         <item name="android:textColorHint">@color/text_hint</item>
+        <item name="dividerColor">@color/light_gray</item>
         <item name="elevation">2dp</item>
     </style>
 
@@ -37,7 +38,8 @@
         <item name="containerBorderPadding">3dp</item>
         <item name="containerBorderPaddingSide">4dp</item>
         <item name="android:editTextColor">@android:color/white</item>
-        <item name="android:textColorHint">@android:color/white</item>
+        <item name="android:textColorHint">#ffA2A2A2</item>
+        <item name="dividerColor">@color/divider_dark</item>
         <item name="elevation">0dp</item>
     </style>
 

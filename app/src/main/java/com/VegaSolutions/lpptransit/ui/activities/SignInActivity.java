@@ -332,7 +332,7 @@ public class SignInActivity extends AppCompatActivity {
                             String[] links = new String[1];
                             links[0] = "/blaadasdolsadpsa.com";
 
-                            LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() , new Date(), "spremenjena5555", tags, links,10);
+                            LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() , new Date(), "spremenjena5555", tags, links);
 
                             //LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
 

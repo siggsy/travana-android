@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
@@ -34,6 +35,8 @@ import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
+import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -66,19 +69,45 @@ public class LiveArrivalFragment extends Fragment {
     private int color, backColor;
 
     private ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
-            // TODO: handle error and no internet connection
-            if (success) {
-                ArrivalWrapper arrivalWrapper = apiResponse.getData();
-                if (context != null)
-                    ((Activity)context).runOnUiThread(() -> {
-                        if (apiResponse.getData().getArrivals().isEmpty())
-                            no_arr_err.setVisibility(View.VISIBLE);
-                        else
-                            no_arr_err.setVisibility(View.GONE);
-                        adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
-                        refreshLayout.setRefreshing(false);
-                    });
-            }
+        if (context == null)
+            return;
+        ((Activity)context).runOnUiThread(() -> refreshLayout.setRefreshing(false));
+        if (success) {
+            ArrivalWrapper arrivalWrapper = apiResponse.getData();
+            ((Activity)context).runOnUiThread(() -> {
+                if (apiResponse.getData().getArrivals().isEmpty())
+                    no_arr_err.setVisibility(View.VISIBLE);
+                else
+                    no_arr_err.setVisibility(View.GONE);
+                adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
+            });
+        } else {
+            ((Activity)context).runOnUiThread(() -> {
+                CustomToast toast = new CustomToast(context);
+                toast
+                    .setTextColor(Color.WHITE)
+                    .setIconColor(Color.WHITE)
+                    .setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
+                switch (statusCode) {
+                    case -2:
+                        toast
+                            .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp))
+                            .setText(getString(R.string.timed_out_error));
+                        break;
+                    case -1:
+                        toast
+                            .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px))
+                            .setText(getString(R.string.network_error));
+                        break;
+                    default:
+                        toast
+                            .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp))
+                            .setText(getString(R.string.unknown_error));
+                        break;
+                }
+                toast.show(Toast.LENGTH_SHORT);
+            });
+        }
 
     };
 

@@ -44,4 +44,10 @@
     <string name="posted_time">objavljeno • %1$dh</string>
     <string name="post_comments">%1$d • komentarjev</string>
     <string name="loading">nalaganje</string>
+    <string name="opposite_error">Nasprotna postaja ne obstaja.</string>
+    <string name="network_error">Brez internetne povezave.</string>
+    <string name="timed_out_error">Povezava je potekla.</string>
+    <string name="unknown_error">Nekaj je šlo narobe. Obrnite se na razvijalce.</string>
+    <string name="refresh">Osveži</string>
+    <string name="create_a_new_post">Create a new post</string>
 </resources>
