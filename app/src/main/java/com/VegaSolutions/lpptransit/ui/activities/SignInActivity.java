@@ -305,13 +305,15 @@ public class SignInActivity extends AppCompatActivity {
             return;
 
 
-        TravanaAPI.tags((data, statusCode, success) ->{
-
+        TravanaAPI.tags((data, statusCode, success) -> {
             if(success){
-                Log.e(TAG, data + "");
+
+                System.out.println(data);
+
             }else{
                 Log.e(TAG, "error" + statusCode);
             }
+
         });
 
 
@@ -324,11 +326,15 @@ public class SignInActivity extends AppCompatActivity {
                             String idToken = task.getResult().getToken();
 
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            /*
+
+
                             MessageTag[] tags = new MessageTag[1];
                             tags[0] = new MessageTag("becool#115678", "becool", "#115678");
 
-                            LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() , new Date(), "spremenjena5555", tags, 10);
+                            String[] links = new String[1];
+                            links[0] = "/blaadasdolsadpsa.com";
+
+                            LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() , new Date(), "spremenjena5555", tags, links,10);
 
                             //LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
 
@@ -342,12 +348,11 @@ public class SignInActivity extends AppCompatActivity {
 
                             });
 
-                             */
+
+
 
                             /*
-                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
-
-                            TravanaAPI.addComment(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", comment, (data, statusCode, success) -> {
+                            TravanaAPI.commentLike(idToken,"comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1617:11:50GMT01:002019", true, (data, statusCode, success) -> {
 
                                 if(success){
                                     Log.e(TAG, data + "");
@@ -358,6 +363,10 @@ public class SignInActivity extends AppCompatActivity {
 
                              */
 
+
+
+                            /*
+
                             LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
 
                             TravanaAPI.removeCommentComment(idToken,"comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3FriNov1521:59:43GMT01:002019", (data, statusCode, success) -> {
@@ -367,6 +376,8 @@ public class SignInActivity extends AppCompatActivity {
                                 }else {
                                     Log.e(TAG, "error" + statusCode);
                                 }});
+
+                             */
 
                             /*
                             TravanaAPI.messagesMeta((data, statusCode, success) -> {
@@ -379,8 +390,11 @@ public class SignInActivity extends AppCompatActivity {
                             });
 
                              */
+
                             /*
-                            TravanaAPI.removeComment(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3FriNov1520:13:01GMT01:002019",(data, statusCode, success) -> {
+                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "MOJ KOMETAR BLA BLA BLA");
+
+                            TravanaAPI.addComment(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1617:10:17GMT01:002019", comment, (data, statusCode, success) -> {
 
                                 if(success){
                                     Log.e(TAG, data + "");
@@ -389,7 +403,31 @@ public class SignInActivity extends AppCompatActivity {
                                 }
                             });
                             */
+                            /*
+                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "MOJ KOMETAR BLA BLA BLA cucucucucucu");
 
+                            TravanaAPI.addCommentComment(idToken, "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1618:33:16GMT01:002019", comment, (data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
+
+                            /*
+                            TravanaAPI.removeComment(idToken, "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1618:23:12GMT01:002019",(data, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+                             */
 
                             /*
                             TravanaAPI.messageid("mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019" , user.getUid(),(data, statusCode, success) -> {
@@ -418,7 +456,7 @@ public class SignInActivity extends AppCompatActivity {
                              */
 
                             /*
-                            TravanaAPI.messagesLike(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1420:19:55GMT01:002019",true,  (data, statusCode, success) -> {
+                            TravanaAPI.messagesLike(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1617:10:17GMT01:002019",true,  (data, statusCode, success) -> {
 
                                 if(success){
                                     Log.e(TAG, data + "");
@@ -428,6 +466,8 @@ public class SignInActivity extends AppCompatActivity {
                             });
 
                              */
+
+
 
                             /*
                             TravanaAPI.removeMessage(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1420:19:55GMT01:002019", (data, statusCode, success) -> {
@@ -456,7 +496,7 @@ public class SignInActivity extends AppCompatActivity {
 
 
                             /*
-                            TravanaAPI.commentLike(idToken, "mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:18:52GMT01:002019", true,(data, statusCode, success) -> {
+                            TravanaAPI.commentLike(idToken, "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3FriNov1516:25:22GMT01:002019", false, (data, statusCode, success) -> {
 
                                 if(success){
                                     Log.e(TAG, data + "");
@@ -464,7 +504,9 @@ public class SignInActivity extends AppCompatActivity {
                                     Log.e(TAG, "error" + statusCode);
                                 }
                             });
-                            */
+
+                             */
+
 
                         } else {
 

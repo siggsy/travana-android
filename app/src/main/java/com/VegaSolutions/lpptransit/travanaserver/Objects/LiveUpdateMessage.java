@@ -10,7 +10,7 @@ public class LiveUpdateMessage {
     private String _id;
     private String user_id;
     private UserData user;
-    //private String photo_path;
+    private String[] photo_links;
     private Date created_time;
     private Date expire_date;
     private String message_content;
@@ -20,10 +20,8 @@ public class LiveUpdateMessage {
     private int comments_int;
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
 
-    //private String[] photos_paths;
-
     public LiveUpdateMessage(String user_id, Date expire_date,
-                             String message_content, MessageTag[] tags, int importance) {
+                             String message_content, MessageTag[] tags, String[] photo_links, int importance) {
 
         this.user_id = user_id;
         this.created_time = new Date();
@@ -31,6 +29,7 @@ public class LiveUpdateMessage {
         this.message_content = message_content;
         this.tags = tags;
         this.importance = importance;
+        this.photo_links = photo_links;
 
         String _id = "mess_gen" + user_id + created_time;
         _id = _id.replaceAll(" ", "");
@@ -126,6 +125,14 @@ public class LiveUpdateMessage {
 
     public void setComments_int(int comments_int) {
         this.comments_int = comments_int;
+    }
+
+    public String[] getPhoto_links() {
+        return photo_links;
+    }
+
+    public void setPhoto_links(String[] photo_links) {
+        this.photo_links = photo_links;
     }
 
     @Override

@@ -1,17 +1,27 @@
 package com.VegaSolutions.lpptransit.travanaserver;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
+import android.widget.ImageView;
 
+import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.LppQuery;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalRequest;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
 public class TravanaAPI {
@@ -267,7 +277,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void addCommentComment(String token, String message_id, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback){
+    public static void addCommentComment(String token, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback){
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
 
@@ -279,7 +289,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).addParams("mess_id", message_id)
+                })
                 .addParams("comm_id", comment_id)
                 .execute();
     }
@@ -299,7 +309,7 @@ public class TravanaAPI {
 
     }
 
-    public static void removeComment(String token, String message_id,String comment_id,TravanaApiCallback callback){
+    public static void removeComment(String token, String comment_id,TravanaApiCallback callback){
 
         new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -309,7 +319,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).addParams("_id", message_id)
+                })
                 .addParams("comment_id", comment_id)
                 .execute();
     }
@@ -393,7 +403,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void commentLike(String token,String mess_id, String comm_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+    public static void commentLike(String token, String comm_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
 
         new TravanaQuery(TravanaQuery.MESSAGE_COMMENT_LIKE, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -403,7 +413,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).addHeaderValues("mess_id", mess_id)
+                })
                 .addHeaderValues("comm_id", comm_id)
                 .addHeaderValues("liked", like + "")
                 .execute();
@@ -449,6 +459,27 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
+
+                        MessageTag[] tags = new Gson().fromJson(response, MessageTag[].class);
+                        callback.onComplete(tags, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .execute();
+    }
+
+    public static void uploadFile(String token, byte[] bytes, TravanaApiCallback callback){
+
+        RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file", "image",
+                        RequestBody.create(MediaType.parse("image/png"), bytes))
+                .build();
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_UPLOAD_FILE, TRAVANA_API_KEY, token, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
                         callback.onComplete(response, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -457,6 +488,35 @@ public class TravanaAPI {
                 .execute();
     }
 
+    public static void uploadFile(String token, Uri image, Context context, TravanaApiCallback callback){
+
+        byte[] bytes = null;
+
+        try{
+            bytes = Utils.getBytes(context, image);
+
+        }catch (IOException e){
+
+            callback.onComplete(null, -1, false);
+            return;
+
+        }
+        RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("file", "image",
+                        RequestBody.create(MediaType.parse("image/png"), bytes))
+                .build();
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_UPLOAD_FILE, TRAVANA_API_KEY, token,  rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .execute();
+    }
 }
 
 

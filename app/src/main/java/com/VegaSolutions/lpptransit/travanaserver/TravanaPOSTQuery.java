@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import org.jsoup.HttpStatusException;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.Credentials;
@@ -21,11 +22,11 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
 
     public static OkHttpClient client = new OkHttpClient();
 
-    public static final String SERVER_URL = "http://192.168.1.7:8081/ljubljana_app_server/api";
+    public static final String SERVER_URL = "http://192.168.1.13:8081/ljubljana_app_server/api";
 
     //public static final String SERVER_URL = "http://192.168.1.7:8081/ljubljana_app_server/api";
 
-    public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
+    public static final String SERVER_IP_ADDRESS = "192.168.1.13:8081";
 
     //public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
 
@@ -47,6 +48,8 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
     public static final String MESSAGES_FOLLOWED = "/live_updates/followed_messages";
 
     public static final String MESSAGES_FOLLOWED_META = "/live_updates/followed_messages_meta";
+
+    public static final String MESSAGES_UPLOAD_FILE = "/file/upload";
 
     private StringBuilder params = new StringBuilder();
 
@@ -153,6 +156,10 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
          * @param success boolean if connection was successful.
          */
         void onComplete(String response, int statusCode, boolean success);
+    }
+
+    public static RequestBody getRequestBodyFile(File file){
+        return null;
     }
 }
 

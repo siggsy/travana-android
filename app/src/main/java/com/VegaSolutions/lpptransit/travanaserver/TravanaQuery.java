@@ -25,11 +25,11 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static OkHttpClient client = new OkHttpClient();
 
-    public static final String SERVER_URL = "http://192.168.1.7:8081/ljubljana_app_server/api";
+    public static final String SERVER_URL = "http://192.168.1.13:8081/ljubljana_app_server/api";
 
     //public static final String SERVER_URL = "http://10.0.1.23:8080/ljubljana_app_server/api";
 
-    public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
+    public static final String SERVER_IP_ADDRESS = "192.168.1.13:8081";
 
     //public static final String SERVER_IP_ADDRESS = "10.0.1.23:8080";
 
@@ -65,6 +65,7 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String MESSAGES_ID = "/live_updates/messagesid";
 
+    public static final String GET_IMAGE = "/file/try";
 
     // Url parameters
     private StringBuilder params = new StringBuilder();
