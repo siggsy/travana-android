@@ -1,5 +1,7 @@
 package com.VegaSolutions.lpptransit.travanaserver;
 
+import android.graphics.Bitmap;
+
 import androidx.annotation.Nullable;
 
 public interface TravanaApiCallback<T> {
@@ -11,4 +13,5 @@ public interface TravanaApiCallback<T> {
      * @param success boolean if it was successfully executed
      */
     void onComplete(@Nullable T apiResponse, int statusCode, boolean success);
+
 }
