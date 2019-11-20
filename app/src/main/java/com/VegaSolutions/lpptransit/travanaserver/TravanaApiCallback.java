@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 
+import java.io.InputStream;
+
 public interface TravanaApiCallback<T> {
 
     /**

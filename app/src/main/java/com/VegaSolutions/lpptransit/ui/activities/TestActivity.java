@@ -1,5 +1,6 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -25,6 +26,8 @@ import android.widget.Toast;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallbackSpecial;
 import com.VegaSolutions.lpptransit.travanaserver.Utils;
 
 import java.io.ByteArrayOutputStream;
@@ -54,12 +57,24 @@ public class TestActivity extends AppCompatActivity {
 
 
             ImageView i = (ImageView)findViewById(R.id.imageView5);
-            //Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL("https://lh3.googleusercontent.com/a-/AAuE7mAqOLAfH4ys0vxqTTI4Mog5jblGKRHZ9DvTDg3f=s96-c").getContent());
+
+
+        TravanaAPI.getImage("/home/domen/UploadFile/testuidTueNov19205223CET2019", new TravanaApiCallbackSpecial() {
+            @Override
+            public void onComplete(@Nullable Bitmap bitmap, int statusCode, boolean success) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        i.setImageBitmap(bitmap);
+                    }
+                });
+            }
+        });
+
+
 
         b.setOnClickListener(e -> {
-
-
-
 
                 if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getApplication(), Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
@@ -127,20 +142,19 @@ public class TestActivity extends AppCompatActivity {
 
                 if (resultCode == RESULT_OK) {
 
+                    /*
                     FirebaseManager.getFirebaseToken((token, statusCode1, success1) -> {
 
                         if (success1) {
 
                             Uri selectedImageUri = data.getData();
 
-                            File file = new File(selectedImageUri.getPath());
-
-                            Log.e(TAG, file.length() + "");
-
                             TravanaAPI.uploadFile(token, selectedImageUri,  getApplicationContext(), (data1, statusCode, success) -> {
 
                                 if(success){
+
                                     Log.e(TAG, data1 + "");
+
                                 }else {
                                     Log.e(TAG, "error" + statusCode);
                                 }
@@ -151,6 +165,8 @@ public class TestActivity extends AppCompatActivity {
                             Log.e(TAG, "error" + statusCode1);
                         }
                     });
+
+                     */
                 }
 
 /*
@@ -164,7 +180,7 @@ public class TestActivity extends AppCompatActivity {
                         }else {
                             Log.e(TAG, "error" + statusCode);
                         }
-                    });
+                    });fr
                 }
 
  */

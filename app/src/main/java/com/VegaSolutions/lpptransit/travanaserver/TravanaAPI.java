@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.LppQuery;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
@@ -16,13 +18,20 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalReques
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.google.gson.Gson;
 
+import org.jsoup.HttpStatusException;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class TravanaAPI {
 
@@ -36,38 +45,38 @@ public class TravanaAPI {
         new TravanaQuery(TravanaQuery.WARNINGS_URL)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
-            if(success){
+                    if (success) {
 
-                Warning[] warnings = new Gson().fromJson(response, Warning[].class);
+                        Warning[] warnings = new Gson().fromJson(response, Warning[].class);
 
-                callback.onComplete(warnings, statusCode, true);
-            }else{
-                callback.onComplete(null, statusCode, false);
-            }
-        }).execute();
-    }
-
-    public static void updates(TravanaApiCallback callback){
-
-        new TravanaQuery(TravanaQuery.UPDATES_URL)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if(success){
-                        callback.onComplete(response, statusCode, true);
-                    }else{
+                        callback.onComplete(warnings, statusCode, true);
+                    } else {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).execute();
     }
 
-    public static void play_store_link(TravanaApiCallback callback){
+    public static void updates(TravanaApiCallback callback) {
+
+        new TravanaQuery(TravanaQuery.UPDATES_URL)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).execute();
+    }
+
+    public static void play_store_link(TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.PLAY_STORE_LINK)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
-                    if(success){
+                    if (success) {
                         callback.onComplete(response, statusCode, true);
-                    }else{
+                    } else {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).execute();
@@ -75,14 +84,14 @@ public class TravanaAPI {
 
 
     //depricated --> adding user-handling on server
-    public static void addUser(String token, RequestBody rbody, TravanaApiCallback callback){
+    public static void addUser(String token, RequestBody rbody, TravanaApiCallback callback) {
 
-        new TravanaPOSTQuery(TravanaPOSTQuery.ADD_USER,TRAVANA_API_KEY, token, rbody)
+        new TravanaPOSTQuery(TravanaPOSTQuery.ADD_USER, TRAVANA_API_KEY, token, rbody)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
-                    if(success){
+                    if (success) {
                         callback.onComplete(response, statusCode, true);
-                    }else{
+                    } else {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).execute();
@@ -204,12 +213,13 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).addParams("_id", message_id )
+                }).addParams("_id", message_id)
                 .execute();
     }
 
     /**
      * Executed code when query completed
+     *
      * @param condition, filter messages by values (possible: "checked", "!checked")
      */
 
@@ -227,7 +237,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void addMessage(String token, LiveUpdateMessage message, TravanaApiCallback callback){
+    public static void addMessage(String token, LiveUpdateMessage message, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(message));
 
@@ -261,7 +271,7 @@ public class TravanaAPI {
     }
      */
 
-    public static void addComment(String token, String message_id, LiveUpdateComment comment, TravanaApiCallback callback){
+    public static void addComment(String token, String message_id, LiveUpdateComment comment, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
 
@@ -277,7 +287,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void addCommentComment(String token, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback){
+    public static void addCommentComment(String token, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
 
@@ -294,7 +304,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void removeMessage(String token, String mess_id, TravanaApiCallback callback){
+    public static void removeMessage(String token, String mess_id, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_REMOVE, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -309,7 +319,7 @@ public class TravanaAPI {
 
     }
 
-    public static void removeComment(String token, String comment_id,TravanaApiCallback callback){
+    public static void removeComment(String token, String comment_id, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -324,7 +334,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void removeCommentComment(String token, String subcomment_id, TravanaApiCallback callback){
+    public static void removeCommentComment(String token, String subcomment_id, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT_COMMENT, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -339,7 +349,23 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void editComment(String token, String message_id, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback){
+    public static void likeCommentComment(String token, String subcomment_id, boolean liked, TravanaApiCallback callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_LIKE_COMMENT_COMMENT, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("subcomm_id", subcomment_id)
+                .addHeaderValues("liked", liked + "")
+                .execute();
+    }
+
+    public static void editComment(String token, String message_id, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
 
@@ -356,7 +382,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void approveMessages(String token, List<MessagesApprovalRequest> approvalRequests, TravanaApiCallback callback){
+    public static void approveMessages(String token, List<MessagesApprovalRequest> approvalRequests, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(approvalRequests));
 
@@ -373,7 +399,7 @@ public class TravanaAPI {
     }
 
 
-    public static void banUser(String token, String user_id, TravanaApiCallback callback){
+    public static void banUser(String token, String user_id, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.BAN_USER, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -387,7 +413,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void messagesLike(String token,String mess_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+    public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
 
         new TravanaQuery(TravanaQuery.MESSAGE_LIKE, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -419,7 +445,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void followedMessages(String user_id, String[] tags_ids, TravanaApiCallback callback){
+    public static void followedMessages(String user_id, String[] tags_ids, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
 
@@ -436,7 +462,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void followedMessagesMeta(String user_id, String[] tags_ids, TravanaApiCallback callback){
+    public static void followedMessagesMeta(String user_id, String[] tags_ids, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
 
@@ -453,7 +479,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void tags(TravanaApiCallback callback){
+    public static void tags(TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGE_TAGS)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -469,7 +495,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void uploadFile(String token, byte[] bytes, TravanaApiCallback callback){
+    public static void uploadFile(String token, byte[] bytes, TravanaApiCallback callback) {
 
         RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file", "image",
@@ -488,14 +514,14 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void uploadFile(String token, Uri image, Context context, TravanaApiCallback callback){
+    public static void uploadImage(String token, Uri image, Context context, TravanaApiCallback callback) {
 
         byte[] bytes = null;
 
-        try{
+        try {
             bytes = Utils.getBytes(context, image);
 
-        }catch (IOException e){
+        } catch (IOException e) {
 
             callback.onComplete(null, -1, false);
             return;
@@ -506,7 +532,7 @@ public class TravanaAPI {
                         RequestBody.create(MediaType.parse("image/png"), bytes))
                 .build();
 
-        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_UPLOAD_FILE, TRAVANA_API_KEY, token,  rbody)
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_UPLOAD_FILE, TRAVANA_API_KEY, token, rbody)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
@@ -517,19 +543,27 @@ public class TravanaAPI {
                 })
                 .execute();
     }
+
+    public static void getImage(String photo_link, TravanaApiCallbackSpecial callback) {
+
+        new TravanaSpecialGetQuery(TravanaQuery.GET_IMAGE)
+                .setOnCompleteListener((inputStreamResponse, statusCode, success) -> {
+
+                    if (success) {
+
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStreamResponse);
+
+                        callback.onComplete(bitmap, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addHeaderValues("link", photo_link)
+                .execute();
+
+    }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,6 +1,8 @@
 package com.VegaSolutions.lpptransit.travanaserver;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -53,6 +55,8 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String MESSAGES_REMOVE_COMMENT_COMMENT = "/live_updates/messages/remove_comment_comment";
 
+    public static final String MESSAGES_LIKE_COMMENT_COMMENT = "/live_updates/messages/like_comment_comment";
+
     public static final String BAN_USER = "/users/banUser";
 
     public static final String MESSAGE_LIKE = "/live_updates/like_message";
@@ -65,7 +69,7 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String MESSAGES_ID = "/live_updates/messagesid";
 
-    public static final String GET_IMAGE = "/file/try";
+    public static final String GET_IMAGE = "/file/get";
 
     // Url parameters
     private StringBuilder params = new StringBuilder();
@@ -160,6 +164,7 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
 
                 String data = r.body().string();
+
                 int code = r.code();
 
                 if(code != 200){
@@ -178,6 +183,50 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
             }
         return null;
     }
+
+    /*
+    public void doSpecialRequest(TravanaApiCallbackSpecial callback){
+
+        try {
+
+            Log.d(TAG, SERVER_URL + URL + params);
+
+            Request request = new Request.Builder()
+                    .url(SERVER_URL + URL + params)
+                    .addHeader("Content-Type", "application/json")  // add request headers
+                    .addHeader("User-Agent", "OkHttp Bot")
+                    .addHeader("Authorization", basic_token)
+                    .addHeader("Accept","")
+                    .addHeader("Cache-Control", "no-cache")
+                    .addHeader("Host", SERVER_IP_ADDRESS)
+                    .addHeader("Accept-Encoding", "gzip, deflate")
+                    .build();
+
+            Response r = client.newCall(request).execute();
+
+            int code = r.code();
+
+            if(code != 200){
+                callback.onComplete(null, code, false);
+
+            }else{
+                Bitmap bitmap = BitmapFactory.decodeStream(r.body().byteStream());
+                callback.onComplete(bitmap, code, false);
+            }
+
+        }catch (HttpStatusException e){
+
+            e.printStackTrace();
+            callback.onComplete(null, e.getStatusCode(), false);
+
+        }catch (IOException e){
+
+            e.printStackTrace();
+            callback.onComplete(null, -1, false);
+        }
+    }
+
+     */
 
     public interface OnCompleteListener {
 
