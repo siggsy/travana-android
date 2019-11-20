@@ -50,4 +50,5 @@
     <string name="unknown_error">Nekaj je šlo narobe. Obrnite se na razvijalce.</string>
     <string name="refresh">Osveži</string>
     <string name="create_a_new_post">Create a new post</string>
+    <string name="too_many_tags_error">Dosegli ste mejo števila oznak.</string>
 </resources>

@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -24,6 +25,8 @@ import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -52,11 +55,13 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private String routeId;
     private String tripId;
 
-    private ImageView backBtn;
+    private ImageView backBtn, locBtn;
     private TextView number;
     private TextView name;
     private View circle;
     private TopMessage route_loading;
+
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     private final int UPDATE_TIME = 2000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
@@ -97,7 +102,6 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
 
         if (success) {
-            runOnUiThread(() -> route_loading.showLoading(false));
             // Sort stations.
             Collections.sort(apiResponse.getData(), (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
             List<LatLng> latLngs = new ArrayList<>();
@@ -160,6 +164,9 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             Api.stationsOnRoute(tripId, callback);
         });
         name.setText(routeName);
+        name.setSelected(true);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
 
     }
@@ -183,6 +190,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         number = findViewById(R.id.route_station_number);
         circle = findViewById(R.id.route_circle);
         route_loading = findViewById(R.id.loading_msg);
+        locBtn = findViewById(R.id.maps_location_icon);
 
 
         setupUI();
@@ -233,7 +241,18 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         });
         mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
         mMap.setPadding(0, 200, 0, 0);
-        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        if (MapUtility.checkLocationPermission(this)) {
+            locBtn.setOnClickListener(v -> fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Location location = task.getResult();
+                    if (location != null)
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15f));
+                }
+            }));
+            mMap.setMyLocationEnabled(true);
+        }
         if (ViewGroupUtils.isDarkTheme(this))
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
 

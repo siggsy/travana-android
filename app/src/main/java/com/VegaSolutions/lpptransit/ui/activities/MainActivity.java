@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -11,27 +13,25 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
@@ -40,26 +40,21 @@ import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.ui.fragments.HomeFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
-import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.VisibleRegion;
-import com.google.maps.android.clustering.Cluster;
+import com.google.android.material.navigation.NavigationView;
 import com.google.maps.android.clustering.ClusterManager;
 
-import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Stack;
@@ -74,7 +69,7 @@ import static com.VegaSolutions.lpptransit.ui.fragments.HomeFragment.TRAIN;
 
 // TODO: Clean the code, fix MapPadding remove useless callbacks and variables
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
 
@@ -86,10 +81,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     Stack<Fragment> fragments = new Stack<>();
 
-    ImageButton account;
+    ImageButton navbar_button;
     ImageButton search;
     View shadow;
     TopMessage loading;
+    ImageView location_icon;
+
+    DrawerLayout dl;
+    NavigationView nv;
 
     View bottom_sheet;
     BusMarkerManager markerManager;
@@ -118,7 +117,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.app_nav_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -131,10 +130,21 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
 
+        dl = findViewById(R.id.nav_layout);
+        nv = findViewById(R.id.nv);
+
+        nv.setNavigationItemSelectedListener(this);
+
         search = findViewById(R.id.search);
+        navbar_button = findViewById(R.id.account);
+        location_icon = findViewById(R.id.maps_location_icon);
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
-        account = findViewById(R.id.account);
-        account.setOnClickListener(view -> startActivityForResult(new Intent(this, SettingsActivity.class), 0));
+        navbar_button.setOnClickListener(view -> dl.openDrawer(GravityCompat.START));
+        if (MapUtility.checkLocationPermission(this)) {
+            location_icon.setVisibility(View.VISIBLE);
+        } else {
+            location_icon.setVisibility(View.GONE);
+        }
         shadow = findViewById(R.id.shadow);
         loading = findViewById(R.id.top_message);
         loading.showLoading(true);
@@ -149,61 +159,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         bottom_sheet = findViewById(R.id.bottom_sheet);
         behavior = ViewPagerBottomSheetBehavior.from(bottom_sheet);
-        behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-                if (newState == ViewPagerBottomSheetBehavior.STATE_DRAGGING) {
-                    if (account.getVisibility() == View.VISIBLE) {
-                        Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shrink);
-                        animation.setAnimationListener(new Animation.AnimationListener() {
-                            @Override
-                            public void onAnimationStart(Animation animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animation animation) {
-                                account.setVisibility(View.GONE);
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animation animation) {
-
-                            }
-                        });
-                        account.startAnimation(animation);
-                    }
-
-                } else if (newState == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
-                    Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.expand);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-                            account.setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    account.startAnimation(animation);
-                } else if (newState == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
-                    account.setVisibility(View.GONE);
-                }
-
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-            }
-        });
 
         switchFragment(StationsFragment.newInstance());
 
@@ -212,6 +167,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onBackPressed() {
+
+        if (dl.isDrawerOpen(GravityCompat.START)) {
+            dl.closeDrawer(GravityCompat.START);
+            return;
+        }
+
         if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
             behavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
         } else {
@@ -230,11 +191,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap = googleMap;
         mMap.getUiSettings().setCompassEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         //mMap.setTrafficEnabled(true);
         setupClusterManager();
-        mMap.setPadding(12, 150, 12, behavior.getPeekHeight());
-        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
+        mMap.setPadding(12, 200, 12, behavior.getPeekHeight());
+        if (MapUtility.checkLocationPermission(this)) {
+            location_icon.setOnClickListener(v -> fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Location location = task.getResult();
+                    if (location != null)
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15f));
+                }
+            }));
+            mMap.setMyLocationEnabled(true);
+        }
 
         if (ViewGroupUtils.isDarkTheme(this))
             mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
@@ -292,17 +262,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             });
         } else {
             runOnUiThread(() -> {
-                switch (responseCode) {
-                    case -2:
-                        loading.showMsg(getString(R.string.timed_out_error), ContextCompat.getDrawable(this, R.drawable.ic_error_outline_black_24dp));
-                        break;
-                    case -1:
-                        loading.showMsg(getString(R.string.network_error), ContextCompat.getDrawable(this, R.drawable.ic_wifi_off_24px));
-                        break;
-                    default:
-                        loading.showMsg(getString(R.string.unknown_error), ContextCompat.getDrawable(this, R.drawable.ic_error_outline_black_24dp));
-                        break;
-                }
+                loading.showMsgDefault(this, responseCode);
             });
         }
 
@@ -387,12 +347,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.forum:
+                startActivity(new Intent(this, ForumActivity.class));
+                break;
+            case R.id.settings:
+                startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+                break;
+        }
+
+        return true;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 }

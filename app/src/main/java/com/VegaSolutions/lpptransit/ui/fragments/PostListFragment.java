@@ -1,29 +1,41 @@
 package com.VegaSolutions.lpptransit.ui.fragments;
 
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.firebase.FirebaseCallback;
+import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
+
+import java.util.Arrays;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -67,13 +79,26 @@ public class PostListFragment extends Fragment {
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-        TravanaAPI.messagesMeta((apiResponse, statusCode, success) -> {
-            if (success) {
-                LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
-                adapter.setMessages(messages);
-                getActivity().runOnUiThread(adapter::notifyDataSetChanged);
-            }
-        });
+
+        if (type == TYPE_ALL) {
+            TravanaAPI.messagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
+                if (success) {
+
+                    LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
+                    Log.i("message json", Arrays.toString(messages));
+                    adapter.setMessages(messages);
+                    getActivity().runOnUiThread(adapter::notifyDataSetChanged);
+                }
+            });
+        } else {
+            TravanaAPI.followedMessagesMeta(FirebaseManager.getSignedUser().getUid(), new String[0], (apiResponse, statusCode, success) -> {
+                if (success) {
+                    LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
+                    adapter.setMessages(messages);
+                    getActivity().runOnUiThread(adapter::notifyDataSetChanged);
+                }
+            });
+        }
 
         return root;
     }
@@ -126,18 +151,41 @@ public class PostListFragment extends Fragment {
                 viewHolder.postTags.addView(v);
             }
 
+            viewHolder.setLiked(message.isLiked(), message);
+
+
+
             viewHolder.likeContainer.setOnClickListener(v -> {
                 if (!message.isLiked()) {
-                    v.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.stretched_circle));
-                    v.getBackground().setTint(ContextCompat.getColor(getContext(), R.color.colorAccent));
-                    viewHolder.postLikes.setTextColor(Color.WHITE);
-                    message.setLiked(true);
+                    viewHolder.setLiked(true, message);
                 } else {
-                    v.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.stretched_circle));
-                    v.getBackground().setTint(ContextCompat.getColor(getContext(), R.color.colorAccent));
-                    viewHolder.postLikes.setTextColor(Color.WHITE);
-                    message.setLiked(false);
+                    viewHolder.setLiked(false, message);
                 }
+
+                FirebaseManager.getFirebaseToken((data, error, success) -> {
+                    if (success) {
+                        TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
+                            if (success1) {
+                                ((Activity) getContext()).runOnUiThread(() -> {
+                                    CustomToast customToast = new CustomToast(getContext());
+                                    customToast.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+                                    customToast.setIconColor(Color.WHITE);
+                                    customToast.setTextColor(Color.WHITE);
+                                    customToast.setText("Success!");
+                                    customToast.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_check_black_24dp));
+                                    customToast.show(Toast.LENGTH_SHORT);
+                                });
+                            } else {
+                                ((Activity) getContext()).runOnUiThread(() -> {
+                                    CustomToast customToast = new CustomToast(getContext());
+                                    customToast.showDefault(getContext(), statusCode);
+                                    message.setLiked(!message.isLiked());
+                                });
+                            }
+                        });
+                    }
+                });
+
             });
 
         }
@@ -151,6 +199,7 @@ public class PostListFragment extends Fragment {
 
             private TextView userName, userTag, postContent, postLikes, postComments, postTime;
             private CircleImageView userImage;
+            private ImageView likeImage;
             private FlexboxLayout postTags;
             private View likeContainer;
 
@@ -166,9 +215,29 @@ public class PostListFragment extends Fragment {
                 userImage = itemView.findViewById(R.id.user_image);
                 postTags = itemView.findViewById(R.id.post_tags);
                 likeContainer = itemView.findViewById(R.id.post_like_container);
+                likeImage = itemView.findViewById(R.id.post_like_image);
 
             }
 
+
+            private void setLiked(boolean value, LiveUpdateMessage message) {
+                if (!message.isLiked()) {
+                    likeContainer.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.stretched_circle));
+                    likeContainer.getBackground().setTint(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                    postLikes.setTextColor(Color.WHITE);
+                    likeImage.setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+                    message.setLiked(true);
+                    postLikes.setText(String.valueOf(message.getLikes()));
+
+                } else {
+                    int color = ViewGroupUtils.isDarkTheme(getContext()) ? Color.WHITE : Color.BLACK;
+                    likeContainer.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.like_container));
+                    postLikes.setTextColor(color);
+                    likeImage.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
+                    message.setLiked(false);
+                    postLikes.setText(String.valueOf(message.getLikes()));
+                }
+            }
 
 
         }

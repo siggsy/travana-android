@@ -1,6 +1,9 @@
 package com.VegaSolutions.lpptransit.travanaserver.Objects;
 
-public class MessageTag {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class MessageTag implements Parcelable {
 
     private String _id;
     private String tag;
@@ -12,6 +15,24 @@ public class MessageTag {
         this.tag = tag;
         this.color = color;
     }
+
+    protected MessageTag(Parcel in) {
+        _id = in.readString();
+        tag = in.readString();
+        color = in.readString();
+    }
+
+    public static final Creator<MessageTag> CREATOR = new Creator<MessageTag>() {
+        @Override
+        public MessageTag createFromParcel(Parcel in) {
+            return new MessageTag(in);
+        }
+
+        @Override
+        public MessageTag[] newArray(int size) {
+            return new MessageTag[size];
+        }
+    };
 
     public String get_id() {
         return _id;
@@ -44,5 +65,17 @@ public class MessageTag {
                 ", tag='" + tag + '\'' +
                 ", color='" + color + '\'' +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(_id);
+        dest.writeString(tag);
+        dest.writeString(color);
     }
 }

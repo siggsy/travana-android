@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import org.jsoup.HttpStatusException;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,11 +28,11 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static OkHttpClient client = new OkHttpClient();
 
-    public static final String SERVER_URL = "http://192.168.1.13:8081/ljubljana_app_server/api";
+    public static final String SERVER_URL = "http://193.77.85.172:8081/ljubljana_app_server/api";
 
     //public static final String SERVER_URL = "http://10.0.1.23:8080/ljubljana_app_server/api";
 
-    public static final String SERVER_IP_ADDRESS = "192.168.1.13:8081";
+    public static final String SERVER_IP_ADDRESS = "193.77.85.172:8081";
 
     //public static final String SERVER_IP_ADDRESS = "10.0.1.23:8080";
 
@@ -177,6 +178,9 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
             } catch (HttpStatusException e) {
                 e.printStackTrace();
                 onCompleteListener.onComplete(null, e.getStatusCode(), false);
+            } catch (SocketTimeoutException e) {
+                e.printStackTrace();
+                onCompleteListener.onComplete(null, -2, false);
             } catch (IOException e) {
                 e.printStackTrace();
                 onCompleteListener.onComplete(null, -1, false);

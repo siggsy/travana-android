@@ -131,12 +131,12 @@
         android:layout_marginTop="8dp"
         android:text="Add a picture..." />
 
-    <com.google.android.flexbox.FlexboxLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/imageView8"
+            android:id="@+id/message_image_0"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginStart="16dp"
@@ -148,7 +148,7 @@
             android:tint="?android:textColor" />
 
         <ImageView
-            android:id="@+id/imageView7"
+            android:id="@+id/message_image_1"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginStart="16dp"
@@ -158,6 +158,6 @@
             android:scaleType="center"
             android:src="@drawable/ic_add_black_24dp"
             android:tint="?android:textColor" />
-    </com.google.android.flexbox.FlexboxLayout>
+    </LinearLayout>
 
 </LinearLayout>

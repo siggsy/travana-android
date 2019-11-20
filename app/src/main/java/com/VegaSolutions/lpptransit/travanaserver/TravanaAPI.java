@@ -479,7 +479,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void tags(TravanaApiCallback callback) {
+    public static void tags(TravanaApiCallback<MessageTag[]> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGE_TAGS)
                 .setOnCompleteListener((response, statusCode, success) -> {

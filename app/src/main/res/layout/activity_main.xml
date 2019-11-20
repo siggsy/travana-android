@@ -10,63 +10,121 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent" >
 
+
+
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ImageButton
-        android:id="@+id/account"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
         android:background="@drawable/stretched_circle"
         android:backgroundTint="?backgroundViewColor"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="6dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <ImageButton
+                android:id="@+id/account"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@drawable/stretched_circle"
+                android:backgroundTint="?backgroundViewColor"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_menu_black_24dp"
+                android:tint="?android:textColor"
+                android:translationZ="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView43"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_directions_bus_black_24dp"
+                android:drawablePadding="8dp"
+                android:text="LPP"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/search"
+                app:layout_constraintStart_toEndOf="@+id/account"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/search"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@drawable/stretched_circle"
+                android:backgroundTint="?backgroundViewColor"
+                android:scaleType="center"
+                android:src="@drawable/ic_search_black_24dp"
+                android:tint="?android:textColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/maps_location_icon"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="162dp"
+        android:background="@drawable/stretched_circle"
+        android:backgroundTint="?backgroundViewColor"
+        android:clickable="true"
         android:elevation="6dp"
-        android:padding="6dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_settings_black_24dp"
-        android:tint="?android:textColor"
-        android:translationZ="0dp" />
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/ic_my_location_black_24dp"
+        android:tint="?android:textColor" />
 
     <View
         android:id="@+id/shadow"
         android:layout_width="match_parent"
         android:layout_height="16dp"
         android:background="@drawable/top_shadow_gradient"
+        android:elevation="6dp"
+        android:translationZ="6dp"
         app:layout_anchor="@id/bottom_sheet" />
 
     <FrameLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/view_pager_bottom_sheet_behavior"
+        android:clickable="true"
+        android:elevation="6dp"
+        android:focusable="true"
+        android:translationZ="6dp"
         app:behavior_hideable="false"
         app:behavior_peekHeight="150dp"
-        android:translationZ="2dp"
-        android:elevation="4dp" />
-
-    <ImageButton
-        android:id="@+id/search"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_gravity="end|top"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="12dp"
-        android:background="@drawable/stretched_circle"
-        android:backgroundTint="?backgroundViewColor"
-        android:elevation="6dp"
-        android:scaleType="center"
-        android:src="@drawable/ic_search_black_24dp"
-        android:tint="?android:textColor" />
+        app:layout_behavior="@string/view_pager_bottom_sheet_behavior" />
 
     <com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage
         android:id="@+id/top_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|top"
-        android:layout_marginTop="57dp" />
+        android:layout_marginTop="65dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

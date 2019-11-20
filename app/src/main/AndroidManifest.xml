@@ -11,8 +11,7 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!--     maybe remove that. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- maybe remove that. -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -23,15 +22,17 @@
         android:theme="@style/DarkTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ui.activities.TagsActivity" />
         <activity
             android:name=".ui.activities.NewMessageActivity"
             android:exported="true"
-            android:theme="@style/DarkTheme"/>
+            android:theme="@style/DarkTheme" />
         <activity
             android:name=".ui.activities.TestActivity"
             android:exported="true" />
         <activity android:name=".ui.activities.PostActivity" />
-        <activity android:name=".ui.activities.ForumActivity" />
+        <activity android:name=".ui.activities.ForumActivity"
+            android:exported="true"/>
         <activity android:name=".ui.activities.SettingsActivity" />
         <activity
             android:name=".ui.activities.WelcomeActivity"

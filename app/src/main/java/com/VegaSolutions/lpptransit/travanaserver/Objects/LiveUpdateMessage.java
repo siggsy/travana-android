@@ -141,6 +141,7 @@ public class LiveUpdateMessage {
 
     public void setLiked(boolean liked) {
         this.liked = liked;
+        setLikes(liked ? likes + 1 : likes - 1);
     }
 
     @Override

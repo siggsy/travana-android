@@ -28,6 +28,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tabIndicatorColor="@color/colorAccent"
+                app:tabRippleColor="@color/colorRipple"
                 app:tabTextColor="?android:textColor" />
 
             <TextView

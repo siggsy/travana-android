@@ -33,22 +33,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/forum_new_messages_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:background="@drawable/stretched_circle"
-                android:backgroundTint="@color/colorAccent"
-                android:padding="4dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="15"
-                android:textColor="@android:color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/forum_title"
-                app:layout_constraintStart_toEndOf="@+id/forum_title"
-                app:layout_constraintTop_toTopOf="@+id/forum_title" />
-
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/forum_tab_layout"
                 android:layout_width="0dp"
@@ -57,6 +41,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tabIndicatorColor="@color/colorAccent"
+                app:tabRippleColor="@color/colorRipple"
                 app:tabTextColor="?android:textColor">
 
                 <com.google.android.material.tabs.TabItem
@@ -93,9 +78,26 @@
         android:id="@+id/forum_view_pager"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="?backgroundViewColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header" />
+        app:layout_constraintTop_toBottomOf="@+id/header" >
+
+    </androidx.viewpager.widget.ViewPager>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/new_message_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/forum_view_pager"
+        app:srcCompat="@drawable/ic_add_black_24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

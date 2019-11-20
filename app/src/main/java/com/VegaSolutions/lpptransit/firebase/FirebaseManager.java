@@ -26,22 +26,21 @@ public class FirebaseManager {
 
         if(token == null) {
             FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (mUser == null) {
+                callback.onComplete("NotSignedIn", null, false);
+                return;
+            }
 
 
             mUser.getIdToken(true)
-                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                        public void onComplete(@NonNull Task<GetTokenResult> task) {
-                            if (task.isSuccessful()) {
-                                String idToken = task.getResult().getToken();
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            String idToken = task.getResult().getToken();
+                            callback.onComplete(idToken, null, true);
 
-                                callback.onComplete(idToken, null, true);
-
-                            } else {
-
-                                callback.onComplete(null, task.getException(), false);
-                                Log.e(TAG, task.getException().getMessage());
-
-                            }
+                        } else {
+                            callback.onComplete(null, task.getException(), false);
+                            Log.e(TAG, task.getException().getMessage());
                         }
                     });
         }

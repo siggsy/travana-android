@@ -54,9 +54,9 @@
             android:backgroundTint="@android:color/holo_orange_light"
             android:elevation="2dp"
             android:paddingStart="8dp"
-            android:paddingTop="2dp"
+            android:paddingTop="4dp"
             android:paddingEnd="8dp"
-            android:paddingBottom="2dp"
+            android:paddingBottom="4dp"
             android:text="@string/into_center"
             android:textColor="@android:color/white"
             android:textSize="12sp" />

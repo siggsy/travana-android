@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,18 +18,20 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.PostListFragment;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-public class ForumActivity extends AppCompatActivity {
+public class ForumActivity extends AppCompatActivity implements FragmentHeaderCallback {
 
 
     private View header;
     private ViewPager viewPager;
     private TabLayout tabLayout;
-    private TextView newMessages;
     private ImageView searchButton;
+    private FloatingActionButton newMessage;
 
     private ViewPagerAdapter adapter;
 
@@ -38,6 +41,8 @@ public class ForumActivity extends AppCompatActivity {
         adapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        newMessage.setOnClickListener(v -> startActivity(new Intent(this, NewMessageActivity.class)));
 
     }
 
@@ -49,12 +54,17 @@ public class ForumActivity extends AppCompatActivity {
 
         header = findViewById(R.id.header);
         viewPager = findViewById(R.id.forum_view_pager);
-        newMessages = findViewById(R.id.forum_new_messages_count);
         searchButton = findViewById(R.id._forum_search_image_view);
         tabLayout = findViewById(R.id.forum_tab_layout);
+        newMessage = findViewById(R.id.new_message_fab);
 
         setupUI();
 
+    }
+
+    @Override
+    public void onHeaderChanged(boolean selected) {
+        newMessage.setVisibility(selected ? View.GONE : View.VISIBLE);
     }
 
 
@@ -79,8 +89,9 @@ public class ForumActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
-                case 0: return getString(R.string.following);
-                case 1: return getString(R.string.all);
+                case 0: return getString(R.string.all);
+                case 1: return getString(R.string.following);
+
             }
             return super.getPageTitle(position);
         }

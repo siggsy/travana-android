@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,9 @@ public class SearchActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        ImageView searchClose = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        searchClose.setColorFilter(ViewGroupUtils.isDarkTheme(this)? Color.WHITE : Color.BLACK, android.graphics.PorterDuff.Mode.SRC_IN);
 
         back.setOnClickListener(view -> finish());
 
