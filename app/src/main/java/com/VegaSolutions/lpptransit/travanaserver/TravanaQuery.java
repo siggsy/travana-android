@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -26,7 +27,7 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     private static final String TAG = TravanaQuery.class.getSimpleName();
 
-    public static OkHttpClient client = new OkHttpClient();
+    public static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
 
     public static final String SERVER_URL = "http://193.77.85.172:8081/ljubljana_app_server/api";
 

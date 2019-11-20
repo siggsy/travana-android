@@ -153,8 +153,6 @@ public class PostListFragment extends Fragment {
 
             viewHolder.setLiked(message.isLiked(), message);
 
-
-
             viewHolder.likeContainer.setOnClickListener(v -> {
                 if (!message.isLiked()) {
                     viewHolder.setLiked(true, message);
@@ -175,12 +173,15 @@ public class PostListFragment extends Fragment {
                                     customToast.setText("Success!");
                                     customToast.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_check_black_24dp));
                                     customToast.show(Toast.LENGTH_SHORT);
+                                    message.setLikes(message.isLiked() ? (message.getLikes() + 1) : (message.getLikes() - 1));
+                                    viewHolder.postLikes.setText(message.getLikes() + "");
                                 });
                             } else {
                                 ((Activity) getContext()).runOnUiThread(() -> {
                                     CustomToast customToast = new CustomToast(getContext());
                                     customToast.showDefault(getContext(), statusCode);
-                                    message.setLiked(!message.isLiked());
+                                    viewHolder.setLiked(!message.isLiked(), message);
+                                    viewHolder.postLikes.setText(message.getLikes() + "");
                                 });
                             }
                         });
@@ -228,7 +229,6 @@ public class PostListFragment extends Fragment {
                     postLikes.setTextColor(Color.WHITE);
                     likeImage.setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
                     message.setLiked(true);
-                    postLikes.setText(String.valueOf(message.getLikes()));
 
                 } else {
                     int color = ViewGroupUtils.isDarkTheme(getContext()) ? Color.WHITE : Color.BLACK;
@@ -236,7 +236,6 @@ public class PostListFragment extends Fragment {
                     postLikes.setTextColor(color);
                     likeImage.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
                     message.setLiked(false);
-                    postLikes.setText(String.valueOf(message.getLikes()));
                 }
             }
 
