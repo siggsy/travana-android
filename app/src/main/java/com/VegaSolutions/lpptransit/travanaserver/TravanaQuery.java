@@ -148,7 +148,6 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
                     builder.addHeader(mentry.getKey().toString(), mentry.getValue().toString());
                 }
 
-                Log.e(TAG, SERVER_URL + URL + params);
 
                 builder.url(SERVER_URL + URL + params)
                         .addHeader("Content-Type", "application/json")  // add request headers

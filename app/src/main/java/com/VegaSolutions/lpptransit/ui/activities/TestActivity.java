@@ -59,9 +59,12 @@ public class TestActivity extends AppCompatActivity {
             ImageView i = (ImageView)findViewById(R.id.imageView5);
 
 
-        TravanaAPI.getImage("/home/domen/UploadFile/testuidTueNov19205223CET2019", new TravanaApiCallbackSpecial() {
+        TravanaAPI.getImage("image2CPPj3qcIsPOOyHueenh6WZsX922WedNov20175144CET2019", new TravanaApiCallbackSpecial() {
             @Override
             public void onComplete(@Nullable Bitmap bitmap, int statusCode, boolean success) {
+
+                Log.e(TAG, success + "");
+                Log.e(TAG, success + ""+ statusCode);
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -142,9 +145,33 @@ public class TestActivity extends AppCompatActivity {
 
                 if (resultCode == RESULT_OK) {
 
-                    /*
+
                     FirebaseManager.getFirebaseToken((token, statusCode1, success1) -> {
 
+                        if(success1){
+
+                            Uri selectedImageUri = data.getData();
+
+                            TravanaAPI.uploadImage(token, selectedImageUri,  getApplicationContext(), (data1, statusCode, success) -> {
+
+                                if(success){
+                                    Log.e(TAG, data1 + "");
+                                }else {
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+                            });
+
+
+                        }else{
+
+                        }
+
+                    });
+
+
+                }
+
+/*
                         if (success1) {
 
                             Uri selectedImageUri = data.getData();
@@ -164,12 +191,7 @@ public class TestActivity extends AppCompatActivity {
                         } else {
                             Log.e(TAG, "error" + statusCode1);
                         }
-                    });
 
-                     */
-                }
-
-/*
                 if (resultCode == RESULT_OK) {
                     Uri selectedImageUri = data.getData();
 

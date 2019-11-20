@@ -10,7 +10,7 @@ public class LiveUpdateMessage {
     private String _id;
     private String user_id;
     private UserData user;
-    private String[] photo_links;
+    private String[] photo_ids;
     private Date created_time;
     private Date expire_date;
     private String message_content;
@@ -22,14 +22,14 @@ public class LiveUpdateMessage {
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
 
     public LiveUpdateMessage(String user_id, Date expire_date,
-                             String message_content, MessageTag[] tags, String[] photo_links) {
+                             String message_content, MessageTag[] tags, String[] photo_ids) {
 
         this.user_id = user_id;
         this.created_time = new Date();
         this.expire_date = expire_date;
         this.message_content = message_content;
         this.tags = tags;
-        this.photo_links = photo_links;
+        this.photo_ids = photo_ids;
 
         String _id = "mess_gen" + user_id + created_time;
         _id = _id.replaceAll(" ", "");
@@ -127,12 +127,12 @@ public class LiveUpdateMessage {
         this.comments_int = comments_int;
     }
 
-    public String[] getPhoto_links() {
-        return photo_links;
+    public String[] getPhoto_ids() {
+        return photo_ids;
     }
 
-    public void setPhoto_links(String[] photo_links) {
-        this.photo_links = photo_links;
+    public void setPhoto_ids(String[] photo_ids) {
+        this.photo_ids = photo_ids;
     }
 
     public boolean isLiked() {
@@ -150,6 +150,7 @@ public class LiveUpdateMessage {
                 "_id='" + _id + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", user=" + user +
+                ", photo_ids=" + Arrays.toString(photo_ids) +
                 ", created_time=" + created_time +
                 ", expire_date=" + expire_date +
                 ", message_content='" + message_content + '\'' +
@@ -157,6 +158,7 @@ public class LiveUpdateMessage {
                 ", importance=" + importance +
                 ", likes=" + likes +
                 ", comments_int=" + comments_int +
+                ", liked=" + liked +
                 ", comments=" + comments +
                 '}';
     }
