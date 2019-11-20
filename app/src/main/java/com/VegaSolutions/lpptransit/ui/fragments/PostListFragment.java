@@ -165,7 +165,8 @@ public class PostListFragment extends Fragment {
                 FirebaseManager.getFirebaseToken((data, error, success) -> {
                     if (success) {
                         TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
-                            if (success1) {
+                            Log.i("Liked",  apiResponse.toString() + " " + statusCode);
+                            if (success1 && apiResponse.toString().equals("Successful")) {
                                 ((Activity) getContext()).runOnUiThread(() -> {
                                     CustomToast customToast = new CustomToast(getContext());
                                     customToast.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
@@ -221,7 +222,7 @@ public class PostListFragment extends Fragment {
 
 
             private void setLiked(boolean value, LiveUpdateMessage message) {
-                if (!message.isLiked()) {
+                if (value) {
                     likeContainer.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.stretched_circle));
                     likeContainer.getBackground().setTint(ContextCompat.getColor(getContext(), R.color.colorAccent));
                     postLikes.setTextColor(Color.WHITE);
