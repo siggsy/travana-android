@@ -495,7 +495,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void uploadFile(String token, byte[] bytes, TravanaApiCallback callback) {
+    public static void uploadImage(String token, byte[] bytes, TravanaApiCallback callback) {
 
         RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file", "image",
@@ -544,7 +544,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void getImage(String photo_link, TravanaApiCallbackSpecial callback) {
+    public static void getImage(String photo_id, TravanaApiCallbackSpecial callback) {
 
         new TravanaSpecialGetQuery(TravanaQuery.GET_IMAGE)
                 .setOnCompleteListener((inputStreamResponse, statusCode, success) -> {
@@ -558,7 +558,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .addHeaderValues("link", photo_link)
+                .addHeaderValues("file_id", photo_id)
                 .execute();
 
     }

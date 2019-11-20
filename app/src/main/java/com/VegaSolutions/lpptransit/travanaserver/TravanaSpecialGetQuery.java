@@ -115,8 +115,6 @@ public class TravanaSpecialGetQuery extends AsyncTask<String, Void, String> {
 
                 InputStream stream = r.body().byteStream();
 
-                Log.e(TAG, (stream == null) + "");
-
                 onCompleteListener.onComplete(stream, code, true);
             }
 

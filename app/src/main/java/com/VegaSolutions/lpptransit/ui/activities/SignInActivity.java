@@ -1,6 +1,7 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -21,6 +22,7 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -454,6 +456,7 @@ public class SignInActivity extends AppCompatActivity {
 
                              */
 
+                            /*
                             TravanaAPI.likeCommentComment(idToken, "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3MonNov1819:36:20GMT01:002019", true, (data, statusCode, success) -> {
 
                                 if(success){
@@ -462,6 +465,8 @@ public class SignInActivity extends AppCompatActivity {
                                     Log.e(TAG, "error" + statusCode);
                                 }
                             });
+
+                             */
 
                             /*
                             TravanaAPI.removeComment(idToken, "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1618:23:12GMT01:002019",(data, statusCode, success) -> {
