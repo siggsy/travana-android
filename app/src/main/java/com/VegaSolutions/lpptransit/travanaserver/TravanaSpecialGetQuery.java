@@ -18,7 +18,7 @@ import okhttp3.Credentials;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class TravanaSpecialGetQuery extends AsyncTask<String, Void, String> {
+public class TravanaSpecialGetQuery implements Runnable {
 
     private static final String TAG = TravanaSpecialGetQuery.class.getSimpleName();
 
@@ -80,6 +80,54 @@ public class TravanaSpecialGetQuery extends AsyncTask<String, Void, String> {
     }
 
     @Override
+    public void run() {
+        try {
+
+            Request.Builder builder = new Request.Builder();
+
+            Set set = header_hashmap.entrySet();
+            Iterator iterator = set.iterator();
+
+            while(iterator.hasNext()) {
+                Map.Entry mentry = (Map.Entry)iterator.next();
+                builder.addHeader(mentry.getKey().toString(), mentry.getValue().toString());
+            }
+
+            builder.url(TravanaQuery.SERVER_URL + URL + params)
+                    .addHeader("Content-Type", "application/json")  // add request headers
+                    .addHeader("User-Agent", "OkHttp Bot")
+                    .addHeader("Authorization", basic_token)
+                    .addHeader("Accept","")
+                    .addHeader("Cache-Control", "no-cache")
+                    .addHeader("Host", TravanaQuery.SERVER_IP_ADDRESS)
+                    .addHeader("Accept-Encoding", "gzip, deflate")
+                    .build();
+
+            Request request = builder.build();
+            Response r = TravanaQuery.client.newCall(request).execute();
+
+            int code = r.code();
+
+            if(code != 200){
+                onCompleteListener.onComplete(null, code, false);
+            }else{
+
+                InputStream stream = r.body().byteStream();
+
+                onCompleteListener.onComplete(stream, code, true);
+            }
+
+        } catch (HttpStatusException e) {
+            e.printStackTrace();
+            onCompleteListener.onComplete(null, e.getStatusCode(), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+            onCompleteListener.onComplete(null, -1, false);
+        }
+    }
+
+    /*
+    @Override
     protected String doInBackground(String... apis) {
         try {
 
@@ -127,6 +175,8 @@ public class TravanaSpecialGetQuery extends AsyncTask<String, Void, String> {
         }
         return null;
     }
+
+     */
 
     public interface OnCompleteListener {
 

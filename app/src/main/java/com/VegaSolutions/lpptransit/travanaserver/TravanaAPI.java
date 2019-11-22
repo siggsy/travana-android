@@ -445,6 +445,7 @@ public class TravanaAPI {
                 .execute();
     }
 
+    /*
     public static void followedMessages(String user_id, String[] tags_ids, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
@@ -462,21 +463,21 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void followedMessagesMeta(String user_id, String[] tags_ids, TravanaApiCallback callback) {
+     */
 
-        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
+    public static void followedMessagesMeta(String token, TravanaApiCallback callback) {
 
-        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_FOLLOWED_META, rbody)
+        new TravanaQuery(TravanaQuery.MESSAGES_FOLLOWED_META, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        //LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
                         callback.onComplete(response, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
                 .execute();
+
     }
 
     public static void tags(TravanaApiCallback<MessageTag[]> callback) {
@@ -559,8 +560,36 @@ public class TravanaAPI {
                     }
                 })
                 .addHeaderValues("file_id", photo_id)
-                .execute();
+                .run();
 
+    }
+
+    public static void followTag(String token, String tag_id, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+
+        new TravanaQuery(TravanaQuery.FOLLOW_TAG, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("tag_id", tag_id)
+                .execute();
+    }
+
+    public static void removeTag(String token, String tag_id, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+
+        new TravanaQuery(TravanaQuery.REMOVE_FOLLOW_TAG, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("tag_id", tag_id)
+                .execute();
     }
 
 }

@@ -11,8 +11,7 @@ public class LiveUpdateMessage {
     private String user_id;
     private UserData user;
     private String[] photo_ids;
-    private Date created_time;
-    private Date expire_date;
+    private String created_time;
     private String message_content;
     private MessageTag[] tags;
     private int importance;									// 10 - it is shown on the top of the list.
@@ -21,21 +20,14 @@ public class LiveUpdateMessage {
     private boolean liked;
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
 
-    public LiveUpdateMessage(String user_id, Date expire_date,
+    public LiveUpdateMessage(String user_id,
                              String message_content, MessageTag[] tags, String[] photo_ids) {
 
-        this.user_id = user_id;
-        this.created_time = new Date();
-        this.expire_date = expire_date;
+        this.user_id = user_id;;
         this.message_content = message_content;
         this.tags = tags;
         this.photo_ids = photo_ids;
 
-        String _id = "mess_gen" + user_id + created_time;
-        _id = _id.replaceAll(" ", "");
-        _id = _id.replace("+", "");
-
-        this._id = _id;
     }
 
     public String get_id() {
@@ -44,22 +36,6 @@ public class LiveUpdateMessage {
 
     public void set_id(String _id) {
         this._id = _id;
-    }
-
-    public Date getCreated_time() {
-        return created_time;
-    }
-
-    public void setCreated_time(Date created_time) {
-        this.created_time = created_time;
-    }
-
-    public Date getExpire_date() {
-        return expire_date;
-    }
-
-    public void setExpire_date(Date expire_date) {
-        this.expire_date = expire_date;
     }
 
     public String getMessage_content() {
@@ -143,6 +119,10 @@ public class LiveUpdateMessage {
         this.liked = liked;
     }
 
+    public String getCreated_time() {
+        return created_time;
+    }
+
     @Override
     public String toString() {
         return "LiveUpdateMessage{" +
@@ -151,7 +131,6 @@ public class LiveUpdateMessage {
                 ", user=" + user +
                 ", photo_ids=" + Arrays.toString(photo_ids) +
                 ", created_time=" + created_time +
-                ", expire_date=" + expire_date +
                 ", message_content='" + message_content + '\'' +
                 ", tags=" + Arrays.toString(tags) +
                 ", importance=" + importance +

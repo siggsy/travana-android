@@ -91,6 +91,7 @@ public class PostListFragment extends Fragment {
                 }
             });
         } else {
+            /*
             TravanaAPI.followedMessagesMeta(FirebaseManager.getSignedUser().getUid(), new String[0], (apiResponse, statusCode, success) -> {
                 if (success) {
                     LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
@@ -98,6 +99,8 @@ public class PostListFragment extends Fragment {
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                 }
             });
+
+             */
         }
 
         return root;

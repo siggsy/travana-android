@@ -29,13 +29,13 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
 
-    public static final String SERVER_URL = "http://193.77.85.172:8081/ljubljana_app_server/api";
+    public static final String SERVER_URL = "http://192.168.1.13:8081/ljubljana_app_server/api";
 
     //public static final String SERVER_URL = "http://10.0.1.23:8080/ljubljana_app_server/api";
 
-    public static final String SERVER_IP_ADDRESS = "193.77.85.172:8081";
+    //public static final String SERVER_IP_ADDRESS = "193.77.85.172:8081";
 
-    //public static final String SERVER_IP_ADDRESS = "10.0.1.23:8080";
+    public static final String SERVER_IP_ADDRESS = "192.168.1.13:8081";
 
     public static final String WARNINGS_URL = "/alerts/warnings";                                   //returns warnings alerts. ex. "{"content": "vsebina","created_date": "10.12.2001","expire_date": "1.1.2020",...
 
@@ -72,6 +72,14 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
     public static final String MESSAGES_ID = "/live_updates/messagesid";
 
     public static final String GET_IMAGE = "/file/get";
+
+    public static final String FOLLOW_TAG = "/live_updates/messages/add_followed_tag";
+
+    public static final String REMOVE_FOLLOW_TAG = "/live_updates/messages/remove_followed_tag";
+
+    public static final String MESSAGES_FOLLOWED = "/live_updates/followed_messages";
+
+    public static final String MESSAGES_FOLLOWED_META = "/live_updates/followed_messages_meta";
 
     // Url parameters
     private StringBuilder params = new StringBuilder();
