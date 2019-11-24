@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/stroke"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/station_circle_node"
+    android:orientation="vertical"
+    android:padding="3dp">
+
+    <ImageView
+        android:id="@+id/solid"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/stretched_circle" />
+</LinearLayout>

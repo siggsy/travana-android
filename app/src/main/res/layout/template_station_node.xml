@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/station_node_background"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?selectableItemBackground">
+
+    <View
+        android:id="@+id/top_node_connection"
+        android:layout_width="4dp"
+        android:layout_height="16dp"
+        android:background="?android:textColor"
+        app:layout_constraintEnd_toEndOf="@+id/node_icon"
+        app:layout_constraintStart_toStartOf="@+id/node_icon"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="24dp"
-        app:srcCompat="@drawable/ring" />
+        android:id="@+id/node_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/station_circle_node"
+        app:layout_constraintEnd_toStartOf="@+id/station_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_node_connection" />
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
+        android:id="@+id/station_name"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="64dp"
         android:text="Barje"
-        android:textColor="@android:color/black"
         android:textSize="18sp"
-        android:textStyle="bold" />
-</LinearLayout>
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/node_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_node_connection" />
+
+    <View
+        android:id="@+id/bottom_node_connection"
+        android:layout_width="4dp"
+        android:layout_height="16dp"
+        android:background="?android:textColor"
+        app:layout_constraintEnd_toEndOf="@+id/node_icon"
+        app:layout_constraintStart_toStartOf="@+id/node_icon"
+        app:layout_constraintTop_toBottomOf="@+id/node_icon" />
+</androidx.constraintlayout.widget.ConstraintLayout>

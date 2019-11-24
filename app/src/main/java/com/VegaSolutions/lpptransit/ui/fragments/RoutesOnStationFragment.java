@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -27,7 +26,7 @@ import android.widget.Toast;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
-import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.DepartureActivity;
 import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
@@ -198,6 +197,7 @@ public class RoutesOnStationFragment extends Fragment {
                 intent.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
                 intent.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
                 intent.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
+                intent.putExtra(RouteActivity.STATION_ID, stationId);
                 startActivity(intent);
             });
 

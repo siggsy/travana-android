@@ -207,7 +207,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if (ViewGroupUtils.isDarkTheme(this))
-            mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
+            mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark_2)));
+        else
+            mMap.setMapStyle(new MapStyleOptions(getString(R.string.white)));
 
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);

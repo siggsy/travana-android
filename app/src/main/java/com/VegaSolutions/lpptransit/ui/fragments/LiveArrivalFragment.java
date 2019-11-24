@@ -1,12 +1,10 @@
 package com.VegaSolutions.lpptransit.ui.fragments;
 
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,10 +20,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,9 +29,8 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
-import com.VegaSolutions.lpptransit.ui.Colors;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
-import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
@@ -43,7 +38,6 @@ import com.google.android.flexbox.FlexboxLayout;
 import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -235,6 +229,7 @@ public class LiveArrivalFragment extends Fragment {
                 i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRoute_name());
                 i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRoute_id());
                 i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTrip_id());
+                i.putExtra(RouteActivity.STATION_ID, stationId);
                 startActivity(i);
             });
 

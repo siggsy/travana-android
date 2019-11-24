@@ -102,6 +102,7 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setInfoWindowAdapter(new StationInfoWindow(this));
         Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
         m.setTag(station);
@@ -113,7 +114,9 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
         mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
         mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
         if (ViewGroupUtils.isDarkTheme(this))
-            mMap.setMapStyle(new MapStyleOptions(getResources().getString(R.string.dark)));
+            mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark_2)));
+        else
+            mMap.setMapStyle(new MapStyleOptions(getString(R.string.white)));
 
     }
 
@@ -177,13 +180,20 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        back.setOnClickListener(v -> onBackPressed());
+        back.setOnClickListener(v -> super.onBackPressed());
 
     }
 
     @Override
     public void onHeaderChanged(boolean selected) {
         animation.elevate(selected);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED)
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        else super.onBackPressed();
     }
 
     class Adapter extends FragmentPagerAdapter {

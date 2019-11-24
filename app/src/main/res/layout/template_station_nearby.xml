@@ -87,5 +87,7 @@
         android:id="@+id/station_nearby_devider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_gray" />
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?dividerColor" />
 </LinearLayout>

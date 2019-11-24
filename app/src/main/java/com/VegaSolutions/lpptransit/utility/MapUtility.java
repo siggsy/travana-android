@@ -17,6 +17,11 @@ import java.text.DecimalFormat;
 
 public class MapUtility {
 
+    /**
+     * Convert android drawable to bitmap suitable for google maps
+     * @param drawable drawable to be converted
+     * @return bitmap created from drawable
+     */
     public static BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
         Canvas canvas = new Canvas();
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
@@ -26,6 +31,12 @@ public class MapUtility {
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+    /**
+     * Calculate distance between two LatLng objects
+     * @param StartP start point
+     * @param EndP end point
+     * @return distance in KM.
+     */
     public static double calculationByDistance(LatLng StartP, LatLng EndP) {
         int Radius = 6371;
         double lat1 = StartP.latitude;
@@ -49,6 +60,11 @@ public class MapUtility {
         return Radius * c;
     }
 
+    /**
+     * Checks if location is permitted
+     * @param context application context to be checked
+     * @return boolean if location is permitted.
+     */
     public static boolean checkLocationPermission(Context context) {
         return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;

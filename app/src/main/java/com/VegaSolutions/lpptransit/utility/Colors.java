@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui;
+package com.VegaSolutions.lpptransit.utility;
 
 import android.graphics.Color;
 
@@ -114,6 +114,11 @@ public class Colors {
         colors.add(Color.HSVToColor(new float[] {111.634f , 0.7f, 0.9f}));
     }
 
+    /**
+     * Returns a color corresponding to the number in the string
+     * @param s string containing a number between 0 and 100.
+     * @return int representing the color.
+     */
     public static int getColorFromString(String s) {
         String color = s.replaceAll("[^0-9]", "");
         return colors.get(Integer.valueOf(color));

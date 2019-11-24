@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,13 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.firebase.FirebaseCallback;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
-import com.VegaSolutions.lpptransit.ui.Colors;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
