@@ -19,6 +19,8 @@ import java.util.Map;
 
 public class LppQuery extends AsyncTask<String, Void, String> {
 
+    //http://194.33.12.32/doc/                                                      //documentation
+
     private static final String TAG = LppQuery.class.getSimpleName();
     public static final String SERVER_URL = "http://194.33.12.32/api";
 

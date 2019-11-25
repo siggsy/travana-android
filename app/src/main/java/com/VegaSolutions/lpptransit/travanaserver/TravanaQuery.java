@@ -39,9 +39,7 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String WARNINGS_URL = "/alerts/warnings";                                   //returns warnings alerts. ex. "{"content": "vsebina","created_date": "10.12.2001","expire_date": "1.1.2020",...
 
-
     public static final String UPDATES_URL = "/alerts/updates";                                     //returns needed upates and still supported verisons ex "{"lastVerison": 110,"stillSupportedVersions": 101,102,...
-
 
     public static final String PLAY_STORE_LINK = "/alerts/play_store_link";                         //returns playstore update/download link ex "https://play.google.com/store/apps/details?id=com.easistent.family"
 
@@ -157,6 +155,7 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
                     builder.addHeader(mentry.getKey().toString(), mentry.getValue().toString());
                 }
 
+                Log.d(TAG, SERVER_URL + URL + params);
 
                 builder.url(SERVER_URL + URL + params)
                         .addHeader("Content-Type", "application/json")  // add request headers

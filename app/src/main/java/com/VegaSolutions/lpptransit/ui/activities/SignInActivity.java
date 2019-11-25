@@ -348,6 +348,8 @@ public class SignInActivity extends AppCompatActivity {
 
 
 
+
+
                         /*
                         TravanaAPI.followTag(token, "zivjo#115678", (data, statusCode1, success1) -> {
 
@@ -365,7 +367,7 @@ public class SignInActivity extends AppCompatActivity {
 
 
 
-
+                        /*
 
                         TravanaAPI.followedMessagesMeta(token, (data, statusCode1, success1) -> {
 
@@ -377,7 +379,20 @@ public class SignInActivity extends AppCompatActivity {
 
                         });
 
+                         */
 
+                        TravanaAPI.messages(new TravanaApiCallback() {
+                            @Override
+                            public void onComplete(@Nullable Object apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, apiResponse.toString());
+                                }else {
+                                    Log.e(TAG, statusCode + "");
+                                }
+
+                            }
+                        });
 
 
 
