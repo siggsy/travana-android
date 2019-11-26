@@ -284,11 +284,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
     public void onTabClicked() {
         behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
     }
@@ -340,9 +335,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.forum:
-                startActivity(new Intent(this, ForumActivity.class));
-                break;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 break;

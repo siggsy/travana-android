@@ -40,10 +40,17 @@ public class RoutesOnStationFragment extends Fragment {
     private static final String STATION_ID = "station_id";
     private static final String STATION_NAME = "station_name";
 
+    // Activity parameters
     private String stationId;
     private String stationName;
+
     private Context context;
     private FragmentHeaderCallback headerCallback;
+
+    // Activity UI elements
+    private RecyclerView rv;
+    private ProgressBar progressBar;
+    private Adapter adapter;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -60,13 +67,7 @@ public class RoutesOnStationFragment extends Fragment {
         context = null;
     }
 
-
-    public RoutesOnStationFragment() {
-
-    }
-
     public static RoutesOnStationFragment newInstance(String stationId, String stationName) {
-
         Bundle args = new Bundle();
         args.putString(STATION_ID, stationId);
         args.putString(STATION_NAME, stationName);
@@ -84,13 +85,10 @@ public class RoutesOnStationFragment extends Fragment {
         }
     }
 
-    private RecyclerView rv;
-    private ProgressBar progressBar;
-    private Adapter adapter;
-
     @Override
     public void onResume() {
         super.onResume();
+        // Update header
         onHeaderChanged(rv.canScrollVertically(-1));
     }
 
@@ -101,8 +99,12 @@ public class RoutesOnStationFragment extends Fragment {
 
         adapter = new Adapter();
 
+        // Find UI elements by id
         rv = root.findViewById(R.id.routes_on_station_rv);
         progressBar = root.findViewById(R.id.progressBar);
+
+
+        // Setup UI
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(context));
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -113,35 +115,22 @@ public class RoutesOnStationFragment extends Fragment {
             }
         });
 
+        // Query all routes on station
         Api.routesOnStation(Integer.valueOf(stationId), (apiResponse, statusCode, success) -> {
+
+            // Cancel UI update if fragment not attached
             if (context == null)
                 return;
-            ((Activity)context).runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-            if (success)
-                ((Activity)context).runOnUiThread(() -> adapter.setRoutes(apiResponse.getData()));
-            else
-                ((Activity)context).runOnUiThread(() -> {
-                    CustomToast toast = new CustomToast(context);
-                    toast
-                        .setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent))
-                        .setIconColor(Color.WHITE)
-                        .setTextColor(Color.WHITE);
 
-                    switch (statusCode) {
-                        case -2:
-                            toast.setText(getString(R.string.timed_out_error));
-                            toast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
-                            break;
-                        case -1:
-                            toast.setText(getString(R.string.network_error));
-                            toast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px));
-                            break;
-                        default:
-                            toast.setText(getString(R.string.unknown_error));
-                            toast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
-                    }
-                    toast.show(Toast.LENGTH_SHORT);
-                });
+            // Update UI
+            ((Activity)context).runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+
+                if (success) adapter.setRoutes(apiResponse.getData());
+                else new CustomToast(context).showDefault(context, Toast.LENGTH_SHORT);
+
+            });
+
         });
 
         return root;
@@ -177,12 +166,14 @@ public class RoutesOnStationFragment extends Fragment {
 
             RouteOnStation route = routes.get(position);
 
+            // Set route name and number
             holder.name.setText(route.getRoute_group_name());
             holder.number.setText(route.getRoute_number());
-            String group = route.getRoute_number().replaceAll("[^0-9]", "");
-            int color = Integer.valueOf(group);
-            holder.circle.getBackground().setTint(Colors.colors.get(color));
 
+            // Set route color
+            holder.circle.getBackground().setTint(Colors.getColorFromString(route.getRoute_number()));
+
+            // Start DepartureActivity on click
             holder.departure.setOnClickListener(v -> {
                 Intent intent = new Intent(context, DepartureActivity.class);
                 intent.putExtra(DepartureActivity.ROUTE_NAME, route.getRoute_group_name());
@@ -191,6 +182,8 @@ public class RoutesOnStationFragment extends Fragment {
                 intent.putExtra(DepartureActivity.STATION_CODE, stationId);
                 startActivity(intent);
             });
+
+            // Start RouteActivity on click
             holder.map.setOnClickListener(v -> {
                 Intent intent = new Intent(context, RouteActivity.class);
                 intent.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_group_name());
@@ -208,13 +201,12 @@ public class RoutesOnStationFragment extends Fragment {
             TextView name, number;
             View circle;
 
-            LinearLayout container;
-
             ImageView departure;
             ImageView map;
 
+            LinearLayout container;
 
-            public ViewHolder(@NonNull View itemView) {
+            private ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 name = itemView.findViewById(R.id.route_name);

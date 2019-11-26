@@ -36,26 +36,19 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
 
-
-// TODO: Clean code.
-
 public class StationsFragment extends Fragment implements FragmentHeaderCallback {
 
 
     private Context context;
 
+    // Activity UI elements
     private FrameLayout header;
     private ViewPager viewPager;
     private TabLayout tabLayout;
-
     private Adapter adapter;
     private ElevationAnimation animation;
 
     private StationsFragmentListener mListener;
-
-
-    public StationsFragment() {
-    }
 
 
     public static StationsFragment newInstance() {
@@ -66,6 +59,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     }
 
     private void setupUI() {
+
         animation = new ElevationAnimation(header, 16);
 
         adapter = new Adapter(getFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
@@ -73,6 +67,8 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         // ViewPager with TabLayout
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        // Set tab layout icons
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             switch (i) {
                 case 0:
@@ -88,6 +84,8 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
                     break;
             }
         }
+
+        // Set tab layout icon color switcher
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -118,6 +116,9 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
     }
 
+    /**
+     * Remove previous or cached fragments to avoid any unwanted results
+     */
     private void removeFragments() {
 
         FragmentManager fm = getFragmentManager();
@@ -148,6 +149,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_stations, container, false);
 
+        // Find all UI elements
         viewPager = root.findViewById(R.id.station_view_pager);
         header = root.findViewById(R.id.header);
         tabLayout = root.findViewById(R.id.tab_layout);
@@ -155,11 +157,6 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         setupUI();
 
         return root;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
 
@@ -193,22 +190,16 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
         SparseArray<Fragment> registeredFragments = new SparseArray<>();
 
-        public Adapter(@NonNull FragmentManager fm, int behavior) {
+        private Adapter(@NonNull FragmentManager fm, int behavior) {
             super(fm, behavior);
         }
 
         @NonNull
         @Override
         public Fragment getItem(int position) {
-
-            switch (position) {
-                case 0:
-                    return StationsSubFragment.newInstance(StationsSubFragment.TYPE_FAVOURITE, StationsFragment.this);
-                case 1:
-                    return StationsSubFragment.newInstance(StationsSubFragment.TYPE_NEARBY, StationsFragment.this);
-                default:
-                    return null;
-            }
+            if (position == 0)
+                return StationsSubFragment.newInstance(StationsSubFragment.TYPE_FAVOURITE, StationsFragment.this);
+            return StationsSubFragment.newInstance(StationsSubFragment.TYPE_NEARBY, StationsFragment.this);
         }
 
         @Override
@@ -247,7 +238,6 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     }
 
     public interface StationsFragmentListener {
-        void onFragmentInteraction(Uri uri);
         void onStationsUpdated(List<Station> stations, boolean success, int responseCode);
         void onTabClicked();
     }

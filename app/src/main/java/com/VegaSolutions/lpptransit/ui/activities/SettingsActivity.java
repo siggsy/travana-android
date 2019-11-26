@@ -37,15 +37,11 @@ public class SettingsActivity extends AppCompatActivity {
         buttonMin = findViewById(R.id.radio_minute);
         buttonHour = findViewById(R.id.radio_hour);
 
-        if (dark_theme)
-            buttonDark.setChecked(true);
-        else
-            buttonWhite.setChecked(true);
+        if (dark_theme) buttonDark.setChecked(true);
+        else buttonWhite.setChecked(true);
 
-        if (hour)
-            buttonHour.setChecked(true);
-        else
-            buttonMin.setChecked(true);
+        if (hour) buttonHour.setChecked(true);
+        else buttonMin.setChecked(true);
 
         setResult(1);
 
@@ -53,6 +49,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (isChecked) {
 
+                // Set dark theme
                 setResult(SETTINGS_UPDATE);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -67,10 +64,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
         });
+
         buttonWhite.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
             if (isChecked) {
 
+                // Set white theme
                 setResult(SETTINGS_UPDATE);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -91,6 +90,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (isChecked) {
 
+                // Set arrival to min to
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("hour", false);
                 editor.apply();
@@ -103,6 +103,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (isChecked) {
 
+                // Set arrival to time when
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("hour", true);
                 editor.apply();

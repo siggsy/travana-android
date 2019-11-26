@@ -179,7 +179,7 @@ public class DepartureActivity extends AppCompatActivity {
             }
 
             if (timetable.isCurrent()) {
-                holder.hour.setTextColor(textColor);
+                holder.hour.setTextColor(Color.WHITE);
                 holder.container.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.colorAccent, null));
             } else {
                 holder.hour.setTextColor(textColor);

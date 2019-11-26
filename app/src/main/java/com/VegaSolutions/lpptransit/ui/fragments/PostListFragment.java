@@ -38,13 +38,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class PostListFragment extends Fragment {
 
 
+    // Available parameters
     public static final int TYPE_FOLLOWING = 1;
     public static final int TYPE_ALL = 0;
 
     private static final String TYPE = "type";
 
+    // Parameter
     private int type;
-
 
     public static PostListFragment newInstance(int type) {
         PostListFragment fragment = new PostListFragment();
@@ -62,19 +63,16 @@ public class PostListFragment extends Fragment {
         }
     }
 
-    private RecyclerView rv;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_post_list, container, false);
 
+        RecyclerView rv = root.findViewById(R.id.post_list_rv);
+
         Adapter adapter = new Adapter();
-        rv = root.findViewById(R.id.post_list_rv);
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
-
-
 
         if (type == TYPE_ALL) {
             TravanaAPI.messagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {

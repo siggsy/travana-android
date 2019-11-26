@@ -77,6 +77,7 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
 
         View root = findViewById(R.id.rootConstraint);
 
+        // Get bottom sheet behaviour for controlling expanding and collapsing
         bottomSheetBehavior = BottomSheetBehavior.from(root);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
@@ -102,21 +103,21 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Setup Google maps UI
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
+        mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
+        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
+
         mMap.setInfoWindowAdapter(new StationInfoWindow(this));
         Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
         m.setTag(station);
         m.showInfoWindow();
-        mMap.setOnInfoWindowClickListener(marker -> {
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        });
+        mMap.setOnInfoWindowClickListener(marker -> bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED));
+
+        // Focus on station
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(station.getLatLng(), 12.5f));
-        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
-        mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
-        if (ViewGroupUtils.isDarkTheme(this))
-            mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark_2)));
-        else
-            mMap.setMapStyle(new MapStyleOptions(getString(R.string.white)));
 
     }
 
@@ -148,34 +149,34 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
                 code = Integer.valueOf(station.getRef_id()) - 1 ;
             else code = Integer.valueOf(station.getRef_id()) + 1;
 
-            Api.stationDetails(code, true, (apiResponse, statusCode, success) -> {
+            // Query opposite station details
+            Api.stationDetails(code, true, (apiResponse, statusCode, success) -> runOnUiThread(() -> {
                 if (success) {
+                    // Start opposite route StationActivity and finish current
                     Intent intent = getIntent();
                     Station station = apiResponse.getData();
                     intent.putExtra("station", station);
                     finish();
                     startActivity(intent);
                 } else {
-                    runOnUiThread(() -> {
-                        CustomToast toast = new CustomToast(StationActivity.this);
-                        if (statusCode == 500) {
-                            toast
-                                .setBackgroundColor(ContextCompat.getColor(StationActivity.this, R.color.colorAccent))
-                                .setTextColor(Color.WHITE)
-                                .setIconColor(Color.WHITE)
-                                .setText(getString(R.string.opposite_error))
-                                .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap_vert_black_24dp))
-                                .show(Toast.LENGTH_SHORT);
-                        }
-                        else toast.showDefault(this, statusCode);
-                    });
+                    // On error
+                    CustomToast toast = new CustomToast(StationActivity.this);
+                    if (statusCode == 500) {
+                        toast
+                            .setBackgroundColor(ContextCompat.getColor(StationActivity.this, R.color.colorAccent))
+                            .setTextColor(Color.WHITE)
+                            .setIconColor(Color.WHITE)
+                            .setText(getString(R.string.opposite_error))
+                            .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap_vert_black_24dp))
+                            .show(Toast.LENGTH_SHORT);
+                    }
+                    else toast.showDefault(this, statusCode);
                 }
-                runOnUiThread(() -> oppositeBtn.setEnabled(true));
-            });
-
-
+                oppositeBtn.setEnabled(true);
+            }));
         });
 
+        // Setup viewpager
         adapter = new Adapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);

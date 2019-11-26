@@ -30,25 +30,31 @@ import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
 
+    // Activity UI elements
     RecyclerView searchList;
     ImageView back;
     SearchView searchView;
     FrameLayout header;
     ProgressBar progressBar;
 
+    // Search objects
     SearchAdapter adapter;
     String filter = "";
     List<SearchItem> items = new ArrayList<>();
 
     void setupUI() {
 
+        // Find all UI elements
         searchList = findViewById(R.id.search_activity_rv);
         searchView = findViewById(R.id.search_activity_search);
         back = findViewById(R.id.search_activity_back);
         header = findViewById(R.id.search_activity_header);
         progressBar = findViewById(R.id.progressBar);
 
+        // Setup UI
         adapter = new SearchAdapter();
+
+        // RV
         searchList.setAdapter(adapter);
         searchList.setLayoutManager(new LinearLayoutManager(this));
         searchList.setHasFixedSize(false);
@@ -60,6 +66,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        // Search interface
         searchView.requestFocusFromTouch();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -114,27 +121,27 @@ public class SearchActivity extends AppCompatActivity {
         setupUI();
 
         // Query stations and then routes.
-        // TODO: add progress indicator
         Api.stationDetails(true, (apiResponse, statusCode, success) -> {
             if (success) {
+
+                // Add stations
                 for (Station station : apiResponse.getData())
                     items.add(new StationItem(station));
-            }
-            else {
-                runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
-            }
-            Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
-                if (success1) {
-                    for (Route route : apiResponse1.getData())
-                        items.add(new RouteItem(route));
-                    runOnUiThread(() -> applyFilter(filter));
-                }
-                else {
-                    runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
-                }
-                runOnUiThread(() -> progressBar.setVisibility(View.GONE));
 
-            });
+                // Query active routes
+                Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
+                    if (success1) {
+                        for (Route route : apiResponse1.getData())
+                            items.add(new RouteItem(route));
+                        runOnUiThread(() -> applyFilter(filter));
+                    }
+                    else runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
+                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+
+                });
+            }
+            else runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
+
         });
 
     }
@@ -226,6 +233,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
 
+    // Wrapper classes for RV adapter //
     abstract class SearchItem {
 
         static final int ROUTE = 0;

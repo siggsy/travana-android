@@ -57,51 +57,29 @@ public class LiveArrivalFragment extends Fragment {
     private Adapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private RecyclerView rv;
-    private View no_arr_err;
+    private View noArrErr;
 
     private boolean hour;
     private int color, backColor;
 
     private ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
+
+        // Cancel UI update if fragment is not attached to activity
         if (context == null)
             return;
-        ((Activity)context).runOnUiThread(() -> refreshLayout.setRefreshing(false));
-        if (success) {
-            ArrivalWrapper arrivalWrapper = apiResponse.getData();
-            ((Activity)context).runOnUiThread(() -> {
-                if (apiResponse.getData().getArrivals().isEmpty())
-                    no_arr_err.setVisibility(View.VISIBLE);
-                else
-                    no_arr_err.setVisibility(View.GONE);
+
+        // Set UI
+        ((Activity)context).runOnUiThread(() -> {
+            refreshLayout.setRefreshing(false);
+            if (success) {
+                ArrivalWrapper arrivalWrapper = apiResponse.getData();
+
+                // Check if arrival list is not empty and refresh rv adapter
+                noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
                 adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
-            });
-        } else {
-            ((Activity)context).runOnUiThread(() -> {
-                CustomToast toast = new CustomToast(context);
-                toast
-                    .setTextColor(Color.WHITE)
-                    .setIconColor(Color.WHITE)
-                    .setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
-                switch (statusCode) {
-                    case -2:
-                        toast
-                            .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp))
-                            .setText(getString(R.string.timed_out_error));
-                        break;
-                    case -1:
-                        toast
-                            .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px))
-                            .setText(getString(R.string.network_error));
-                        break;
-                    default:
-                        toast
-                            .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp))
-                            .setText(getString(R.string.unknown_error));
-                        break;
-                }
-                toast.show(Toast.LENGTH_SHORT);
-            });
-        }
+
+            } else new CustomToast(context).showDefault(context, Toast.LENGTH_SHORT);
+        });
 
     };
 
@@ -123,11 +101,41 @@ public class LiveArrivalFragment extends Fragment {
         refreshLayout.setOnRefreshListener(() -> Api.arrival(stationId, callback));
         refreshLayout.setColorSchemeColors(ContextCompat.getColor(context, R.color.colorAccent));
 
+        // Save default theme colors
         int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
         TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
         backColor = array.getColor(1, Color.WHITE);
         color = array.getColor(0, Color.BLACK);
         array.recycle();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
+        hour = sharedPreferences.getBoolean("hour", false);
+
+        if (getArguments() != null) {
+            stationId = getArguments().getString(STATION_ID);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
+
+        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
+        rv = root.findViewById(R.id.live_arrival_rv);
+        noArrErr = root.findViewById(R.id.live_arrival_no_arrivals_error);
+        setupUI();
+
+        // Query arrivals.
+        Api.arrival(stationId, callback);
+
+        return root;
+
     }
 
     public static LiveArrivalFragment newInstance(String stationId) {
@@ -136,9 +144,6 @@ public class LiveArrivalFragment extends Fragment {
         args.putString(STATION_ID, stationId);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public LiveArrivalFragment() {
     }
 
     @Override
@@ -162,36 +167,6 @@ public class LiveArrivalFragment extends Fragment {
         onHeaderChanged(rv.canScrollVertically(-1));
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
-        hour = sharedPreferences.getBoolean("hour", false);
-
-        if (getArguments() != null) {
-            stationId = getArguments().getString(STATION_ID);
-        }
-    }
-
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
-
-        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
-        rv = root.findViewById(R.id.live_arrival_rv);
-        no_arr_err = root.findViewById(R.id.live_arrival_no_arrivals_error);
-        setupUI();
-
-        // Query arrivals.
-        Api.arrival(stationId, callback);
-
-        return root;
-
-    }
 
     private void onHeaderChanged(boolean value) {
         if (headerCallback != null)
@@ -237,6 +212,7 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.arrivals.removeAllViews();
             for (ArrivalWrapper.Arrival arrival : route.arrivals) {
 
+                // Inflate view
                 View v = getLayoutInflater().inflate(R.layout.template_arrival_time, viewHolder.arrivals, false);
                 TextView arrival_time = v.findViewById(R.id.arrival_time_time);
                 TextView arrival_event = v.findViewById(R.id.arrival_time_event);
@@ -244,11 +220,13 @@ public class LiveArrivalFragment extends Fragment {
                 View back = v.findViewById(R.id.arrival_time_back);
 
                 SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+
+                // Set preferred time format
                 arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
                 arrival_time.setTextColor(color);
                 back.getBackground().setTint(backColor);
 
-                //(0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
+                // (0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
 
                 switch (arrival.getType()) {
                     case 0:
@@ -272,8 +250,12 @@ public class LiveArrivalFragment extends Fragment {
                         arrival_event.setVisibility(View.GONE);
                         arrival_event_icon.setVisibility(View.GONE);
                 }
+
+                // Ignore "ghost" arrivals
                 if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
                     viewHolder.arrivals.addView(v);
+
+                // Add "garage" flag
                 if (arrival.getDepot() == 1) {
                     arrival_event.setText(getString(R.string.garage));
                     arrival_event.setTextColor(color);
@@ -284,6 +266,8 @@ public class LiveArrivalFragment extends Fragment {
                     arrival_event.getBackground().setTint(backColor);
                     arrival_event.setVisibility(View.GONE);
                 }
+
+                // Show only one if type is "detour"
                 if (arrival.getType() == 3) break;
 
             }
