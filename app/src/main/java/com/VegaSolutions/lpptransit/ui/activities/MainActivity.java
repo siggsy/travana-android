@@ -106,15 +106,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Check for permission
+        if (!MapUtility.checkLocationPermission(this))
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
 
         // TODO: Change to non Google Services dependent location service
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-
-        // Check for permission
-        if (MapUtility.checkLocationPermission(this))
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
-
 
         // Find all UI elements
         dl = findViewById(R.id.nav_layout);
