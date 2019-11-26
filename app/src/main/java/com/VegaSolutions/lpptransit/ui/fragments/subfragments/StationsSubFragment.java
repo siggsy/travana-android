@@ -193,7 +193,7 @@ public class StationsSubFragment extends Fragment {
 
                         // Check permissions
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (MapUtility.checkLocationPermission(context)) {
+                            if (!MapUtility.checkLocationPermission(context)) {
                                 locErr.setVisibility(View.VISIBLE);
                                 progressBar.setVisibility(View.GONE);
                                 return;
