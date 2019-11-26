@@ -9,10 +9,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
@@ -67,28 +65,32 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     public static final String TRIP_ID = "trip_id";
     public static final String STATION_ID = "station_id";
 
+    // Activity parameters
     private String routeName;
     private String routeNumber;
     private String routeId;
     private String tripId;
     private String stationId;
 
+    // Activity UI elements
     private ImageView backBtn, locBtn;
     private TextView number;
     private TextView name;
     private View circle;
-    private TopMessage route_loading;
+    private TopMessage routeLoading;
     private RecyclerView recyclerView;
     private Adapter adapter;
     private View header;
-    private View bottom_sheet;
+    private View bottomSheet;
     private BottomSheetBehavior behavior;
     private ImageButton opposite;
-
     private ElevationAnimation elevationAnimation;
 
+
+    // TODO: change to non Google Services dependent location service
     private FusedLocationProviderClient fusedLocationProviderClient;
 
+    // Google maps parameters
     private final int UPDATE_TIME = 2000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
     private GoogleMap mMap;
@@ -97,46 +99,49 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private MarkerOptions busOptions;
     private MarkerOptions stationOptions;
 
-
+    // Bus updater query
     private ApiCallback<List<BusOnRoute>> busQuery = new ApiCallback<List<BusOnRoute>>() {
         @Override
         public void onComplete(@Nullable ApiResponse<List<BusOnRoute>> apiResponse, int statusCode, boolean success) {
-            if (success) {
-                List<BusOnRoute> buses = new ArrayList<>();
+            runOnUiThread(() -> {
+                if (success) {
+                    List<BusOnRoute> buses = new ArrayList<>();
+                    routeLoading.showLoading(false);
 
-                runOnUiThread(() -> route_loading.showLoading(false));
+                    // Filter by trip ID.
+                    for (BusOnRoute busOnRoute : apiResponse.getData())
+                        if (busOnRoute.getTrip_id().equals(tripId))
+                            buses.add(busOnRoute);
 
-                // Filter by trip ID.
-                for (BusOnRoute busOnRoute : apiResponse.getData())
-                    if (busOnRoute.getTrip_id().equals(tripId))
-                        runOnUiThread(() -> buses.add(busOnRoute));
+                    // Update markers and queue another update.
+                    busManager.update(buses);
+                    handler.postDelayed(runnable, UPDATE_TIME);
 
-                // Update markers.
-                runOnUiThread(() -> busManager.update(buses));
-                handler.postDelayed(runnable, UPDATE_TIME);
-            }
-            else {
-                handler.removeCallbacks(runnable);
-                runOnUiThread(() -> route_loading.showMsgDefault(RouteActivity.this, statusCode));
-            }
+                } else {
+                    // Remove update queue and show error message
+                    handler.removeCallbacks(runnable);
+                    routeLoading.showMsgDefault(RouteActivity.this, statusCode);
+                }
+            });
         }
     };
 
     private Runnable runnable = () -> Api.busesOnRoute(routeNumber, busQuery);
 
+    // Stations on route query
     private ApiCallback<List<StationOnRoute>> callback = (apiResponse, statusCode, success) -> {
 
-
         if (success) {
+            List<StationOnRoute> stationsOnRoute = apiResponse.getData();
+
             // Sort stations.
-            Collections.sort(apiResponse.getData(), (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
-            adapter.stationsOnRoute = apiResponse.getData();
+            Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
+            adapter.stationsOnRoute = stationsOnRoute;
             runOnUiThread(() -> adapter.notifyDataSetChanged());
             List<LatLng> latLngs = new ArrayList<>();
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
             // Add station markers.
-            for (StationOnRoute stationOnRoute : apiResponse.getData()) {
+            for (StationOnRoute stationOnRoute : stationsOnRoute) {
                 LatLng latLng = stationOnRoute.getLatLng();
                 latLngs.add(latLng);
                 builder.include(latLng);
@@ -150,60 +155,53 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             }
 
             // Connect stations with polyline and move the camera.
-            if (!apiResponse.getData().isEmpty()) {
+            if (!stationsOnRoute.isEmpty()) {
                 LatLngBounds bounds = builder.build();
                 runOnUiThread(() -> {
                     mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(Colors.getColorFromString(routeNumber))); // ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK
                     mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
                 });
             } else {
-                runOnUiThread(() -> {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
-                });
+                runOnUiThread(() -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f)));
             }
 
             // Start bus updater.
             handler.post(runnable);
 
-        } else {
-            runOnUiThread(() -> {
-                route_loading.showMsgDefault(RouteActivity.this, statusCode);
-            });
-        }
+        } else runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
     };
 
 
 
     private void setupUI() {
 
+        // Header elevation animation
         elevationAnimation = new ElevationAnimation(header, 16);
 
         // Get drawable resource for markers.
         int color = Colors.getColorFromString(routeNumber);
 
+        // Set bus and station marker style
         View v = getLayoutInflater().inflate(R.layout.station_node_maps, null);
         v.findViewById(R.id.stroke).getBackground().setTint(color);
         v.findViewById(R.id.solid).getBackground().setTint(ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background));
-
         IconGenerator generator = new IconGenerator(this);
         generator.setBackground(null);
         generator.setContentView(v);
-
         busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.ic_bus_24dp))).flat(true);
         stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true); // MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this,R.drawable.station_circle))
 
         // Setup views.
         backBtn.setOnClickListener(vi -> super.onBackPressed());
-        //names.setText(routeName);
         number.setText(routeNumber);
         number.setTextSize(14f);
         circle.getBackground().setTint(Colors.getColorFromString(routeNumber));
-        route_loading.showLoading(true);
-        route_loading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
-        route_loading.setErrorMsgColor(Color.WHITE);
-        route_loading.setErrorIconColor(Color.WHITE);
-        route_loading.setRefreshClickEvent(vi -> {
-            route_loading.showLoading(true);
+        routeLoading.showLoading(true);
+        routeLoading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+        routeLoading.setErrorMsgColor(Color.WHITE);
+        routeLoading.setErrorIconColor(Color.WHITE);
+        routeLoading.setRefreshClickEvent(vi -> {
+            routeLoading.showLoading(true);
             Api.stationsOnRoute(tripId, callback);
         });
         name.setText(routeName);
@@ -220,38 +218,23 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             }
         });
 
-        opposite.setOnClickListener(vi -> {
+        opposite.setOnClickListener(vi -> Api.routes(routeId, (apiResponse, statusCode, success) -> {
+            if (success) {
+                List<Route> routes = apiResponse.getData();
 
-            Api.routes(routeId, (apiResponse, statusCode, success) -> {
-                if (success) {
-                    List<Route> routes = apiResponse.getData();
-                    if (routes.size() > 2) {
-                        String[] trips = new String[routes.size()];
-                        for (int i = 0, routesSize = routes.size(); i < routesSize; i++) {
-                            Route route = routes.get(i);
-                            trips[i] = route.getRoute_name();
-                        }
+                // Show list of all trips
+                if (routes.size() > 2) {
+                    String[] trips = new String[routes.size()];
+                    for (int i = 0, routesSize = routes.size(); i < routesSize; i++) {
+                        Route route = routes.get(i);
+                        trips[i] = route.getRoute_name();
+                    }
 
-                        runOnUiThread(() -> {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setTitle(getString(R.string.select_route));
-                            builder.setItems(trips, (dialog, which) -> runOnUiThread(() -> {
-                                Route route = routes.get(which);
-                                Intent i = new Intent(this, RouteActivity.class);
-                                i.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_name());
-                                i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
-                                i.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
-                                i.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
-                                i.putExtra(RouteActivity.STATION_ID, stationId);
-                                startActivity(i);
-                                finish();
-                            }));
-                            builder.show();
-                        });
-
-                    } else {
-                        Route route = routes.get(routes.get(0).getTrip_id().equals(tripId) ? 1 : 0);
-                        runOnUiThread(() -> {
+                    runOnUiThread(() -> {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle(getString(R.string.select_route));
+                        builder.setItems(trips, (dialog, which) -> runOnUiThread(() -> {
+                            Route route = routes.get(which);
                             Intent i = new Intent(this, RouteActivity.class);
                             i.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_name());
                             i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
@@ -260,19 +243,29 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                             i.putExtra(RouteActivity.STATION_ID, stationId);
                             startActivity(i);
                             finish();
-                        });
-                    }
+                        }));
+                        builder.show();
+                    });
 
                 } else {
-                    runOnUiThread(() -> new CustomToast(this).showDefault(this, Toast.LENGTH_SHORT));
+                    // Auto-swap if there are only 2 trips
+                    Route route = routes.get(routes.get(0).getTrip_id().equals(tripId) ? 1 : 0);
+                    runOnUiThread(() -> {
+                        Intent i = new Intent(this, RouteActivity.class);
+                        i.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_name());
+                        i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
+                        i.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
+                        i.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
+                        i.putExtra(RouteActivity.STATION_ID, stationId);
+                        startActivity(i);
+                        finish();
+                    });
                 }
-            });
 
-
-        });
+            } else runOnUiThread(() -> new CustomToast(this).showDefault(this, Toast.LENGTH_SHORT));
+        }));
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
 
     }
 
@@ -285,6 +278,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Get activity parameters
         routeName = getIntent().getStringExtra(ROUTE_NAME);
         routeNumber = getIntent().getStringExtra(ROUTE_NUMBER);
         routeId = getIntent().getStringExtra(ROUTE_ID);
@@ -292,19 +286,19 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         stationId = getIntent().getStringExtra(STATION_ID);
         if (stationId == null) stationId = "0";
 
+        // Find all UI elements
         backBtn = findViewById(R.id.back);
         name = findViewById(R.id.route_name);
         number = findViewById(R.id.route_station_number);
         circle = findViewById(R.id.route_circle);
-        route_loading = findViewById(R.id.loading_msg);
+        routeLoading = findViewById(R.id.loading_msg);
         locBtn = findViewById(R.id.maps_location_icon);
         recyclerView = findViewById(R.id.station_list);
         header = findViewById(R.id.header);
-        bottom_sheet = findViewById(R.id.bottom_sheet);
+        bottomSheet = findViewById(R.id.bottom_sheet);
         opposite = findViewById(R.id.route_opposite_btn);
 
-        behavior = BottomSheetBehavior.from(bottom_sheet);
-
+        behavior = BottomSheetBehavior.from(bottomSheet);
 
         setupUI();
 
@@ -313,6 +307,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
+        // Resume bus updates
         if (handler != null)
             handler.postDelayed(runnable, UPDATE_TIME);
     }
@@ -320,11 +315,15 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     @Override
     protected void onPause() {
         super.onPause();
-        handler.removeCallbacks(runnable);
+        // Pause bus updates
+        if (handler != null)
+            handler.removeCallbacks(runnable);
     }
 
     @Override
     public void onBackPressed() {
+
+        // Collapse bottom sheet if expanded
         if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
             behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         else super.onBackPressed();
@@ -334,36 +333,40 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.clear();
 
+        // Setup Google maps UI
+        mMap.clear();
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
+        mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
+        mMap.setPadding(0, 0, 0, behavior.getPeekHeight());
+
+
+        // Setup handlers.
         handler = new Handler();
         busManager = new BusMarkerManager(mMap, busOptions);
 
-        // Setup map.
-        mMap.setOnInfoWindowClickListener(marker -> {
-            Api.stationDetails(Integer.valueOf((String) marker.getTag()), true, (apiResponse, statusCode, success) -> {
-                if (success) {
-                    Intent i = new Intent(this, StationActivity.class);
-                    i.putExtra(StationActivity.STATION, apiResponse.getData());
-                    startActivity(i);
-                } else {
-                    runOnUiThread(() -> {
-                        CustomToast customToast = new CustomToast(this);
-                        customToast
-                                .setTextColor(Color.WHITE)
-                                .setIconColor(Color.WHITE)
-                                .setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
-                        customToast.showDefault(this, statusCode);
-                    });
+        // Set station InfoWindow click listener
+        mMap.setOnInfoWindowClickListener(marker -> Api.stationDetails(Integer.valueOf((String) marker.getTag()), true, (apiResponse, statusCode, success) -> {
+            if (success) {
+                // Start StationActivity
+                Intent i = new Intent(this, StationActivity.class);
+                i.putExtra(StationActivity.STATION, apiResponse.getData());
+                startActivity(i);
+            } else {
+                // Show toast.
+                runOnUiThread(() -> {
+                    CustomToast customToast = new CustomToast(this);
+                    customToast
+                            .setTextColor(Color.WHITE)
+                            .setIconColor(Color.WHITE)
+                            .setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+                    customToast.showDefault(this, statusCode);
+                });
+            }
+        }));
 
-                }
-            });
-
-        });
-        mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
-        mMap.setPadding(0, 0, 0, behavior.getPeekHeight());
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
-
+        // Check app location permission and set location button click event
         if (MapUtility.checkLocationPermission(this)) {
             locBtn.setOnClickListener(v -> fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -374,11 +377,6 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             }));
             mMap.setMyLocationEnabled(true);
         }
-
-        if (ViewGroupUtils.isDarkTheme(this))
-            mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark_2)));
-        else
-            mMap.setMapStyle(new MapStyleOptions(getString(R.string.white)));
 
         // Query stations on route and display them on the map.
         Api.stationsOnRoute(tripId, callback);
@@ -405,14 +403,19 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
             StationOnRoute station = stationsOnRoute.get(position);
 
+            // Get line color
             int color = Colors.getColorFromString(routeNumber);
 
+            // Color line
             holder.topConnector.getBackground().setTint(color);
             holder.bottomConnector.getBackground().setTint(color);
             holder.node.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
 
+            // Set station name and text style
             holder.name.setText(station.getName());
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.node.getLayoutParams();
+
+            // Set bold and bigger text for previous activity station
             if (Integer.valueOf(stationId)/10 == station.getCode_id()/10) {
                 holder.name.setTypeface(null, Typeface.BOLD);
                 holder.name.setTextSize(18f);
@@ -426,27 +429,19 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             }
             holder.node.setLayoutParams(params);
 
+            // Remove redundant top and bottom connectors
             holder.topConnector.setVisibility(position == 0 ? View.INVISIBLE : View.VISIBLE);
             holder.bottomConnector.setVisibility(position == getItemCount() - 1 ? View.INVISIBLE : View.VISIBLE);
-            holder.background.setOnClickListener(v -> {
-                Api.stationDetails(station.getCode_id(), true, (apiResponse, statusCode, success) -> {
-                    if (success) {
-                        Intent i = new Intent(RouteActivity.this, StationActivity.class);
-                        i.putExtra(StationActivity.STATION, apiResponse.getData());
-                        startActivity(i);
-                    } else {
-                        runOnUiThread(() -> {
-                            CustomToast customToast = new CustomToast(RouteActivity.this);
-                            customToast
-                                    .setTextColor(Color.WHITE)
-                                    .setIconColor(Color.WHITE)
-                                    .setBackgroundColor(ContextCompat.getColor(RouteActivity.this, R.color.colorAccent));
-                            customToast.showDefault(RouteActivity.this, statusCode);
-                        });
 
-                    }
-                });
-            });
+            // Set node click event
+            holder.background.setOnClickListener(v -> Api.stationDetails(station.getCode_id(), true, (apiResponse, statusCode, success) -> {
+                if (success) {
+                    // Start StationActivity
+                    Intent i = new Intent(RouteActivity.this, StationActivity.class);
+                    i.putExtra(StationActivity.STATION, apiResponse.getData());
+                    startActivity(i);
+                } else runOnUiThread(() -> new CustomToast(RouteActivity.this).showDefault(RouteActivity.this, statusCode));
+            }));
 
         }
 

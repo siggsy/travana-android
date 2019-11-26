@@ -198,7 +198,7 @@ public class SignInActivity extends AppCompatActivity {
         }
     }
 
-    //Sign in firebase with google navbar_button.
+    //Sign in firebase with google navbar_btn.
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());

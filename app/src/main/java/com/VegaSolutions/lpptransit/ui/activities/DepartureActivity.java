@@ -34,25 +34,25 @@ public class DepartureActivity extends AppCompatActivity {
     public static final String ROUTE_NUMBER = "route_number";
     public static final String ROUTE_NAME = "route_name";
 
-
+    // Activity parameters
     private String station_code;
     private String station_name;
     private String route_number;
     private String route_name;
 
+    // Activity UI elements
     private TextView routeName, routeNumber, stationName, stationCenter;
     private View routeNumberCircle;
     private RecyclerView rv;
     private FrameLayout header;
-    private View dep_err;
+    private View depErr;
     private ProgressBar progressBar;
 
     private Adapter adapter;
 
+    // Private local variables
     private int textColor;
     private int backGroundColor;
-
-    boolean hour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,17 +60,21 @@ public class DepartureActivity extends AppCompatActivity {
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_departure);
 
+        // Get theme default colors
         int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
         TypedArray array = obtainStyledAttributes(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
         textColor = array.getColor(0, Color.BLACK);
         backGroundColor = array.getColor(1, Color.WHITE);
         array.recycle();
 
+        // Get activity parameters
         station_code = getIntent().getStringExtra(STATION_CODE);
         station_name = getIntent().getStringExtra(STATION_NAME);
         route_number = getIntent().getStringExtra(ROUTE_NUMBER);
         route_name = getIntent().getStringExtra(ROUTE_NAME);
 
+
+        // Find all UI elements
         routeName = findViewById(R.id.departure_route_name);
         routeNumber = findViewById(R.id.route_station_number);
         stationName = findViewById(R.id.departure_station_name);
@@ -78,16 +82,16 @@ public class DepartureActivity extends AppCompatActivity {
         routeNumberCircle = findViewById(R.id.include);
         rv = findViewById(R.id.departure_rv);
         header = findViewById(R.id.header);
-        dep_err = findViewById(R.id.departure_no_departures_error);
+        depErr = findViewById(R.id.departure_no_departures_error);
         progressBar = findViewById(R.id.progressBar);
 
+
+        // Set UI elements
         routeName.setText(route_name);
         routeNumber.setText(route_number);
         routeNumber.setTextSize(16f);
         stationName.setText(station_name);
         stationCenter.setVisibility(Integer.valueOf(station_code) % 2 != 0 ? View.VISIBLE : View.GONE);
-
-        String group = route_number.replaceAll("[^0-9]", "");
         routeNumberCircle.getBackground().setTint(Colors.getColorFromString(route_number));
 
         adapter = new Adapter();
@@ -103,31 +107,41 @@ public class DepartureActivity extends AppCompatActivity {
             }
         });
 
+
+        // Get group number
+        String group = route_number.replaceAll("[^0-9]", "");
+
         Api.timetable(Integer.valueOf(station_code), 100, 100, (apiResponse, statusCode, success) -> {
-            runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-            if (success) {
-                if (apiResponse.getData().getRoute_groups().get(0).getRoutes().isEmpty())
-                    dep_err.setVisibility(View.VISIBLE);
-                for (TimetableWrapper.RouteGroup.Route route : apiResponse.getData().getRoute_groups().get(0).getRoutes()) {
-                    if (route.getParent_name().equals(route_name)) {
-                        runOnUiThread(() -> {
+            runOnUiThread(() -> {
+
+                // Remove progress bar
+                progressBar.setVisibility(View.GONE);
+                if (success) {
+                    TimetableWrapper timetableWrapper = apiResponse.getData();
+
+                    // Notify user if timetable is empty
+                    if (timetableWrapper.getRoute_groups().get(0).getRoutes().isEmpty())
+                        depErr.setVisibility(View.VISIBLE);
+
+                    // Search for the right timetable
+                    for (TimetableWrapper.RouteGroup.Route route : timetableWrapper.getRoute_groups().get(0).getRoutes()) {
+                        if (route.getParent_name().equals(route_name)) {
                             adapter.setTimetables(route.getTimetable());
+                            // Notify user if empty
                             if (adapter.timetables.isEmpty())
-                                dep_err.setVisibility(View.VISIBLE);
-                        });
-                        return;
+                                depErr.setVisibility(View.VISIBLE);
+                            return;
+                        }
                     }
+
+                    // If the right timetable was not found
+                    depErr.setVisibility(View.VISIBLE);
                 }
 
-                runOnUiThread(() -> {
-                    dep_err.setVisibility(View.VISIBLE);
-                });
+                // In case of error, show Toast with error message
+                else new CustomToast(this).showDefault(this, statusCode);
 
-
-            } else {
-                runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
-            }
-
+            });
         }, Integer.valueOf(group));
 
     }
@@ -136,7 +150,7 @@ public class DepartureActivity extends AppCompatActivity {
 
         List<TimetableWrapper.RouteGroup.Route.Timetable> timetables = new ArrayList<>();
 
-        public void setTimetables(List<TimetableWrapper.RouteGroup.Route.Timetable> timetables) {
+        private void setTimetables(List<TimetableWrapper.RouteGroup.Route.Timetable> timetables) {
             this.timetables = timetables;
             notifyDataSetChanged();
         }
@@ -152,26 +166,25 @@ public class DepartureActivity extends AppCompatActivity {
 
             TimetableWrapper.RouteGroup.Route.Timetable timetable = timetables.get(position);
 
+            // Set hour number
             holder.hour.setText(String.valueOf(timetable.getHour()));
             holder.minutes.removeAllViews();
 
+            // Set minutes in an hour
             for (int min : timetable.getMinutes()) {
                 TextView textView = (TextView) getLayoutInflater().inflate(R.layout.template_departure_min, holder.minutes, false);
                 textView.setText(String.valueOf(min));
-                textView.setTextColor(timetable.isIs_current() ? Color.WHITE : textColor);
+                textView.setTextColor(timetable.isCurrent() ? Color.WHITE : textColor);
                 holder.minutes.addView(textView);
             }
 
-            if (timetable.isIs_current()) {
-                holder.hour.setTextColor(Color.WHITE);
-            }
-            else {
+            if (timetable.isCurrent()) {
                 holder.hour.setTextColor(textColor);
+                holder.container.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.colorAccent, null));
+            } else {
+                holder.hour.setTextColor(textColor);
+                holder.container.getBackground().setTint(backGroundColor);
             }
-
-            holder.container.getBackground().setTint(timetable.isIs_current() ? ResourcesCompat.getColor(getResources(), R.color.colorAccent, null) : backGroundColor);
-
-
 
         }
 
@@ -184,10 +197,9 @@ public class DepartureActivity extends AppCompatActivity {
 
             TextView hour;
             FlexboxLayout minutes;
-
             CardView container;
 
-            public ViewHolder(@NonNull View itemView) {
+            private ViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 hour = itemView.findViewById(R.id.departure_hour_hour);

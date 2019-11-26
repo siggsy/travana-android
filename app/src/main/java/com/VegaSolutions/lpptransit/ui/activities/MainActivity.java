@@ -33,7 +33,6 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
-import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
@@ -51,7 +50,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -77,41 +75,28 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     FusedLocationProviderClient fusedLocationProviderClient;
     private final int locationRequestCode = 1000;
 
-    ViewPagerBottomSheetBehavior behavior;
 
+
+    // Fragment navigation stack
     Stack<Fragment> fragments = new Stack<>();
 
-    ImageButton navbar_button;
-    ImageButton search;
+    // UI elements
+    ImageButton navBarBtn, search;
     View shadow;
     TopMessage loading;
-    ImageView location_icon;
-
+    ImageView locationIcon;
+    ViewPagerBottomSheetBehavior behavior;
     DrawerLayout dl;
     NavigationView nv;
+    View bottomSheet;
 
-    View bottom_sheet;
-    BusMarkerManager markerManager;
     private ClusterManager<StationMarker> clusterManager;
 
+    // Map updater
     private ApiCallback<List<Station>> callback = (apiResponse, statusCode, success) -> {
-        if (success) {
-            onStationsUpdated(apiResponse.getData(), true, statusCode);
-        } else {
-            onStationsUpdated(null, false, statusCode);
-        }
+        if (success) onStationsUpdated(apiResponse.getData(), true, statusCode);
+        else onStationsUpdated(null, false, statusCode);
     };
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0) {
-            if (resultCode == SettingsActivity.SETTINGS_UPDATE) {
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            }
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,32 +106,35 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        // TODO: Change to non Google Services dependent location service
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    locationRequestCode);
 
-        }
+        // Check for permission
+        if (MapUtility.checkLocationPermission(this))
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
 
+
+        // Find all UI elements
         dl = findViewById(R.id.nav_layout);
         nv = findViewById(R.id.nv);
-
-        nv.setNavigationItemSelectedListener(this);
-
         search = findViewById(R.id.search);
-        navbar_button = findViewById(R.id.account);
-        location_icon = findViewById(R.id.maps_location_icon);
-        search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
-        navbar_button.setOnClickListener(view -> dl.openDrawer(GravityCompat.START));
-        if (MapUtility.checkLocationPermission(this)) {
-            location_icon.setVisibility(View.VISIBLE);
-        } else {
-            location_icon.setVisibility(View.GONE);
-        }
+        navBarBtn = findViewById(R.id.account);
+        locationIcon = findViewById(R.id.maps_location_icon);
         shadow = findViewById(R.id.shadow);
         loading = findViewById(R.id.top_message);
+        bottomSheet = findViewById(R.id.bottom_sheet);
+
+
+        // Setup UI elements
+        nv.setNavigationItemSelectedListener(this);
+
+        search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
+        navBarBtn.setOnClickListener(view -> dl.openDrawer(GravityCompat.START));
+
+        locationIcon.setVisibility(MapUtility.checkLocationPermission(this)? View.VISIBLE : View.GONE);
+
         loading.showLoading(true);
         loading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
         loading.setErrorMsgColor(Color.WHITE);
@@ -157,46 +145,30 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             switchFragment(StationsFragment.newInstance());
         });
 
-        bottom_sheet = findViewById(R.id.bottom_sheet);
-        behavior = ViewPagerBottomSheetBehavior.from(bottom_sheet);
+        behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
 
+
+        // Switch bottom sheet fragment
         switchFragment(StationsFragment.newInstance());
 
-    }
-
-
-    @Override
-    public void onBackPressed() {
-
-        if (dl.isDrawerOpen(GravityCompat.START)) {
-            dl.closeDrawer(GravityCompat.START);
-            return;
-        }
-
-        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
-            behavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
-        } else {
-            fragments.pop();
-            try {
-                Fragment f = fragments.pop();
-                switchFragment(f);
-            } catch (EmptyStackException e) {
-                super.onBackPressed();
-            }
-        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+
+        // Setup google maps UI
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        //mMap.setTrafficEnabled(true);
-        setupClusterManager();
         mMap.setPadding(12, 200, 12, behavior.getPeekHeight());
+        mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
+        setupClusterManager();
+
+
+        // Set location button location callback
         if (MapUtility.checkLocationPermission(this)) {
-            location_icon.setOnClickListener(v -> fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
+            locationIcon.setOnClickListener(v -> fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Location location = task.getResult();
                     if (location != null)
@@ -206,11 +178,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
         }
 
-        if (ViewGroupUtils.isDarkTheme(this))
-            mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark_2)));
-        else
-            mMap.setMapStyle(new MapStyleOptions(getString(R.string.white)));
 
+        // Set Station InfoWindow click listener
         mMap.setOnInfoWindowClickListener(marker -> {
             Intent i = new Intent(this, StationActivity.class);
             Station station = (Station) marker.getTag();
@@ -218,39 +187,84 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             startActivity(i);
         });
 
+
         // Set camera to Ljubljana
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
+
+        // Query for stations
         Api.stationDetails(false, callback);
 
 
     }
 
+    @Override
+    public void onBackPressed() {
+
+        // Close drawer if open
+        if (dl.isDrawerOpen(GravityCompat.START)) {
+            dl.closeDrawer(GravityCompat.START);
+            return;
+        }
+
+        // Collapse bottom sheet if expanded
+        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
+            behavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+        } else {
+            fragments.pop();
+
+            // Go to previous fragment
+            try {
+                Fragment f = fragments.pop();
+                switchFragment(f);
+            }
+
+            // Close app if there is no previous fragment
+            catch (EmptyStackException e) {
+                super.onBackPressed();
+            }
+        }
+    }
+
 
     private void setupClusterManager() {
+
         clusterManager = new ClusterManager<>(this, mMap);
         CustomClusterRenderer customClusterRenderer = new CustomClusterRenderer(this, mMap, clusterManager);
+
         clusterManager.setRenderer(customClusterRenderer);
         clusterManager.setOnClusterClickListener(cluster -> {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cluster.getPosition(), mMap.getCameraPosition().zoom + 2f));
             return true;
         });
+
+        // Set cluster manager as camera listener
         mMap.setOnCameraIdleListener(clusterManager);
         mMap.setOnMarkerClickListener(clusterManager);
+
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        // Restart activity if theme was changed
+        if (requestCode == 0) {
+            if (resultCode == SettingsActivity.SETTINGS_UPDATE) {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            }
+        }
     }
 
     @Override
     public void onStationsUpdated(List<Station> stations, boolean success, int responseCode) {
+        runOnUiThread(() -> {
 
-        if (success) {
-            runOnUiThread(() -> {
+            if (success) {
                 loading.showLoading(false);
                 if (mMap != null) {
+                    // Clear map and add station markers
                     mMap.clear();
                     mMap.setInfoWindowAdapter(new StationInfoWindow(this));
                     if (clusterManager != null) {
@@ -260,43 +274,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         clusterManager.cluster();
                     }
                 }
+            }
 
-            });
-        } else {
-            runOnUiThread(() -> {
-                loading.showMsgDefault(this, responseCode);
-            });
-        }
+            // Show error message on error
+            else loading.showMsgDefault(this, responseCode);
+
+        });
+
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
     }
 
     @Override
     public void onTabClicked() {
         behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-    }
-
-
-    private void animateMarkerAlpha(final Marker marker) {
-        final Handler handler = new Handler();
-
-        final long startTime = SystemClock.uptimeMillis();
-        final long duration = 300; // ms
-
-        final Interpolator interpolator = new LinearInterpolator();
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - startTime;
-                float t = interpolator.getInterpolation((float) elapsed / duration);
-                marker.setAlpha(t);
-
-                if (t < 1.0) {
-                    // Post again 16ms later (60fps)
-                    handler.postDelayed(this, 16);
-                }
-            }
-        });
     }
 
     @Override
@@ -316,14 +310,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void switchFragment(Fragment fragment) {
 
-        shadow.setVisibility(fragment instanceof HomeFragment ?View.GONE :View.VISIBLE);
-        if (!(fragment instanceof HomeFragment)) {
-            if (mMap != null)
-                mMap.clear();
-        } else if (mMap != null) {
-            mMap.clear();
-            markerManager = new BusMarkerManager(mMap, new MarkerOptions().icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_circle))).anchor(0.5f, 0.5f));
-        }
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.bottom_sheet,fragment);

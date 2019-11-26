@@ -90,7 +90,7 @@ public class TimetableWrapper {
                     return minutes;
                 }
 
-                public boolean isIs_current() {
+                public boolean isCurrent() {
                     return is_current;
                 }
             }
