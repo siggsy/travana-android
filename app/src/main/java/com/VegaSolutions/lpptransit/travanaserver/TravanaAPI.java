@@ -11,10 +11,12 @@ import androidx.annotation.Nullable;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.LppQuery;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalRequest;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.google.gson.Gson;
 
@@ -40,7 +42,7 @@ public class TravanaAPI {
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static void warnings(TravanaApiCallback callback) {
+    public static void warnings(TravanaApiCallback<Warning[]> callback) {
 
         new TravanaQuery(TravanaQuery.WARNINGS_URL)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -56,20 +58,22 @@ public class TravanaAPI {
                 }).execute();
     }
 
-    public static void updates(TravanaApiCallback callback) {
+    public static void updates(TravanaApiCallback<Update> callback) {
 
         new TravanaQuery(TravanaQuery.UPDATES_URL)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
+                    Update update = new Gson().fromJson(response, Update.class);
+
                     if (success) {
-                        callback.onComplete(response, statusCode, true);
+                        callback.onComplete(update, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).execute();
     }
 
-    public static void play_store_link(TravanaApiCallback callback) {
+    public static void play_store_link(TravanaApiCallback<String> callback) {
 
         new TravanaQuery(TravanaQuery.PLAY_STORE_LINK)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -83,7 +87,8 @@ public class TravanaAPI {
     }
 
 
-    //depricated --> adding user-handling on server
+    @Deprecated
+    //--> adding user-handling on server
     public static void addUser(String token, RequestBody rbody, TravanaApiCallback callback) {
 
         new TravanaPOSTQuery(TravanaPOSTQuery.ADD_USER, TRAVANA_API_KEY, token, rbody)
@@ -97,7 +102,7 @@ public class TravanaAPI {
                 }).execute();
     }
 
-    public static void messages(TravanaApiCallback callback) {
+    public static void messages(TravanaApiCallback<LiveUpdateMessage[]> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -111,7 +116,7 @@ public class TravanaAPI {
                 }).execute();
     }
 
-    public static void messages(String user_id, TravanaApiCallback callback) {                                  //can be null
+    public static void messages(String user_id, TravanaApiCallback<LiveUpdateMessage[]> callback) {                                  //can be null
 
         new TravanaQuery(TravanaQuery.MESSAGES)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -127,7 +132,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void messagesMeta(TravanaApiCallback callback) {
+    public static void messagesMeta(TravanaApiCallback<LiveUpdateMessage[]> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_META)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -141,7 +146,7 @@ public class TravanaAPI {
                 }).execute();
     }
 
-    public static void messagesMeta(String user_id, TravanaApiCallback callback) {
+    public static void messagesMeta(String user_id, TravanaApiCallback<LiveUpdateMessage[]> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_META)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -156,7 +161,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void messageid(String message_id, TravanaApiCallback callback) {                                  //can be null
+    public static void messageid(String message_id, TravanaApiCallback<LiveUpdateMessage> callback) {                                  //can be null
 
         new TravanaQuery(TravanaQuery.MESSAGES_ID)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -172,7 +177,7 @@ public class TravanaAPI {
                 .execute();
     }
 
-    public static void messageid(String message_id, String user_id, TravanaApiCallback callback) {                                  //can be null
+    public static void messageid(String message_id, String user_id, TravanaApiCallback<LiveUpdateMessage> callback) {                                  //can be null
 
         new TravanaQuery(TravanaQuery.MESSAGES_ID)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -189,6 +194,8 @@ public class TravanaAPI {
                 .execute();
     }
 
+
+    //TODO -> TESTING NEEDED
     public static void messagesAdmin(String token, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_ADMIN, TRAVANA_API_KEY, token)
@@ -203,6 +210,7 @@ public class TravanaAPI {
                 }).execute();
     }
 
+    //TODO -> TESTING NEEDED
     public static void messagesAdmin(String token, String message_id, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_ADMIN, TRAVANA_API_KEY, token)
@@ -223,6 +231,7 @@ public class TravanaAPI {
      * @param condition, filter messages by values (possible: "checked", "!checked")
      */
 
+    //TODO -> TESTING NEEDED
     public static void messagesAdminFiltered(String token, String condition, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_ADMIN, TRAVANA_API_KEY, token)
@@ -252,7 +261,9 @@ public class TravanaAPI {
                 }).execute();
     }
 
-    //TODO --
+
+
+    //@Deprecated
     /*
     public static void editMessage(String token, String ms_id, LiveUpdateMessage message, TravanaApiCallback callback){
 
@@ -365,6 +376,8 @@ public class TravanaAPI {
                 .execute();
     }
 
+    //@Depricated
+    /*
     public static void editComment(String token, String message_id, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
@@ -381,6 +394,8 @@ public class TravanaAPI {
                 .addParams("comment_id", comment_id)
                 .execute();
     }
+
+     */
 
     public static void approveMessages(String token, List<MessagesApprovalRequest> approvalRequests, TravanaApiCallback callback) {
 
@@ -589,6 +604,25 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addHeaderValues("tag_id", tag_id)
+                .execute();
+    }
+
+    public static void calculatedBusesInfo(List<String> bus_unit_ids, TravanaApiCallback<CalBusInfo[]> callback) {
+
+        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(bus_unit_ids));
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.BUS_CAL_INFO_IDS, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        CalBusInfo[] busInfos = new Gson().fromJson(response, CalBusInfo[].class);
+
+                        callback.onComplete(busInfos, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
                 .execute();
     }
 

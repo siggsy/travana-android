@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
@@ -49,6 +50,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import okhttp3.Credentials;
 import okhttp3.FormBody;
@@ -305,6 +307,36 @@ public class SignInActivity extends AppCompatActivity {
             return;
 
 
+        TravanaAPI.messages(new TravanaApiCallback<LiveUpdateMessage[]>() {
+            @Override
+            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                Log.e(TAG, Arrays.toString(apiResponse));
+
+            }
+        });
+
+
+        List<String> list = new ArrayList<>();
+
+        list.add("E6EA4090-33CB-4772-9611-FD62585945CF");
+        list.add("1F481B30-0C45-4A6D-9224-7407F6467AD9");
+
+        TravanaAPI.calculatedBusesInfo(list, new TravanaApiCallback<CalBusInfo[]>() {
+            @Override
+            public void onComplete(@Nullable CalBusInfo[] apiResponse, int statusCode, boolean success) {
+
+                if(success){
+                    Log.e(TAG, Arrays.toString(apiResponse));
+                }else{
+                    Log.e(TAG, "error" + statusCode);
+                }
+
+            }
+        });
+
+
+        /*
         TravanaAPI.tags((data, statusCode, success) -> {
             if(success){
 
@@ -314,7 +346,9 @@ public class SignInActivity extends AppCompatActivity {
                 Log.e(TAG, "error" + statusCode);
             }
 
-        });
+        })
+
+         */
 
         FirebaseManager.getFirebaseToken((token, statusCode, success) -> {
                     if(success){
@@ -386,6 +420,7 @@ public class SignInActivity extends AppCompatActivity {
                             public void onComplete(@Nullable Object apiResponse, int statusCode, boolean success) {
 
                                 if(success){
+
                                     Log.e(TAG, apiResponse.toString());
                                 }else {
                                     Log.e(TAG, statusCode + "");

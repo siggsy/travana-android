@@ -19,6 +19,8 @@ public class LiveUpdateMessage {
     private int comments_int;
     private boolean liked;
     public List<LiveUpdateComment> comments = new ArrayList<LiveUpdateComment>();
+    private String time_ago;
+    private long time_ago_millis;
 
     public LiveUpdateMessage(String user_id,
                              String message_content, MessageTag[] tags, String[] photo_ids) {
@@ -123,6 +125,26 @@ public class LiveUpdateMessage {
         return created_time;
     }
 
+    public void setCreated_time(String created_time) {
+        this.created_time = created_time;
+    }
+
+    public String getTime_ago() {
+        return time_ago;
+    }
+
+    public void setTime_ago(String time_ago) {
+        this.time_ago = time_ago;
+    }
+
+    public long getTime_ago_millis() {
+        return time_ago_millis;
+    }
+
+    public void setTime_ago_millis(long time_ago_millis) {
+        this.time_ago_millis = time_ago_millis;
+    }
+
     @Override
     public String toString() {
         return "LiveUpdateMessage{" +
@@ -130,7 +152,7 @@ public class LiveUpdateMessage {
                 ", user_id='" + user_id + '\'' +
                 ", user=" + user +
                 ", photo_ids=" + Arrays.toString(photo_ids) +
-                ", created_time=" + created_time +
+                ", created_time='" + created_time + '\'' +
                 ", message_content='" + message_content + '\'' +
                 ", tags=" + Arrays.toString(tags) +
                 ", importance=" + importance +
@@ -138,6 +160,11 @@ public class LiveUpdateMessage {
                 ", comments_int=" + comments_int +
                 ", liked=" + liked +
                 ", comments=" + comments +
+                ", time_ago='" + time_ago + '\'' +
+                ", time_ago_millis=" + time_ago_millis +
                 '}';
     }
+
 }
+
+

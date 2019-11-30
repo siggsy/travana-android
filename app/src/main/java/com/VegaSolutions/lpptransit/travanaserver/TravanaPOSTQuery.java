@@ -49,6 +49,8 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
 
     public static final String MESSAGES_UPLOAD_FILE = "/file/upload";
 
+    public static final String BUS_CAL_INFO_IDS = "/lpp_buses/calculated_traffic/ids";
+
     private StringBuilder params = new StringBuilder();
 
     private String URL;
@@ -100,7 +102,7 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected String doInBackground(String... apis) {
         try {
 
             Log.d(TAG, SERVER_URL + URL + params);
@@ -125,7 +127,6 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
 
             if(code != 200){
                 onCompleteListener.onComplete(null, code, false);
-                return null;
             }else{
                 onCompleteListener.onComplete(data, code, true);
             }
@@ -143,8 +144,6 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
             e.printStackTrace();
             onCompleteListener.onComplete(null, -1, false);
         }
-
-
         return null;
     }
 

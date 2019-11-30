@@ -31,11 +31,15 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
 
     public static final String SERVER_URL = "http://192.168.1.13:8081/ljubljana_app_server/api";
 
+    //public static final String SERVER_URL = "https://192.168.1.13:8443/ljubljana_app_server/api";
+
     //public static final String SERVER_URL = "http://10.0.1.23:8080/ljubljana_app_server/api";
 
     //public static final String SERVER_IP_ADDRESS = "193.77.85.172:8081";
 
     public static final String SERVER_IP_ADDRESS = "192.168.1.13:8081";
+
+    //public static final String SERVER_IP_ADDRESS = "192.168.1.13:8443";
 
     public static final String WARNINGS_URL = "/alerts/warnings";                                   //returns warnings alerts. ex. "{"content": "vsebina","created_date": "10.12.2001","expire_date": "1.1.2020",...
 
@@ -140,70 +144,23 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
         return this;
     }
 
-
     @Override
     protected String doInBackground(String... apis) {
-            try {
-
-                Request.Builder builder = new Request.Builder();
-
-                Set set = header_hashmap.entrySet();
-                Iterator iterator = set.iterator();
-
-                while(iterator.hasNext()) {
-                    Map.Entry mentry = (Map.Entry)iterator.next();
-                    builder.addHeader(mentry.getKey().toString(), mentry.getValue().toString());
-                }
-
-                Log.d(TAG, SERVER_URL + URL + params);
-
-                builder.url(SERVER_URL + URL + params)
-                        .addHeader("Content-Type", "application/json")  // add request headers
-                        .addHeader("User-Agent", "OkHttp Bot")
-                        .addHeader("Authorization", basic_token)
-                        .addHeader("Accept","")
-                        .addHeader("Cache-Control", "no-cache")
-                        .addHeader("Host", SERVER_IP_ADDRESS)
-                        .addHeader("Accept-Encoding", "gzip, deflate")
-                        .build();
-
-                Request request = builder.build();
-                Response r = client.newCall(request).execute();
-
-
-                String data = r.body().string();
-
-                int code = r.code();
-
-                if(code != 200){
-                    onCompleteListener.onComplete(null, code, false);
-                    return null;
-                }else{
-                    onCompleteListener.onComplete(data, code, true);
-                }
-
-            } catch (HttpStatusException e) {
-                e.printStackTrace();
-                onCompleteListener.onComplete(null, e.getStatusCode(), false);
-            } catch (SocketTimeoutException e) {
-                e.printStackTrace();
-                onCompleteListener.onComplete(null, -2, false);
-            } catch (IOException e) {
-                e.printStackTrace();
-                onCompleteListener.onComplete(null, -1, false);
-            }
-        return null;
-    }
-
-    /*
-    public void doSpecialRequest(TravanaApiCallbackSpecial callback){
-
         try {
+
+            Request.Builder builder = new Request.Builder();
+
+            Set set = header_hashmap.entrySet();
+            Iterator iterator = set.iterator();
+
+            while(iterator.hasNext()) {
+                Map.Entry mentry = (Map.Entry)iterator.next();
+                builder.addHeader(mentry.getKey().toString(), mentry.getValue().toString());
+            }
 
             Log.d(TAG, SERVER_URL + URL + params);
 
-            Request request = new Request.Builder()
-                    .url(SERVER_URL + URL + params)
+            builder.url(SERVER_URL + URL + params)
                     .addHeader("Content-Type", "application/json")  // add request headers
                     .addHeader("User-Agent", "OkHttp Bot")
                     .addHeader("Authorization", basic_token)
@@ -213,31 +170,32 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
                     .addHeader("Accept-Encoding", "gzip, deflate")
                     .build();
 
+            Request request = builder.build();
             Response r = client.newCall(request).execute();
+
+
+            String data = r.body().string();
 
             int code = r.code();
 
             if(code != 200){
-                callback.onComplete(null, code, false);
-
+                onCompleteListener.onComplete(null, code, false);
             }else{
-                Bitmap bitmap = BitmapFactory.decodeStream(r.body().byteStream());
-                callback.onComplete(bitmap, code, false);
+                onCompleteListener.onComplete(data, code, true);
             }
 
-        }catch (HttpStatusException e){
-
+        } catch (HttpStatusException e) {
             e.printStackTrace();
-            callback.onComplete(null, e.getStatusCode(), false);
-
-        }catch (IOException e){
-
+            onCompleteListener.onComplete(null, e.getStatusCode(), false);
+        } catch (SocketTimeoutException e) {
             e.printStackTrace();
-            callback.onComplete(null, -1, false);
+            onCompleteListener.onComplete(null, -2, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+            onCompleteListener.onComplete(null, -1, false);
         }
+        return null;
     }
-
-     */
 
     public interface OnCompleteListener {
 
