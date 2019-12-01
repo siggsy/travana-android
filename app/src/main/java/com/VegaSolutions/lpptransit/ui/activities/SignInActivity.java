@@ -317,6 +317,7 @@ public class SignInActivity extends AppCompatActivity {
         });
 
 
+        /*
         List<String> list = new ArrayList<>();
 
         list.add("E6EA4090-33CB-4772-9611-FD62585945CF");
@@ -334,6 +335,8 @@ public class SignInActivity extends AppCompatActivity {
 
             }
         });
+
+         */
 
 
         /*

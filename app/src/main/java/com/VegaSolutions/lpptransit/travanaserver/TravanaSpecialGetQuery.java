@@ -18,7 +18,7 @@ import okhttp3.Credentials;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class TravanaSpecialGetQuery implements Runnable {
+public class TravanaSpecialGetQuery extends Thread {
 
     private static final String TAG = TravanaSpecialGetQuery.class.getSimpleName();
 

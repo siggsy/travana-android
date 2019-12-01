@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -59,7 +61,9 @@ public class TestActivity extends AppCompatActivity {
             ImageView i = (ImageView)findViewById(R.id.imageView5);
 
 
-        TravanaAPI.getImage("image2CPPj3qcIsPOOyHueenh6WZsX922WedNov20175144CET2019", new TravanaApiCallbackSpecial() {
+
+
+        TravanaAPI.getImage("imagetestDOomenSunDec01192343CET2019.jpg", new TravanaApiCallbackSpecial() {
             @Override
             public void onComplete(@Nullable Bitmap bitmap, int statusCode, boolean success) {
 
@@ -74,6 +78,8 @@ public class TestActivity extends AppCompatActivity {
                 });
             }
         });
+
+
 
 
 
@@ -138,6 +144,16 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
+
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -151,6 +167,15 @@ public class TestActivity extends AppCompatActivity {
                         if(success1){
 
                             Uri selectedImageUri = data.getData();
+
+                            ContentResolver cR = getApplicationContext().getContentResolver();
+                            MimeTypeMap mime = MimeTypeMap.getSingleton();
+                            String type = mime.getExtensionFromMimeType(cR.getType(selectedImageUri));
+
+                            Log.e(TAG, type + "s");
+
+                            File f = new File(selectedImageUri.getPath());
+                            long size = f.length();
 
                             TravanaAPI.uploadImage(token, selectedImageUri,  getApplicationContext(), (data1, statusCode, success) -> {
 

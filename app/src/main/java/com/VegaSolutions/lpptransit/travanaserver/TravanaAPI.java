@@ -1,10 +1,12 @@
 package com.VegaSolutions.lpptransit.travanaserver;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -55,7 +57,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
     public static void updates(TravanaApiCallback<Update> callback) {
@@ -70,7 +72,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
     public static void play_store_link(TravanaApiCallback<String> callback) {
@@ -83,7 +85,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
 
@@ -99,7 +101,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
     public static void messages(TravanaApiCallback<LiveUpdateMessage[]> callback) {
@@ -113,7 +115,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
     public static void messages(String user_id, TravanaApiCallback<LiveUpdateMessage[]> callback) {                                  //can be null
@@ -129,7 +131,7 @@ public class TravanaAPI {
                     }
                 })
                 .addHeaderValues("user_id", user_id)
-                .execute();
+                .start();
     }
 
     public static void messagesMeta(TravanaApiCallback<LiveUpdateMessage[]> callback) {
@@ -143,7 +145,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
     public static void messagesMeta(String user_id, TravanaApiCallback<LiveUpdateMessage[]> callback) {
@@ -158,7 +160,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addHeaderValues("user_id", user_id)
-                .execute();
+                .start();
     }
 
     public static void messageid(String message_id, TravanaApiCallback<LiveUpdateMessage> callback) {                                  //can be null
@@ -174,7 +176,7 @@ public class TravanaAPI {
                     }
                 })
                 .addParams("mess_id", message_id)
-                .execute();
+                .start();
     }
 
     public static void messageid(String message_id, String user_id, TravanaApiCallback<LiveUpdateMessage> callback) {                                  //can be null
@@ -191,7 +193,7 @@ public class TravanaAPI {
                 })
                 .addParams("mess_id", message_id)
                 .addHeaderValues("user_id", user_id)
-                .execute();
+                .start();
     }
 
 
@@ -207,7 +209,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
     //TODO -> TESTING NEEDED
@@ -222,7 +224,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addParams("_id", message_id)
-                .execute();
+                .start();
     }
 
     /**
@@ -243,7 +245,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addParams("condition", condition)
-                .execute();
+                .start();
     }
 
     public static void addMessage(String token, LiveUpdateMessage message, TravanaApiCallback callback) {
@@ -258,7 +260,7 @@ public class TravanaAPI {
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
-                }).execute();
+                }).start();
     }
 
 
@@ -295,7 +297,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addParams("_id", message_id)
-                .execute();
+                .start();
     }
 
     public static void addCommentComment(String token, String comment_id, LiveUpdateComment comment, TravanaApiCallback callback) {
@@ -312,7 +314,7 @@ public class TravanaAPI {
                     }
                 })
                 .addParams("comm_id", comment_id)
-                .execute();
+                .start();
     }
 
     public static void removeMessage(String token, String mess_id, TravanaApiCallback callback) {
@@ -326,7 +328,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addParams("_id", mess_id)
-                .execute();
+                .start();
 
     }
 
@@ -342,7 +344,7 @@ public class TravanaAPI {
                     }
                 })
                 .addParams("comment_id", comment_id)
-                .execute();
+                .start();
     }
 
     public static void removeCommentComment(String token, String subcomment_id, TravanaApiCallback callback) {
@@ -357,7 +359,7 @@ public class TravanaAPI {
                     }
                 })
                 .addParams("subcomm_id", subcomment_id)
-                .execute();
+                .start();
     }
 
     public static void likeCommentComment(String token, String subcomment_id, boolean liked, TravanaApiCallback callback) {
@@ -373,7 +375,7 @@ public class TravanaAPI {
                 })
                 .addParams("subcomm_id", subcomment_id)
                 .addHeaderValues("liked", liked + "")
-                .execute();
+                .start();
     }
 
     //@Depricated
@@ -410,7 +412,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .execute();
+                .start();
     }
 
 
@@ -425,7 +427,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addParams("_id", user_id)
-                .execute();
+                .start();
     }
 
     public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
@@ -441,7 +443,7 @@ public class TravanaAPI {
                 }).addHeaderValues("mess_id", mess_id)
                 .addHeaderValues("liked", like + "")
                 //.addHeaderValues("user_id", user_id)
-                .execute();
+                .start();
     }
 
     public static void commentLike(String token, String comm_id, boolean like, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
@@ -457,7 +459,7 @@ public class TravanaAPI {
                 })
                 .addHeaderValues("comm_id", comm_id)
                 .addHeaderValues("liked", like + "")
-                .execute();
+                .start();
     }
 
     /*
@@ -491,7 +493,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .execute();
+                .start();
 
     }
 
@@ -508,10 +510,10 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .execute();
+                .start();
     }
 
-    public static void uploadImage(String token, byte[] bytes, TravanaApiCallback callback) {
+    public static void uploadImage(String token, byte[] bytes, String file_type, TravanaApiCallback callback) {
 
         RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file", "image",
@@ -527,10 +529,11 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .execute();
+                .addHeaderValues("file_type", file_type)
+                .start();
     }
 
-    public static void uploadImage(String token, Uri image, Context context, TravanaApiCallback callback) {
+    public static void uploadImage(String token, Uri image,Context context, TravanaApiCallback callback) {
 
         byte[] bytes = null;
 
@@ -543,6 +546,11 @@ public class TravanaAPI {
             return;
 
         }
+
+        ContentResolver cR = context.getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        String type = mime.getExtensionFromMimeType(cR.getType(image));
+
         RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file", "image",
                         RequestBody.create(MediaType.parse("image/png"), bytes))
@@ -557,7 +565,8 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .execute();
+                .addHeaderValues("file_type", type)
+                .start();
     }
 
     public static void getImage(String photo_id, TravanaApiCallbackSpecial callback) {
@@ -575,7 +584,7 @@ public class TravanaAPI {
                     }
                 })
                 .addHeaderValues("file_id", photo_id)
-                .run();
+                .start();
 
     }
 
@@ -590,7 +599,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addHeaderValues("tag_id", tag_id)
-                .execute();
+                .start();
     }
 
     public static void removeTag(String token, String tag_id, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
@@ -604,7 +613,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addHeaderValues("tag_id", tag_id)
-                .execute();
+                . start();
     }
 
     public static void calculatedBusesInfo(List<String> bus_unit_ids, TravanaApiCallback<CalBusInfo[]> callback) {
@@ -623,7 +632,7 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .execute();
+                .start();
     }
 
 }
