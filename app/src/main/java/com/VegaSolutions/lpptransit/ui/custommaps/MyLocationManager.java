@@ -94,6 +94,10 @@ public class MyLocationManager {
         }
     }
 
+    public boolean isMainProviderEnabled() {
+        return !listeners.isEmpty();
+    }
+
     private LatLng getLatestFromPreferences() {
 
         SharedPreferences preferences = context.getSharedPreferences("Latest_location", Context.MODE_PRIVATE);

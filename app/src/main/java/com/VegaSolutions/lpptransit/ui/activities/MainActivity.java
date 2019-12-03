@@ -104,7 +104,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         loading = findViewById(R.id.top_message);
         bottomSheet = findViewById(R.id.bottom_sheet);
 
-
         // Setup UI elements.
         nv.setNavigationItemSelectedListener(this);
 
@@ -124,7 +123,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
-
 
         // Switch bottom sheet fragment.
         switchFragment(StationsFragment.newInstance());
@@ -183,7 +181,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         // Query for stations.
         Api.stationDetails(false, callback);
 
-
     }
 
     @Override
@@ -191,6 +188,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onPause();
         if (locationManager != null)
             locationManager.removeListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (locationManager != null)
+            locationManager.addListener(this);
     }
 
     @Override
@@ -262,7 +266,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 if (mMap != null) {
 
                     // Clear map and add station markers
-                    // mMap.clear(); // Removes current location
+                    // mMap.clear(); // TODO: (fix) Removes current location
                     mMap.setInfoWindowAdapter(new StationInfoWindow(this));
 
                     // Refresh clusters
@@ -319,17 +323,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case locationRequestCode: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (mMap != null)
-                        onMapReady(mMap);
-                } else {
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            }
+        if (requestCode == locationRequestCode) {
+            // If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (mMap != null)
+                    onMapReady(mMap);
+            } else Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
         }
     }
 
