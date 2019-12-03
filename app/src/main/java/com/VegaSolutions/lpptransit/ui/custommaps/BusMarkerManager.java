@@ -9,6 +9,7 @@ import android.view.animation.Interpolator;
 
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
+import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -23,11 +24,13 @@ public class BusMarkerManager {
     private Map<String, Marker> busMap;
     private GoogleMap map;
     private MarkerOptions options;
+    private MarkerAnimator animator;
 
     public BusMarkerManager(GoogleMap map, MarkerOptions options) {
         busMap = new HashMap<>();
         this.map = map;
         this.options = options;
+        animator = new MarkerAnimator();
     }
 
     public void update(List<BusOnRoute> busesOnRoute) {
@@ -42,7 +45,7 @@ public class BusMarkerManager {
         for (BusOnRoute busOnRoute : busesOnRoute) {
             Marker bus = busMap.get(busOnRoute.getBus_unit_id());
             if (bus != null)
-               animateMarker(bus, busOnRoute.getLatLng(), busOnRoute.getCardinal_direction(), new LatLngInterpolator.Linear());
+               animator.animateMarker(bus, busOnRoute.getLatLng(), busOnRoute.getCardinal_direction(), new LatLngInterpolator.Linear());
             else {
                 Marker marker = map.addMarker(options.position(busOnRoute.getLatLng()).rotation(busOnRoute.getCardinal_direction()));
                 busMap.put(busOnRoute.getBus_unit_id(), marker);
@@ -63,7 +66,7 @@ public class BusMarkerManager {
         for (Bus bus : buses) {
             Marker busMarker = busMap.get(bus.getBus_unit_id());
             if (busMarker != null)
-                animateMarker(busMarker, bus.getLatLng(), bus.getCardinal_direction(), new LatLngInterpolator.Linear());
+                animator.animateMarker(busMarker, bus.getLatLng(), bus.getCardinal_direction(), new LatLngInterpolator.Linear());
             else {
                 Marker marker = map.addMarker(options.position(bus.getLatLng()).rotation(bus.getCardinal_direction()));
                 busMap.put(bus.getBus_unit_id(), marker);
@@ -81,52 +84,6 @@ public class BusMarkerManager {
         for (Bus bus : buses)
             if (bus.getBus_unit_id().equals(id)) return true;
         return false;
-    }
-
-    private void animateMarker(Marker marker, LatLng finalPosition, float finalCardinalDirection,  LatLngInterpolator latLngInterpolator) {
-
-        final LatLng startPosition = marker.getPosition();
-        float startCardinalDirection = marker.getRotation() % 360;
-        final float beginCardinalDirection;
-        final float endCardinalDirection;
-
-        // Adjust angle animation (shortest path).
-        if (Math.abs(finalCardinalDirection - startCardinalDirection) > 180) {
-            if (finalCardinalDirection > startCardinalDirection)
-                startCardinalDirection += 360;
-            else finalCardinalDirection += 360;
-        }
-
-        endCardinalDirection = finalCardinalDirection;
-        beginCardinalDirection = startCardinalDirection;
-
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        final Interpolator interpolator = new AccelerateDecelerateInterpolator();
-        final float durationInMs = 1000;
-
-        handler.post(new Runnable() {
-            long elapsed;
-            float t;
-            float v;
-
-            @Override
-            public void run() {
-                // Calculate progress using interpolator
-                elapsed = SystemClock.uptimeMillis() - start;
-                t = elapsed / durationInMs;
-                v = interpolator.getInterpolation(t);
-
-                marker.setPosition(latLngInterpolator.interpolate(v, startPosition, finalPosition));
-                marker.setRotation(v * (endCardinalDirection - beginCardinalDirection) + beginCardinalDirection);
-
-                // Repeat till progress is complete.
-                if (t < 1) {
-                    // Post again 16ms later.
-                    handler.postDelayed(this, 16);
-                }
-            }
-        });
     }
 
 }
