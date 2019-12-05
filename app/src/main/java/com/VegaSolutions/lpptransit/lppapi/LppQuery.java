@@ -17,7 +17,7 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LppQuery extends AsyncTask<String, Void, String> {
+public class LppQuery extends Thread {
 
     //http://194.33.12.32/doc/                                                      //documentation
 
@@ -51,6 +51,11 @@ public class LppQuery extends AsyncTask<String, Void, String> {
     // Timetable
     public static final String ROUTE_DEPARTURES = "/timetable/route-departures";    // (!trip-id=a3295EA8-3404-4D34-9C6A-1604EFD15E40) & (!route-id=117C48BE-5CB3-4030-92FC-E22371A0779F)
 
+    public LppQuery(String URL){
+        this.URL = URL;
+    }
+
+    private String URL;
     // Url parameters
     private StringBuilder params = new StringBuilder();
     // Default onCompleteListener
@@ -82,11 +87,10 @@ public class LppQuery extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... apis) {
-        for (String api : apis) {
+    public void run() {
 
             try {
-                Connection.Response r = Jsoup.connect(SERVER_URL + api + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(10000).execute(); //.header("apikey", BuildConfig.LPP_API_KEY)
+                Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(10000).execute(); //.header("apikey", BuildConfig.LPP_API_KEY)
                 Log.i(TAG, r.body());
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
             } catch (HttpStatusException e) {
@@ -100,9 +104,6 @@ public class LppQuery extends AsyncTask<String, Void, String> {
                 onCompleteListener.onComplete(null, -1, false);
             }
 
-        }
-
-        return null;
     }
 
 

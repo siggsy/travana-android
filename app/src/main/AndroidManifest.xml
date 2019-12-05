@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.VegaSolutions.lpptransit">
-
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -15,14 +13,14 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
     <application
         android:allowBackup="false"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/DarkTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="GoogleAppIndexingWarning" >
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ui.activities.LauncherActivity"></activity>
         <activity android:name=".ui.activities.TagsActivity" />
         <activity
             android:name=".ui.activities.NewMessageActivity"
@@ -32,8 +30,9 @@
             android:name=".ui.activities.TestActivity"
             android:exported="true" />
         <activity android:name=".ui.activities.PostActivity" />
-        <activity android:name=".ui.activities.ForumActivity"
-            android:exported="true"/>
+        <activity
+            android:name=".ui.activities.ForumActivity"
+            android:exported="true" />
         <activity android:name=".ui.activities.SettingsActivity" />
         <activity
             android:name=".ui.activities.WelcomeActivity"

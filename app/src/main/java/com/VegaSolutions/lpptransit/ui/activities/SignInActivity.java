@@ -17,11 +17,8 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -45,17 +42,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import okhttp3.Credentials;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -259,47 +247,6 @@ public class SignInActivity extends AppCompatActivity {
 
     //after updates user is added in database by server
 
-    private void addTravanaUser(){
-
-        if(FirebaseAuth.getInstance().getCurrentUser() == null)
-            return;
-
-
-        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        mUser.getIdToken(true)
-                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                    public void onComplete(@NonNull Task<GetTokenResult> task) {
-                        if (task.isSuccessful()) {
-                            String idToken = task.getResult().getToken();
-
-                            uidToken = idToken;
-
-                            UserData user = new UserData(mUser.getUid(), mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl().toString());
-
-                            RequestBody rbody = RequestBody.create(
-                                    MediaType.parse("application/json; charset=utf-8"), new Gson().toJson(user));
-
-                            TravanaAPI.addUser(idToken, rbody, (data, statusCode, success) ->{
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                        } else {
-
-                            Log.e(TAG, task.getException().getMessage());
-                            Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong_try_again), Toast.LENGTH_LONG).show();
-                            mAuth.signOut();
-
-                        }
-                    }
-                });
-    }
-
     private void getwarnings(){
 
 
@@ -455,16 +402,16 @@ public class SignInActivity extends AppCompatActivity {
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
-                            /*
+
                             MessageTag[] tags = new MessageTag[1];
                             tags[0] = new MessageTag("becool#115678", "becool", "#115678");
 
                             String[] links = new String[1];
                             links[0] = "/blaadasdolsadpsa.com";
 
-                            LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() , new Date(), "spremenjena5555", tags, links);
+                            LiveUpdateMessage message = new LiveUpdateMessage(mUser.getUid(), "spremenjena5555", tags, links);
 
-                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
+                            //LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
 
                             TravanaAPI.addMessage(idToken, message, (data, statusCode, success) -> {
 
@@ -476,7 +423,7 @@ public class SignInActivity extends AppCompatActivity {
 
                             });
 
-                             */
+
 
 
 
