@@ -18,7 +18,7 @@ public class Api {
 
     public static void busDetails_name(String bus_name, ApiCallback<List<Bus>> callback) {
 
-        new LppQuery()
+        new LppQuery(LppQuery.BUS_DETAILS)
                 .addParams("bus-name", bus_name)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
@@ -26,12 +26,12 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.BUS_DETAILS);
+                .start();
 
     }
     public static void busDetails_vin(String bus_vin, ApiCallback<Bus> callback) {
 
-        new LppQuery()
+        new LppQuery(LppQuery.BUS_DETAILS)
                 .addParams("bus-vin", bus_vin)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
@@ -39,21 +39,21 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.BUS_DETAILS);
+                .start();
 
     }
     public static void busDetails_all(ApiCallback<List<Bus>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.BUS_DETAILS)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Bus>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Bus>>>(){}.getType());
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.BUS_DETAILS);
+                .start();
     }
     public static void busesOnRoute(String routeGroupNumber, ApiCallback<List<BusOnRoute>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.BUSES_ON_ROUTE)
                 .addParams("route-group-number", routeGroupNumber)
                 .addParams("specific", "1")
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -62,33 +62,33 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.BUSES_ON_ROUTE);
+                .start();
     }
 
     public static void activeRoutes(ApiCallback<List<Route>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.ACTIVE_ROUTES)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Route>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Route>>>(){}.getType());
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.ACTIVE_ROUTES);
+                .start();
     }
 
     public static void routes(ApiCallback<List<Route>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.ROUTES)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Route>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Route>>>(){}.getType());
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.ROUTES);
+                .start();
     }
 
     public static void routes(String route_id, ApiCallback<List<Route>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.ROUTES)
                 .addParams("route-id", route_id)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
@@ -96,11 +96,11 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.ROUTES);
+                .start();
     }
 
     public static void stationsOnRoute(String trip_id, ApiCallback<List<StationOnRoute>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.STATIONS_ON_ROUTE)
                 .addParams("trip-id", trip_id)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
@@ -108,12 +108,12 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.STATIONS_ON_ROUTE);
+                .start();
 
     }
 
     public static void arrival(String station_code, ApiCallback<ArrivalWrapper> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.ARRIVAL)
                 .addParams("station-code", station_code)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
@@ -121,11 +121,11 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.ARRIVAL);
+                .start();
     }
 
     public static void routesOnStation(int station_code, ApiCallback<List<RouteOnStation>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.ROUTES_ON_STATION)
                 .addParams("station-code", String.valueOf(station_code))
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
@@ -133,11 +133,11 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.ROUTES_ON_STATION);
+                .start();
     }
 
     public static void stationDetails(int station_code, boolean show_subroutes, ApiCallback<Station> callback) {
-            new LppQuery()
+            new LppQuery(LppQuery.STATION_DETAILS)
                     .addParams("station-code", String.valueOf(station_code))
                     .addParams("show-subroutes", show_subroutes ? "1" : "0")
                     .setOnCompleteListener((response, statusCode, success) -> {
@@ -146,11 +146,11 @@ public class Api {
                             callback.onComplete(data, statusCode, true);
                         } else callback.onComplete(null, statusCode, false);
                     })
-                    .execute(LppQuery.STATION_DETAILS);
+                    .start();
     }
 
     public static void stationDetails(boolean show_subroutes, ApiCallback<List<Station>> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.STATION_DETAILS)
                 .addParams("show-subroutes", show_subroutes ? "1" : "0")
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
@@ -158,11 +158,11 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.STATION_DETAILS);
+                .start();
     }
 
     public static void timetable(int station_code, int next_hours, int previous_hours, ApiCallback<TimetableWrapper> callback, int... route_group_numbers) {
-        LppQuery q = new LppQuery()
+        LppQuery q = new LppQuery(LppQuery.TIMETABLE)
                 .addParams("station-code", String.valueOf(station_code))
                 .addParams("next-hours", String.valueOf(next_hours))
                 .addParams("previous-hours", String.valueOf(previous_hours))
@@ -174,11 +174,12 @@ public class Api {
                 });
         for (int gnum : route_group_numbers)
             q.addParams("route-group-number", String.valueOf(gnum));
-        q.execute(LppQuery.TIMETABLE);
+
+        q.start();
     }
 
     public static void routeDepartures(String trip_id, String route_id, ApiCallback<DepartureWrapper> callback) {
-        new LppQuery()
+        new LppQuery(LppQuery.ROUTE_DEPARTURES)
                 .addParams("trip-id", trip_id)
                 .addParams("route-id", route_id)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -187,7 +188,7 @@ public class Api {
                         callback.onComplete(data, statusCode, true);
                     } else callback.onComplete(null, statusCode, false);
                 })
-                .execute(LppQuery.ROUTE_DEPARTURES);
+                .start();
     }
 
 }

@@ -10,6 +10,10 @@ import org.jsoup.HttpStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Credentials;
@@ -18,7 +22,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
+public class TravanaPOSTQuery extends Thread {
 
     private static final String TAG = TravanaPOSTQuery.class.getSimpleName();
 
@@ -57,6 +61,8 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
     private String basic_token = "";
     private RequestBody rbody;
 
+    private HashMap<String, String> header_hashmap = new HashMap<String, String>();
+
     public TravanaPOSTQuery(String URL, String key, String token, RequestBody rbody){
         this.URL = URL;
 
@@ -94,6 +100,22 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
         return this;
     }
 
+    /**
+     * add required parameter
+     * @param key value name
+     * @param value the value
+     */
+    public TravanaPOSTQuery addHeaderValues(@NonNull String key, @NonNull String value) {
+        header_hashmap.put(key, value);
+        return this;
+    }
+
+    /**
+     * add required parameter
+     * @param key value name
+     * @param value the value
+     * @return current instance for chaining
+     */
     public TravanaPOSTQuery addParams(@NonNull String key, @NonNull String value) {
         if (params.length() == 0) params.append("?");
         else params.append("&");
@@ -102,13 +124,22 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected String doInBackground(String... apis) {
+    public void run() {
         try {
+
+            Request.Builder builder = new Request.Builder();
+
+            Set set = header_hashmap.entrySet();
+            Iterator iterator = set.iterator();
+
+            while(iterator.hasNext()) {
+                Map.Entry mentry = (Map.Entry)iterator.next();
+                builder.addHeader(mentry.getKey().toString(), mentry.getValue().toString());
+            }
 
             Log.d(TAG, SERVER_URL + URL + params);
 
-            Request request = new Request.Builder()
-                    .url(SERVER_URL + URL + params)
+            builder.url(SERVER_URL + URL + params)
                     .addHeader("Content-Type", "application/json")  // add request headers
                     .addHeader("User-Agent", "OkHttp Bot")
                     .addHeader("Authorization", basic_token)
@@ -119,6 +150,7 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
                     .post(rbody)
                     .build();
 
+            Request request = builder.build();
             Response r = client.newCall(request).execute();
 
 
@@ -144,7 +176,6 @@ public class TravanaPOSTQuery extends AsyncTask<String, Void, String> {
             e.printStackTrace();
             onCompleteListener.onComplete(null, -1, false);
         }
-        return null;
     }
 
     public interface OnCompleteListener {

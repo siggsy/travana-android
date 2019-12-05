@@ -23,7 +23,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class TravanaQuery extends AsyncTask<String, Void, String>  {
+public class TravanaQuery extends Thread  {
 
     private static final String TAG = TravanaQuery.class.getSimpleName();
 
@@ -145,7 +145,7 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
     }
 
     @Override
-    protected String doInBackground(String... apis) {
+    public void run() {
         try {
 
             Request.Builder builder = new Request.Builder();
@@ -194,7 +194,6 @@ public class TravanaQuery extends AsyncTask<String, Void, String>  {
             e.printStackTrace();
             onCompleteListener.onComplete(null, -1, false);
         }
-        return null;
     }
 
     public interface OnCompleteListener {

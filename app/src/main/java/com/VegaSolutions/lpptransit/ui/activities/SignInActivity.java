@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -17,11 +18,8 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.UserData;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -45,24 +43,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import okhttp3.Credentials;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 
 public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "SignInActivity";
 
-    private TextView c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18,
-    c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34, c35, c36;
+    private View[] views = new View[36];
 
     private FirebaseAuth mAuth;
 
@@ -259,47 +247,6 @@ public class SignInActivity extends AppCompatActivity {
 
     //after updates user is added in database by server
 
-    private void addTravanaUser(){
-
-        if(FirebaseAuth.getInstance().getCurrentUser() == null)
-            return;
-
-
-        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        mUser.getIdToken(true)
-                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                    public void onComplete(@NonNull Task<GetTokenResult> task) {
-                        if (task.isSuccessful()) {
-                            String idToken = task.getResult().getToken();
-
-                            uidToken = idToken;
-
-                            UserData user = new UserData(mUser.getUid(), mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl().toString());
-
-                            RequestBody rbody = RequestBody.create(
-                                    MediaType.parse("application/json; charset=utf-8"), new Gson().toJson(user));
-
-                            TravanaAPI.addUser(idToken, rbody, (data, statusCode, success) ->{
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                        } else {
-
-                            Log.e(TAG, task.getException().getMessage());
-                            Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong_try_again), Toast.LENGTH_LONG).show();
-                            mAuth.signOut();
-
-                        }
-                    }
-                });
-    }
-
     private void getwarnings(){
 
 
@@ -317,6 +264,7 @@ public class SignInActivity extends AppCompatActivity {
         });
 
 
+        /*
         List<String> list = new ArrayList<>();
 
         list.add("E6EA4090-33CB-4772-9611-FD62585945CF");
@@ -334,6 +282,8 @@ public class SignInActivity extends AppCompatActivity {
 
             }
         });
+
+         */
 
 
         /*
@@ -452,16 +402,16 @@ public class SignInActivity extends AppCompatActivity {
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
-                            /*
+
                             MessageTag[] tags = new MessageTag[1];
                             tags[0] = new MessageTag("becool#115678", "becool", "#115678");
 
                             String[] links = new String[1];
                             links[0] = "/blaadasdolsadpsa.com";
 
-                            LiveUpdateMessage message = new LiveUpdateMessage(user.getUid() , new Date(), "spremenjena5555", tags, links);
+                            LiveUpdateMessage message = new LiveUpdateMessage(mUser.getUid(), "spremenjena5555", tags, links);
 
-                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
+                            //LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
 
                             TravanaAPI.addMessage(idToken, message, (data, statusCode, success) -> {
 
@@ -473,191 +423,6 @@ public class SignInActivity extends AppCompatActivity {
 
                             });
 
-                             */
-
-
-
-
-
-
-                            /*
-                            TravanaAPI.commentLike(idToken,"comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3MonNov1819:40:28GMT01:002019", false, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-
-
-                            /*
-                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
-
-                            TravanaAPI.removeCommentComment(idToken,"comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3MonNov1818:45:29GMT01:002019", (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }});
-
-                             */
-
-
-
-
-
-                            /*
-                            TravanaAPI.messagesMeta((data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-                            /*
-                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "MOJ222222222222");
-
-                            TravanaAPI.addComment(idToken,"mess_gen2CPPj3qcIsPOOyHueenh6WZsX922WedNov2020:28:48GMT01:002019", comment, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-                            /*
-                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "MOJ KOMETAR BLA BLA BLA cucucucucucu");
-
-                            TravanaAPI.addCommentComment(idToken, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922WedNov2020:31:24GMT01:002019", comment, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-
-                            });
-
-                             */
-
-
-
-                            /*
-                            TravanaAPI.likeCommentComment(idToken, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922WedNov2020:46:09GMT01:002019", false, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-                            
-                             */
-
-
-
-
-                            /*
-                            TravanaAPI.removeComment(idToken, "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1618:23:12GMT01:002019",(data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-                            /*
-                            TravanaAPI.messageid("mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019" , user.getUid(),(data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-                            /*
-                            String[] tags = {"becool#115678"};
-
-                            TravanaAPI.followedMessagesMeta(user.getUid(), tags, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-                            /*
-                            TravanaAPI.messagesLike(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3SatNov1617:10:17GMT01:002019",true,  (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-
-
-                            /*
-                            TravanaAPI.removeMessage(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1420:19:55GMT01:002019", (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else {
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
-
-                            /*
-                            LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "vsebinavKRALJ");
-
-                            TravanaAPI.addComment(idToken,"mess_gen84nYHXDIkIPV17yt6UADuJwYKGJ3ThuNov1421:08:54GMT01:002019", comment, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-                            */
-
-
-                            /*
-                            TravanaAPI.commentLike(idToken, "comm_gen84nYHXDIkIPV17yt6UADuJwYKGJ3FriNov1516:25:22GMT01:002019", false, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-                            });
-
-                             */
 
 
                         } else {
@@ -676,88 +441,64 @@ public class SignInActivity extends AppCompatActivity {
 
     private void initializeCircleTextViews(){
 
-        c1 = findViewById(R.id.circle1);
-        c2 = findViewById(R.id.textView3);
-        c3 = findViewById(R.id.textView9);
-        c4 = findViewById(R.id.textView10);
-        c5 = findViewById(R.id.textView11);
-        c6 = findViewById(R.id.textView12);
-        c7 = findViewById(R.id.textView13);
-        c8 = findViewById(R.id.textView14);
-        c9 = findViewById(R.id.textView15);
-        c10 = findViewById(R.id.textView16);
-        c11 = findViewById(R.id.textView20);
-        c12 = findViewById(R.id.textView21);
-        c13 = findViewById(R.id.textView22);
-        c14 = findViewById(R.id.textView23);
-        c15 = findViewById(R.id.textView24);
-        c16 = findViewById(R.id.textView25);
-        c17 = findViewById(R.id.textView26);
-        c18 = findViewById(R.id.textView19);
+        views[0] = findViewById(R.id.circle1);
+        views[1] = findViewById(R.id.textView3);
+        views[2] = findViewById(R.id.textView9);
+        views[3] = findViewById(R.id.textView10);
+        views[4] = findViewById(R.id.textView11);
+        views[5] = findViewById(R.id.textView12);
+        views[6] = findViewById(R.id.textView13);
+        views[7] = findViewById(R.id.textView14);
+        views[8] = findViewById(R.id.textView15);
+        views[9] = findViewById(R.id.textView16);
+        views[10] = findViewById(R.id.textView20);
+        views[11] = findViewById(R.id.textView21);
+        views[12] = findViewById(R.id.textView22);
+        views[13] = findViewById(R.id.textView23);
+        views[14] = findViewById(R.id.textView24);
+        views[15] = findViewById(R.id.textView25);
+        views[16] = findViewById(R.id.textView26);
+        views[17] = findViewById(R.id.textView19);
 
-        c19 = findViewById(R.id.textView27);
-        c20 = findViewById(R.id.textView28);
-        c21 = findViewById(R.id.textView29);
-        c22 = findViewById(R.id.textView30);
-        c23 = findViewById(R.id.textView31);
-        c24 = findViewById(R.id.textView32);
-        c25 = findViewById(R.id.textView33);
-        c26 = findViewById(R.id.textView34);
-        c27 = findViewById(R.id.textView35);
-        c28 = findViewById(R.id.textView36);
-        c29 = findViewById(R.id.textView37);
-        c30 = findViewById(R.id.textView38);
-        c31 = findViewById(R.id.textView39);
-        c32 = findViewById(R.id.textView40);
-        c33 = findViewById(R.id.textView45);
-        c34 = findViewById(R.id.textView46);
-        c35 = findViewById(R.id.textView47);
-        c36 = findViewById(R.id.textView48);
+        views[18] = findViewById(R.id.textView27);
+        views[19] = findViewById(R.id.textView28);
+        views[20] = findViewById(R.id.textView29);
+        views[21] = findViewById(R.id.textView30);
+        views[22] = findViewById(R.id.textView31);
+        views[23] = findViewById(R.id.textView32);
+        views[24] = findViewById(R.id.textView33);
+        views[25] = findViewById(R.id.textView34);
+        views[26] = findViewById(R.id.textView35);
+        views[27] = findViewById(R.id.textView36);
+        views[28] = findViewById(R.id.textView37);
+        views[29] = findViewById(R.id.textView38);
+        views[30] = findViewById(R.id.textView39);
+        views[31] = findViewById(R.id.textView40);
+        views[32] = findViewById(R.id.textView45);
+        views[33] = findViewById(R.id.textView46);
+        views[34] = findViewById(R.id.textView47);
+        views[35] = findViewById(R.id.textView48);
     }
 
     private void createCircleAnimation(){
 
-        if(c1 == null){
+        if(views[0] == null){
             initializeCircleTextViews();
         }
 
-        c1.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c2.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c3.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c4.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c5.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c6.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c7.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c8.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c9.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c10.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c11.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c12.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c13.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c14.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c15.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c16.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c17.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c18.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
+        int anim_speed = 1;
+        for (View view : views){
 
-        c19.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c20.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c21.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c22.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c23.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c24.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c25.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c26.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c27.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c28.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c29.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c30.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c31.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c32.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c33.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
-        c34.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-        c35.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-        c36.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
+            if(anim_speed == 0){
+                view.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
+            }else if(anim_speed == 1){
+                view.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
+            }else{
+                view.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
+            }
 
+            anim_speed = (anim_speed + 1) % 3;
+
+        }
     }
 }
