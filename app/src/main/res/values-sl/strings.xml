@@ -52,4 +52,6 @@
     <string name="create_a_new_post">Create a new post</string>
     <string name="too_many_tags_error">Dosegli ste mejo števila oznak.</string>
     <string name="select_route">Izberite linijo</string>
+    <string name="officially">Uradno</string>
+    <string name="approved_by">potrjeno od</string>
 </resources>
