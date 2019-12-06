@@ -9,12 +9,19 @@ public class LiveUpdateComment {
     //private String photo_path;
     private String comment_id;
     private String comment_content;
-    private Date created_date;
+    private String created_date;
+    private int likes;
+    private String time_ago;
+    private long time_ago_millis;
 
-    public LiveUpdateComment() {
+    
+    public LiveUpdateComment(String comment_content) {
+
+        this.comment_content = comment_content;
 
     }
 
+    /*
     public LiveUpdateComment(String user_id, String comment_content) {
         this.user_id = user_id;
         this.comment_content = comment_content;
@@ -26,6 +33,9 @@ public class LiveUpdateComment {
 
         this.comment_id = _id;
     }
+
+     */
+
 
     public String getUser_id() {
         return user_id;
@@ -51,12 +61,20 @@ public class LiveUpdateComment {
         this.comment_content = comment_content;
     }
 
-    public Date getCreated_date() {
+    public String getCreated_date() {
         return created_date;
     }
 
-    public void setCreated_date(Date created_date) {
-        this.created_date = created_date;
+    public int getLikes() {
+        return likes;
+    }
+
+    public String getTime_ago() {
+        return time_ago;
+    }
+
+    public long getTime_ago_millis() {
+        return time_ago_millis;
     }
 
     @Override
