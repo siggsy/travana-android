@@ -63,6 +63,7 @@ public class TestActivity extends AppCompatActivity {
 
 
 
+            /*
         TravanaAPI.getImage("imagetestDOomenSunDec01192343CET2019.jpg", new TravanaApiCallbackSpecial() {
             @Override
             public void onComplete(@Nullable Bitmap bitmap, int statusCode, boolean success) {
@@ -79,6 +80,28 @@ public class TestActivity extends AppCompatActivity {
             }
         });
 
+             */
+
+
+            TravanaAPI.getUserImage("https://lh3.googleusercontent.com/-6zz3MuLYmv8/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3reL87K3FaDuynldu3oLhVwM1mINOA/s96-c/photo.jpg", new TravanaApiCallbackSpecial() {
+                @Override
+                public void onComplete(@Nullable Bitmap bitmap, int statusCode, boolean success) {
+
+                    if(success){
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                i.setImageBitmap(bitmap);
+                            }
+                        });
+
+                    }else{
+                        Log.e(TAG, "error bla bla");
+                    }
+
+                }
+            });
 
 
 
