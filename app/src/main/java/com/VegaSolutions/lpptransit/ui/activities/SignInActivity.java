@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
@@ -327,6 +328,16 @@ public class SignInActivity extends AppCompatActivity {
 
                         */
 
+
+                        LiveUpdateComment comment = new LiveUpdateComment(FirebaseManager.getSignedUser().getUid(), "komentar teglavič");
+
+                        TravanaAPI.addComment(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-04_21:50:51", comment, new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                            }
+
+                    });
 
 
 
