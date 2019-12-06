@@ -325,11 +325,7 @@ public class SignInActivity extends AppCompatActivity {
 
                         });
 
-                         */
-
-
-
-
+                        */
 
 
 
@@ -390,51 +386,6 @@ public class SignInActivity extends AppCompatActivity {
                     }}
                     );
 
-
-        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        mUser.getIdToken(true)
-                .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                    public void onComplete(@NonNull Task<GetTokenResult> task) {
-                        if (task.isSuccessful()) {
-                            String idToken = task.getResult().getToken();
-
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-
-
-                            MessageTag[] tags = new MessageTag[1];
-                            tags[0] = new MessageTag("becool#115678", "becool", "#115678");
-
-                            String[] links = new String[1];
-                            links[0] = "/blaadasdolsadpsa.com";
-
-                            LiveUpdateMessage message = new LiveUpdateMessage(mUser.getUid(), "spremenjena5555", tags, links);
-
-                            //LiveUpdateComment comment = new LiveUpdateComment(user.getUid(), "spremenjena5555");
-
-                            TravanaAPI.addMessage(idToken, message, (data, statusCode, success) -> {
-
-                                if(success){
-                                    Log.e(TAG, data + "");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-
-                            });
-
-
-
-                        } else {
-
-                            Log.e(TAG, task.getException().getMessage());
-                            Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong_try_again), Toast.LENGTH_LONG).show();
-                            mAuth.signOut();
-
-
-                        }
-                    }
-                });
     }
 
     //--------------------------------------Animations

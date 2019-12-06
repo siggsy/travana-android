@@ -9,6 +9,7 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.VegaSolutions.lpptransit.R;
@@ -28,6 +29,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -588,7 +591,7 @@ public class TravanaAPI {
 
     }
 
-    public static void followTag(String token, String tag_id, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+    public static void followTag(String token, String tag_id, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.FOLLOW_TAG, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -602,7 +605,7 @@ public class TravanaAPI {
                 .start();
     }
 
-    public static void removeTag(String token, String tag_id, TravanaApiCallback callback) {          //like = true -> likes++ , like = false -> likes--
+    public static void removeTag(String token, String tag_id, TravanaApiCallback callback) {
 
         new TravanaQuery(TravanaQuery.REMOVE_FOLLOW_TAG, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -633,6 +636,34 @@ public class TravanaAPI {
                     }
                 })
                 .start();
+    }
+
+    public static void getUserImage(@NonNull  String url, TravanaApiCallbackSpecial callbackSpecial){
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    URL urlc = new URL(url);
+                    HttpURLConnection connection = (HttpURLConnection) urlc.openConnection();
+                    connection.setDoInput(true);
+                    connection.connect();
+                    InputStream input = connection.getInputStream();
+                    Bitmap bitmap = BitmapFactory.decodeStream(input);
+
+                    callbackSpecial.onComplete(bitmap, 200, true);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    callbackSpecial.onComplete(null, -1, false);
+                }
+
+            }
+        });
+
+        thread.start();
+
     }
 
 }
