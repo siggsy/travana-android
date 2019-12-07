@@ -36,7 +36,6 @@ public class LiveUpdateComment {
 
      */
 
-
     public String getUser_id() {
         return user_id;
     }

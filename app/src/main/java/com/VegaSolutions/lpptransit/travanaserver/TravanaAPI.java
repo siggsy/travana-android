@@ -19,6 +19,7 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalRequest;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.google.gson.Gson;
@@ -435,7 +436,7 @@ public class TravanaAPI {
                 .start();
     }
 
-    public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback<String> callback) {          //like = true -> likes++ , like = false -> likes--
+    public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback<String> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGE_LIKE, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -448,6 +449,52 @@ public class TravanaAPI {
                 }).addHeaderValues("mess_id", mess_id)
                 .addHeaderValues("liked", like + "")
                 //.addHeaderValues("user_id", user_id)
+                .start();
+    }
+
+    public static void messagesMarkSeen(String token, String mess_id, boolean seen, TravanaApiCallback<String> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_MARK_SEEN, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("mess_id", mess_id)
+                .addHeaderValues("seen", seen + "")
+                .start();
+    }
+
+    public static void messagesMarkNotified(String token, String mess_id, boolean notified, TravanaApiCallback<String> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_MARK_NOTIFIED, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        callback.onComplete(response, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("mess_id", mess_id)
+                .addHeaderValues("seen", notified + "")
+                .start();
+    }
+
+    public static void messagesFollowedUnseenMeta(String token, TravanaApiCallback<LiveUpdateMessage[]> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_FOLLOWD_UNSEEN_META, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
                 .start();
     }
 
@@ -487,13 +534,16 @@ public class TravanaAPI {
 
      */
 
-    public static void followedMessagesMeta(String token, TravanaApiCallback<String> callback) {
+    public static void followedMessagesMeta(String token, TravanaApiCallback<LiveUpdateMessage[]> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_FOLLOWED_META, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        callback.onComplete(response, statusCode, true);
+
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+
+                        callback.onComplete(messages, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -502,14 +552,14 @@ public class TravanaAPI {
 
     }
 
-    public static void tags(TravanaApiCallback<MessageTag[]> callback) {
+    public static void tags(TravanaApiCallback<TagsBox> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGE_TAGS)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
 
-                        MessageTag[] tags = new Gson().fromJson(response, MessageTag[].class);
+                        TagsBox tags = new Gson().fromJson(response, TagsBox.class);
                         callback.onComplete(tags, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);

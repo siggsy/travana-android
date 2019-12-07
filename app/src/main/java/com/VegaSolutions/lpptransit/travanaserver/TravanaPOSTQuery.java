@@ -44,7 +44,7 @@ public class TravanaPOSTQuery extends Thread {
 
     public static final String MESSAGES_ADD = "/live_updates/messages/add";
 
-    //TODO
+    //TODO -> depricated?
     public static final String MESSAGES_EDIT = "/live_updates/messages/edit";
 
     public static final String MESSAGES_ADD_COMMENT = "/live_updates/messages/add_comment";

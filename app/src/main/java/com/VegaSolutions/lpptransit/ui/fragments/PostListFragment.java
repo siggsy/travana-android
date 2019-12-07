@@ -128,7 +128,7 @@ public class PostListFragment extends Fragment {
                 if (message.getUser().getTag() != null) {
                     viewHolder.userTag.setVisibility(View.VISIBLE);
                     viewHolder.userTag.setText(message.getUser().getTag().getTag());
-                    viewHolder.userTag.getBackground().setTint(Color.parseColor(message.getUser().getTag().getTag_color()));
+                    viewHolder.userTag.getBackground().setTint(Color.parseColor(message.getUser().getTag().getColor()));
                 } else {
                     viewHolder.userTag.setVisibility(View.GONE);
                 }
