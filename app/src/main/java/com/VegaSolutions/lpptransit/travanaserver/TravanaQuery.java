@@ -91,6 +91,10 @@ public class TravanaQuery extends Thread  {
 
     public static final String MESSAGES_FOLLOWD_UNSEEN_META = "/live_updates/messages/followed_unseen_meta";
 
+    public static final String MESSAGES_BY_TAG = "/live_updates/messages_by_tag";
+
+    public static final String MESSAGES_BY_TAG_U = "/live_updates/messages_by_tag_u";
+
     // Url parameters
     private StringBuilder params = new StringBuilder();
     private String URL;
