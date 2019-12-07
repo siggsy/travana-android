@@ -255,6 +255,7 @@ public class SignInActivity extends AppCompatActivity {
             return;
 
 
+        /*
         TravanaAPI.messages(new TravanaApiCallback<LiveUpdateMessage[]>() {
             @Override
             public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
@@ -263,6 +264,8 @@ public class SignInActivity extends AppCompatActivity {
 
             }
         });
+
+         */
 
 
         /*
@@ -314,7 +317,7 @@ public class SignInActivity extends AppCompatActivity {
 
                         FirebaseUser basic_user_firebase_data = FirebaseManager.getSignedUser();
 
-                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "spremenjena111", tags, links);
+                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "sdasds", tags, links);
 
                         TravanaAPI.addMessage(token, message, (data, statusCode1, success1) -> {
 
@@ -326,18 +329,81 @@ public class SignInActivity extends AppCompatActivity {
 
                         });
 
-                        */
+                         */
 
 
+
+                        /*
                         LiveUpdateComment comment = new LiveUpdateComment(FirebaseManager.getSignedUser().getUid(), "komentar teglavič");
 
-                        TravanaAPI.addComment(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-04_21:50:51", comment, new TravanaApiCallback<String>() {
+                        TravanaAPI.addComment(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-06_17:31:40", comment, new TravanaApiCallback<String>() {
                             @Override
                             public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, "add comment" + apiResponse);
+                                }else{
+                                    Log.e(TAG, statusCode + "error");
+                                }
 
                             }
 
                     });
+
+                         */
+
+
+                        /*
+                         TravanaAPI.commentLike(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:32:44GMT01:002019", true, new TravanaApiCallback<String>() {
+                             @Override
+                             public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+
+                                 if(success){
+                                     Log.e(TAG, "like comment" + apiResponse);
+                                 }else{
+                                     Log.e(TAG, "like comment " + statusCode + "error");
+                                 }
+
+
+                             }
+                         });*/
+
+                        LiveUpdateComment comment = new LiveUpdateComment("basdsadasdasd bl asa s ");
+
+                         TravanaAPI.addCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:32:44GMT01:002019", comment, new TravanaApiCallback<String>() {
+                             @Override
+                             public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                                 if(success){
+                                     Log.e(TAG, "add subcomment" + apiResponse);
+                                 }else{
+                                     Log.e(TAG, statusCode + "error");
+                                 }
+
+                             }
+                         });
+
+
+
+                        /*
+                        TravanaAPI.likeCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:58:27GMT01:002019", true, new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, "like subcomment" + apiResponse);
+                                }else{
+                                    Log.e(TAG, statusCode + "error");
+                                }
+
+                            }
+                        });
+
+                         */
+
+
+
 
 
 
@@ -372,6 +438,7 @@ public class SignInActivity extends AppCompatActivity {
 
                          */
 
+                        /*
                         TravanaAPI.messages(new TravanaApiCallback() {
                             @Override
                             public void onComplete(@Nullable Object apiResponse, int statusCode, boolean success) {
@@ -385,6 +452,8 @@ public class SignInActivity extends AppCompatActivity {
 
                             }
                         });
+
+                         */
 
 
 
