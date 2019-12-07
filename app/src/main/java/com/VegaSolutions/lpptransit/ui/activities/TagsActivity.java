@@ -94,6 +94,7 @@ public class TagsActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,13 +106,14 @@ public class TagsActivity extends AppCompatActivity {
 
         setupUI();
 
+        /*
         TravanaAPI.tags((apiResponse, statusCode, success) -> {
             if (success) {
                 Log.i("TagsActivity", Arrays.toString(apiResponse));
                 tagList.addAll(Arrays.asList(apiResponse));
                 runOnUiThread(() -> applyFilter(filter));
             }
-        });
+        });*/
 
     }
 }
