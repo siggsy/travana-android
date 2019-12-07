@@ -84,6 +84,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "271997165503-t5id3taad43fp18joh4l3csc6gjo5dut.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit.debug",
+            "certificate_hash": "2c0156e3b01c3cff116475f33021143f6c65ccd8"
+          }
+        },
+        {
           "client_id": "271997165503-86a3a8j6d5008ms3eolqmaj7qtg09jha.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
