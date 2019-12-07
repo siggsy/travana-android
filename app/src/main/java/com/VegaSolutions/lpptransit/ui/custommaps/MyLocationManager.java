@@ -4,7 +4,6 @@ package com.VegaSolutions.lpptransit.ui.custommaps;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,7 +22,8 @@ public class MyLocationManager {
     private Context context;
 
     private LocationManager locationManager;
-    private String provider;
+    private boolean gps, network = false;
+    private static boolean live;
 
     private static LatLng latest;
     private static List<MyLocationListener> listeners = new ArrayList<>();
@@ -32,6 +32,11 @@ public class MyLocationManager {
         public void onLocationChanged(Location location) {
 
             Log.i(TAG, "location updated: " + location.toString());
+
+            if (location.getAccuracy() > 500)
+                return;
+
+            live = true;
 
             // Notify all listeners
             for (MyLocationListener listener : listeners)
@@ -47,9 +52,15 @@ public class MyLocationManager {
 
             Log.i(TAG, "Provider enabled: " + provider);
 
-            if (provider.equals(MyLocationManager.this.provider))
-                for (MyLocationListener listener : listeners)
-                    listener.onProviderAvailabilityChanged(true);
+            // Notify listeners if at least one is enabled
+            for (MyLocationListener listener : listeners)
+                listener.onProviderAvailabilityChanged(true);
+
+            if (provider.equals(LocationManager.GPS_PROVIDER))
+                gps = true;
+            else if (provider.equals(LocationManager.NETWORK_PROVIDER))
+                network = true;
+
         }
 
         @Override
@@ -57,15 +68,26 @@ public class MyLocationManager {
 
             Log.i(TAG, "Provider disabled: " + provider);
 
-            if (provider.equals(MyLocationManager.this.provider))
-                for (MyLocationListener listener : listeners)
-                    listener.onProviderAvailabilityChanged(false);
+           if (provider.equals(LocationManager.GPS_PROVIDER))
+               gps = false;
+           else if (provider.equals(LocationManager.NETWORK_PROVIDER))
+               network = false;
+
+           // Notify listeners if both providers are disabled
+           if (!gps &&!network)
+               for (MyLocationListener listener : listeners)
+                   listener.onProviderAvailabilityChanged(false);
+
         }
 
         // Redundant (Deprecated on API 29)
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     };
+
+    private void handleLocationChanged(Location location) {
+
+    }
 
     public MyLocationManager(Context context) {
         this.context = context;
@@ -96,6 +118,10 @@ public class MyLocationManager {
 
     public boolean isMainProviderEnabled() {
         return !listeners.isEmpty();
+    }
+
+    public boolean isLive() {
+        return live;
     }
 
     private LatLng getLatestFromPreferences() {
@@ -139,24 +165,21 @@ public class MyLocationManager {
             long minTime = 2000;
             float minDist = 50;
 
-            // Set criteria for the best provider
-            Criteria criteria = new Criteria();
-            criteria.setBearingRequired(false);
-            criteria.setAltitudeRequired(false);
-            criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-
             // Get service if null
             if (locationManager == null)
                 locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            provider = locationManager.getBestProvider(criteria, true);
-
-            // Return result false if getting best provider failed
-            if (provider == null)
+            if (locationManager == null)
                 return false;
 
             // Request location updates and return true for success
-            locationManager.requestLocationUpdates(provider, minTime, minDist, mainListener);
-            return true;
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDist, mainListener);
+                gps = true;
+            } if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, minDist, mainListener);
+                network = true;
+            }
+            return gps || network;
 
         } else {
             locationManager.removeUpdates(mainListener);

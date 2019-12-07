@@ -30,6 +30,9 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
+import com.VegaSolutions.lpptransit.ui.custommaps.LocationMarkerManager;
+import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
+import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager.MyLocationListener;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
@@ -56,7 +59,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RouteActivity extends FragmentActivity implements OnMapReadyCallback {
+public class RouteActivity extends MapFragmentActivity {
 
 
     public static final String ROUTE_NAME = "route_name";
@@ -73,7 +76,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private String stationId;
 
     // Activity UI elements
-    private ImageView backBtn, locBtn;
+    private ImageView backBtn;
     private TextView number;
     private TextView name;
     private View circle;
@@ -86,14 +89,12 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     private ImageButton opposite;
     private ElevationAnimation elevationAnimation;
 
-
-    // TODO: change to non Google Services dependent location service
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    private MyLocationManager locationManager;
+    private LocationMarkerManager markerManager;
 
     // Google maps parameters
     private final int UPDATE_TIME = 2000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
-    private GoogleMap mMap;
     private Handler handler;
     private BusMarkerManager busManager;
     private MarkerOptions busOptions;
@@ -140,6 +141,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             runOnUiThread(() -> adapter.notifyDataSetChanged());
             List<LatLng> latLngs = new ArrayList<>();
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
             // Add station markers.
             for (StationOnRoute stationOnRoute : stationsOnRoute) {
                 LatLng latLng = stationOnRoute.getLatLng();
@@ -155,15 +157,15 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             }
 
             // Connect stations with polyline and move the camera.
+            runOnUiThread(() -> {
             if (!stationsOnRoute.isEmpty()) {
                 LatLngBounds bounds = builder.build();
-                runOnUiThread(() -> {
+
                     mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(Colors.getColorFromString(routeNumber))); // ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK
                     mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
-                });
-            } else {
-                runOnUiThread(() -> mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f)));
-            }
+
+            } else mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
+            });
 
             // Start bus updater.
             handler.post(runnable);
@@ -189,7 +191,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         generator.setBackground(null);
         generator.setContentView(v);
         busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.ic_bus_24dp))).flat(true);
-        stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true); // MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this,R.drawable.station_circle))
+        stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true);
 
         // Setup views.
         backBtn.setOnClickListener(vi -> super.onBackPressed());
@@ -265,8 +267,6 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
             } else runOnUiThread(() -> new CustomToast(this).showDefault(this, Toast.LENGTH_SHORT));
         }));
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
     }
 
     @Override
@@ -292,7 +292,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         number = findViewById(R.id.route_station_number);
         circle = findViewById(R.id.route_circle);
         routeLoading = findViewById(R.id.loading_msg);
-        locBtn = findViewById(R.id.maps_location_icon);
+        locationIcon = findViewById(R.id.maps_location_icon);
         recyclerView = findViewById(R.id.station_list);
         header = findViewById(R.id.header);
         bottomSheet = findViewById(R.id.bottom_sheet);
@@ -332,15 +332,11 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        super.onMapReady(googleMap);
 
         // Setup Google maps UI
-        mMap.clear();
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
-        mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
         mMap.setPadding(0, 0, 0, behavior.getPeekHeight());
-
+        mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
 
         // Setup handlers.
         handler = new Handler();
@@ -365,18 +361,6 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
                 });
             }
         }));
-
-        // Check app location permission and set location button click event
-        if (MapUtility.checkLocationPermission(this)) {
-            locBtn.setOnClickListener(v -> fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    if (location != null)
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15f));
-                }
-            }));
-            mMap.setMyLocationEnabled(true);
-        }
 
         // Query stations on route and display them on the map.
         Api.stationsOnRoute(tripId, callback);
@@ -469,6 +453,5 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         }
 
     }
-
 
 }

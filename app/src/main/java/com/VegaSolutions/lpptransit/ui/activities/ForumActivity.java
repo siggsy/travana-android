@@ -18,6 +18,7 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
+import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.PostListFragment;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -32,6 +33,7 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
     private TabLayout tabLayout;
     private ImageView searchButton;
     private FloatingActionButton newMessage;
+    private ElevationAnimation elevationAnimation;
 
     private ViewPagerAdapter adapter;
 
@@ -43,6 +45,10 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
         tabLayout.setupWithViewPager(viewPager);
 
         newMessage.setOnClickListener(v -> startActivity(new Intent(this, NewMessageActivity.class)));
+
+        final Intent tagSearch = new Intent(this, TagsActivity.class);
+        tagSearch.putExtra("TYPE", TagsActivity.TYPE_NORMAL);
+        searchButton.setOnClickListener(v -> startActivity(tagSearch));
 
     }
 
@@ -58,6 +64,8 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
         tabLayout = findViewById(R.id.forum_tab_layout);
         newMessage = findViewById(R.id.new_message_fab);
 
+        elevationAnimation = new ElevationAnimation(header, 16);
+
         setupUI();
 
     }
@@ -65,6 +73,7 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
     @Override
     public void onHeaderChanged(boolean selected) {
         newMessage.setVisibility(selected ? View.GONE : View.VISIBLE);
+        elevationAnimation.elevate(selected);
     }
 
 
@@ -82,7 +91,7 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
 
         @Override
         public int getCount() {
-            return 1;
+            return 2;
         }
 
         @Nullable

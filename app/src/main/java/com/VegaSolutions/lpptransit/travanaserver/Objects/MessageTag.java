@@ -8,8 +8,6 @@ public class MessageTag implements Parcelable {
     private String _id;
     private String tag;
     private String color;
-    private String description_slo = "";
-    private String description_ang = "";
 
 
     public MessageTag(String _id, String tag, String color) {
@@ -58,14 +56,6 @@ public class MessageTag implements Parcelable {
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    public String getDescription_slo() {
-        return description_slo;
-    }
-
-    public String getDescription_ang() {
-        return description_ang;
     }
 
     @Override

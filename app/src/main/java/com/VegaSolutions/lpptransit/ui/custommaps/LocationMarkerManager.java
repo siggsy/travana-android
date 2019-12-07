@@ -1,7 +1,16 @@
 package com.VegaSolutions.lpptransit.ui.custommaps;
 
+import android.content.Context;
+import android.location.Location;
+
+import androidx.core.content.ContextCompat;
+
+import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -12,15 +21,19 @@ public class LocationMarkerManager {
 
     // Marker objects
     private Marker marker;
+    private Circle accuracyCircle;
     private MarkerOptions options;
+    private CircleOptions accuracyOptions;
     private BitmapDescriptor live, offline;
     private MarkerAnimator animator;
 
-    public LocationMarkerManager(GoogleMap map, LatLng latest, BitmapDescriptor live, BitmapDescriptor offline) {
+    public LocationMarkerManager(Context context, GoogleMap map, LatLng latest, BitmapDescriptor live, BitmapDescriptor offline) {
         this.map = map;
 
         // Set marker style
-        options = new MarkerOptions().anchor(0.5f, 0.5f).icon(offline).flat(true);
+        options = new MarkerOptions().anchor(0.5f, 0.5f).icon(offline).flat(true).zIndex(10f);
+        accuracyOptions = new CircleOptions().fillColor(ContextCompat.getColor(context, R.color.colorRipple)).strokeColor(ContextCompat.getColor(context, R.color.colorAccent)).strokeWidth(5f);
+
         this.live = live;
         this.offline = offline;
         animator = new MarkerAnimator();
@@ -31,17 +44,26 @@ public class LocationMarkerManager {
 
     }
 
-    public void update(LatLng location) {
+    public void update(Location location) {
+
+        LatLng latLng = MapUtility.getLatLngFromLocation(location);
 
         if (marker == null)
-            marker = map.addMarker(options.position(location).icon(live));
-        else animator.animateMarker(marker, location, 0, new LatLngInterpolator.Linear());
+            marker = map.addMarker(options.position(latLng).icon(live));
+        if (accuracyCircle == null)
+            accuracyCircle = map.addCircle(accuracyOptions.center(latLng).radius(location.getAccuracy()));
+
+        animator.animateMarkerWithCircle(marker, accuracyCircle, location.getAccuracy(), latLng, new LatLngInterpolator.Linear());
+
         setLive(true);
 
     }
 
-    private void setLive(boolean value) {
-        marker.setIcon(value ? live : offline);
+    public void setLive(boolean value) {
+        if (marker != null)
+            marker.setIcon(value ? live : offline);
+        if (accuracyCircle != null && !value)
+            accuracyCircle.setRadius(0);
     }
 
 }

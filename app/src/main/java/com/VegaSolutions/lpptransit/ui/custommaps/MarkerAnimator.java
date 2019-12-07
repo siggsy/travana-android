@@ -5,15 +5,20 @@ import android.os.SystemClock;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-public class MarkerAnimator {
+import java.util.ArrayList;
+import java.util.List;
+
+class MarkerAnimator {
 
     private Handler handler;
     private Runnable current;
+    private List<Object> animated = new ArrayList<>();
 
-    public MarkerAnimator() {
+    MarkerAnimator() {
         handler = new Handler();
     }
 
@@ -24,7 +29,7 @@ public class MarkerAnimator {
      * @param finalCardinalDirection final rotation
      * @param latLngInterpolator interpolator to interpolate marker
      */
-    public void animateMarker(Marker marker, LatLng finalPosition, float finalCardinalDirection, LatLngInterpolator latLngInterpolator) {
+    void animateMarker(Marker marker, LatLng finalPosition, float finalCardinalDirection, LatLngInterpolator latLngInterpolator) {
 
         final LatLng startPosition = marker.getPosition();
         float startCardinalDirection = marker.getRotation() % 360;
@@ -41,7 +46,10 @@ public class MarkerAnimator {
         endCardinalDirection = finalCardinalDirection;
         beginCardinalDirection = startCardinalDirection;
 
-        handler.removeCallbacks(current);
+        if (animated.contains(marker))
+            handler.removeCallbacks(current);
+        else animated.add(marker);
+
         final long start = SystemClock.uptimeMillis();
         final Interpolator interpolator = new AccelerateDecelerateInterpolator();
         final float durationInMs = 1000;
@@ -67,7 +75,51 @@ public class MarkerAnimator {
                 if (t < 1) {
                     // Post again 16ms later.
                     handler.postDelayed(this, 16);
-                }
+                } else animated.remove(marker);
+            }
+        };
+
+        handler.post(current);
+    }
+
+    void animateMarkerWithCircle(Marker marker, Circle circle, double radius, LatLng finalPosition, LatLngInterpolator latLngInterpolator) {
+
+        final LatLng startPosition = marker.getPosition();
+        final double startRad = circle.getRadius();
+
+        if (animated.contains(marker))
+            handler.removeCallbacks(current);
+        else animated.add(marker);
+
+        final long start = SystemClock.uptimeMillis();
+        final Interpolator interpolator = new AccelerateDecelerateInterpolator();
+        final float durationInMs = 1000;
+
+        current = new Runnable() {
+            long elapsed;
+            float t;
+            float v;
+
+            @Override
+            public void run() {
+
+                // Calculate progress using interpolator
+                elapsed = SystemClock.uptimeMillis() - start;
+                t = elapsed / durationInMs;
+                v = interpolator.getInterpolation(t);
+
+                // Update marker and circle
+                LatLng pos = latLngInterpolator.interpolate(v, startPosition, finalPosition);
+                double rad = (radius - startRad) * v  + startRad;
+                marker.setPosition(pos);
+                circle.setCenter(pos);
+                circle.setRadius(rad);
+
+                // Repeat till progress is complete.
+                if (t < 1) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 16);
+                } else animated.remove(marker);
             }
         };
 

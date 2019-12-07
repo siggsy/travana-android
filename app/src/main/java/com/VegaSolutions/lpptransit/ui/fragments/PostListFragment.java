@@ -2,14 +2,18 @@ package com.VegaSolutions.lpptransit.ui.fragments;
 
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +28,7 @@ import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallbackSpecial;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
@@ -44,8 +49,13 @@ public class PostListFragment extends Fragment {
 
     private static final String TYPE = "type";
 
+    private FragmentHeaderCallback fragmentHeaderCallback;
+
+
     // Parameter
     private int type;
+
+    private RecyclerView rv;
 
     public static PostListFragment newInstance(int type) {
         PostListFragment fragment = new PostListFragment();
@@ -53,6 +63,14 @@ public class PostListFragment extends Fragment {
         args.putInt(TYPE, type);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentHeaderCallback)
+            fragmentHeaderCallback = (FragmentHeaderCallback) context;
+
     }
 
     @Override
@@ -64,38 +82,76 @@ public class PostListFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        fragmentHeaderCallback.onHeaderChanged(rv.canScrollVertically(-1));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_post_list, container, false);
 
-        RecyclerView rv = root.findViewById(R.id.post_list_rv);
+        rv = root.findViewById(R.id.post_list_rv);
+        SwipeRefreshLayout refreshLayout = root.findViewById(R.id.refresh_layout);
 
         Adapter adapter = new Adapter();
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                fragmentHeaderCallback.onHeaderChanged(recyclerView.canScrollVertically(-1));
+            }
+        });
+
+        refreshLayout.setRefreshing(true);
+        refreshLayout.setOnRefreshListener(() -> {
+            if (type == TYPE_ALL) {
+                TravanaAPI.messagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
+                    getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
+                    if (success) {
+                        Log.i("message json", Arrays.toString(apiResponse));
+                        adapter.setMessages(apiResponse);
+                        getActivity().runOnUiThread(adapter::notifyDataSetChanged);
+                    }
+                });
+            } else {
+
+            TravanaAPI.followedMessagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
+                getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
+                if (success) {
+                    adapter.setMessages((LiveUpdateMessage[]) apiResponse);
+                    getActivity().runOnUiThread(adapter::notifyDataSetChanged);
+                }
+            });
+
+
+            }
+        });
 
         if (type == TYPE_ALL) {
             TravanaAPI.messagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
+                getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                 if (success) {
-
-                    LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
-                    Log.i("message json", Arrays.toString(messages));
-                    adapter.setMessages(messages);
+                    Log.i("message json", Arrays.toString(apiResponse));
+                    adapter.setMessages(apiResponse);
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                 }
             });
         } else {
-            /*
-            TravanaAPI.followedMessagesMeta(FirebaseManager.getSignedUser().getUid(), new String[0], (apiResponse, statusCode, success) -> {
+            TravanaAPI.followedMessagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
+                getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                 if (success) {
                     LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
                     adapter.setMessages(messages);
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                 }
             });
-
-             */
         }
+
+
 
         return root;
     }
@@ -128,25 +184,25 @@ public class PostListFragment extends Fragment {
                 if (message.getUser().getTag() != null) {
                     viewHolder.userTag.setVisibility(View.VISIBLE);
                     viewHolder.userTag.setText(message.getUser().getTag().getTag());
-                    viewHolder.userTag.getBackground().setTint(Color.parseColor(message.getUser().getTag().getColor()));
+                    viewHolder.userTag.getBackground().setTint(Color.parseColor(message.getUser().getTag().getTag_color()));
                 } else {
                     viewHolder.userTag.setVisibility(View.GONE);
                 }
             }
 
-
             viewHolder.postLikes.setText(String.valueOf(message.getLikes()));
             viewHolder.postComments.setText(getString(R.string.post_comments, message.getComments_int()));
-            viewHolder.postTime.setText(getString(R.string.posted_time, Hours.hoursBetween(new DateTime(message.getCreated_time()), DateTime.now()).getHours()));
+            viewHolder.postTime.setText(getString(R.string.posted_time, message.getTime_ago()));
             viewHolder.postContent.setText(message.getMessage_content());
 
             viewHolder.postTags.removeAllViews();
-            for (MessageTag tag : message.getTags()) {
-                TextView v = (TextView) getLayoutInflater().inflate(R.layout.template_tag, viewHolder.postTags, false);
-                v.getBackground().setTint(Color.parseColor(tag.getColor()));
-                v.setText("#" + tag.getTag());
-                viewHolder.postTags.addView(v);
-            }
+            if (message.getTags() != null)
+                for (MessageTag tag : message.getTags()) {
+                    TextView v = (TextView) getLayoutInflater().inflate(R.layout.template_tag, viewHolder.postTags, false);
+                    v.getBackground().setTint(Color.parseColor(tag.getColor()));
+                    v.setText("#" + tag.getTag());
+                    viewHolder.postTags.addView(v);
+                }
 
             viewHolder.setLiked(message.isLiked(), message);
 
@@ -160,7 +216,7 @@ public class PostListFragment extends Fragment {
                 FirebaseManager.getFirebaseToken((data, error, success) -> {
                     if (success) {
                         TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
-                            Log.i("Liked",  apiResponse.toString() + " " + statusCode);
+                            Log.i("Liked",  apiResponse + " " + statusCode);
                             if (success1 && apiResponse.toString().equals("Successful")) {
                                 ((Activity) getContext()).runOnUiThread(() -> {
                                     CustomToast customToast = new CustomToast(getContext());
@@ -184,7 +240,14 @@ public class PostListFragment extends Fragment {
                         });
                     }
                 });
+            });
 
+            TravanaAPI.getUserImage(message.getUser().getUser_photo_url(), (bitmap, statusCode, success) -> {
+                getActivity().runOnUiThread(() -> {
+                    if (success)
+                        viewHolder.userImage.setImageBitmap(bitmap);
+                    else new CustomToast(getContext()).showDefault(getActivity(), Toast.LENGTH_SHORT);
+                });
             });
 
         }

@@ -52,13 +52,8 @@ import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, NavigationView.OnNavigationItemSelectedListener, MyLocationManager.MyLocationListener {
+public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, NavigationView.OnNavigationItemSelectedListener{
 
-    private GoogleMap mMap;
-
-    LatLng ljubljana = new LatLng(46.056319, 14.505381);
-    MyLocationManager locationManager;
-    LocationMarkerManager markerManager;
     private final int locationRequestCode = 1000;
 
     // Fragment navigation stack
@@ -68,7 +63,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     ImageButton navBarBtn, search;
     View shadow;
     TopMessage loading;
-    ImageView locationIcon;
     ViewPagerBottomSheetBehavior behavior;
     DrawerLayout dl;
     NavigationView nv;
@@ -131,39 +125,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
-        mMap = googleMap;
+        super.onMapReady(googleMap);
 
         // Setup google maps UI.
-        mMap.getUiSettings().setCompassEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setPadding(12, 200, 12, behavior.getPeekHeight());
-        mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
         setupClusterManager();
-
-
-        // Set location button location callback.
-        if (MapUtility.checkLocationPermission(this)) {
-
-            locationIcon.setVisibility(View.VISIBLE);
-
-            // Setup location manager.
-            locationManager = new MyLocationManager(this);
-            locationManager.addListener(this);
-
-            markerManager = new LocationMarkerManager(mMap,
-                    locationManager.getLatest(),
-                    MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_live)),
-                    MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_offline)));
-
-            locationIcon.setOnClickListener(v -> {
-                LatLng location = locationManager.getLatest();
-                if (location != null)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
-            });
-
-        }
-
 
         // Set Station InfoWindow click listener.
         mMap.setOnInfoWindowClickListener(marker -> {
@@ -173,28 +139,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             startActivity(i);
         });
 
-
-        // Set camera to Ljubljana.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
-
-
         // Query for stations.
         Api.stationDetails(false, callback);
 
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (locationManager != null)
-            locationManager.removeListener(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (locationManager != null)
-            locationManager.addListener(this);
     }
 
     @Override
@@ -342,18 +289,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 break;
+            case R.id.forum:
+                startActivity(new Intent(this, ForumActivity.class));
         }
 
         return true;
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        markerManager.update(new LatLng(location.getLatitude(), location.getLongitude()));
-    }
-
-    @Override
-    public void onProviderAvailabilityChanged(boolean value) {
-
-    }
 }

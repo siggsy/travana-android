@@ -436,7 +436,7 @@ public class TravanaAPI {
                 .start();
     }
 
-    public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback<String> callback) {
+    public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback<String> callback) {          //like = true -> likes++ , like = false -> likes--
 
         new TravanaQuery(TravanaQuery.MESSAGE_LIKE, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -449,52 +449,6 @@ public class TravanaAPI {
                 }).addHeaderValues("mess_id", mess_id)
                 .addHeaderValues("liked", like + "")
                 //.addHeaderValues("user_id", user_id)
-                .start();
-    }
-
-    public static void messagesMarkSeen(String token, String mess_id, boolean seen, TravanaApiCallback<String> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGES_MARK_SEEN, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                }).addHeaderValues("mess_id", mess_id)
-                .addHeaderValues("seen", seen + "")
-                .start();
-    }
-
-    public static void messagesMarkNotified(String token, String mess_id, boolean notified, TravanaApiCallback<String> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGES_MARK_NOTIFIED, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                }).addHeaderValues("mess_id", mess_id)
-                .addHeaderValues("seen", notified + "")
-                .start();
-    }
-
-    public static void messagesFollowedUnseenMeta(String token, TravanaApiCallback<LiveUpdateMessage[]> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGES_FOLLOWD_UNSEEN_META, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-
-                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
-                        callback.onComplete(messages, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                })
                 .start();
     }
 
@@ -514,8 +468,8 @@ public class TravanaAPI {
                 .start();
     }
 
-    /*
-    public static void followedMessages(String user_id, String[] tags_ids, TravanaApiCallback callback) {
+
+ /*   public static void followedMessages(String user_id, String[] tags_ids, TravanaApiCallback callback) {
 
         RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(tags_ids));
 
@@ -531,18 +485,14 @@ public class TravanaAPI {
                 })
                 .execute();
     }
-
-     */
-
+*/
     public static void followedMessagesMeta(String token, TravanaApiCallback<LiveUpdateMessage[]> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGES_FOLLOWED_META, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-
                         LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
-
                         callback.onComplete(messages, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -558,7 +508,6 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-
                         TagsBox tags = new Gson().fromJson(response, TagsBox.class);
                         callback.onComplete(tags, statusCode, true);
                     } else {

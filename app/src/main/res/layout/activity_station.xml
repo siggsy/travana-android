@@ -12,6 +12,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ImageView
+        android:id="@+id/maps_location_icon"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="112dp"
+        android:background="@drawable/stretched_circle"
+        android:backgroundTint="?backgroundViewColor"
+        android:clickable="true"
+        android:elevation="6dp"
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/ic_my_location_black_24dp"
+        android:tint="?android:textColor" />
+
     <View
         android:id="@+id/shadow"
         android:layout_width="match_parent"
@@ -27,6 +43,7 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="false"
         app:behavior_peekHeight="100dp"
+        android:translationZ="6dp"
         android:clickable="true"
         android:focusable="true">
 

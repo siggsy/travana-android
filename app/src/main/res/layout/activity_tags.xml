@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?backgroundViewColor"
     tools:context=".ui.activities.TagsActivity">
 
     <FrameLayout
@@ -18,7 +19,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="?backgroundViewColor">
 
             <ImageView
                 android:id="@+id/search_activity_back"
@@ -53,16 +55,14 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 
-    <com.google.android.flexbox.FlexboxLayout
-        android:id="@+id/tags_fb"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_activity_rv"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="?backgroundViewColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_activity_header"
-        app:alignItems="flex_start"
-        app:flexWrap="wrap"/>
+        app:layout_constraintTop_toBottomOf="@+id/search_activity_header" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
