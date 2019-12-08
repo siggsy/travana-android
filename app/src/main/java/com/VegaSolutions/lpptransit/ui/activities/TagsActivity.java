@@ -18,12 +18,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.firebase.FirebaseCallback;
+import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaQuery;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.common.util.ArrayUtils;
@@ -182,12 +188,6 @@ public class TagsActivity extends AppCompatActivity {
                 };
             }
 
-            View.OnClickListener followClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    TravanaAPI.followTag();
-                }
-            }
             if (tag instanceof UserTag) {
 
                 UserTag uTag = (UserTag) tag;
@@ -197,6 +197,24 @@ public class TagsActivity extends AppCompatActivity {
                 vh.name.getBackground().setTint(Color.parseColor(uTag.getColor()));
                 vh.description.setText(uTag.getDescription_ang());
                 vh.root.setOnClickListener(onClickListener);
+                vh.following.setOnClickListener(v -> {
+                    FirebaseManager.getFirebaseToken((data, error, success) -> {
+                        if (success) {
+                            TravanaAPI.followTag(data, uTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                                if (success1 && apiResponse.equals("Successful")) {
+                                    CustomToast customToast = new CustomToast(TagsActivity.this);
+                                    customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
+                                    customToast.setIconColor(Color.WHITE);
+                                    customToast.setTextColor(Color.WHITE);
+                                    customToast.setText("Success!");
+                                    customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
+                                    customToast.show(Toast.LENGTH_SHORT);
+                                }
+                            }));
+                        }
+                    });
+
+                });
 
             } else {
 
@@ -207,6 +225,24 @@ public class TagsActivity extends AppCompatActivity {
                 vh.name.getBackground().setTint(Color.parseColor(mTag.getColor()));
                 vh.description.setText(mTag.getDescription_ang());
                 vh.root.setOnClickListener(onClickListener);
+                vh.following.setOnClickListener(v -> {
+                    FirebaseManager.getFirebaseToken((data, error, success) -> {
+                        if (success) {
+                            TravanaAPI.followTag(data, mTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                                if (success1 && apiResponse.equals("Successful")) {
+                                    CustomToast customToast = new CustomToast(TagsActivity.this);
+                                    customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
+                                    customToast.setIconColor(Color.WHITE);
+                                    customToast.setTextColor(Color.WHITE);
+                                    customToast.setText("Success!");
+                                    customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
+                                    customToast.show(Toast.LENGTH_SHORT);
+                                }
+                            }));
+                        }
+                    });
+
+                });
 
             }
 
@@ -240,7 +276,6 @@ public class TagsActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            Log.i("length", "" + tags.length);
             return tags.length;
         }
 

@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.firebase.FirebaseCallback;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
@@ -119,13 +120,18 @@ public class PostListFragment extends Fragment {
                 });
             } else {
 
-            TravanaAPI.followedMessagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
-                getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
-                if (success) {
-                    adapter.setMessages((LiveUpdateMessage[]) apiResponse);
-                    getActivity().runOnUiThread(adapter::notifyDataSetChanged);
-                }
-            });
+                FirebaseManager.getFirebaseToken((data, error, success) -> TravanaAPI.followedMessagesMeta(data, (apiResponse, statusCode, success1) -> {
+                    getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
+                    if (success1) {
+                        Log.i("following json", Arrays.toString(apiResponse));
+                        adapter.setMessages(apiResponse);
+                        getActivity().runOnUiThread(adapter::notifyDataSetChanged);
+                    }
+                    else {
+                        Log.i("failed json", Arrays.toString(apiResponse));
+                    }
+                }));
+
 
 
             }
@@ -138,17 +144,22 @@ public class PostListFragment extends Fragment {
                     Log.i("message json", Arrays.toString(apiResponse));
                     adapter.setMessages(apiResponse);
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
+                } else {
+                    Log.i("message json", Arrays.toString(apiResponse));
                 }
             });
         } else {
-            TravanaAPI.followedMessagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
+            FirebaseManager.getFirebaseToken((data, error, success) -> TravanaAPI.followedMessagesMeta(data, (apiResponse, statusCode, success1) -> {
                 getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
-                if (success) {
-                    LiveUpdateMessage[] messages = (LiveUpdateMessage[]) apiResponse;
-                    adapter.setMessages(messages);
+                if (success1) {
+                    Log.i("following json", Arrays.toString(apiResponse));
+                    adapter.setMessages(apiResponse);
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                 }
-            });
+                else {
+                    Log.i("failed json", Arrays.toString(apiResponse));
+                }
+            }));
         }
 
 
