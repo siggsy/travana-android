@@ -20,7 +20,8 @@
         android:theme="@style/DarkTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.activities.LauncherActivity"></activity>
+        <activity android:name=".ui.activities.LauncherActivity" />
+        <activity android:name=".ui.activities.TagMessageActivity"/>
         <activity android:name=".ui.activities.TagsActivity" />
         <activity
             android:name=".ui.activities.NewMessageActivity"

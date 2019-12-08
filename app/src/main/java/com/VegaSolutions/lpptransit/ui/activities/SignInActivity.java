@@ -400,33 +400,14 @@ public class SignInActivity extends AppCompatActivity {
 
                          */
 
-                        TravanaAPI.messagesByTag("xyz#115678", new TravanaApiCallback<LiveUpdateMessage[]>() {
-                            @Override
-                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+                        TravanaAPI.tags(new TravanaApiCallback<TagsBox>() {
+                                            @Override
+                                            public void onComplete(@Nullable TagsBox apiResponse, int statusCode, boolean success) {
 
-                                if(success){
-                                    Log.e("SIZE", apiResponse.length + "");
-                                    Log.e(TAG, Arrays.toString(apiResponse) + " ");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
+                                                Log.e(TAG, apiResponse + "");
 
-                            }
-                        });
-
-                        TravanaAPI.messagesByTag(token, "xyz#115678", new TravanaApiCallback<LiveUpdateMessage[]>() {
-                            @Override
-                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
-
-                                if(success){
-                                    Log.e("SIZE", apiResponse.length + "");
-                                    Log.e(TAG, Arrays.toString(apiResponse) + " ");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
-
-                            }
-                        });
+                                            }
+                                        });
 
 
                         /*

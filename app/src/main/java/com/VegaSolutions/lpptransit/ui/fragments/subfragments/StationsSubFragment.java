@@ -1,11 +1,9 @@
 package com.VegaSolutions.lpptransit.ui.fragments.subfragments;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,16 +23,13 @@ import android.widget.TextView;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
-import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -45,9 +40,7 @@ import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
-// TODO: Clean code and redo api call.
-
-public class StationsSubFragment extends Fragment {
+public class StationsSubFragment extends Fragment implements MyLocationManager.MyLocationListener {
 
     private static final String TYPE = "type";
 
@@ -57,21 +50,23 @@ public class StationsSubFragment extends Fragment {
     // Fragment parameters
     private int type;
 
-    private Location location;
-    private Adapter adapter = new Adapter();
+    // Probably redundant
+    private LatLng location;
+
 
     private Context context;
-    private FragmentHeaderCallback callback;
-    private FusedLocationProviderClient locationClient;
+    // private FusedLocationProviderClient locationClient;
+    private MyLocationManager locationManager;
     private List<Station> stations;
 
     // UI elements
     private RecyclerView list;
     private View favErr, locErr, progressBar;
     private FloatingActionButton locationRefresh;
+    private Adapter adapter = new Adapter();
+    private FragmentHeaderCallback callback;
 
-    // Location callback
-    private OnCompleteListener<Location> onCompleteListener = task -> {
+    private void updateLocationList(LatLng location) {
 
         // Cancel UI update if fragment not attached
         if (context == null)
@@ -79,8 +74,6 @@ public class StationsSubFragment extends Fragment {
 
         // Update UI
         ((Activity) context).runOnUiThread(() -> {
-            Location location = task.getResult();
-
             progressBar.setVisibility(View.GONE);
             if (location != null) {
                 this.location = location;
@@ -89,7 +82,7 @@ public class StationsSubFragment extends Fragment {
             } else locErr.setVisibility(View.VISIBLE);
         });
 
-    };
+    }
 
     public static StationsSubFragment newInstance(int type, FragmentHeaderCallback callback) {
         StationsSubFragment fragment = new StationsSubFragment();
@@ -121,14 +114,9 @@ public class StationsSubFragment extends Fragment {
             locationRefresh.setOnClickListener((v) -> {
                 locErr.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
-                adapter.setStations(new ArrayList<>());
-                locationClient.getLastLocation().addOnCompleteListener(onCompleteListener);
+                updateLocationList(locationManager.getLatest());
             });
         }
-    }
-
-    private void setupCurrentLocationUpdates() {
-        locationClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
     @Override
@@ -146,13 +134,19 @@ public class StationsSubFragment extends Fragment {
         callback.onHeaderChanged(list.canScrollVertically(-1));
         if (stations != null) {
             if (type == TYPE_FAVOURITE) setFavouriteStations(stations);
-            else adapter.notifyDataSetChanged();
+            else if (locationManager != null) updateLocationList(locationManager.getLatest());
+        }
+        if (type == TYPE_NEARBY && locationManager != null && !locationManager.isMainProviderEnabled()) {
+            if (stations != null)
+                locationManager.addListener(this);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if (type == TYPE_NEARBY && locationManager != null)
+            locationManager.removeListener(this);
     }
 
     @Override
@@ -179,7 +173,8 @@ public class StationsSubFragment extends Fragment {
             // Update UI
             ((Activity)context).runOnUiThread(() -> {
                 progressBar.setVisibility(View.GONE);
-                if (success) {
+                if (success && apiResponse != null) {
+
                     stations = apiResponse.getData();
 
                     // Show favourite stations
@@ -201,9 +196,11 @@ public class StationsSubFragment extends Fragment {
                         }
 
                         // Setup location for updates
-                        setupCurrentLocationUpdates();
+                        locationManager = new MyLocationManager(context);
+                        if (!locationManager.isMainProviderEnabled())
+                            locationManager.addListener(this);
                         locErr.setVisibility(View.GONE);
-                        locationClient.getLastLocation().addOnCompleteListener(onCompleteListener);
+                        updateLocationList(locationManager.getLatest());
                         locationRefresh.setVisibility(View.VISIBLE);
 
                     }
@@ -221,7 +218,6 @@ public class StationsSubFragment extends Fragment {
 
         ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
 
-        // Filter by favourites
         for (Station station : stations) {
             Boolean f = favourites.get(station.getRef_id());
             if (f == null) f = false;
@@ -232,6 +228,7 @@ public class StationsSubFragment extends Fragment {
         if (stationWrappersFav.size() == 0) {
             locErr.setVisibility(View.GONE);
             favErr.setVisibility(View.VISIBLE);
+            adapter.setStations(stationWrappersFav);
         } else {
             favErr.setVisibility(View.GONE);
             locErr.setVisibility(View.GONE);
@@ -247,14 +244,15 @@ public class StationsSubFragment extends Fragment {
 
         // Check for location availability
         if (location == null) {
+            adapter.setStations(new ArrayList<>());
             favErr.setVisibility(View.GONE);
             locErr.setVisibility(View.VISIBLE);
         } else {
 
             // Sort stations by current location
             Collections.sort(stations, (o1, o2) -> {
-                double o1D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o1.getLatLng());
-                double o2D = MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), o2.getLatLng());
+                double o1D = MapUtility.calculationByDistance(location, o1.getLatLng());
+                double o2D = MapUtility.calculationByDistance(location, o2.getLatLng());
                 return Double.compare(o1D, o2D);
             });
 
@@ -262,15 +260,17 @@ public class StationsSubFragment extends Fragment {
             for (Station station : stations) {
                 Boolean f = favourites.get(station.getRef_id());
                 if (f == null) f = false;
-                stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(new LatLng(location.getLatitude(), location.getLongitude()), station.getLatLng()) * 1000)));
+                stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(location, station.getLatLng()) * 1000)));
             }
 
             // Show on recyclerView
             favErr.setVisibility(View.GONE);
             locErr.setVisibility(View.GONE);
-
             adapter.setStations(stationWrappersFav.subList(0, 30));
+            adapter.refreshStations(stationWrappersFav.subList(0, 30));
+
         }
+
     }
 
     private Map<String, Boolean> getFavourite() {
@@ -290,6 +290,16 @@ public class StationsSubFragment extends Fragment {
         context = null;
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        // Nothing
+    }
+
+    @Override
+    public void onProviderAvailabilityChanged(boolean value) {
+        // Nothing
+    }
+
     public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public List<StationWrapper> stations;
@@ -298,10 +308,80 @@ public class StationsSubFragment extends Fragment {
             stations = new ArrayList<>();
         }
 
-        private void setStations(List<StationWrapper> stations) {
-            this.stations = stations;
-            notifyDataSetChanged();
+        private void setStations(List<StationWrapper> stationsNew) {
+
+            // Check for new elements
+            for (int i = 0; i < stationsNew.size(); i++) {
+                StationWrapper newStation = stationsNew.get(i);
+                int j = where(newStation, stations);
+                if (j == -1) {
+                    // Add if not inserted
+                    stations.add(i, newStation);
+                    notifyItemInserted(i);
+                } else {
+                    StationWrapper oldStation = stations.get(j);
+                    if (newStation.distance != oldStation.distance || newStation.favourite != oldStation.favourite) {
+                        stations.remove(i);
+                        stations.add(i, newStation);
+                        notifyItemChanged(i);
+                    }
+                }
+            }
+
+
+
+            for (int i = 0; i < stations.size(); i++) {
+                if (where(stations.get(i), stationsNew) == -1) {
+                    stations.remove(i);
+                    notifyItemRemoved(i);
+                    i--;
+                }
+            }
+
         }
+
+        private int where(StationWrapper a, List<StationWrapper> b) {
+
+            if (b.isEmpty())
+                return -1;
+            for (int i = 0; i < b.size(); i++) {
+                if (a.station.equals(b.get(i).station))
+                    return i;
+            }
+            return -1;
+
+        }
+
+        private void refreshStations(List<StationWrapper> stationsNew) {
+
+            // Check for new elements
+            for (int i = 0; i < stationsNew.size(); i++) {
+                int j = where(stationsNew.get(i), stations);
+
+                if (j != -1) {
+                    // Move if already in
+                    if (i != j) {
+                        stations.remove(j);
+                        stations.add(i, stationsNew.get(i));
+                        notifyItemMoved(j, i);
+                    }
+                } else {
+                    // Insert if not
+                    stations.add(i, stationsNew.get(i));
+                    notifyItemInserted(i);
+                }
+            }
+
+            for (int i = 0; i < stations.size(); i++) {
+                if (where(stations.get(i), stationsNew) == -1) {
+                    stations.remove(i);
+                    notifyItemRemoved(i);
+                    i--;
+                }
+            }
+            list.scrollToPosition(0);
+        }
+
         public ArrayList<Station> getStations() {
             // Convert array
             ArrayList<Station> stations = new ArrayList<>();

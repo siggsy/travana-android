@@ -42,7 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
 
-public class StationActivity extends AppCompatActivity implements FragmentHeaderCallback, OnMapReadyCallback {
+public class StationActivity extends MapFragmentActivity implements FragmentHeaderCallback {
 
 
     public static final String STATION = "station";
@@ -61,8 +61,6 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
     // Station data
     Station station;
     boolean favourite;
-
-    GoogleMap mMap;
 
     ElevationAnimation animation;
 
@@ -91,6 +89,7 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
         viewPager = findViewById(R.id.station_pager);
         tabLayout = findViewById(R.id.station_tab_layout);
         back = findViewById(R.id.back);
+        locationIcon = findViewById(R.id.maps_location_icon);
 
         // Get Intent data
         station = getIntent().getParcelableExtra(STATION);
@@ -102,13 +101,10 @@ public class StationActivity extends AppCompatActivity implements FragmentHeader
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        super.onMapReady(googleMap);
 
         // Setup Google maps UI
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
-        mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
-        mMap.setMyLocationEnabled(MapUtility.checkLocationPermission(this));
 
         mMap.setInfoWindowAdapter(new StationInfoWindow(this));
         Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));

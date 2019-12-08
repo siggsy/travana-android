@@ -36,6 +36,10 @@ public class TagsBox {
         this.main_tags = main_tags;
     }
 
+    public int getFullLength() {
+        return user_tags.length + main_tags.length + tags.length;
+    }
+
     @Override
     public String toString() {
         return "TagsBox{" +

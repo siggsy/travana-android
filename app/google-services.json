@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "271997165503-rufkqrab0sf69mromdr3bv3il61pm8e9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit",
+            "certificate_hash": "b5acd3b4878dd4d0d0de2cd536764d3ebc4e965d"
+          }
+        },
+        {
+          "client_id": "271997165503-46kmf9bmitnqhenretpkcmtdndcl375v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit",
+            "certificate_hash": "db1c9098c4fd01c236ccb2266a47800a2f951811"
+          }
+        },
+        {
+          "client_id": "271997165503-bou9m9tciajip70b9kb5s67kht9fqllg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit",
+            "certificate_hash": "298000403d9c0b20761b9b1a050c42e3de69187e"
+          }
+        },
+        {
           "client_id": "271997165503-islthemscam9fhp8uk8ni0ifacmvq9h4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -28,6 +52,51 @@
           "android_info": {
             "package_name": "com.VegaSolutions.lpptransit",
             "certificate_hash": "ec0a910acad21444db12daec7637255348b3cd25"
+          }
+        },
+        {
+          "client_id": "271997165503-0gr1injf8qiqfu7p0u42cd60ps6cklt2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDR3dcFzY3XDE9bUq_6zZU5z4D5V1qeTPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271997165503-0gr1injf8qiqfu7p0u42cd60ps6cklt2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271997165503:android:d863425932981635b00b0a",
+        "android_client_info": {
+          "package_name": "com.VegaSolutions.lpptransit.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271997165503-t5id3taad43fp18joh4l3csc6gjo5dut.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit.debug",
+            "certificate_hash": "2c0156e3b01c3cff116475f33021143f6c65ccd8"
+          }
+        },
+        {
+          "client_id": "271997165503-86a3a8j6d5008ms3eolqmaj7qtg09jha.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit.debug",
+            "certificate_hash": "1af0e708fa582ce01a349de952d347dcb2139d92"
           }
         },
         {
