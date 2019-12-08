@@ -10,6 +10,16 @@ public class TagsBox {
 
     public MessageTag[] main_tags;
 
+    public UserTag[] user_tags;
+
+    public UserTag[] getUser_tags() {
+        return user_tags;
+    }
+
+    public void setUser_tags(UserTag[] user_tags) {
+        this.user_tags = user_tags;
+    }
+
     public MessageTag[] getTags() {
         return tags;
     }
@@ -26,11 +36,16 @@ public class TagsBox {
         this.main_tags = main_tags;
     }
 
+    public int getFullLength() {
+        return user_tags.length + main_tags.length + tags.length;
+    }
+
     @Override
     public String toString() {
         return "TagsBox{" +
                 "tags=" + Arrays.toString(tags) +
                 ", main_tags=" + Arrays.toString(main_tags) +
+                ", user_tags=" + Arrays.toString(user_tags) +
                 '}';
     }
 }
