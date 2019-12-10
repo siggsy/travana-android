@@ -547,7 +547,6 @@ public class TravanaAPI {
                     }
                 })
                 .start();
-
     }
 
     public static void messagesByTag(String tag_id, TravanaApiCallback<LiveUpdateMessage[]> callback) {
@@ -589,6 +588,22 @@ public class TravanaAPI {
     public static void tags(TravanaApiCallback<TagsBox> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGE_TAGS)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        TagsBox tags = new Gson().fromJson(response, TagsBox.class);
+                        callback.onComplete(tags, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .start();
+    }
+
+    public static void tags(String token, TravanaApiCallback<TagsBox> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGE_TAGS, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {

@@ -10,6 +10,7 @@ public class MessageTag implements Parcelable {
     private String color;
     private String description_slo = "";
     private String description_ang = "";
+    private boolean followed;
 
 
     public MessageTag(String _id, String tag, String color) {
@@ -74,6 +75,9 @@ public class MessageTag implements Parcelable {
                 "_id='" + _id + '\'' +
                 ", tag='" + tag + '\'' +
                 ", color='" + color + '\'' +
+                ", description_slo='" + description_slo + '\'' +
+                ", description_ang='" + description_ang + '\'' +
+                ", followed=" + followed +
                 '}';
     }
 

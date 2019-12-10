@@ -309,6 +309,41 @@ public class SignInActivity extends AppCompatActivity {
                     if(success){
 
 
+
+
+                        TravanaAPI.tags(token, new TravanaApiCallback<TagsBox>() {
+                            @Override
+                            public void onComplete(@Nullable TagsBox apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, apiResponse + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+
+                            }
+                        });
+
+
+
+
+
+                        TravanaAPI.followTag(token, "Main#121111", new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, apiResponse + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            }
+                        });
+
+
+
                         /*
                         TravanaAPI.followedMessagesMeta(token, new TravanaApiCallback<LiveUpdateMessage[]>() {
                             @Override
@@ -400,14 +435,34 @@ public class SignInActivity extends AppCompatActivity {
 
                          */
 
-                        TravanaAPI.tags(new TravanaApiCallback<TagsBox>() {
-                                            @Override
-                                            public void onComplete(@Nullable TagsBox apiResponse, int statusCode, boolean success) {
+                        /*
+                        TravanaAPI.messagesByTag("xyz#115678", new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
 
-                                                Log.e(TAG, apiResponse + "");
+                                if(success){
+                                    Log.e("SIZE", apiResponse.length + "");
+                                    Log.e(TAG, Arrays.toString(apiResponse) + " ");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
 
-                                            }
-                                        });
+                            }
+                        });
+
+                        TravanaAPI.messagesByTag(token, "xyz#115678", new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e("SIZE", apiResponse.length + "");
+                                    Log.e(TAG, Arrays.toString(apiResponse) + " ");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            }
+                        });*/
 
 
                         /*
