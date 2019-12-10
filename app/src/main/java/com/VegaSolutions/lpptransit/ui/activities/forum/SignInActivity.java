@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities;
+package com.VegaSolutions.lpptransit.ui.activities.forum;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

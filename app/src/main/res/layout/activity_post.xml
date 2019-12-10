@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activities.PostActivity">
+    tools:context=".ui.activities.forum.PostActivity">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -13,9 +13,10 @@
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/ic_perm_identity_black_24dp"
         app:civ_border_color="?android:textColor"
-        app:civ_border_width="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/post_nested_scroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Domen Kralj"
+        android:text="Banana"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/user_image"
@@ -41,13 +42,58 @@
         android:padding="2dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
-        android:text="DEVELOPER"
+        android:text="BLABLA"
         android:textColor="@android:color/white"
         android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/user_name"
         app:layout_constraintStart_toEndOf="@+id/user_name"
         app:layout_constraintTop_toTopOf="@+id/user_name" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/post_nested_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_image">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/post_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/test_text" />
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/post_tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                app:alignItems="flex_start"
+                app:flexWrap="wrap"
+                app:layout_constraintEnd_toEndOf="@+id/post_content"
+                app:layout_constraintStart_toStartOf="@+id/post_content"
+                app:layout_constraintTop_toBottomOf="@+id/post_content" />
+
+            <TextView
+                android:id="@+id/post_comment_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/post_comments" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

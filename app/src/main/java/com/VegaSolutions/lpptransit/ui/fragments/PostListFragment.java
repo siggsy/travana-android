@@ -45,18 +45,18 @@ public class PostListFragment extends Fragment {
 
 
     // Available parameters
-    public static final int TYPE_FOLLOWING = 1;
-    public static final int TYPE_ALL = 0;
+    public static final int TYPE_FOLLOWING = 0;
+    public static final int TYPE_ALL = 1;
 
     private static final String TYPE = "type";
-
-    private FragmentHeaderCallback fragmentHeaderCallback;
 
 
     // Parameter
     private int type;
 
+    // UI elements
     private RecyclerView rv;
+    private FragmentHeaderCallback fragmentHeaderCallback;
 
     public static PostListFragment newInstance(int type) {
         PostListFragment fragment = new PostListFragment();
@@ -73,6 +73,13 @@ public class PostListFragment extends Fragment {
             fragmentHeaderCallback = (FragmentHeaderCallback) context;
 
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        fragmentHeaderCallback = null;
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,7 +126,6 @@ public class PostListFragment extends Fragment {
                     }
                 });
             } else {
-
                 FirebaseManager.getFirebaseToken((data, error, success) -> TravanaAPI.followedMessagesMeta(data, (apiResponse, statusCode, success1) -> {
                     getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                     if (success1) {
@@ -128,12 +134,9 @@ public class PostListFragment extends Fragment {
                         getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                     }
                     else {
-                        Log.i("failed json", Arrays.toString(apiResponse));
+                        Log.i("failed json", apiResponse.toString());
                     }
                 }));
-
-
-
             }
         });
 
@@ -141,7 +144,6 @@ public class PostListFragment extends Fragment {
             TravanaAPI.messagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
                 getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                 if (success) {
-                    Log.i("message json", Arrays.toString(apiResponse));
                     adapter.setMessages(apiResponse);
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                 } else {
@@ -171,7 +173,7 @@ public class PostListFragment extends Fragment {
 
         private LiveUpdateMessage[] messages = new LiveUpdateMessage[0];
 
-        public void setMessages(LiveUpdateMessage[] messages) {
+        void setMessages(LiveUpdateMessage[] messages) {
             this.messages = messages;
         }
 
@@ -194,7 +196,7 @@ public class PostListFragment extends Fragment {
                 viewHolder.userName.setText(message.getUser().getName());
                 if (message.getUser().getTag() != null) {
                     viewHolder.userTag.setVisibility(View.VISIBLE);
-                    viewHolder.userTag.setText("#" + message.getUser().getTag().getTag());
+                    viewHolder.userTag.setText(message.getUser().getTag().getTag());
                     viewHolder.userTag.getBackground().setTint(Color.parseColor(message.getUser().getTag().getColor()));
                 } else {
                     viewHolder.userTag.setVisibility(View.GONE);
@@ -228,7 +230,7 @@ public class PostListFragment extends Fragment {
                     if (success) {
                         TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
                             Log.i("Liked",  apiResponse + " " + statusCode);
-                            if (success1 && apiResponse.toString().equals("Successful")) {
+                            if (success1 && apiResponse.equals("Successful")) {
                                 ((Activity) getContext()).runOnUiThread(() -> {
                                     CustomToast customToast = new CustomToast(getContext());
                                     customToast.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));

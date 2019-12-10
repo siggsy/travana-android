@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities;
+package com.VegaSolutions.lpptransit.ui.activities.forum;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,20 +15,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.firebase.FirebaseCallback;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaPOSTQuery;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class NewMessageActivity extends AppCompatActivity {

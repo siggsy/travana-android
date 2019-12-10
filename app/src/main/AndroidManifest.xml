@@ -2,14 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.VegaSolutions.lpptransit">
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- maybe remove that. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- maybe remove that. --> <!-- NO -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -17,22 +13,22 @@
         android:allowBackup="false"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/DarkTheme"
+        android:theme="@style/WhiteTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".ui.activities.LauncherActivity" />
-        <activity android:name=".ui.activities.TagMessageActivity"/>
-        <activity android:name=".ui.activities.TagsActivity" />
+        <activity android:name=".ui.activities.forum.TagMessageActivity"/>
+        <activity android:name=".ui.activities.forum.TagsActivity" />
         <activity
-            android:name=".ui.activities.NewMessageActivity"
+            android:name=".ui.activities.forum.NewMessageActivity"
             android:exported="true"
             android:theme="@style/DarkTheme" />
         <activity
             android:name=".ui.activities.TestActivity"
             android:exported="true" />
-        <activity android:name=".ui.activities.PostActivity" />
+        <activity android:name=".ui.activities.forum.PostActivity" />
         <activity
-            android:name=".ui.activities.ForumActivity"
+            android:name=".ui.activities.forum.ForumActivity"
             android:exported="true" />
         <activity android:name=".ui.activities.SettingsActivity" />
         <activity
@@ -40,7 +36,7 @@
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activities.DepartureActivity"
+            android:name=".ui.activities.lpp.DepartureActivity"
             android:screenOrientation="portrait" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -55,7 +51,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".ui.activities.RouteActivity"
+            android:name=".ui.activities.lpp.RouteActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.MainActivity"
@@ -68,7 +64,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.SignInActivity"
+            android:name=".ui.activities.forum.SignInActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
@@ -76,7 +72,7 @@
             android:exported="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activities.StationActivity"
+            android:name=".ui.activities.lpp.StationActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.facebook.FacebookActivity"
