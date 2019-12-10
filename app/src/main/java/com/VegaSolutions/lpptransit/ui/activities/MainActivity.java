@@ -25,6 +25,7 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.forum.ForumActivity;
+import com.VegaSolutions.lpptransit.ui.activities.forum.SignInActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
@@ -285,6 +286,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 break;
             case R.id.forum:
                 startActivity(new Intent(this, ForumActivity.class));
+                break;
+            case R.id.sign_in:
+                startActivity(new Intent(this, SignInActivity.class));
+                break;
         }
 
         return true;

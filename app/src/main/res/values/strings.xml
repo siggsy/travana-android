@@ -51,6 +51,7 @@
     <string name="loading_buses">Loading buses</string>
     <string name="forum" translatable="false">Forum</string>
     <string name="following">following</string>
+    <string name="follow">follow</string>
     <string name="all">all</string>
     <string name="posted_time">posted • %1$s</string>
     <string name="post_comments">%1$d • comments</string>

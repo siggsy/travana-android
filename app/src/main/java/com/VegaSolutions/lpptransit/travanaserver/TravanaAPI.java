@@ -707,7 +707,7 @@ public class TravanaAPI {
                 .start();
     }
 
-    public static void removeTag(String token, String tag_id, TravanaApiCallback<String> callback) {
+    public static void unfollowTag(String token, String tag_id, TravanaApiCallback<String> callback) {
 
         new TravanaQuery(TravanaQuery.REMOVE_FOLLOW_TAG, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {

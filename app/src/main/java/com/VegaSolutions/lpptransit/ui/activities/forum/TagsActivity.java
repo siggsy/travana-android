@@ -30,6 +30,7 @@ import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class TagsActivity extends AppCompatActivity {
 
@@ -79,26 +80,6 @@ public class TagsActivity extends AppCompatActivity {
 
     }
 
-    private void setTags(List<MessageTag> messageTags) {
-
-        LayoutInflater inflater = getLayoutInflater();
-
-        for (MessageTag tag : messageTags) {
-
-            View v = inflater.inflate(R.layout.template_tag, tags, false);
-            TextView name = v.findViewById(R.id.tag_text);
-            name.setText("#" + tag.getTag());
-            name.getBackground().setTint(Color.parseColor(tag.getColor()));
-            name.setOnClickListener(vi -> {
-                setResult(SELECTED, getIntent().putExtra("TAG", tag));
-                finish();
-            });
-            tags.addView(v);
-
-        }
-
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +87,7 @@ public class TagsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tags);
 
         type = getIntent().getIntExtra("TYPE", 0);
+        Log.i("type", type + "");
 
         back = findViewById(R.id.search_activity_back);
         searchView = findViewById(R.id.search_activity_search);
@@ -116,45 +98,49 @@ public class TagsActivity extends AppCompatActivity {
 
         if (type == TYPE_NORMAL) {
 
-            TravanaAPI.tags((apiResponse, statusCode, success) -> {
-                if (success) {
-                    MessageTag[] main = apiResponse.getMain_tags();
-                    MessageTag[] tags = apiResponse.getTags();
-                    UserTag[] userTags = apiResponse.getUser_tags();
 
-                    Log.i("tags", Arrays.toString(main));
+            FirebaseManager.getFirebaseToken((data, error, success) -> {
+                if (success) TravanaAPI.tags(data, (apiResponse, statusCode, success1) -> {
+                    if (success1) {
+                        MessageTag[] main = apiResponse.getMain_tags();
+                        MessageTag[] tags = apiResponse.getTags();
+                        UserTag[] userTags = apiResponse.getUser_tags();
 
-                    Object[] allTags = new Object[main.length + tags.length + userTags.length];
-                    System.arraycopy(userTags, 0, allTags, 0, userTags.length);
-                    System.arraycopy(main, 0, allTags, userTags.length, main.length);
-                    System.arraycopy(tags, 0, allTags, userTags.length + main.length, tags.length);
+                        Log.i("tags", Arrays.toString(main));
 
-                    adapter.allTags = allTags;
-                    runOnUiThread(() -> {
-                        adapter.applyFilter(filter);
-                        adapter.notifyDataSetChanged();
-                    });
-                }
+                        Object[] allTags = new Object[main.length + tags.length + userTags.length];
+                        System.arraycopy(userTags, 0, allTags, 0, userTags.length);
+                        System.arraycopy(main, 0, allTags, userTags.length, main.length);
+                        System.arraycopy(tags, 0, allTags, userTags.length + main.length, tags.length);
+
+                        adapter.allTags = allTags;
+                        runOnUiThread(() -> {
+                            adapter.applyFilter(filter);
+                            adapter.notifyDataSetChanged();
+                        });
+                    }
+                });
             });
 
         } else {
-            TravanaAPI.tags((apiResponse, statusCode, success) -> {
-                if (success) {
+            FirebaseManager.getFirebaseToken((data, error, success) -> {
+                if (success) TravanaAPI.tags(data, (apiResponse, statusCode, success1) -> {
+                    if (success1) {
 
-                    MessageTag[] main = apiResponse.getMain_tags();
-                    MessageTag[] tags = apiResponse.getTags();
+                        MessageTag[] main = apiResponse.getMain_tags();
+                        MessageTag[] tags = apiResponse.getTags();
 
-                    Object[] allTags = new Object[main.length + tags.length];
-                    System.arraycopy(main, 0, allTags, 0, main.length);
-                    System.arraycopy(tags, 0, allTags, main.length, tags.length);
+                        Object[] allTags = new Object[main.length + tags.length];
+                        System.arraycopy(main, 0, allTags, 0, main.length);
+                        System.arraycopy(tags, 0, allTags, main.length, tags.length);
 
-                    adapter.allTags = allTags;
-                    runOnUiThread(() -> {
-                        adapter.applyFilter(filter);
-                        adapter.notifyDataSetChanged();
-                    });
-
-                }
+                        adapter.allTags = allTags;
+                        runOnUiThread(() -> {
+                            adapter.applyFilter(filter);
+                            adapter.notifyDataSetChanged();
+                        });
+                    }
+                });
             });
         }
 
@@ -196,23 +182,56 @@ public class TagsActivity extends AppCompatActivity {
                 vh.name.setText(uTag.getTag());
                 vh.name.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_perm_identity_black_24dp, 0, 0, 0);
                 vh.name.getBackground().setTint(Color.parseColor(uTag.getColor()));
-                vh.description.setText(uTag.getDescription_ang());
+                vh.description.setText(Locale.getDefault().getLanguage().equals("sl") ? uTag.getDescription_slo() : uTag.getDescription_ang());
                 vh.root.setOnClickListener(onClickListener);
-                vh.following.setOnClickListener(v -> FirebaseManager.getFirebaseToken((data, error, success) -> {
-                    if (success) {
-                        TravanaAPI.followTag(data, uTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
-                            if (success1 && apiResponse.equals("Successful")) {
-                                CustomToast customToast = new CustomToast(TagsActivity.this);
-                                customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
-                                customToast.setIconColor(Color.WHITE);
-                                customToast.setTextColor(Color.WHITE);
-                                customToast.setText("Success!");
-                                customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
-                                customToast.show(Toast.LENGTH_SHORT);
+                vh.following.setText(uTag.isFollowed() ? R.string.following : R.string.follow);
+                vh.following.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        vh.following.setOnClickListener(null);
+                        FirebaseManager.getFirebaseToken((data, error, success) -> {
+                            if (success) {
+                                if (uTag.isFollowed()) TravanaAPI.unfollowTag(data, uTag.get_id(), (apiResponse, statusCode, success12) -> {
+                                    if (success12 && apiResponse.equals("Successful")) {
+                                        runOnUiThread(() -> {
+                                            CustomToast customToast = new CustomToast(TagsActivity.this);
+                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
+                                            customToast.setIconColor(Color.WHITE);
+                                            customToast.setTextColor(Color.WHITE);
+                                            customToast.setText("Success!");
+                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
+                                            customToast.show(Toast.LENGTH_SHORT);
+                                            uTag.setFollowed(false);
+
+                                            vh.following.setOnClickListener(this);
+                                            vh.following.setText(R.string.follow);
+                                        });
+
+                                    }
+                                });
+                                else TravanaAPI.followTag(data, uTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                                    if (success1 && apiResponse.equals("Successful")) {
+                                        runOnUiThread(() -> {
+                                            CustomToast customToast = new CustomToast(TagsActivity.this);
+                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
+                                            customToast.setIconColor(Color.WHITE);
+                                            customToast.setTextColor(Color.WHITE);
+                                            customToast.setText("Success!");
+                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
+                                            customToast.show(Toast.LENGTH_SHORT);
+                                            uTag.setFollowed(true);
+
+                                            vh.following.setOnClickListener(this);
+                                            vh.following.setText(R.string.following);
+                                        });
+                                    }
+                                }));
                             }
-                        }));
+                        });
                     }
-                }));
+                });
+
+
 
             } else {
 
@@ -221,23 +240,54 @@ public class TagsActivity extends AppCompatActivity {
                 vh.name.setText("#" + mTag.getTag());
                 vh.name.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 vh.name.getBackground().setTint(Color.parseColor(mTag.getColor()));
-                vh.description.setText(mTag.getDescription_ang());
+                vh.description.setText(Locale.getDefault().getLanguage().equals("sl") ? mTag.getDescription_slo() : mTag.getDescription_ang());
                 vh.root.setOnClickListener(onClickListener);
-                vh.following.setOnClickListener(v -> FirebaseManager.getFirebaseToken((data, error, success) -> {
-                    if (success) {
-                        TravanaAPI.followTag(data, mTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
-                            if (success1 && apiResponse.equals("Successful")) {
-                                CustomToast customToast = new CustomToast(TagsActivity.this);
-                                customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
-                                customToast.setIconColor(Color.WHITE);
-                                customToast.setTextColor(Color.WHITE);
-                                customToast.setText("Success!");
-                                customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
-                                customToast.show(Toast.LENGTH_SHORT);
+                vh.following.setText(mTag.isFollowed() ? R.string.following : R.string.follow);
+                vh.following.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        vh.following.setOnClickListener(null);
+                        FirebaseManager.getFirebaseToken((data, error, success) -> {
+                            if (success) {
+                                if (mTag.isFollowed()) TravanaAPI.unfollowTag(data, mTag.get_id(), (apiResponse, statusCode, success12) -> {
+                                    if (success12 && apiResponse.equals("Successful")) {
+                                        runOnUiThread(() -> {
+                                            CustomToast customToast = new CustomToast(TagsActivity.this);
+                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
+                                            customToast.setIconColor(Color.WHITE);
+                                            customToast.setTextColor(Color.WHITE);
+                                            customToast.setText("Success!");
+                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
+                                            customToast.show(Toast.LENGTH_SHORT);
+                                            mTag.setFollowed(false);
+
+                                            vh.following.setOnClickListener(this);
+                                            vh.following.setText(R.string.follow);
+                                        });
+
+                                    }
+                                });
+                                else TravanaAPI.followTag(data, mTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                                    if (success1 && apiResponse.equals("Successful")) {
+                                        runOnUiThread(() -> {
+                                            CustomToast customToast = new CustomToast(TagsActivity.this);
+                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
+                                            customToast.setIconColor(Color.WHITE);
+                                            customToast.setTextColor(Color.WHITE);
+                                            customToast.setText("Success!");
+                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
+                                            customToast.show(Toast.LENGTH_SHORT);
+                                            mTag.setFollowed(true);
+
+                                            vh.following.setOnClickListener(this);
+                                            vh.following.setText(R.string.following);
+                                        });
+                                    }
+                                }));
                             }
-                        }));
+                        });
                     }
-                }));
+                });
 
             }
 
