@@ -547,12 +547,63 @@ public class TravanaAPI {
                     }
                 })
                 .start();
+    }
 
+    public static void messagesByTag(String tag_id, TravanaApiCallback<LiveUpdateMessage[]> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_BY_TAG)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addHeaderValues("tag_id", tag_id)
+                .start();
+    }
+
+    public static void messagesByTag(String token, String tag_id, TravanaApiCallback<LiveUpdateMessage[]> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_BY_TAG_U, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        LiveUpdateMessage[] messages = new Gson().fromJson(response, LiveUpdateMessage[].class);
+
+                        callback.onComplete(messages, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addHeaderValues("tag_id", tag_id)
+                .start();
     }
 
     public static void tags(TravanaApiCallback<TagsBox> callback) {
 
         new TravanaQuery(TravanaQuery.MESSAGE_TAGS)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        TagsBox tags = new Gson().fromJson(response, TagsBox.class);
+                        callback.onComplete(tags, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .start();
+    }
+
+    public static void tags(String token, TravanaApiCallback<TagsBox> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGE_TAGS, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {

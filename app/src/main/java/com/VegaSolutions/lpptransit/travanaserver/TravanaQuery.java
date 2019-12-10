@@ -31,15 +31,15 @@ public class TravanaQuery extends Thread  {
 
     //public static final String SERVER_URL = "http://192.168.1.13:8081/ljubljana_app_server/api";
 
-    public static final String SERVER_URL = "http://193.77.85.172:8081/ljubljana_app_server/api";
+    //public static final String SERVER_URL = "http://193.77.85.172:8081/ljubljana_app_server/api";
 
-    //public static final String SERVER_URL = "http://192.168.1.7:8081/ljubljana_app_server/api";
+    public static final String SERVER_URL = "http://192.168.1.7:8081/ljubljana_app_server/api";
 
     //public static final String SERVER_URL = "http://10.0.1.23:8080/ljubljana_app_server/api";
 
-    public static final String SERVER_IP_ADDRESS = "193.77.85.172:8081";
+    //public static final String SERVER_IP_ADDRESS = "193.77.85.172:8081";
 
-    //public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
+    public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
 
     //public static final String SERVER_IP_ADDRESS = "192.168.1.13:8443";
 
@@ -90,6 +90,10 @@ public class TravanaQuery extends Thread  {
     public static final String MESSAGES_MARK_NOTIFIED = "/live_updates/messages/notified";
 
     public static final String MESSAGES_FOLLOWD_UNSEEN_META = "/live_updates/messages/followed_unseen_meta";
+
+    public static final String MESSAGES_BY_TAG = "/live_updates/messages_by_tag";
+
+    public static final String MESSAGES_BY_TAG_U = "/live_updates/messages_by_tag_u";
 
     // Url parameters
     private StringBuilder params = new StringBuilder();

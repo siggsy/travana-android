@@ -21,6 +21,7 @@ import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -308,16 +309,69 @@ public class SignInActivity extends AppCompatActivity {
                     if(success){
 
 
+
+
+                        TravanaAPI.tags(token, new TravanaApiCallback<TagsBox>() {
+                            @Override
+                            public void onComplete(@Nullable TagsBox apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, apiResponse + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+
+                            }
+                        });
+
+
+
+
+
+                        TravanaAPI.followTag(token, "Main#121111", new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, apiResponse + "");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            }
+                        });
+
+
+
+                        /*
+                        TravanaAPI.followedMessagesMeta(token, new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, Arrays.toString(apiResponse));
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+
+                            }
+                        });
+
+                         */
+
                         /*
                         MessageTag[] tags = new MessageTag[1];
-                        tags[0] = new MessageTag("smrt#115678", "smrt", "#123456");
+                        tags[0] = new MessageTag("xyz#115678", "xyz", "#123456");
+
 
                         String[] links = new String[1];
                         links[0] = "/blaadasdolsadpsa.com";
 
                         FirebaseUser basic_user_firebase_data = FirebaseManager.getSignedUser();
 
-                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "sdasds", tags, links);
+                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "new massage", tags, links);
 
                         TravanaAPI.addMessage(token, message, (data, statusCode1, success1) -> {
 
@@ -327,10 +381,88 @@ public class SignInActivity extends AppCompatActivity {
                                 Log.e(TAG, "error" + statusCode1);
                             }
 
+                        });*/
+
+
+
+
+
+
+
+
+                        /*
+                        TravanaAPI.messagesMarkSeen(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-07_18:55:17", true, new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String response, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e(TAG, response + " ");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            }
+                        });*/
+
+
+
+
+                        /*
+                        TravanaAPI.messages(new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                Log.e("SIZE", apiResponse.length + "");
+                                Log.e(TAG + "all", Arrays.toString(apiResponse) + " ");
+
+                            }
+                        });*/
+
+                        /*
+                        TravanaAPI.messagesFollowedUnseenMeta(token, new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e("SIZE", apiResponse.length + "");
+                                    Log.e(TAG, Arrays.toString(apiResponse) + " ");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            }
                         });
 
                          */
 
+                        /*
+                        TravanaAPI.messagesByTag("xyz#115678", new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e("SIZE", apiResponse.length + "");
+                                    Log.e(TAG, Arrays.toString(apiResponse) + " ");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            }
+                        });
+
+                        TravanaAPI.messagesByTag(token, "xyz#115678", new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                if(success){
+                                    Log.e("SIZE", apiResponse.length + "");
+                                    Log.e(TAG, Arrays.toString(apiResponse) + " ");
+                                }else{
+                                    Log.e(TAG, "error" + statusCode);
+                                }
+
+                            }
+                        });*/
 
 
                         /*
@@ -369,6 +501,7 @@ public class SignInActivity extends AppCompatActivity {
                              }
                          });*/
 
+                        /*
                         LiveUpdateComment comment = new LiveUpdateComment("basdsadasdasd bl asa s ");
 
                          TravanaAPI.addCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:32:44GMT01:002019", comment, new TravanaApiCallback<String>() {
@@ -383,7 +516,7 @@ public class SignInActivity extends AppCompatActivity {
 
                              }
                          });
-
+                           */
 
 
                         /*
@@ -408,7 +541,7 @@ public class SignInActivity extends AppCompatActivity {
 
 
                         /*
-                        TravanaAPI.followTag(token, "zivjo#115678", (data, statusCode1, success1) -> {
+                        TravanaAPI.followTag(token, "Admin#111111", (data, statusCode1, success1) -> {
 
                             if(success1){
                                 Log.e(TAG, data + " ");
@@ -416,11 +549,46 @@ public class SignInActivity extends AppCompatActivity {
                                 Log.e(TAG, "error" + statusCode1);
                             }
 
+                        });*/
+
+
+
+                        /*
+                        TravanaAPI.followedMessagesMeta(token, new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, Arrays.toString(apiResponse) + "");
+
+                            }
                         });
 
                          */
 
+                        /*
+                        TravanaAPI.messagesMarkSeen(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-07_17:01:42", false, new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
 
+                                if(success)
+
+                                Log.e(TAG, apiResponse + "sa");
+
+                                else
+                                    Log.e(TAG, apiResponse + "error");
+                            }
+                        });
+
+                        TravanaAPI.messagesFollowedUnseenMeta(token, new TravanaApiCallback<LiveUpdateMessage[]>() {
+                            @Override
+                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG + "ALL", Arrays.toString(apiResponse) + "");
+
+                            }
+                        });
+
+                         */
 
 
 
@@ -454,11 +622,6 @@ public class SignInActivity extends AppCompatActivity {
                         });
 
                          */
-
-
-
-
-
 
 
                     }else{

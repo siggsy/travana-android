@@ -14,6 +14,8 @@ public class UserTag implements Parcelable {
     private String description_slo = "";
     private String description_ang = "";
 
+    private String followed;
+
     protected UserTag(Parcel in) {
         _id = in.readString();
         tag = in.readString();
@@ -62,6 +64,7 @@ public class UserTag implements Parcelable {
                 ", color='" + color + '\'' +
                 ", description_slo='" + description_slo + '\'' +
                 ", description_ang='" + description_ang + '\'' +
+                ", followed='" + followed + '\'' +
                 '}';
     }
 
