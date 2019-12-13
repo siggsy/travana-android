@@ -21,21 +21,6 @@ public class LiveUpdateComment {
 
     }
 
-    /*
-    public LiveUpdateComment(String user_id, String comment_content) {
-        this.user_id = user_id;
-        this.comment_content = comment_content;
-        this.created_date = new Date();
-
-        String _id = "comm_gen" + user_id+ created_date;
-        _id = _id.replaceAll(" ", "");
-        _id = _id.replace("+", "");
-
-        this.comment_id = _id;
-    }
-
-     */
-
     public String getUser_id() {
         return user_id;
     }

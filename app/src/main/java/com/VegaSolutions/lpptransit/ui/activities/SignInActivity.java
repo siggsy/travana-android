@@ -22,6 +22,7 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -310,7 +311,7 @@ public class SignInActivity extends AppCompatActivity {
 
 
 
-
+                        /*
                         TravanaAPI.tags(token, new TravanaApiCallback<TagsBox>() {
                             @Override
                             public void onComplete(@Nullable TagsBox apiResponse, int statusCode, boolean success) {
@@ -342,6 +343,8 @@ public class SignInActivity extends AppCompatActivity {
                             }
                         });
 
+                         */
+
 
 
                         /*
@@ -371,19 +374,92 @@ public class SignInActivity extends AppCompatActivity {
 
                         FirebaseUser basic_user_firebase_data = FirebaseManager.getSignedUser();
 
-                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "new massage", tags, links);
+                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "Sporočilo da tesitram casdsads", tags, links);
 
-                        TravanaAPI.addMessage(token, message, (data, statusCode1, success1) -> {
+                        TravanaAPI.addMessage(token, message, new TravanaApiCallback<ResponseObjectCommit>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
 
-                            if(success1){
-                                Log.e(TAG, data + " " + statusCode);
-                            }else{
-                                Log.e(TAG, "error" + statusCode1);
+                                Log.e(TAG, apiResponse + "");
+
                             }
-
                         });*/
 
 
+
+                        /*
+                        TravanaAPI.removeMessage(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_21:37:21", new TravanaApiCallback<ResponseObjectCommit>() {
+                                    @Override
+                                    public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+
+                                        Log.e(TAG, "response " + apiResponse);
+
+                                    }
+                                });*/
+
+                        /*
+                        TravanaAPI.messagesLike(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_21:36:25", true, new TravanaApiCallback<ResponseObjectCommit>() {
+                                    @Override
+                                    public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+
+                                        Log.e(TAG, "response " + apiResponse);
+
+                                    }
+                                });
+                        */
+
+                        /*
+                        LiveUpdateComment comment = new LiveUpdateComment("komentar teglavič");
+
+                        TravanaAPI.addComment(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_21:36:25", comment, new TravanaApiCallback<ResponseObjectCommit>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, "response " + apiResponse);
+
+                            }
+                        });*/
+
+                        /*
+                        TravanaAPI.removeComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_22:10:24", new TravanaApiCallback<ResponseObjectCommit>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, "response " + apiResponse);
+
+                            }
+                        });*/
+
+                        /*
+                        TravanaAPI.likeComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_22:08:08", false, new TravanaApiCallback<ResponseObjectCommit>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, "response " + apiResponse);
+
+                            }
+                        });*/
+
+                        /*
+                        LiveUpdateComment comment = new LiveUpdateComment("subcomment teglavič");
+
+                        TravanaAPI.addCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_22:08:08", comment, new TravanaApiCallback<ResponseObjectCommit>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, "response " + apiResponse);
+
+                            }
+                        });*/
+
+                        TravanaAPI.removeCommentComment(token, "subcomm_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_22:28:14", new TravanaApiCallback<ResponseObjectCommit>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+
+
+
+                            }
+                        });
 
 
 

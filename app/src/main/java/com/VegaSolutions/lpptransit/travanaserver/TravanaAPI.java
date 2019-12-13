@@ -22,6 +22,8 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalReques
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.google.gson.Gson;
 
 import org.jsoup.HttpStatusException;
@@ -39,7 +41,6 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class TravanaAPI {
 
@@ -47,6 +48,211 @@ public class TravanaAPI {
     private static String TRAVANA_API_KEY = "mlrX6m18wsmb8UF9dQd0wcYxhE47UyYc";
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+    /*
+    *Responses
+    * false, 3003, "Error: during reading from database" -> almost impossible
+    * true, 200
+    */
+    public static void addMessage(String token, LiveUpdateMessage message, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(message));
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_ADD, TRAVANA_API_KEY, token, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).start();
+    }
+
+    /*
+     *Responses
+     * false, 3003, "Error: database down -> almost impossible
+     * false, 3002, "Error: message with this id do not exists
+     * true, 200
+     */
+    public static void removeMessage(String token, String mess_id, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_REMOVE, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addParams("_id", mess_id)
+                .start();
+
+    }
+
+
+    /*
+     *Responses
+     * false, 1005, "Error: messages is already liked
+     * false, 1006, "Error: messages is already unliked
+     * true, 200
+     */
+    public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGE_LIKE, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addHeaderValues("mess_id", mess_id)
+                .addHeaderValues("liked", like + "")
+                .start();
+    }
+
+    /*
+     *Responses
+     * false, x, "Error: posting too much (15 min limit)" -> todo, not implemented yet
+     * false, 4001, "Error: during inserting comment into database
+     * true, 200
+     */
+    public static void addComment(String token, String message_id, LiveUpdateComment comment, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_ADD_COMMENT, TRAVANA_API_KEY, token, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                }).addParams("_id", message_id)
+                .start();
+    }
+
+    /*
+     *Responses
+     * false, 4001, "Error: cannot delete comment
+     * true, 200
+     */
+    public static void removeComment(String token, String comment_id, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("comment_id", comment_id)
+                .start();
+    }
+
+
+    /*
+     *Responses
+     * false, 1005, "Error: comment is already liked
+     * false, 1006, "Error: comment is already unliked
+     * false, 4001, "Error: cannot unlike comment"
+     * true, 200
+     */
+    public static void likeComment(String token, String comment_id, boolean liked, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGE_COMMENT_LIKE, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addHeaderValues("comm_id", comment_id)
+                .addHeaderValues("liked", liked + "")
+                .start();
+    }
+
+    /*
+     *Responses
+     * false, x, too often (spamming) -> todo
+     * false, 4001, "Error: cannot add subcomment
+     * true, 200
+     */
+    public static void addCommentComment(String token, String comment_id, LiveUpdateComment comment, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
+
+        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_ADD_COMMENT_COMMENT, TRAVANA_API_KEY, token, rbody)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("comm_id", comment_id)
+                .start();
+    }
+
+    /*
+     *Responses
+     * false, 4001, "Error: cannot remove subcomment
+     * true, 200
+     */
+    public static void removeCommentComment(String token, String subcomment_id, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT_COMMENT, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("subcomm_id", subcomment_id)
+                .start();
+    }
+
+    public static void likeCommentComment(String token, String subcomment_id, boolean liked, TravanaApiCallback<ResponseObjectCommit> callback) {
+
+        new TravanaQuery(TravanaQuery.MESSAGES_LIKE_COMMENT_COMMENT, TRAVANA_API_KEY, token)
+                .setOnCompleteListener((response, statusCode, success) -> {
+
+                    if (success) {
+
+                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(r, statusCode, true);
+                    } else {
+                        callback.onComplete(null, statusCode, false);
+                    }
+                })
+                .addParams("subcomm_id", subcomment_id)
+                .addHeaderValues("liked", liked + "")
+                .start();
+    }
 
     public static void warnings(TravanaApiCallback<Warning[]> callback) {
 
@@ -252,23 +458,6 @@ public class TravanaAPI {
                 .start();
     }
 
-    public static void addMessage(String token, LiveUpdateMessage message, TravanaApiCallback<String> callback) {
-
-        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(message));
-
-        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_ADD, TRAVANA_API_KEY, token, rbody)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                }).start();
-    }
-
-
-
     //@Deprecated
     /*
     public static void editMessage(String token, String ms_id, LiveUpdateMessage message, TravanaApiCallback callback){
@@ -286,101 +475,7 @@ public class TravanaAPI {
                 }).addParams("_id", ms_id)
                 .execute();
     }
-     */
 
-    public static void addComment(String token, String message_id, LiveUpdateComment comment, TravanaApiCallback<String> callback) {
-
-        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
-
-        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_ADD_COMMENT, TRAVANA_API_KEY, token, rbody)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                }).addParams("_id", message_id)
-                .start();
-    }
-
-    public static void addCommentComment(String token, String comment_id, LiveUpdateComment comment, TravanaApiCallback<String> callback) {
-
-        RequestBody rbody = RequestBody.create(JSON, new Gson().toJson(comment));
-
-        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_ADD_COMMENT_COMMENT, TRAVANA_API_KEY, token, rbody)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                })
-                .addParams("comm_id", comment_id)
-                .start();
-    }
-
-    public static void removeMessage(String token, String mess_id, TravanaApiCallback<String> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGES_REMOVE, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                }).addParams("_id", mess_id)
-                .start();
-
-    }
-
-    public static void removeComment(String token, String comment_id, TravanaApiCallback<String> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                })
-                .addParams("comment_id", comment_id)
-                .start();
-    }
-
-    public static void removeCommentComment(String token, String subcomment_id, TravanaApiCallback<String> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGES_REMOVE_COMMENT_COMMENT, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                })
-                .addParams("subcomm_id", subcomment_id)
-                .start();
-    }
-
-    public static void likeCommentComment(String token, String subcomment_id, boolean liked, TravanaApiCallback<String> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGES_LIKE_COMMENT_COMMENT, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                })
-                .addParams("subcomm_id", subcomment_id)
-                .addHeaderValues("liked", liked + "")
-                .start();
-    }
 
     //@Depricated
     /*
@@ -433,22 +528,6 @@ public class TravanaAPI {
                         callback.onComplete(null, statusCode, false);
                     }
                 }).addParams("_id", user_id)
-                .start();
-    }
-
-    public static void messagesLike(String token, String mess_id, boolean like, TravanaApiCallback<String> callback) {
-
-        new TravanaQuery(TravanaQuery.MESSAGE_LIKE, TRAVANA_API_KEY, token)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-                        callback.onComplete(response, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                }).addHeaderValues("mess_id", mess_id)
-                .addHeaderValues("liked", like + "")
-                //.addHeaderValues("user_id", user_id)
                 .start();
     }
 
