@@ -10,4 +10,10 @@
         android:id="@+id/settings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settings" />
+
+    <item
+        android:id="@+id/sign_in"
+        android:icon="@drawable/ic_perm_identity_black_24dp"
+        android:title="Sign in" />
+
 </menu>

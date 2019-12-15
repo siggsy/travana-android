@@ -69,6 +69,14 @@ public class MessageTag implements Parcelable {
         return description_ang;
     }
 
+    public boolean isFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(boolean followed) {
+        this.followed = followed;
+    }
+
     @Override
     public String toString() {
         return "MessageTag{" +

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?backgroundViewColor"
-    tools:context=".ui.activities.TagsActivity">
+    tools:context=".ui.activities.forum.TagsActivity">
 
     <FrameLayout
         android:id="@+id/search_activity_header"

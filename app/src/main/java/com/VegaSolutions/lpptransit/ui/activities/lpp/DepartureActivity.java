@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities;
+package com.VegaSolutions.lpptransit.ui.activities.lpp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

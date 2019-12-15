@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities;
+package com.VegaSolutions.lpptransit.ui.activities.forum;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,12 +12,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.PostListFragment;
@@ -98,9 +94,8 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
-                case 0: return getString(R.string.all);
-                case 1: return getString(R.string.following);
-
+                case 0: return getString(R.string.following);
+                case 1: return getString(R.string.all);
             }
             return super.getPageTitle(position);
         }

@@ -30,7 +30,7 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.utility.Colors;
-import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
+import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?backgroundViewColor"
-    tools:context=".ui.activities.SignInActivity">
+    tools:context=".ui.activities.forum.SignInActivity">
 
 
     <com.facebook.login.widget.LoginButton

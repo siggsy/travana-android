@@ -14,15 +14,6 @@
         tools:context=".ui.activities.lpp.RouteActivity" />
 
 
-
-    <!--<View
-        android:id="@+id/shadow"
-        android:layout_width="match_parent"
-        android:layout_height="16dp"
-        android:background="@drawable/top_shadow_gradient"
-        app:layout_anchor="@id/bottom_sheet" /> -->
-
-
     <ImageView
         android:id="@+id/maps_location_icon"
         android:layout_width="55dp"
@@ -56,9 +47,6 @@
         app:behavior_hideable="false"
         app:behavior_peekHeight="100dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-        <!--<androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/> </!-->
 
         <FrameLayout
             android:id="@+id/header"

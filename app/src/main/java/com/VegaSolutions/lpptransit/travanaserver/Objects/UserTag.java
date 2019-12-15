@@ -14,7 +14,7 @@ public class UserTag implements Parcelable {
     private String description_slo = "";
     private String description_ang = "";
 
-    private String followed;
+    private boolean followed;
 
     protected UserTag(Parcel in) {
         _id = in.readString();
@@ -48,6 +48,14 @@ public class UserTag implements Parcelable {
         return color;
     }
 
+    public boolean isFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(boolean followed) {
+        this.followed = followed;
+    }
+
     public String getDescription_slo() {
         return description_slo;
     }
@@ -55,6 +63,8 @@ public class UserTag implements Parcelable {
     public String getDescription_ang() {
         return description_ang;
     }
+
+
 
     @Override
     public String toString() {

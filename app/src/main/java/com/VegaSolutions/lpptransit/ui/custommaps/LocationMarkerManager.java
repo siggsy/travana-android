@@ -32,7 +32,7 @@ public class LocationMarkerManager {
 
         // Set marker style
         options = new MarkerOptions().anchor(0.5f, 0.5f).icon(offline).flat(true).zIndex(10f);
-        accuracyOptions = new CircleOptions().fillColor(ContextCompat.getColor(context, R.color.colorRipple)).strokeColor(ContextCompat.getColor(context, R.color.colorAccent)).strokeWidth(5f);
+        accuracyOptions = new CircleOptions().fillColor(ContextCompat.getColor(context, R.color.colorRipple)).strokeColor(ContextCompat.getColor(context, R.color.colorAccent)).strokeWidth(2f);
 
         this.live = live;
         this.offline = offline;

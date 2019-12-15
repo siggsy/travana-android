@@ -38,6 +38,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+What happened with your TagsActivity? Did you delete it?
+ */
+
 public class TagsActivity extends AppCompatActivity {
 
     public static final int SELECTED = 11;
@@ -117,9 +121,9 @@ public class TagsActivity extends AppCompatActivity {
             TravanaAPI.tags((apiResponse, statusCode, success) -> {
                 if (success) {
 
-                    MessageTag[] main = apiResponse.getData().getMain_tags();
-                    MessageTag[] tags = apiResponse.getData().getTags();
-                    UserTag[] userTags = apiResponse.getData().getUser_tags();
+                    MessageTag[] main = apiResponse.getMain_tags();
+                    MessageTag[] tags = apiResponse.getTags();
+                    UserTag[] userTags = apiResponse.getUser_tags();
 
                     Log.i("tags", Arrays.toString(main));
 
@@ -139,8 +143,8 @@ public class TagsActivity extends AppCompatActivity {
             TravanaAPI.tags((apiResponse, statusCode, success) -> {
                 if (success) {
 
-                    MessageTag[] main = apiResponse.getData().getMain_tags();
-                    MessageTag[] tags = apiResponse.getData().getTags();
+                    MessageTag[] main = apiResponse.getMain_tags();
+                    MessageTag[] tags = apiResponse.getTags();
 
                     Object[] allTags = new Object[main.length + tags.length];
                     System.arraycopy(main, 0, allTags, 0, main.length);

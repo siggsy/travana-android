@@ -4,12 +4,10 @@ package com.VegaSolutions.lpptransit.ui.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,8 +25,8 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.utility.Colors;
-import com.VegaSolutions.lpptransit.ui.activities.DepartureActivity;
-import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
+import com.VegaSolutions.lpptransit.ui.activities.lpp.DepartureActivity;
+import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 
 import java.util.ArrayList;
