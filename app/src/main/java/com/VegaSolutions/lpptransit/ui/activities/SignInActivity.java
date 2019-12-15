@@ -430,6 +430,7 @@ public class SignInActivity extends AppCompatActivity {
                          */
 
 
+                        /*
                         TravanaAPI.removeMessage(token, "mess_genZG6f4yfSOWUOX6CO2xy6DXN0L7w22019-12-15_10:35:44", new TravanaApiCallback<ResponseObjectCommit>() {
                                     @Override
                                     public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
@@ -438,7 +439,7 @@ public class SignInActivity extends AppCompatActivity {
 
                                     }
                                 });
-
+                        */
 
 
                         /*
