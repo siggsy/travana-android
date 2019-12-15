@@ -5,21 +5,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.nfc.Tag;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.lppapi.LppQuery;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.MessagesApprovalRequest;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
@@ -27,22 +19,14 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObje
 import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.google.gson.Gson;
 
-import org.jsoup.HttpStatusException;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class TravanaAPI {
