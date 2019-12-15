@@ -159,11 +159,14 @@ public class TravanaPOSTQuery extends Thread {
             String data = r.body().string();
             int code = r.code();
 
+            /*
             if(code != 200){
                 onCompleteListener.onComplete(null, code, false);
             }else{
                 onCompleteListener.onComplete(data, code, true);
-            }
+            }*/
+
+            onCompleteListener.onComplete(data, code, true);
 
         }catch (HttpStatusException e){
 

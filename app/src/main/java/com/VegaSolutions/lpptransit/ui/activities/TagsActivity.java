@@ -117,9 +117,9 @@ public class TagsActivity extends AppCompatActivity {
             TravanaAPI.tags((apiResponse, statusCode, success) -> {
                 if (success) {
 
-                    MessageTag[] main = apiResponse.getMain_tags();
-                    MessageTag[] tags = apiResponse.getTags();
-                    UserTag[] userTags = apiResponse.getUser_tags();
+                    MessageTag[] main = apiResponse.getData().getMain_tags();
+                    MessageTag[] tags = apiResponse.getData().getTags();
+                    UserTag[] userTags = apiResponse.getData().getUser_tags();
 
                     Log.i("tags", Arrays.toString(main));
 
@@ -139,8 +139,8 @@ public class TagsActivity extends AppCompatActivity {
             TravanaAPI.tags((apiResponse, statusCode, success) -> {
                 if (success) {
 
-                    MessageTag[] main = apiResponse.getMain_tags();
-                    MessageTag[] tags = apiResponse.getTags();
+                    MessageTag[] main = apiResponse.getData().getMain_tags();
+                    MessageTag[] tags = apiResponse.getData().getTags();
 
                     Object[] allTags = new Object[main.length + tags.length];
                     System.arraycopy(main, 0, allTags, 0, main.length);

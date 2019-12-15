@@ -28,19 +28,9 @@ import android.widget.Toast;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallbackSpecial;
-import com.VegaSolutions.lpptransit.travanaserver.Utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.spec.ECField;
+
 
 
 public class TestActivity extends AppCompatActivity {
@@ -82,7 +72,7 @@ public class TestActivity extends AppCompatActivity {
 
              */
 
-
+            /*
             TravanaAPI.getUserImage("https://lh3.googleusercontent.com/-6zz3MuLYmv8/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3reL87K3FaDuynldu3oLhVwM1mINOA/s96-c/photo.jpg", new TravanaApiCallbackSpecial() {
                 @Override
                 public void onComplete(@Nullable Bitmap bitmap, int statusCode, boolean success) {
@@ -102,6 +92,8 @@ public class TestActivity extends AppCompatActivity {
 
                 }
             });
+
+             */
 
 
 

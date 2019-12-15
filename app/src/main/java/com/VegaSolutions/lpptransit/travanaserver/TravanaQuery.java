@@ -81,19 +81,17 @@ public class TravanaQuery extends Thread  {
 
     public static final String REMOVE_FOLLOW_TAG = "/live_updates/messages/remove_followed_tag";
 
-    public static final String MESSAGES_FOLLOWED = "/live_updates/followed_messages";
+    //public static final String MESSAGES_FOLLOWED = "/live_updates/followed_messages"; —> @Depricated?
 
     public static final String MESSAGES_FOLLOWED_META = "/live_updates/followed_messages_meta";
+
+    public static final String MESSAGES_BY_TAG_META = "/live_updates/messages_by_tag";
 
     public static final String MESSAGES_MARK_SEEN = "/live_updates/messages/seen";
 
     public static final String MESSAGES_MARK_NOTIFIED = "/live_updates/messages/notified";
 
     public static final String MESSAGES_FOLLOWD_UNSEEN_META = "/live_updates/messages/followed_unseen_meta";
-
-    public static final String MESSAGES_BY_TAG = "/live_updates/messages_by_tag";
-
-    public static final String MESSAGES_BY_TAG_U = "/live_updates/messages_by_tag_u";
 
     // Url parameters
     private StringBuilder params = new StringBuilder();
@@ -171,6 +169,7 @@ public class TravanaQuery extends Thread  {
             }
 
             Log.d(TAG, SERVER_URL + URL + params);
+            Log.d(TAG, "!!" + basic_token + "!!");
 
             builder.url(SERVER_URL + URL + params)
                     .addHeader("Content-Type", "application/json")  // add request headers
@@ -190,11 +189,14 @@ public class TravanaQuery extends Thread  {
 
             int code = r.code();
 
+            /*
             if(code != 200){
                 onCompleteListener.onComplete(null, code, false);
             }else{
                 onCompleteListener.onComplete(data, code, true);
-            }
+            }*/
+
+            onCompleteListener.onComplete(data, code, true);
 
         } catch (HttpStatusException e) {
             e.printStackTrace();

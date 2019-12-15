@@ -1,6 +1,11 @@
 package com.VegaSolutions.lpptransit.travanaserver.Objects;
 
 
+import com.VegaSolutions.lpptransit.travanaserver.Utils;
+import com.google.gson.annotations.Expose;
+
+import java.util.Arrays;
+
 public class CalBusInfo {
 
     private String bus_name;
@@ -10,6 +15,8 @@ public class CalBusInfo {
     private double current_speed;
 
     private long time_stamp_milis;                // Date last_updated = new Date(time_stamps_milis), date in milliseconds when data was updated.
+
+    private BusSpeed[] speedvalues;
 
     public String getBus_name() {
         return bus_name;
@@ -35,6 +42,10 @@ public class CalBusInfo {
         return time_stamp_milis;
     }
 
+    public BusSpeed[] getSpeedvalues() {
+        return speedvalues;
+    }
+
     @Override
     public String toString() {
         return "CalBusInfo{" +
@@ -44,6 +55,36 @@ public class CalBusInfo {
                 ", traffic_flow=" + traffic_flow +
                 ", current_speed=" + current_speed +
                 ", time_stamp_milis=" + time_stamp_milis +
+                ", speedvalues=" + Arrays.toString(speedvalues) +
                 '}';
     }
+
+    class BusSpeed {
+
+        private double value;
+        private String updated_time;
+        private long updated_time_millis;
+
+        public double getValue() {
+            return value;
+        }
+
+        public String getUpdated_time() {
+            return updated_time;
+        }
+
+        public long getUpdated_time_millis() {
+            return updated_time_millis;
+        }
+
+        @Override
+        public String toString() {
+            return "BusSpeed{" +
+                    "value=" + value +
+                    ", updated_time='" + updated_time + '\'' +
+                    ", updated_time_millis=" + updated_time_millis +
+                    '}';
+        }
+    }
+
 }

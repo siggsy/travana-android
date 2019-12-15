@@ -113,8 +113,8 @@ public class PostListFragment extends Fragment {
                 TravanaAPI.messagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
                     getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                     if (success) {
-                        Log.i("message json", Arrays.toString(apiResponse));
-                        adapter.setMessages(apiResponse);
+                        Log.i("message json", Arrays.toString(apiResponse.getData()));
+                        adapter.setMessages(apiResponse.getData());
                         getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                     }
                 });
@@ -123,12 +123,12 @@ public class PostListFragment extends Fragment {
                 FirebaseManager.getFirebaseToken((data, error, success) -> TravanaAPI.followedMessagesMeta(data, (apiResponse, statusCode, success1) -> {
                     getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                     if (success1) {
-                        Log.i("following json", Arrays.toString(apiResponse));
-                        adapter.setMessages(apiResponse);
+                        Log.i("following json", Arrays.toString(apiResponse.getData()));
+                        adapter.setMessages(apiResponse.getData());
                         getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                     }
                     else {
-                        Log.i("failed json", Arrays.toString(apiResponse));
+                        Log.i("failed json", Arrays.toString(apiResponse.getData()));
                     }
                 }));
 
@@ -141,23 +141,23 @@ public class PostListFragment extends Fragment {
             TravanaAPI.messagesMeta(FirebaseManager.getSignedUser().getUid(), (apiResponse, statusCode, success) -> {
                 getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                 if (success) {
-                    Log.i("message json", Arrays.toString(apiResponse));
-                    adapter.setMessages(apiResponse);
+                    Log.i("message json", Arrays.toString(apiResponse.getData()));
+                    adapter.setMessages(apiResponse.getData());
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                 } else {
-                    Log.i("message json", Arrays.toString(apiResponse));
+                    Log.i("message json", Arrays.toString(apiResponse.getData()));
                 }
             });
         } else {
             FirebaseManager.getFirebaseToken((data, error, success) -> TravanaAPI.followedMessagesMeta(data, (apiResponse, statusCode, success1) -> {
                 getActivity().runOnUiThread(() -> refreshLayout.setRefreshing(false));
                 if (success1) {
-                    Log.i("following json", Arrays.toString(apiResponse));
-                    adapter.setMessages(apiResponse);
+                    Log.i("following json", Arrays.toString(apiResponse.getData()));
+                    adapter.setMessages(apiResponse.getData());
                     getActivity().runOnUiThread(adapter::notifyDataSetChanged);
                 }
                 else {
-                    Log.i("failed json", Arrays.toString(apiResponse));
+                    Log.i("failed json", Arrays.toString(apiResponse.getData()));
                 }
             }));
         }
