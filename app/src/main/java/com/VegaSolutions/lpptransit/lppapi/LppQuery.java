@@ -99,7 +99,7 @@ public class LppQuery extends Thread {
             } catch(SocketTimeoutException e) {
                 e.printStackTrace();
                 onCompleteListener.onComplete(null, -2, false);
-            }catch (IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 onCompleteListener.onComplete(null, -1, false);
             }

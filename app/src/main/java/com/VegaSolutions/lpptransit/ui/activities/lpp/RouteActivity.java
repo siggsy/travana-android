@@ -258,7 +258,7 @@ public class RouteActivity extends MapFragmentActivity {
                     });
                 }
 
-            } else runOnUiThread(() -> new CustomToast(this).showDefault(this, Toast.LENGTH_SHORT));
+            } else runOnUiThread(() -> new CustomToast(this).showDefault(Toast.LENGTH_SHORT));
         }));
 
     }
@@ -351,7 +351,7 @@ public class RouteActivity extends MapFragmentActivity {
                             .setTextColor(Color.WHITE)
                             .setIconColor(Color.WHITE)
                             .setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
-                    customToast.showDefault(this, statusCode);
+                    customToast.showDefault(statusCode);
                 });
             }
         }));
@@ -418,7 +418,7 @@ public class RouteActivity extends MapFragmentActivity {
                     Intent i = new Intent(RouteActivity.this, StationActivity.class);
                     i.putExtra(StationActivity.STATION, apiResponse.getData());
                     startActivity(i);
-                } else runOnUiThread(() -> new CustomToast(RouteActivity.this).showDefault(RouteActivity.this, statusCode));
+                } else runOnUiThread(() -> new CustomToast(RouteActivity.this).showDefault(statusCode));
             }));
 
         }

@@ -27,8 +27,8 @@ import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
-import com.VegaSolutions.lpptransit.ui.fragments.LiveArrivalFragment;
-import com.VegaSolutions.lpptransit.ui.fragments.RoutesOnStationFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.lpp.LiveArrivalFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.lpp.RoutesOnStationFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -163,7 +163,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
                             .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap_vert_black_24dp))
                             .show(Toast.LENGTH_SHORT);
                     }
-                    else toast.showDefault(this, statusCode);
+                    else toast.showDefault(statusCode);
                 }
                 oppositeBtn.setEnabled(true);
             }));

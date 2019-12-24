@@ -55,7 +55,8 @@
     <string name="select_route">Izberite linijo</string>
     <string name="officially">Uradno</string>
     <string name="approved_by">potrjeno od</string>
-
+    <string name="attachments">Priponke</string>
+    <string name="connection_refused">Povezava zavrnjena.</string>
 
 
 </resources>

@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.fragments;
+package com.VegaSolutions.lpptransit.ui.fragments.lpp;
 
 
 import android.app.Activity;
@@ -29,6 +29,7 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
@@ -44,6 +45,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class LiveArrivalFragment extends Fragment {
@@ -55,9 +59,10 @@ public class LiveArrivalFragment extends Fragment {
     private FragmentHeaderCallback headerCallback;
 
     private Adapter adapter;
-    private SwipeRefreshLayout refreshLayout;
-    private RecyclerView rv;
-    private View noArrErr;
+
+    @BindView(R.id.live_arrival_swipe_refresh) SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.live_arrival_rv) RecyclerView rv;
+    @BindView(R.id.live_arrival_no_arrivals_error) View noArrErr;
 
     private boolean hour;
     private int color, backColor;
@@ -78,7 +83,7 @@ public class LiveArrivalFragment extends Fragment {
                 noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
                 adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
 
-            } else new CustomToast(context).showDefault(context, Toast.LENGTH_SHORT);
+            } else new CustomToast(context).showDefault(Toast.LENGTH_SHORT);
         });
 
     };
@@ -125,10 +130,8 @@ public class LiveArrivalFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
+        ButterKnife.bind(this, root);
 
-        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
-        rv = root.findViewById(R.id.live_arrival_rv);
-        noArrErr = root.findViewById(R.id.live_arrival_no_arrivals_error);
         setupUI();
 
         // Query arrivals.
@@ -323,7 +326,10 @@ public class LiveArrivalFragment extends Fragment {
                 RouteWrapper route = map.get(arrival.getTrip_id());
                 if (route == null) {
                     route = new RouteWrapper();
-                    route.name = arrival.getStations() != null ? arrival.getStations().getArrival() : arrival.getTrip_name();
+
+                    ArrivalWrapper.Arrival.Stations stations = arrival.getStations();
+                    route.name = stations != null && stations.getArrival() != null && !stations.getArrival().equals("") ? stations.getArrival() : arrival.getTrip_name();
+
                     route.arrivalObject = arrival;
                     map.put(arrival.getTrip_id(), route);
                 }

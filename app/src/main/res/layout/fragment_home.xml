@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/layout_bg"
     android:backgroundTint="?backgroundViewColor"
-    tools:context=".ui.fragments.HomeFragment">
+    tools:context=".ui.fragments.lpp.HomeFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -9,6 +9,8 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
@@ -18,6 +20,7 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -421,7 +424,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -442,13 +445,13 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
-                .addParams("mess_id", message_id)
+                .addHeaderValues("mess_id", message_id)
                 .start();
     }
 
@@ -463,7 +466,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -485,7 +488,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -551,7 +554,7 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<TagsBox> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -571,7 +574,7 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<TagsBox> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);

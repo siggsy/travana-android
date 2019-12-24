@@ -10,10 +10,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MyLocationManager {
 
@@ -33,8 +35,8 @@ public class MyLocationManager {
 
             Log.i(TAG, "location updated: " + location.toString());
 
-            if (location.getAccuracy() > 500)
-                return;
+            /*if (location.getAccuracy() > 500)
+                return;*/
 
             live = true;
 
@@ -74,7 +76,7 @@ public class MyLocationManager {
                network = false;
 
            // Notify listeners if both providers are disabled
-           if (!gps &&!network)
+           if (!gps  && !network)
                for (MyLocationListener listener : listeners)
                    listener.onProviderAvailabilityChanged(false);
 
@@ -84,10 +86,6 @@ public class MyLocationManager {
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     };
-
-    private void handleLocationChanged(Location location) {
-
-    }
 
     public MyLocationManager(Context context) {
         this.context = context;
@@ -171,11 +169,13 @@ public class MyLocationManager {
             if (locationManager == null)
                 return false;
 
+            int permission = MapUtility.getGrantedLocationPermission(context);
+
             // Request location updates and return true for success
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && (permission == 2 || permission == 3)) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDist, mainListener);
                 gps = true;
-            } if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            } if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && (permission == 1 || permission == 3)) {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, minDist, mainListener);
                 network = true;
             }

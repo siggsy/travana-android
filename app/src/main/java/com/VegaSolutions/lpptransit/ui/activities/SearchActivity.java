@@ -137,12 +137,12 @@ public class SearchActivity extends AppCompatActivity {
                             items.add(new RouteItem(route));
                         runOnUiThread(() -> applyFilter(filter));
                     }
-                    else runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
+                    else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
                     runOnUiThread(() -> progressBar.setVisibility(View.GONE));
 
                 });
             }
-            else runOnUiThread(() -> new CustomToast(this).showDefault(this, statusCode));
+            else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
 
         });
 

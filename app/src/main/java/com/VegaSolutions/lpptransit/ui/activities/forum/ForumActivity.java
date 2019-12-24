@@ -16,22 +16,25 @@ import android.widget.ImageView;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
-import com.VegaSolutions.lpptransit.ui.fragments.PostListFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.forum.PostListFragment;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class ForumActivity extends AppCompatActivity implements FragmentHeaderCallback {
 
 
-    private View header;
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
-    private ImageView searchButton;
-    private FloatingActionButton newMessage;
-    private ElevationAnimation elevationAnimation;
+    @BindView(R.id.header) View header;
+    @BindView(R.id.forum_view_pager) ViewPager viewPager;
+    @BindView(R.id.forum_tab_layout) TabLayout tabLayout;
+    @BindView(R.id._forum_search_image_view) ImageView searchButton;
+    @BindView(R.id.new_message_fab) FloatingActionButton newMessage;
 
-    private ViewPagerAdapter adapter;
+    ElevationAnimation elevationAnimation;
+    ViewPagerAdapter adapter;
 
 
     private void setupUI() {
@@ -53,12 +56,7 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_forum);
-
-        header = findViewById(R.id.header);
-        viewPager = findViewById(R.id.forum_view_pager);
-        searchButton = findViewById(R.id._forum_search_image_view);
-        tabLayout = findViewById(R.id.forum_tab_layout);
-        newMessage = findViewById(R.id.new_message_fab);
+        ButterKnife.bind(this);
 
         elevationAnimation = new ElevationAnimation(header, 16);
 
@@ -75,7 +73,7 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
 
-        public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
+        ViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
             super(fm, behavior);
         }
 

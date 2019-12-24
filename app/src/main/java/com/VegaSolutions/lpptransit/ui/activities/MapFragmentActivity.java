@@ -57,7 +57,7 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
 
         // Set location button location callback.
-        if (MapUtility.checkLocationPermission(this)) {
+        if (MapUtility.checkIfAtLeastOnePermissionPermitted(this)) {
 
             // Setup location objects
             locationManager = new MyLocationManager(this);

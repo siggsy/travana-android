@@ -31,8 +31,8 @@ import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
-import com.VegaSolutions.lpptransit.ui.fragments.HomeFragment;
-import com.VegaSolutions.lpptransit.ui.fragments.StationsFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.lpp.HomeFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -80,7 +80,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         mapFragment.getMapAsync(this);
 
         // Check for permission.
-        if (!MapUtility.checkLocationPermission(this))
+        if (!MapUtility.checkIfAtLeastOnePermissionPermitted(this))
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
 
         // Find all UI elements.
@@ -99,7 +99,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
         navBarBtn.setOnClickListener(view -> dl.openDrawer(GravityCompat.START));
 
-        locationIcon.setVisibility(MapUtility.checkLocationPermission(this)? View.VISIBLE : View.GONE);
+        locationIcon.setVisibility(MapUtility.checkIfAtLeastOnePermissionPermitted(this)? View.VISIBLE : View.GONE);
 
         loading.showLoading(true);
         loading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));

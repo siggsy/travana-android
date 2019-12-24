@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        tools:context=".ui.fragments.subfragments.StationsSubFragment" />
+        tools:context=".ui.fragments.lpp.subfragments.StationsSubFragment" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/stations_sub_list_favourite_error"

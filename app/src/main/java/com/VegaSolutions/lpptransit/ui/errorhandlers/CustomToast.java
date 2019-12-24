@@ -60,11 +60,15 @@ public class CustomToast {
         t.show();
     }
 
-    public void showDefault(Context context, int statusCode) {
+    public void showDefault(int statusCode) {
         setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
         setTextColor(Color.WHITE);
         setIconColor(Color.WHITE);
         switch (statusCode) {
+            case -3:
+                setText(context.getString(R.string.connection_refused));
+                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                break;
             case -2:
                 setText(context.getString(R.string.timed_out_error));
                 setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));

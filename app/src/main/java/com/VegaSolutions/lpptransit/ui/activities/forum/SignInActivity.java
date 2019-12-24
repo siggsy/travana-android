@@ -18,13 +18,10 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -51,10 +48,11 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
 
+import butterknife.BindView;
+
 public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "SignInActivity";
-
     private View[] views = new View[36];
 
     private FirebaseAuth mAuth;
@@ -313,19 +311,16 @@ public class SignInActivity extends AppCompatActivity {
 
 
 
-                        /*
-                        TravanaAPI.tags(token, new TravanaApiCallback<TagsBox>() {
-                            @Override
-                            public void onComplete(@Nullable TagsBox apiResponse, int statusCode, boolean success) {
 
-                                if(success){
-                                    Log.e(TAG, apiResponse + "");
-                                }else{
-                                    Log.e(TAG, "error" + statusCode);
-                                }
+                        TravanaAPI.tags(token, (apiResponse, statusCode1, success1) -> {
 
-
+                            if(success1){
+                                Log.e(TAG, apiResponse + "");
+                            }else{
+                                Log.e(TAG, "error" + statusCode1);
                             }
+
+
                         });
 
 
@@ -344,8 +339,6 @@ public class SignInActivity extends AppCompatActivity {
 
                             }
                         });
-
-                         */
 
 
 
@@ -366,11 +359,9 @@ public class SignInActivity extends AppCompatActivity {
 
                          */
 
-
-
                         /*
                         MessageTag[] tags = new MessageTag[1];
-                        tags[0] = new MessageTag("novtag#115678", "novtag", "#123456");
+                        tags[0] = new MessageTag("xyz#115678", "xyz", "#123456");
 
 
                         String[] links = new String[1];
@@ -378,143 +369,17 @@ public class SignInActivity extends AppCompatActivity {
 
                         FirebaseUser basic_user_firebase_data = FirebaseManager.getSignedUser();
 
-                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "Sporočilo nov tag", tags, links);
+                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "new massage", tags, links);
 
-                        TravanaAPI.addMessage(token, message, new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+                        TravanaAPI.addMessage(token, message, (data, statusCode1, success1) -> {
 
-                                Log.e(TAG, apiResponse + "");
-
+                            if(success1){
+                                Log.e(TAG, data + " " + statusCode);
+                            }else{
+                                Log.e(TAG, "error" + statusCode1);
                             }
-                        });
 
-                         */
-
-
-                        /*
-                        TravanaAPI.followTag(token, "novtag#115678", new TravanaApiCallback<String>() {
-                            @Override
-                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, apiResponse + "");
-
-                            }
-                        });
-
-                         */
-
-                        /*
-                        TravanaAPI.followedMessagesMeta(token, new TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObject<LiveUpdateMessage[]> apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, apiResponse + "");
-
-                            }
-                        });
-
-                         */
-
-                        /*
-                        String[] ids = {"E6EA4090-33CB-4772-9611-FD62585945CF", "3B1F822B-60D7-48F3-A3CB-229CB0FCC101", "000A7297-6AC7-4EDB-A0F7-86DC6E5F9962", "DA3C65A2-513B-4D60-8C1E-F50570092CEC"};
-
-                        TravanaAPI.calculatedBusesInfo(Arrays.asList(ids), new TravanaApiCallback<ResponseObject<CalBusInfo[]>>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObject<CalBusInfo[]> apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, apiResponse + "");
-
-                            }
-                        });
-                         */
-
-
-                        /*
-                        TravanaAPI.removeMessage(token, "mess_genZG6f4yfSOWUOX6CO2xy6DXN0L7w22019-12-15_10:35:44", new TravanaApiCallback<ResponseObjectCommit>() {
-                                    @Override
-                                    public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                        Log.e(TAG, "response " + apiResponse + statusCode);
-
-                                    }
-                                });
-                        */
-
-
-                        /*
-                        TravanaAPI.messagesLike(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_21:36:25", true, new TravanaApiCallback<ResponseObjectCommit>() {
-                                    @Override
-                                    public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                        Log.e(TAG, "response " + apiResponse);
-
-                                    }
-                                });
-                        */
-
-
-                        /*
-                        LiveUpdateComment comment = new LiveUpdateComment("komentar teglavič");
-
-                        TravanaAPI.addComment(token, "mess_genZG6f4yfSOWUOX6CO2xy6DXN0L7w22019-12-15_10:35:44", comment, new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response " + apiResponse);
-
-                            }
                         });*/
-
-
-
-                        /*
-                        TravanaAPI.removeComment(token, "comm_genZG6f4yfSOWUOX6CO2xy6DXN0L7w22019-12-15_10:36:36", new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response " + apiResponse);
-
-                            }
-                        });
-                        */
-
-                        /*
-                        TravanaAPI.likeComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_22:08:08", false, new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response " + apiResponse);
-
-                            }
-                        });*/
-
-                        /*
-                        LiveUpdateComment comment = new LiveUpdateComment("subcomment teglavič");
-
-                        TravanaAPI.addCommentComment(token, "comm_genZG6f4yfSOWUOX6CO2xy6DXN0L7w22019-12-15_10:36:36", comment, new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response " + apiResponse);
-
-                            }
-                        });
-
-                         */
-
-
-                        /*
-                        TravanaAPI.removeCommentComment(token, "subcomm_genZG6f4yfSOWUOX6CO2xy6DXN0L7w22019-12-15_10:37:15", new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response " + apiResponse);
-
-                            }
-                        });
-
-                         */
 
 
 
@@ -634,147 +499,23 @@ public class SignInActivity extends AppCompatActivity {
                              }
                          });*/
 
-
                         /*
                         LiveUpdateComment comment = new LiveUpdateComment("basdsadasdasd bl asa s ");
 
-                         TravanaAPI.addCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_2208:08", comment, new TravanaApiCallback<ResponseObjectCommit>() {
-                                     @Override
-                                     public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+                         TravanaAPI.addCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:32:44GMT01:002019", comment, new TravanaApiCallback<String>() {
+                             @Override
+                             public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
 
-                                         Log.e(TAG, "response" + apiResponse);
+                                 if(success){
+                                     Log.e(TAG, "add subcomment" + apiResponse);
+                                 }else{
+                                     Log.e(TAG, statusCode + "error");
+                                 }
 
-                                     }
-                                 });
-                        */
-
-
-                        /*
-                        TravanaAPI.likeCommentComment(token, "subcomm_genZG6f4yfSOWUOX6CO2xy6DXN0L7w22019-12-15_10:37:15", true, new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-                            }
-                        });*/
-
-                        /*
-                        TravanaAPI.followTag(token, "sadblablatag#asdsad", new TravanaApiCallback<String>() {
-                            @Override
-                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-
-                            }
-                        });*/
-
-                        /*
-                        TravanaAPI.removeTag(token, "sadblablatag#asdsad", new TravanaApiCallback<String>() {
-                            @Override
-                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-
-                            }
-                        });*/
-
-                        /*
-                        TravanaAPI.tags(new TravanaApiCallback<ResponseObject<TagsBox>>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObject<TagsBox> apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-
-                            }
-                        });*/
-
-                        /*
-                        TravanaAPI.messagesMeta(new TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObject<LiveUpdateMessage[]> apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-
-                            }
-                        });*/
-
-                        /*
-                        TravanaAPI.messageid("mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_21:36:25", FirebaseManager.getSignedUser().getUid(), new TravanaApiCallback<ResponseObject<LiveUpdateMessage>>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObject<LiveUpdateMessage> apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-                            }
-                        });*/
-
-
-                        /*
-                        TravanaAPI.messageid("mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_21:36:25", FirebaseManager.getSignedUser().getUid(), new TravanaApiCallback<ResponseObject<LiveUpdateMessage>>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObject<LiveUpdateMessage> apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-                            }
-                        });*/
-
-                        /*
-                        TravanaAPI.removeTag(token, "novtag#115678", new TravanaApiCallback<String>() {
-                            @Override
-                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-
-                            }
-                        });
-
-                        TravanaAPI.followedMessagesMeta(token, new TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObject<LiveUpdateMessage[]> apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-                                Log.e(TAG, "response" + apiResponse + statusCode);
-
-
-                            }
-                        });
-
-                         */
-
-                        /*
-                        TravanaAPI.messagesLike(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-13_21:36:25", true, new TravanaApiCallback<ResponseObjectCommit>() {
-                            @Override
-                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-
-                            }
-                        });
-
+                             }
+                         });
                            */
 
-                        /*
-                        TravanaAPI.messagesByTagMeta( "Admin#111111", new TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>>() {
-                                    @Override
-                                    public void onComplete(@Nullable ResponseObject<LiveUpdateMessage[]> apiResponse, int statusCode, boolean success) {
-
-                                        Log.e(TAG, "response" + apiResponse);
-                                    }
-                                });
-
-                         */
-
-
-
-                        /*
-                        TravanaAPI.followTag(token, "xyz#115678", new TravanaApiCallback<String>() {
-                            @Override
-                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
-
-                                Log.e(TAG, "response" + apiResponse);
-
-                            }
-                        });
-                        */
 
                         /*
                         TravanaAPI.likeCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:58:27GMT01:002019", true, new TravanaApiCallback<String>() {
@@ -940,11 +681,11 @@ public class SignInActivity extends AppCompatActivity {
         int anim_speed = 1;
         for (View view : views){
 
-            if(anim_speed == 0){
+            if(anim_speed == 0) {
                 view.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_fast));
-            }else if(anim_speed == 1){
+            } else if(anim_speed == 1) {
                 view.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_slow));
-            }else{
+            } else {
                 view.setAnimation(AnimationUtils.loadAnimation(this, R.anim.popout_medium));
             }
 

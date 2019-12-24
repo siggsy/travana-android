@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserTag;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
@@ -102,9 +103,15 @@ public class TagsActivity extends AppCompatActivity {
             FirebaseManager.getFirebaseToken((data, error, success) -> {
                 if (success) TravanaAPI.tags(data, (apiResponse, statusCode, success1) -> {
                     if (success1) {
-                        MessageTag[] main = apiResponse.getMain_tags();
-                        MessageTag[] tags = apiResponse.getTags();
-                        UserTag[] userTags = apiResponse.getUser_tags();
+
+                        TagsBox tagsBox = apiResponse.getData();
+
+                        if (tagsBox == null)
+                            return;
+
+                        MessageTag[] main = tagsBox.getMain_tags();
+                        MessageTag[] tags = tagsBox.getTags();
+                        UserTag[] userTags = tagsBox.getUser_tags();
 
                         Log.i("tags", Arrays.toString(main));
 
@@ -118,6 +125,7 @@ public class TagsActivity extends AppCompatActivity {
                             adapter.applyFilter(filter);
                             adapter.notifyDataSetChanged();
                         });
+
                     }
                 });
             });
@@ -127,8 +135,11 @@ public class TagsActivity extends AppCompatActivity {
                 if (success) TravanaAPI.tags(data, (apiResponse, statusCode, success1) -> {
                     if (success1) {
 
-                        MessageTag[] main = apiResponse.getMain_tags();
-                        MessageTag[] tags = apiResponse.getTags();
+                        TagsBox tagsBox = apiResponse.getData();
+                        if (tagsBox == null)
+                            return;
+                        MessageTag[] main = tagsBox.getMain_tags();
+                        MessageTag[] tags = tagsBox.getTags();
 
                         Object[] allTags = new Object[main.length + tags.length];
                         System.arraycopy(main, 0, allTags, 0, main.length);
@@ -191,7 +202,7 @@ public class TagsActivity extends AppCompatActivity {
                         vh.following.setOnClickListener(null);
                         FirebaseManager.getFirebaseToken((data, error, success) -> {
                             if (success) {
-                                if (uTag.isFollowed()) TravanaAPI.unfollowTag(data, uTag.get_id(), (apiResponse, statusCode, success12) -> {
+                                if (uTag.isFollowed()) TravanaAPI.removeTag(data, uTag.get_id(), (apiResponse, statusCode, success12) -> {
                                     if (success12 && apiResponse.equals("Successful")) {
                                         runOnUiThread(() -> {
                                             CustomToast customToast = new CustomToast(TagsActivity.this);
@@ -249,7 +260,7 @@ public class TagsActivity extends AppCompatActivity {
                         vh.following.setOnClickListener(null);
                         FirebaseManager.getFirebaseToken((data, error, success) -> {
                             if (success) {
-                                if (mTag.isFollowed()) TravanaAPI.unfollowTag(data, mTag.get_id(), (apiResponse, statusCode, success12) -> {
+                                if (mTag.isFollowed()) TravanaAPI.removeTag(data, mTag.get_id(), (apiResponse, statusCode, success12) -> {
                                     if (success12 && apiResponse.equals("Successful")) {
                                         runOnUiThread(() -> {
                                             CustomToast customToast = new CustomToast(TagsActivity.this);

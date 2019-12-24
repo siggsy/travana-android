@@ -77,6 +77,26 @@ public class MapUtility {
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    public static boolean checkIfAtLeastOnePermissionPermitted(Context context) {
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Get int representing location permission level
+     * @param context with which to check the permission
+     * @return 3 - FINE && COARSE, 2 - FINE, 1 - COARSE, 0 - NONE
+     */
+    public static int getGrantedLocationPermission(Context context) {
+        if (checkLocationPermission(context))
+            return 3;
+        else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            return 2;
+        else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            return 1;
+        else return 0;
+    }
+
     public static LatLng getLatLngFromLocation(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }

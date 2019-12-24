@@ -18,7 +18,9 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
@@ -27,13 +29,19 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class NewMessageActivity extends AppCompatActivity {
 
-    private ImageView back, image0, image1;
-    private TextView post, add;
+    @BindView(R.id.new_message_back) ImageView back;
+    @BindView(R.id.message_image_0) ImageView image0;
+    @BindView(R.id.message_image_1) ImageView image1;
+    @BindView(R.id.new_message_post) TextView post;
+    @BindView(R.id.message_add_tags_btn) TextView add;
+    @BindView(R.id.message_content) EditText messageContent;
+    @BindView(R.id.message_tags) FlexboxLayout tags;
 
-    private EditText messageContent;
-    private FlexboxLayout tags;
     private List<MessageTag> tagList = new ArrayList<>();
 
 
@@ -45,31 +53,27 @@ public class NewMessageActivity extends AppCompatActivity {
                 FirebaseUser user = FirebaseManager.getSignedUser();
                 // TODO: implement pictures
                 LiveUpdateMessage message = new LiveUpdateMessage(user.getUid(), messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
-                TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> {
+                TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
                     if (success1) {
-                        Log.i("NewMessage", apiResponse.toString());
-                        runOnUiThread(this::finish);
-                    }
-                    else {
-                        runOnUiThread(() -> {
-                            CustomToast customToast = new CustomToast(this);
-                            customToast.showDefault(this, statusCode);
-                        });
+                        Log.i("NewMessage", apiResponse.getInternal_error() + "fesfesf");
+                        NewMessageActivity.this.finish();
+                    } else {
+                        new CustomToast(NewMessageActivity.this).showDefault(statusCode);
                         Log.e("NewMessage", statusCode + "");
                     }
-                });
+                }));
             }
         }));
         add.setOnClickListener(v -> {
             if (tagList.size() >= 3) {
-                CustomToast customToast = new CustomToast(this);
-                customToast.setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+                CustomToast customToast = new CustomToast(NewMessageActivity.this);
+                customToast.setBackgroundColor(ContextCompat.getColor(NewMessageActivity.this, R.color.colorAccent));
                 customToast.setIconColor(Color.WHITE);
                 customToast.setTextColor(Color.WHITE);
-                customToast.setText(getString(R.string.too_many_tags_error));
-                customToast.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_error_outline_black_24dp));
+                customToast.setText(NewMessageActivity.this.getString(R.string.too_many_tags_error));
+                customToast.setIcon(ContextCompat.getDrawable(NewMessageActivity.this, R.drawable.ic_error_outline_black_24dp));
                 customToast.show(Toast.LENGTH_SHORT);
-            } else startActivityForResult(new Intent(this, TagsActivity.class), 100);
+            } else NewMessageActivity.this.startActivityForResult(new Intent(NewMessageActivity.this, TagsActivity.class), 100);
         });
 
     }
@@ -79,14 +83,7 @@ public class NewMessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_new_message);
-
-        back = findViewById(R.id.new_message_back);
-        add = findViewById(R.id.message_add_tags_btn);
-        post = findViewById(R.id.new_message_post);
-        messageContent = findViewById(R.id.message_content);
-        tags = findViewById(R.id.message_tags);
-        image0 = findViewById(R.id.message_image_0);
-        image1 = findViewById(R.id.message_image_1);
+        ButterKnife.bind(this);
 
         setupUI();
 

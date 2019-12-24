@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.fragments.subfragments;
+package com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -188,7 +188,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
                         // Check permissions
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (!MapUtility.checkLocationPermission(context)) {
+                            if (!MapUtility.checkIfAtLeastOnePermissionPermitted(context)) {
                                 locErr.setVisibility(View.VISIBLE);
                                 progressBar.setVisibility(View.GONE);
                                 return;

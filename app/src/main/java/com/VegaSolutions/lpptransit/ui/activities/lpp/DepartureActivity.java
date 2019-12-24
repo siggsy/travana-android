@@ -27,6 +27,10 @@ import com.google.android.flexbox.FlexboxLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 public class DepartureActivity extends AppCompatActivity {
 
     public static final String STATION_CODE = "station_code";
@@ -41,12 +45,15 @@ public class DepartureActivity extends AppCompatActivity {
     private String route_name;
 
     // Activity UI elements
-    private TextView routeName, routeNumber, stationName, stationCenter;
-    private View routeNumberCircle;
-    private RecyclerView rv;
-    private FrameLayout header;
-    private View depErr;
-    private ProgressBar progressBar;
+    @BindView(R.id.departure_route_name) TextView routeName;
+    @BindView(R.id.route_station_number) TextView routeNumber;
+    @BindView(R.id.departure_station_name) TextView stationName;
+    @BindView(R.id.station_center) TextView stationCenter;
+    @BindView(R.id.include) View routeNumberCircle;
+    @BindView(R.id.departure_rv) RecyclerView rv;
+    @BindView(R.id.header) FrameLayout header;
+    @BindView(R.id.departure_no_departures_error) View depErr;
+    @BindView(R.id.progressBar) ProgressBar progressBar;
 
     private Adapter adapter;
 
@@ -59,6 +66,7 @@ public class DepartureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_departure);
+        ButterKnife.bind(this);
 
         // Get theme default colors
         int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
@@ -72,19 +80,6 @@ public class DepartureActivity extends AppCompatActivity {
         station_name = getIntent().getStringExtra(STATION_NAME);
         route_number = getIntent().getStringExtra(ROUTE_NUMBER);
         route_name = getIntent().getStringExtra(ROUTE_NAME);
-
-
-        // Find all UI elements
-        routeName = findViewById(R.id.departure_route_name);
-        routeNumber = findViewById(R.id.route_station_number);
-        stationName = findViewById(R.id.departure_station_name);
-        stationCenter = findViewById(R.id.station_center);
-        routeNumberCircle = findViewById(R.id.include);
-        rv = findViewById(R.id.departure_rv);
-        header = findViewById(R.id.header);
-        depErr = findViewById(R.id.departure_no_departures_error);
-        progressBar = findViewById(R.id.progressBar);
-
 
         // Set UI elements
         routeName.setText(route_name);
@@ -139,7 +134,7 @@ public class DepartureActivity extends AppCompatActivity {
                 }
 
                 // In case of error, show Toast with error message
-                else new CustomToast(this).showDefault(this, statusCode);
+                else new CustomToast(this).showDefault(statusCode);
 
             });
         }, Integer.valueOf(group));

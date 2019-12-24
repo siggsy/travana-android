@@ -1,20 +1,16 @@
-package com.VegaSolutions.lpptransit.ui.fragments;
+package com.VegaSolutions.lpptransit.ui.fragments.lpp;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.util.SparseArray;
@@ -24,14 +20,10 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
-import com.VegaSolutions.lpptransit.ui.fragments.subfragments.StationsSubFragment;
-import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
-import com.google.android.gms.location.LocationServices;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
+import com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments.StationsSubFragment;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;

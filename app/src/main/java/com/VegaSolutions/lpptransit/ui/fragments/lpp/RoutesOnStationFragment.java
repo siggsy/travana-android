@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.fragments;
+package com.VegaSolutions.lpptransit.ui.fragments.lpp;
 
 
 import android.app.Activity;
@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.DepartureActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
@@ -125,7 +126,7 @@ public class RoutesOnStationFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
 
                 if (success) adapter.setRoutes(apiResponse.getData());
-                else new CustomToast(context).showDefault(context, Toast.LENGTH_SHORT);
+                else new CustomToast(context).showDefault(Toast.LENGTH_SHORT);
 
             });
 
