@@ -96,7 +96,7 @@ public class TravanaSpecialGetQuery extends Thread {
             builder.url(TravanaQuery.SERVER_URL + URL + params)
                     .addHeader("Content-Type", "application/json")  // add request headers
                     .addHeader("User-Agent", "OkHttp Bot")
-                    .addHeader("Authorization", basic_token)
+                    .addHeader("Authorization_test", basic_token)
                     .addHeader("Accept","")
                     .addHeader("Cache-Control", "no-cache")
                     .addHeader("Host", TravanaQuery.SERVER_IP_ADDRESS)

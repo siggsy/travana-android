@@ -7,6 +7,13 @@ public class ResponseObject<T> {
     private int response_code;
     private String internal_error;
 
+    public ResponseObject(boolean success, T data, int response_code, String internal_error) {
+        this.success = success;
+        this.data = data;
+        this.response_code = response_code;
+        this.internal_error = internal_error;
+    }
+
     public boolean isSuccess() {
         return success;
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -41,6 +43,7 @@ public class TravanaAPI {
 
     /*
     *Responses
+    * false, 4002, 'Error: posting to often.            -> if user has more than 3 posts in last 24 hours OR the last massage has been posted less than 10 min ago !(now - for testing it is set to 1 min)!
     * false, 4001, "Error: cannot add message
     * true, 200
     */
@@ -53,8 +56,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try{
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -75,8 +82,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -616,6 +627,8 @@ public class TravanaAPI {
      * false, 6003, Error: Wrong format. We support just jpg,jpeg and png.
      * false, 6004, Error: during compressing file. Maybe you Should check if you provided file type.
      * false, 6005, Error: The system can not save the file."
+     * false, 6006, "Please pass file_type and data"
+     * false, 6007, "Error: posting too often."             -> you have uploaded more than 10 photos in last 10 hours.
      * true, 200, photo_id;
      */
     public static void uploadImage(String token, Uri image,Context context, TravanaApiCallback<ResponseObject<String>> callback) {
@@ -636,9 +649,11 @@ public class TravanaAPI {
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         String type = mime.getExtensionFromMimeType(cR.getType(image));
 
+        Log.e(TAG, type);
+
         RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("file", "image",
-                        RequestBody.create(MediaType.parse("image/png"), bytes))
+                        RequestBody.create(MediaType.parse("image/" + type), bytes))
                 .build();
 
         new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_UPLOAD_FILE, TRAVANA_API_KEY, token, rbody)
@@ -707,38 +722,35 @@ public class TravanaAPI {
      * if everything was sucessfull just image is returned otherwise image is null or callback is unsuccessfull;
      */
 
-    //private static HashMap<String, Bitmap> images = new HashMap<>();
+    private static HashMap<String, Bitmap> images = new HashMap<>();
 
     public static void getUserImage(@NonNull  String url, TravanaApiCallbackSpecial callbackSpecial){
 
-        /*
+
         if(images.containsKey(url)){
             callbackSpecial.onComplete(images.get(url), 200, true);
             return;
         }
-        */
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
 
-                try {
-                    URL urlc = new URL(url);
-                    HttpURLConnection connection = (HttpURLConnection) urlc.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    Bitmap bitmap = BitmapFactory.decodeStream(input);
+        Thread thread = new Thread(() -> {
 
-                    //images.put(url, bitmap);
+            try {
+                URL urlc = new URL(url);
+                HttpURLConnection connection = (HttpURLConnection) urlc.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
 
-                    callbackSpecial.onComplete(bitmap, 200, true);
+                //images.put(url, bitmap);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    callbackSpecial.onComplete(null, -1, false);
-                }
+                callbackSpecial.onComplete(bitmap, 200, true);
 
+            } catch (IOException e) {
+                e.printStackTrace();
+                callbackSpecial.onComplete(null, -1, false);
             }
+
         });
 
         thread.start();

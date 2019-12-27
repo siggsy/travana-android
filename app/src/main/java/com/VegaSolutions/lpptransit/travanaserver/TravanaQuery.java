@@ -11,13 +11,21 @@ import androidx.annotation.NonNull;
 import org.jsoup.HttpStatusException;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
@@ -28,21 +36,19 @@ public class TravanaQuery extends Thread  {
 
     private static final String TAG = TravanaQuery.class.getSimpleName();
 
-    public static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+    //public static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
 
-    //public static final String SERVER_URL = "http://192.168.1.13:8081/ljubljana_app_server/api";
+    public static OkHttpClient client = getUnsafeOkHttpClient();
 
-    public static final String SERVER_URL = "https://travana.si:8443/ljubljana_app_server/api";
+    public static final String SERVER_IP_ADDRESS = "192.168.1.11:8081";
 
-    //public static final String SERVER_URL = "http://192.168.1.7:8081/ljubljana_app_server/api";
+    //public static final String SERVER_IP_ADDRESS = "193.77.85.172:8443";
 
-    //public static final String SERVER_URL = "http://10.0.1.23:8080/ljubljana_app_server/api";
+    //public static final String SERVER_IP_ADDRESS = "travana.si:8443";
 
-    public static final String SERVER_IP_ADDRESS = "travana.si:8443";
+    //public static final String SERVER_URL = "http://" + SERVER_IP_ADDRESS + "/ljubljana_app_server/api";
 
-    //public static final String SERVER_IP_ADDRESS = "192.168.1.7:8081";
-
-    //public static final String SERVER_IP_ADDRESS = "192.168.1.13:8443";
+    public static final String SERVER_URL = "http://192.168.1.11:8081/ljubljana_app_server/api";
 
     public static final String WARNINGS_URL = "/alerts/warnings";                                   //returns warnings alerts. ex. "{"content": "vsebina","created_date": "10.12.2001","expire_date": "1.1.2020",...
 
@@ -170,12 +176,12 @@ public class TravanaQuery extends Thread  {
             }
 
             Log.d(TAG, SERVER_URL + URL + params);
-            Log.d(TAG, "!!" + basic_token + "!!");
+            Log.e(TAG, "!!" + basic_token + "!!");
 
             builder.url(SERVER_URL + URL + params)
                     .addHeader("Content-Type", "application/json")  // add request headers
                     .addHeader("User-Agent", "OkHttp Bot")
-                    .addHeader("Authorization", basic_token)
+                    .addHeader("Authorization_test", basic_token)
                     .addHeader("Accept","")
                     .addHeader("Cache-Control", "no-cache")
                     .addHeader("Host", SERVER_IP_ADDRESS)
@@ -205,12 +211,55 @@ public class TravanaQuery extends Thread  {
         } catch (SocketTimeoutException e) {
             e.printStackTrace();
             onCompleteListener.onComplete(null, -2, false);
-        } catch (ConnectException e) {
-            e.printStackTrace();
-            onCompleteListener.onComplete(null, -3, false);
         } catch (IOException e) {
             e.printStackTrace();
             onCompleteListener.onComplete(null, -1, false);
+        }
+
+    }
+
+    public static OkHttpClient getUnsafeOkHttpClient() {
+
+        try {
+            // Create a trust manager that does not validate certificate chains
+            final TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain,
+                                                       String authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain,
+                                                       String authType) throws CertificateException {
+                        }
+
+                        @Override
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
+                    }
+            };
+
+            // Install the all-trusting trust manager
+            final SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            // Create an ssl socket factory with our all-trusting manager
+            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0])
+                    .hostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String hostname, SSLSession session) {
+                            return true;
+                        }
+                    }).build();
+
+            return client;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

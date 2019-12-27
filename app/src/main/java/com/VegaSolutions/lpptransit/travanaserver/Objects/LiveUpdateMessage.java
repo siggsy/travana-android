@@ -22,10 +22,9 @@ public class LiveUpdateMessage {
     private String time_ago;
     private long time_ago_millis;
 
-    public LiveUpdateMessage(String user_id,
+    public LiveUpdateMessage(
                              String message_content, MessageTag[] tags, String[] photo_ids) {
 
-        this.user_id = user_id;;
         this.message_content = message_content;
         this.tags = tags;
         this.photo_ids = photo_ids;

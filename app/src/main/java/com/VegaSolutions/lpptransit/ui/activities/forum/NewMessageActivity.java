@@ -52,7 +52,7 @@ public class NewMessageActivity extends AppCompatActivity {
             if (success) {
                 FirebaseUser user = FirebaseManager.getSignedUser();
                 // TODO: implement pictures
-                LiveUpdateMessage message = new LiveUpdateMessage(user.getUid(), messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
+                LiveUpdateMessage message = new LiveUpdateMessage(messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
                 TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
                     if (success1) {
                         Log.i("NewMessage", apiResponse.getInternal_error() + "fesfesf");

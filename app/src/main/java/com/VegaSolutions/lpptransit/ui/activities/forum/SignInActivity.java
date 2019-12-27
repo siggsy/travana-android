@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,12 +19,9 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -43,12 +41,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
-
-import butterknife.BindView;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -310,8 +305,19 @@ public class SignInActivity extends AppCompatActivity {
                     if(success){
 
 
+                        /*
+                        TravanaAPI.messagesMeta(token, new TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObject<LiveUpdateMessage[]> apiResponse, int statusCode, boolean success) {
 
+                                Log.e(TAG, apiResponse + "");
 
+                            }
+                        });
+
+                         */
+
+                        /*
                         TravanaAPI.tags(token, (apiResponse, statusCode1, success1) -> {
 
                             if(success1){
@@ -339,7 +345,7 @@ public class SignInActivity extends AppCompatActivity {
 
                             }
                         });
-
+                        */
 
 
                         /*
@@ -359,7 +365,7 @@ public class SignInActivity extends AppCompatActivity {
 
                          */
 
-                        /*
+
                         MessageTag[] tags = new MessageTag[1];
                         tags[0] = new MessageTag("xyz#115678", "xyz", "#123456");
 
@@ -369,19 +375,31 @@ public class SignInActivity extends AppCompatActivity {
 
                         FirebaseUser basic_user_firebase_data = FirebaseManager.getSignedUser();
 
-                        LiveUpdateMessage message = new LiveUpdateMessage(basic_user_firebase_data.getUid(), "new massage", tags, links);
+                        LiveUpdateMessage message = new LiveUpdateMessage("new massage", tags, links);
 
                         TravanaAPI.addMessage(token, message, (data, statusCode1, success1) -> {
 
                             if(success1){
-                                Log.e(TAG, data + " " + statusCode);
+                                Log.e(TAG, data + " " + statusCode1);
                             }else{
                                 Log.e(TAG, "error" + statusCode1);
                             }
 
-                        });*/
+                        });
 
 
+                        /*
+                        Log.e(TAG, token);
+
+                        TravanaAPI.followTag(token, "domenjecar#12321", new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, apiResponse);
+
+                            }
+                        });
+                        */
 
 
 
