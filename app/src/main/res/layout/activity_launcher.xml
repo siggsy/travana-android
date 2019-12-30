@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?backgroundViewColor"
     tools:context=".ui.activities.WelcomeActivity">
 
 
@@ -14,7 +15,6 @@
         android:layout_marginTop="20dp"
         android:alpha="0.7"
         android:text="@string/app_name"
-        android:textColor="@color/color_black"
         android:textSize="38sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.192"
@@ -28,7 +28,6 @@
         android:layout_marginTop="4dp"
         android:alpha="0.5"
         android:text="@string/app_slogan_welcome_activity"
-        android:textColor="@color/color_black"
         android:textSize="17sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,7 +42,6 @@
         android:layout_marginBottom="10dp"
         android:alpha="0.5"
         android:text="@string/by_developers"
-        android:textColor="@color/color_black"
         android:textSize="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -56,7 +54,6 @@
         android:layout_marginBottom="40dp"
         android:alpha="0.5"
         android:text="@string/approved_by"
-        android:textColor="@color/color_black"
         app:layout_constraintBottom_toTopOf="@+id/textView_developers"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -66,7 +63,6 @@
         android:layout_height="wrap_content"
         android:alpha="0.5"
         android:text="@string/officially"
-        android:textColor="@color/color_black"
         app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toEndOf="@+id/textView2"
         app:layout_constraintHorizontal_bias="0.458"
