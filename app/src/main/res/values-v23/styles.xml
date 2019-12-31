@@ -33,7 +33,7 @@
         <item name="android:editTextColor">@android:color/white</item>
         <item name="android:textColorHint">#ffA2A2A2</item>
         <item name="dividerColor">@color/divider_dark</item>
-        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorPrimaryDark">@color/color_main_background_dark</item>
         <item name="elevation">0dp</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>

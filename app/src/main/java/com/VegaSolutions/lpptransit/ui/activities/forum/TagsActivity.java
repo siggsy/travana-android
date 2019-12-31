@@ -132,12 +132,14 @@ public class TagsActivity extends AppCompatActivity {
 
         } else {
             FirebaseManager.getFirebaseToken((data, error, success) -> {
-                if (success) TravanaAPI.tags(data, (apiResponse, statusCode, success1) -> {
+                if (success) TravanaAPI.tags((apiResponse, statusCode, success1) -> {
                     if (success1) {
 
                         TagsBox tagsBox = apiResponse.getData();
+
                         if (tagsBox == null)
                             return;
+
                         MessageTag[] main = tagsBox.getMain_tags();
                         MessageTag[] tags = tagsBox.getTags();
 
@@ -150,6 +152,7 @@ public class TagsActivity extends AppCompatActivity {
                             adapter.applyFilter(filter);
                             adapter.notifyDataSetChanged();
                         });
+
                     }
                 });
             });

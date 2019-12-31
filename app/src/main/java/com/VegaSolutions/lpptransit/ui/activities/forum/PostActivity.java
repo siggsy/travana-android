@@ -43,6 +43,7 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.post_pictures_container) LinearLayout pictureContainer;
     @BindView(R.id.post_pictures) FlexboxLayout pictures;
     @BindView(R.id.post_tags) FlexboxLayout mTags;
+    @BindView(R.id.post_comment_count) TextView commentCount;
 
 
     @Override
@@ -108,6 +109,16 @@ public class PostActivity extends AppCompatActivity {
                 mTags.addView(v);
             }
         }
+
+        commentCount.setText(getString(R.string.post_comments, message.comments.size()));
+
+        TravanaAPI.getUserImage(message.getUser().getUser_photo_url(), (bitmap, statusCode, success) -> {
+           runOnUiThread(() -> {
+                if (success)
+                    userImage.setImageBitmap(bitmap);
+                else new CustomToast(this).showDefault(Toast.LENGTH_SHORT);
+            });
+        });
 
     }
 

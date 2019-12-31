@@ -30,6 +30,9 @@ public class CustomToast {
 
     public CustomToast setText(String text) {
         textView.setText(text);
+        if (text.equals(""))
+            textView.setVisibility(View.GONE);
+        else textView.setVisibility(View.VISIBLE);
         return this;
     }
 

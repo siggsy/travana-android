@@ -564,7 +564,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-
+                        Log.i("TAGS", response);
                         ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
@@ -584,7 +584,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-
+                        Log.i("TAGS", response);
                         ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {

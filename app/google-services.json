@@ -84,6 +84,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "271997165503-v78ncapm81ja69sjvdg6ao756p5oitr0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit.debug",
+            "certificate_hash": "d904ddfc6cb3cfa895565652e3e6814fa6d90776"
+          }
+        },
+        {
+          "client_id": "271997165503-avhg3k2fdmpq9vpvkgfjcgt8ca2dmb2c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.VegaSolutions.lpptransit.debug",
+            "certificate_hash": "ec0a910acad21444db12daec7637255348b3cd25"
+          }
+        },
+        {
           "client_id": "271997165503-t5id3taad43fp18joh4l3csc6gjo5dut.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

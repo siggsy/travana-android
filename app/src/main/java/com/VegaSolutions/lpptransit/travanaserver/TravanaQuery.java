@@ -40,15 +40,15 @@ public class TravanaQuery extends Thread  {
 
     public static OkHttpClient client = getUnsafeOkHttpClient();
 
-    public static final String SERVER_IP_ADDRESS = "192.168.1.11:8081";
+    //public static final String SERVER_IP_ADDRESS = "192.168.1.11:8081";
 
     //public static final String SERVER_IP_ADDRESS = "193.77.85.172:8443";
 
-    //public static final String SERVER_IP_ADDRESS = "travana.si:8443";
+    public static final String SERVER_IP_ADDRESS = "travana.si:8443";
 
-    //public static final String SERVER_URL = "http://" + SERVER_IP_ADDRESS + "/ljubljana_app_server/api";
+    public static final String SERVER_URL = "https://" + SERVER_IP_ADDRESS + "/ljubljana_app_server/api";
 
-    public static final String SERVER_URL = "http://192.168.1.11:8081/ljubljana_app_server/api";
+    //public static final String SERVER_URL = "http://192.168.1.11:8081/ljubljana_app_server/api";
 
     public static final String WARNINGS_URL = "/alerts/warnings";                                   //returns warnings alerts. ex. "{"content": "vsebina","created_date": "10.12.2001","expire_date": "1.1.2020",...
 

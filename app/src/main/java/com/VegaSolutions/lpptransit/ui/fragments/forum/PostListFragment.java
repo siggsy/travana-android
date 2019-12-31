@@ -212,22 +212,24 @@ public class PostListFragment extends Fragment {
                     if (success) {
                         TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
                             Log.i("Liked",  apiResponse + " " + statusCode);
-                            if (success1 && apiResponse.equals("Successful")) {
-                                ((Activity) getContext()).runOnUiThread(() -> {
+                            Activity activity = (Activity) getContext();
+                            if (activity == null)
+                                return;
+                            if (success1 && apiResponse.isSuccess()) {
+                                activity.runOnUiThread(() -> {
                                     CustomToast customToast = new CustomToast(getContext());
                                     customToast.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
                                     customToast.setIconColor(Color.WHITE);
                                     customToast.setTextColor(Color.WHITE);
-                                    customToast.setText("Success!");
+                                    customToast.setText("");
                                     customToast.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_check_black_24dp));
                                     customToast.show(Toast.LENGTH_SHORT);
                                     message.setLikes(message.isLiked() ? (message.getLikes() + 1) : (message.getLikes() - 1));
                                     viewHolder.postLikes.setText(message.getLikes() + "");
                                 });
                             } else {
-                                ((Activity) getContext()).runOnUiThread(() -> {
-                                    CustomToast customToast = new CustomToast(getContext());
-                                    customToast.showDefault(statusCode);
+                                activity.runOnUiThread(() -> {
+                                    new CustomToast(activity).showDefault(statusCode);
                                     viewHolder.setLiked(!message.isLiked(), message);
                                     viewHolder.postLikes.setText(message.getLikes() + "");
                                 });
