@@ -50,12 +50,42 @@
         app:layout_constraintStart_toEndOf="@+id/user_name"
         app:layout_constraintTop_toTopOf="@+id/user_name" />
 
+    <EditText
+        android:id="@+id/new_comment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?backgroundViewColor"
+        android:ems="10"
+        android:hint="@string/comment_on_the_post"
+        android:importantForAutofill="no"
+        android:inputType="textPersonName"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/new_comment_post"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_nested_scroll" />
+
+    <ImageView
+        android:id="@+id/new_comment_post"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        android:backgroundTint="?backgroundViewColor"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="center"
+        android:tint="?android:textColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/new_comment"
+        app:srcCompat="@drawable/ic_send_black_24dp" />
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/post_nested_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/new_comment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/user_image">
@@ -117,6 +147,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@string/post_comments" />
+
+            <ListView
+                android:id="@+id/post_comments"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

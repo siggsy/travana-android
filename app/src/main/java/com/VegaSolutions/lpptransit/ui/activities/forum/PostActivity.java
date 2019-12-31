@@ -2,12 +2,14 @@ package com.VegaSolutions.lpptransit.ui.activities.forum;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,10 +18,12 @@ import android.widget.Toast;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseCallback;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserTag;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallbackSpecial;
@@ -44,6 +48,8 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.post_pictures) FlexboxLayout pictures;
     @BindView(R.id.post_tags) FlexboxLayout mTags;
     @BindView(R.id.post_comment_count) TextView commentCount;
+    @BindView(R.id.new_comment) EditText newComment;
+    @BindView(R.id.new_comment_post) ImageView newCommentPost;
 
 
     @Override
@@ -112,6 +118,7 @@ public class PostActivity extends AppCompatActivity {
 
         commentCount.setText(getString(R.string.post_comments, message.comments.size()));
 
+        // Load user image
         TravanaAPI.getUserImage(message.getUser().getUser_photo_url(), (bitmap, statusCode, success) -> {
            runOnUiThread(() -> {
                 if (success)
@@ -119,6 +126,29 @@ public class PostActivity extends AppCompatActivity {
                 else new CustomToast(this).showDefault(Toast.LENGTH_SHORT);
             });
         });
+
+        // Comment on the post
+        newCommentPost.setOnClickListener(v -> {
+            if (newComment.getText().length() == 0)
+                return;
+            FirebaseManager.getFirebaseToken((data, error, success) -> {
+                if (error != null)
+                    return;
+                TravanaAPI.addComment(data, message.get_id(), new LiveUpdateComment(newComment.getText().toString()), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                    if (success1 && apiResponse.isSuccess()) {
+                        CustomToast customToast = new CustomToast(this);
+                        customToast.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+                        customToast.setIconColor(Color.WHITE);
+                        customToast.setTextColor(Color.WHITE);
+                        customToast.setText("");
+                        customToast.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_check_black_24dp));
+                        customToast.show(Toast.LENGTH_SHORT);
+                    } else new CustomToast(this).showDefault(statusCode);
+                }));
+            });
+        });
+
+
 
     }
 

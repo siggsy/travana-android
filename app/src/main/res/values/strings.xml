@@ -17,7 +17,7 @@
     <string name="developer_help_contact" translatable="false">domenkralj.sahist@gmail.com</string>
     <string name="arrival">arrival</string>
     <string name="detour">detour</string>
-    <string name="by_developers">Avtorja Domen Kralj, Žiga Leskovec</string>
+    <string name="by_developers">By Domen Kralj, Žiga Leskovec</string>
     <string name="app_slogan_welcome_activity">better public transport.</string>
     <string name="officially">Officially</string>
     <string name="approved_by">approved by</string>
@@ -66,5 +66,6 @@
     <string name="select_route">Select a route</string>
     <string name="attachments">Attachments</string>
     <string name="connection_refused">Connection refused.</string>
+    <string name="comment_on_the_post">Comment on the post …</string>
 
 </resources>

@@ -44,7 +44,7 @@
 
 
     <!-- dark theme -->
-    <color name="color_main_background_dark">#202020</color>
+    <color name="color_main_background_dark">#212529</color> <!-- #202020 -->
     <color name="color_text_dark">#FFFFFF</color>
 
 </resources>

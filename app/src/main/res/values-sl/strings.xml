@@ -3,7 +3,7 @@
     <string name="app_name">Travana</string>
     <string name="app_slogan_welcome_activity">boljši javni prevoz.</string>
     <string name="arrival">PRIHOD</string>
-    <string name="by_developers">od Domen Kralj, Žiga Leskovec</string>
+    <string name="by_developers">Avtorja Domen Kralj, Žiga Leskovec</string>
     <string name="contact_us">Kontaktiraj nas.</string>
     <string name="routes">Linije</string>
     <string name="sign_in_with_fb">Prijava s Facebook</string>
@@ -54,9 +54,10 @@
     <string name="too_many_tags_error">Dosegli ste mejo števila oznak.</string>
     <string name="select_route">Izberite linijo</string>
     <string name="officially">Uradno</string>
-    <string name="approved_by">potrjeno od</string>
+    <string name="approved_by">odobril</string>
     <string name="attachments">Priponke</string>
     <string name="connection_refused">Povezava zavrnjena.</string>
+    <string name="comment_on_the_post">Komentiraj na objavo …</string>
 
 
 </resources>
