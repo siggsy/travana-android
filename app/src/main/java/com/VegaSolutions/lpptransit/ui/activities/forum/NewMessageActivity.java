@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,13 +17,10 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,16 +46,15 @@ public class NewMessageActivity extends AppCompatActivity {
         back.setOnClickListener(v -> onBackPressed());
         post.setOnClickListener(v -> FirebaseManager.getFirebaseToken((data, error, success) -> {
             if (success) {
-                FirebaseUser user = FirebaseManager.getSignedUser();
                 // TODO: implement pictures
                 LiveUpdateMessage message = new LiveUpdateMessage(messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
                 TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
-                    if (success1) {
-                        Log.i("NewMessage", apiResponse.getInternal_error() + "fesfesf");
+                    if (success1 && apiResponse.isSuccess()) {
                         NewMessageActivity.this.finish();
                     } else {
-                        new CustomToast(NewMessageActivity.this).showDefault(statusCode);
-                        Log.e("NewMessage", statusCode + "");
+                        if (!success1)
+                            new CustomToast(NewMessageActivity.this).showDefault(statusCode);
+                        else new CustomToast(NewMessageActivity.this).showStringError(apiResponse.getInternal_error());
                     }
                 }));
             }

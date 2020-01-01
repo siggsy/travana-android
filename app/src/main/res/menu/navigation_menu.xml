@@ -11,9 +11,9 @@
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settings" />
 
-    <item
+    <!-- <item
         android:id="@+id/sign_in"
         android:icon="@drawable/ic_perm_identity_black_24dp"
-        android:title="Sign in" />
+        android:title="Sign in" /> -->
 
 </menu>

@@ -60,7 +60,7 @@
     <string name="opposite_error">Opposite station does not exist.</string>
     <string name="network_error">No internet connection.</string>
     <string name="timed_out_error">Connection timed out.</string>
-    <string name="unknown_error">Something went wrong. Please contact developers.</string>
+    <string name="unknown_error">Something went wrong. Please contact developers. - %1$d</string>
     <string name="refresh">Refresh</string>
     <string name="create_a_new_post">Create a new post</string>
     <string name="too_many_tags_error">You have reached tag count limit.</string>

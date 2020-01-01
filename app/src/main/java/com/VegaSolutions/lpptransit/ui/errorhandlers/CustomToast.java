@@ -81,11 +81,20 @@ public class CustomToast {
                 setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px));
                 break;
             default:
-                setText(context.getString(R.string.unknown_error));
+                setText(context.getString(R.string.unknown_error, statusCode));
                 setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
                 break;
 
         }
+        show(Toast.LENGTH_SHORT);
+    }
+
+    public void showStringError(String error) {
+        setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
+        setTextColor(Color.WHITE);
+        setIconColor(Color.WHITE);
+        setText(error);
+        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
         show(Toast.LENGTH_SHORT);
     }
 

@@ -1,6 +1,7 @@
 package com.VegaSolutions.lpptransit.ui.activities.forum;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -24,9 +25,13 @@ import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserTag;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,68 +102,81 @@ public class TagsActivity extends AppCompatActivity {
 
         setupUI();
 
+        TravanaApiCallback<ResponseObject<TagsBox>> callback;
+
         if (type == TYPE_NORMAL) {
 
+            callback = (apiResponse, statusCode, success1) -> {
+                if (success1) {
 
-            FirebaseManager.getFirebaseToken((data, error, success) -> {
-                if (success) TravanaAPI.tags(data, (apiResponse, statusCode, success1) -> {
-                    if (success1) {
+                    TagsBox tagsBox = apiResponse.getData();
 
-                        TagsBox tagsBox = apiResponse.getData();
+                    if (tagsBox == null)
+                        return;
 
-                        if (tagsBox == null)
-                            return;
+                    MessageTag[] main = tagsBox.getMain_tags();
+                    MessageTag[] tags = tagsBox.getTags();
+                    UserTag[] userTags = tagsBox.getUser_tags();
 
-                        MessageTag[] main = tagsBox.getMain_tags();
-                        MessageTag[] tags = tagsBox.getTags();
-                        UserTag[] userTags = tagsBox.getUser_tags();
+                    Log.i("tags", Arrays.toString(main));
 
-                        Log.i("tags", Arrays.toString(main));
+                    Object[] allTags = new Object[main.length + tags.length + userTags.length];
+                    System.arraycopy(userTags, 0, allTags, 0, userTags.length);
+                    System.arraycopy(main, 0, allTags, userTags.length, main.length);
+                    System.arraycopy(tags, 0, allTags, userTags.length + main.length, tags.length);
 
-                        Object[] allTags = new Object[main.length + tags.length + userTags.length];
-                        System.arraycopy(userTags, 0, allTags, 0, userTags.length);
-                        System.arraycopy(main, 0, allTags, userTags.length, main.length);
-                        System.arraycopy(tags, 0, allTags, userTags.length + main.length, tags.length);
+                    adapter.allTags = allTags;
+                    runOnUiThread(() -> {
+                        adapter.applyFilter(filter);
+                        adapter.notifyDataSetChanged();
+                    });
 
-                        adapter.allTags = allTags;
-                        runOnUiThread(() -> {
-                            adapter.applyFilter(filter);
-                            adapter.notifyDataSetChanged();
-                        });
+                }
+            };
 
-                    }
-                });
-            });
 
         } else {
-            FirebaseManager.getFirebaseToken((data, error, success) -> {
-                if (success) TravanaAPI.tags((apiResponse, statusCode, success1) -> {
-                    if (success1) {
 
-                        TagsBox tagsBox = apiResponse.getData();
+            callback = (apiResponse, statusCode, success1) -> {
+                if (success1) {
 
-                        if (tagsBox == null)
-                            return;
+                    TagsBox tagsBox = apiResponse.getData();
 
-                        MessageTag[] main = tagsBox.getMain_tags();
-                        MessageTag[] tags = tagsBox.getTags();
+                    if (tagsBox == null)
+                        return;
 
-                        Object[] allTags = new Object[main.length + tags.length];
-                        System.arraycopy(main, 0, allTags, 0, main.length);
-                        System.arraycopy(tags, 0, allTags, main.length, tags.length);
+                    MessageTag[] main = tagsBox.getMain_tags();
+                    MessageTag[] tags = tagsBox.getTags();
 
-                        adapter.allTags = allTags;
-                        runOnUiThread(() -> {
-                            adapter.applyFilter(filter);
-                            adapter.notifyDataSetChanged();
-                        });
+                    Object[] allTags = new Object[main.length + tags.length];
+                    System.arraycopy(main, 0, allTags, 0, main.length);
+                    System.arraycopy(tags, 0, allTags, main.length, tags.length);
 
-                    }
-                });
-            });
+                    adapter.allTags = allTags;
+                    TagsActivity.this.runOnUiThread(() -> {
+                        adapter.applyFilter(filter);
+                        adapter.notifyDataSetChanged();
+                    });
+
+                }
+            };
+
         }
 
+        if (FirebaseManager.isSignedIn()) TravanaAPI.tags(FirebaseManager.getSignedUser().getUid(), callback);
+        else TravanaAPI.tags(callback);
 
+
+    }
+
+    private void showSignIn() {
+        Snackbar snack = Snackbar
+                .make(tags, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
+                .setAction(R.string.sign_in_text, v -> startActivity(new Intent(this, SignInActivity.class)));
+        View view = snack.getView();
+        TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+        snack.show();
     }
 
     class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -181,7 +199,19 @@ public class TagsActivity extends AppCompatActivity {
 
             View.OnClickListener onClickListener;
             if (type == TYPE_NORMAL) {
-               onClickListener = v -> startActivity(new Intent(TagsActivity.this, TagMessageActivity.class));
+               onClickListener = v -> {
+                   Intent i = new Intent(TagsActivity.this, TagMessageActivity.class);
+                   if (tag instanceof UserTag){
+                       UserTag uTag = (UserTag) tag;
+                       i.putExtra(TagMessageActivity.TAG_NAME, uTag.getTag());
+                       i.putExtra(TagMessageActivity.TAG_ID, uTag.get_id());
+                   } else {
+                       MessageTag mTag = (MessageTag) tag;
+                       i.putExtra(TagMessageActivity.TAG_NAME, mTag.getTag());
+                       i.putExtra(TagMessageActivity.TAG_ID, mTag.get_id());
+                   }
+                   startActivity(i);
+               };
             } else {
                 onClickListener = v -> {
                     setResult(SELECTED, getIntent().putExtra("TAG", (MessageTag) tag));
@@ -202,11 +232,15 @@ public class TagsActivity extends AppCompatActivity {
                 vh.following.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (!FirebaseManager.isSignedIn()) {
+                            showSignIn();
+                            return;
+                        }
                         vh.following.setOnClickListener(null);
                         FirebaseManager.getFirebaseToken((data, error, success) -> {
                             if (success) {
                                 if (uTag.isFollowed()) TravanaAPI.removeTag(data, uTag.get_id(), (apiResponse, statusCode, success12) -> {
-                                    if (success12 && apiResponse.equals("Successful")) {
+                                    if (success12 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
                                             CustomToast customToast = new CustomToast(TagsActivity.this);
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
@@ -224,7 +258,7 @@ public class TagsActivity extends AppCompatActivity {
                                     }
                                 });
                                 else TravanaAPI.followTag(data, uTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
-                                    if (success1 && apiResponse.equals("Successful")) {
+                                    if (success1 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
                                             CustomToast customToast = new CustomToast(TagsActivity.this);
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
@@ -264,7 +298,7 @@ public class TagsActivity extends AppCompatActivity {
                         FirebaseManager.getFirebaseToken((data, error, success) -> {
                             if (success) {
                                 if (mTag.isFollowed()) TravanaAPI.removeTag(data, mTag.get_id(), (apiResponse, statusCode, success12) -> {
-                                    if (success12 && apiResponse.equals("Successful")) {
+                                    if (success12 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
                                             CustomToast customToast = new CustomToast(TagsActivity.this);
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
@@ -278,11 +312,10 @@ public class TagsActivity extends AppCompatActivity {
                                             vh.following.setOnClickListener(this);
                                             vh.following.setText(R.string.follow);
                                         });
-
                                     }
                                 });
-                                else TravanaAPI.followTag(data, mTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
-                                    if (success1 && apiResponse.equals("Successful")) {
+                                else TravanaAPI.followTag(data, mTag.get_id(), (apiResponse, statusCode, success1) -> {
+                                    if (success1 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
                                             CustomToast customToast = new CustomToast(TagsActivity.this);
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
@@ -297,7 +330,7 @@ public class TagsActivity extends AppCompatActivity {
                                             vh.following.setText(R.string.following);
                                         });
                                     }
-                                }));
+                                });
                             }
                         });
                     }

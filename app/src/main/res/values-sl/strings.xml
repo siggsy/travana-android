@@ -48,7 +48,7 @@
     <string name="opposite_error">Nasprotna postaja ne obstaja.</string>
     <string name="network_error">Brez internetne povezave.</string>
     <string name="timed_out_error">Povezava je potekla.</string>
-    <string name="unknown_error">Nekaj je šlo narobe. Obrnite se na razvijalce.</string>
+    <string name="unknown_error">Nekaj je šlo narobe. Obrnite se na razvijalce. - %1$d</string>
     <string name="refresh">Osveži</string>
     <string name="create_a_new_post">Create a new post</string>
     <string name="too_many_tags_error">Dosegli ste mejo števila oznak.</string>

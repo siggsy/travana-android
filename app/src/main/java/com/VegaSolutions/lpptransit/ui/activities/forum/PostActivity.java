@@ -3,13 +3,14 @@ package com.VegaSolutions.lpptransit.ui.activities.forum;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,31 +23,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.firebase.FirebaseCallback;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserTag;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallbackSpecial;
-import com.VegaSolutions.lpptransit.ui.custommaps.LatLngInterpolator;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
-
-import java.util.List;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 public class PostActivity extends AppCompatActivity {
 
     public static final String MESSAGE_ID = "MESSAGE_ID";
+
+    String id;
 
     @BindView(R.id.user_tag) TextView tag;
     @BindView(R.id.user_name) TextView name;
@@ -59,6 +55,7 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.new_comment) EditText newComment;
     @BindView(R.id.new_comment_post) ImageView newCommentPost;
     @BindView(R.id.post_replies) ListView comments;
+    @BindView(R.id.root) ConstraintLayout root;
 
 
     @Override
@@ -68,13 +65,18 @@ public class PostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post);
         ButterKnife.bind(this);
 
-        String id = getIntent().getStringExtra(MESSAGE_ID);
+
+        id = getIntent().getStringExtra(MESSAGE_ID);
 
         FirebaseManager.getFirebaseToken((data, error, success) -> {
-            TravanaAPI.messageid(id, (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
-                if (success1 && apiResponse.getResponse_code() == 200) {
+            TravanaAPI.messageid(id, data, (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                if (success1 && apiResponse.isSuccess()) {
                     updateUI(apiResponse.getData());
-                } else new CustomToast(this).showDefault(apiResponse != null ? apiResponse.getResponse_code() : statusCode);
+                } else {
+                    if (!success1)
+                        new CustomToast(this).showDefault(statusCode);
+                    else new CustomToast(this).showStringError(apiResponse.getInternal_error());
+                }
             }));
         });
 
@@ -101,15 +103,18 @@ public class PostActivity extends AppCompatActivity {
         content.setText(message.getMessage_content());
 
         // Set photos
+
         String[] photos = message.getPhoto_ids();
         if (photos != null && photos.length != 0) {
             pictureContainer.setVisibility(View.VISIBLE);
+            pictureContainer.removeAllViews();
             for (String url : photos) {
                 ImageView iv = new ImageView(this);
                 pictures.addView(iv);
                 TravanaAPI.getImage(url, (bitmap, statusCode, success) -> {
                     if (success)
                         iv.setImageBitmap(bitmap);
+                    else new CustomToast(this).showDefault(statusCode);
                 });
             }
         } else pictureContainer.setVisibility(View.GONE);
@@ -117,6 +122,7 @@ public class PostActivity extends AppCompatActivity {
         // Set message tags
         MessageTag[] messageTags = message.getTags();
         if (messageTags.length != 0) {
+            mTags.removeAllViews();
             for (MessageTag messageTag : messageTags) {
                 TextView v = (TextView) getLayoutInflater().inflate(R.layout.template_tag, mTags, false);
                 v.getBackground().setTint(Color.parseColor(messageTag.getColor()));
@@ -150,7 +156,20 @@ public class PostActivity extends AppCompatActivity {
                         customToast.setText("");
                         customToast.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_check_black_24dp));
                         customToast.show(Toast.LENGTH_SHORT);
-                    } else new CustomToast(this).showDefault(statusCode);
+                        TravanaAPI.messageid(id, data, (apiResponse1, statusCode1, success2) -> runOnUiThread(() -> {
+                            if (success2 && apiResponse1.isSuccess()) {
+                                updateUI(apiResponse1.getData());
+                            } else {
+                                if (!success2)
+                                    new CustomToast(this).showDefault(statusCode1);
+                                else new CustomToast(this).showStringError(apiResponse1.getInternal_error());
+                            }
+                        }));
+                    } else {
+                        if (!success1)
+                            new CustomToast(this).showDefault(statusCode);
+                        else new CustomToast(this).showStringError(apiResponse.getInternal_error());
+                    }
                 }));
             });
         });
@@ -198,9 +217,74 @@ public class PostActivity extends AppCompatActivity {
             } else replies.setVisibility(View.GONE);
             likes.setText("" + comment.getLikes());
             likeImage.setColorFilter(comment.isLiked() ? ContextCompat.getColor(PostActivity.this, R.color.colorAccent) : ViewGroupUtils.isDarkTheme(PostActivity.this) ? Color.WHITE : Color.BLACK);
+
+
+            likeImage.setOnClickListener(v -> {
+
+                if (!FirebaseManager.isSignedIn()) {
+                    showSignIn();
+                    return;
+                }
+
+                if (!comment.isLiked()) {
+                    setLiked(true, comment, likeImage);
+                } else {
+                    setLiked(false, comment, likeImage);
+                }
+                FirebaseManager.getFirebaseToken((data, error, success) -> {
+                    if (success) {
+                        TravanaAPI.likeComment(data, comment.getComment_id(), comment.isLiked(), (apiResponse, statusCode, success1) -> {
+                            Log.i("Liked",  apiResponse + " " + statusCode);
+                            if (success1 && apiResponse.isSuccess()) {
+                                runOnUiThread(() -> {
+                                    CustomToast customToast = new CustomToast(getContext());
+                                    customToast.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+                                    customToast.setIconColor(Color.WHITE);
+                                    customToast.setTextColor(Color.WHITE);
+                                    customToast.setText("");
+                                    customToast.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_check_black_24dp));
+                                    customToast.show(Toast.LENGTH_SHORT);
+                                    comment.setLikes(comment.isLiked() ? (comment.getLikes() + 1) : (comment.getLikes() - 1));
+                                    likes.setText(comment.getLikes() + "");
+                                });
+                            } else {
+                                runOnUiThread(() -> {
+                                    if (!success1)
+                                        new CustomToast(PostActivity.this).showDefault(statusCode);
+                                    else new CustomToast(PostActivity.this).showStringError(apiResponse.getInternal_error());
+                                    setLiked(!comment.isLiked(), comment, likeImage);
+                                    likes.setText(comment.getLikes() + "");
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
             return convertView;
 
         }
+
+        void setLiked(boolean value, LiveUpdateComment comment, ImageView likeContainer) {
+            if (value) {
+                likeContainer.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                comment.setLiked(true);
+            } else {
+                int color = ViewGroupUtils.isDarkTheme(getContext()) ? Color.WHITE : Color.BLACK;
+                likeContainer.setColorFilter(color);
+                comment.setLiked(false);
+            }
+        }
+    }
+
+    private void showSignIn() {
+        Snackbar snack = Snackbar
+                .make(root, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
+                .setAction(R.string.sign_in_text, v -> startActivity(new Intent(this, SignInActivity.class)));
+        View view = snack.getView();
+        TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+        snack.show();
     }
 
 }

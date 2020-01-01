@@ -47,7 +47,8 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
-                android:text="POST" />
+                android:text="POST"
+                android:textSize="18sp" />
         </LinearLayout>
     </FrameLayout>
 
@@ -129,11 +130,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="Add a picture..." />
+        android:text="Add a picture..."
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/message_image_0"
