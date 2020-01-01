@@ -55,6 +55,7 @@
     <string name="all">all</string>
     <string name="posted_time">posted • %1$s</string>
     <string name="post_comments">%1$d • comments</string>
+    <string name="comment_replies">%1$d • replies</string>
     <string name="loading">loading</string>
     <string name="opposite_error">Opposite station does not exist.</string>
     <string name="network_error">No internet connection.</string>
@@ -67,5 +68,8 @@
     <string name="attachments">Attachments</string>
     <string name="connection_refused">Connection refused.</string>
     <string name="comment_on_the_post">Comment on the post …</string>
+    <string name="sign_in_alert">You must be signed in to perform this action</string>
+    <string name="sign_in_text">Sign in</string>
+    <string name="sign_in_error">Sign in to see followed posts</string>
 
 </resources>

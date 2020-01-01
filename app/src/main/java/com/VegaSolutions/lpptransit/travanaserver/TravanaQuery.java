@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import org.jsoup.HttpStatusException;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -208,7 +209,7 @@ public class TravanaQuery extends Thread  {
         } catch (HttpStatusException e) {
             e.printStackTrace();
             onCompleteListener.onComplete(null, e.getStatusCode(), false);
-        } catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException | ConnectException e) {
             e.printStackTrace();
             onCompleteListener.onComplete(null, -2, false);
         } catch (IOException e) {

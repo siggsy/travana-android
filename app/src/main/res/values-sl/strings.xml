@@ -58,6 +58,10 @@
     <string name="attachments">Priponke</string>
     <string name="connection_refused">Povezava zavrnjena.</string>
     <string name="comment_on_the_post">Komentiraj na objavo …</string>
+    <string name="sign_in_alert">Za izvedbo tega dejanje morate biti prijavljeni</string>
+    <string name="sign_in_text">Prijava</string>
+    <string name="sign_in_error">Prijavite se za ogled sledljivih objav</string>
+    <string name="comment_replies">%1$d • odgovorov</string>
 
 
 </resources>

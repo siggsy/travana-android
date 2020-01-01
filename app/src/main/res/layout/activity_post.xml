@@ -149,7 +149,7 @@
                 android:text="@string/post_comments" />
 
             <ListView
-                android:id="@+id/post_comments"
+                android:id="@+id/post_replies"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 

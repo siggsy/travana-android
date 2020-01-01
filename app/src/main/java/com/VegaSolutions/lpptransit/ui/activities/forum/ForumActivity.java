@@ -9,16 +9,21 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.forum.PostListFragment;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import butterknife.BindView;
@@ -39,11 +44,17 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
 
     private void setupUI() {
 
+        elevationAnimation = new ElevationAnimation(header, 16);
+
         adapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        newMessage.setOnClickListener(v -> startActivity(new Intent(this, NewMessageActivity.class)));
+        newMessage.setOnClickListener(v -> {
+            if (FirebaseManager.isSignedIn())
+                startActivity(new Intent(this, NewMessageActivity.class));
+            else showSignIn();
+        });
 
         final Intent tagSearch = new Intent(this, TagsActivity.class);
         tagSearch.putExtra("TYPE", TagsActivity.TYPE_NORMAL);
@@ -58,10 +69,18 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
         setContentView(R.layout.activity_forum);
         ButterKnife.bind(this);
 
-        elevationAnimation = new ElevationAnimation(header, 16);
-
         setupUI();
 
+    }
+
+    private void showSignIn() {
+        Snackbar snack = Snackbar
+                .make(viewPager, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
+                .setAction(R.string.sign_in_text, v -> startActivity(new Intent(this, SignInActivity.class)));
+        View view = snack.getView();
+        TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+        snack.show();
     }
 
     @Override

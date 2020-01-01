@@ -416,7 +416,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);

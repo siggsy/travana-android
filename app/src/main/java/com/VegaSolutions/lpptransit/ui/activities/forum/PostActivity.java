@@ -1,17 +1,23 @@
 package com.VegaSolutions.lpptransit.ui.activities.forum;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +38,8 @@ import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
@@ -50,6 +58,7 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.post_comment_count) TextView commentCount;
     @BindView(R.id.new_comment) EditText newComment;
     @BindView(R.id.new_comment_post) ImageView newCommentPost;
+    @BindView(R.id.post_replies) ListView comments;
 
 
     @Override
@@ -119,13 +128,11 @@ public class PostActivity extends AppCompatActivity {
         commentCount.setText(getString(R.string.post_comments, message.comments.size()));
 
         // Load user image
-        TravanaAPI.getUserImage(message.getUser().getUser_photo_url(), (bitmap, statusCode, success) -> {
-           runOnUiThread(() -> {
-                if (success)
-                    userImage.setImageBitmap(bitmap);
-                else new CustomToast(this).showDefault(Toast.LENGTH_SHORT);
-            });
-        });
+        TravanaAPI.getUserImage(message.getUser().getUser_photo_url(), (bitmap, statusCode, success) -> runOnUiThread(() -> {
+             if (success)
+                 userImage.setImageBitmap(bitmap);
+             else new CustomToast(this).showDefault(statusCode);
+         }));
 
         // Comment on the post
         newCommentPost.setOnClickListener(v -> {
@@ -149,7 +156,51 @@ public class PostActivity extends AppCompatActivity {
         });
 
 
+        // Load comments on the list
+        Adapter adapter = new Adapter(this, message.comments.toArray(new LiveUpdateComment[0]));
+        comments.setAdapter(adapter);
 
+    }
+
+    private class Adapter extends ArrayAdapter<LiveUpdateComment> {
+
+
+        public Adapter(Context context, LiveUpdateComment[] comments) {
+            super(context, 0, comments);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
+            LiveUpdateComment comment = getItem(position);
+
+            if (convertView == null)
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.template_comment, parent, false);
+
+            TextView name = convertView.findViewById(R.id.user_name);
+            TextView tag = convertView.findViewById(R.id.user_tag);
+            TextView timeAgo = convertView.findViewById(R.id.posted_time);
+            TextView content = convertView.findViewById(R.id.post_content);
+            TextView replies = convertView.findViewById(R.id.post_replies);
+            TextView likes = convertView.findViewById(R.id.post_likes);
+            ImageView likeImage = convertView.findViewById(R.id.post_like_image);
+
+            name.setText(comment.getUser().getName());
+            tag.getBackground().setTint(Color.parseColor(comment.getUser().getTag().getColor()));
+            timeAgo.setText(comment.getTime_ago());
+            content.setText(comment.getComment_content());
+            if (comment.getSubcomments() != null) {
+                replies.setText(getString(R.string.comment_replies, comment.getSubcomments().length));
+                if (comment.getSubcomments().length == 0)
+                    replies.setVisibility(View.VISIBLE);
+                else replies.setVisibility(View.GONE);
+            } else replies.setVisibility(View.GONE);
+            likes.setText("" + comment.getLikes());
+            likeImage.setColorFilter(comment.isLiked() ? ContextCompat.getColor(PostActivity.this, R.color.colorAccent) : ViewGroupUtils.isDarkTheme(PostActivity.this) ? Color.WHITE : Color.BLACK);
+            return convertView;
+
+        }
     }
 
 }

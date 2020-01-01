@@ -17,10 +17,13 @@ public class FirebaseManager {
     private static String token = null;
 
     public static FirebaseUser getSignedUser(){
-
         return FirebaseAuth.getInstance().getCurrentUser();
-
     }
+
+    public static boolean isSignedIn() {
+        return FirebaseAuth.getInstance().getCurrentUser() != null;
+    }
+
 
     public static void getFirebaseToken(FirebaseCallback callback){
 
@@ -31,19 +34,18 @@ public class FirebaseManager {
                 return;
             }
 
-
             mUser.getIdToken(true)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             String idToken = task.getResult().getToken();
                             callback.onComplete(idToken, null, true);
-
+                            token = idToken;
                         } else {
                             callback.onComplete(null, task.getException(), false);
                             Log.e(TAG, task.getException().getMessage());
                         }
                     });
-        }
+        } else callback.onComplete(token, null, true);
 
     }
 

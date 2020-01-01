@@ -30,13 +30,16 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObje
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.activities.forum.PostActivity;
+import com.VegaSolutions.lpptransit.ui.activities.forum.SignInActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Arrays;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PostListFragment extends Fragment {
@@ -52,9 +55,12 @@ public class PostListFragment extends Fragment {
     private int type;
 
     // UI elements
-    private RecyclerView rv;
+    @BindView(R.id.post_list_rv) RecyclerView rv;
+    @BindView(R.id.refresh_layout) SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.sign_in_text) TextView signInText;
+    @BindView(R.id.sign_in_btn) TextView signInBtn;
+
     private Adapter adapter;
-    private SwipeRefreshLayout refreshLayout;
     private FragmentHeaderCallback fragmentHeaderCallback;
 
     private TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>> callback = (apiResponse, statusCode, success1) -> {
@@ -64,8 +70,13 @@ public class PostListFragment extends Fragment {
         a.runOnUiThread(() -> {
             refreshLayout.setRefreshing(false);
             if (success1) {
-                Log.i("following json", Arrays.toString(apiResponse.getData()));
-                adapter.setMessages(apiResponse.getData());
+                if (apiResponse.getData() == null)
+                    adapter.setMessages(new LiveUpdateMessage[0]);
+                else {
+                    adapter.setMessages(apiResponse.getData());
+                    signInText.setVisibility(View.GONE);
+                    signInBtn.setVisibility(View.GONE);
+                }
                 adapter.notifyDataSetChanged();
             } else {
                 if (apiResponse != null)
@@ -119,9 +130,7 @@ public class PostListFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_post_list, container, false);
 
-        rv = root.findViewById(R.id.post_list_rv);
-
-        refreshLayout = root.findViewById(R.id.refresh_layout);
+        ButterKnife.bind(this, root);
 
         adapter = new Adapter();
         rv.setAdapter(adapter);
@@ -142,16 +151,42 @@ public class PostListFragment extends Fragment {
 
         }));
 
-        FirebaseManager.getFirebaseToken((data, error, success) -> {
-            if (type == TYPE_ALL)
-                TravanaAPI.messagesMeta(data, callback);
-            else TravanaAPI.followedMessagesMeta(data, callback);
-        });
+        if (FirebaseManager.isSignedIn()) {
+            signInText.setVisibility(View.GONE);
+            signInBtn.setVisibility(View.GONE);
+            FirebaseManager.getFirebaseToken((data, error, success) -> {
+                if (type == TYPE_ALL)
+                    TravanaAPI.messagesMeta(data, callback);
+                else TravanaAPI.followedMessagesMeta(data, callback);
+            });
+        } else {
+            if (type == TYPE_ALL) {
+                TravanaAPI.messagesMeta(callback);
+                signInText.setVisibility(View.GONE);
+                signInBtn.setVisibility(View.GONE);
+            }
+            else {
+                refreshLayout.setRefreshing(false);
+                signInText.setVisibility(View.VISIBLE);
+                signInBtn.setVisibility(View.VISIBLE);
+                signInBtn.setOnClickListener(v -> startActivity(new Intent(getContext(), SignInActivity.class)));
+            }
+        }
 
         return root;
     }
 
-    public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private void showSignIn() {
+        Snackbar snack = Snackbar
+                .make(rv, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
+                .setAction(R.string.sign_in_text, v -> startActivity(new Intent(getContext(), SignInActivity.class)));
+        View view = snack.getView();
+        TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+        snack.show();
+    }
+
+    private class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private LiveUpdateMessage[] messages = new LiveUpdateMessage[0];
 
@@ -202,12 +237,17 @@ public class PostListFragment extends Fragment {
             viewHolder.setLiked(message.isLiked(), message);
 
             viewHolder.likeContainer.setOnClickListener(v -> {
+
+                if (!FirebaseManager.isSignedIn()) {
+                    showSignIn();
+                    return;
+                }
+
                 if (!message.isLiked()) {
                     viewHolder.setLiked(true, message);
                 } else {
                     viewHolder.setLiked(false, message);
                 }
-
                 FirebaseManager.getFirebaseToken((data, error, success) -> {
                     if (success) {
                         TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
@@ -276,7 +316,7 @@ public class PostListFragment extends Fragment {
                 userTag = itemView.findViewById(R.id.user_tag);
                 postContent = itemView.findViewById(R.id.post_content);
                 postLikes = itemView.findViewById(R.id.post_likes);
-                postComments = itemView.findViewById(R.id.post_comments);
+                postComments = itemView.findViewById(R.id.post_replies);
                 postTime = itemView.findViewById(R.id.posted_time);
                 userImage = itemView.findViewById(R.id.user_image);
                 postTags = itemView.findViewById(R.id.post_tags);
