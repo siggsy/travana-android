@@ -287,9 +287,9 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
             case R.id.forum:
                 startActivity(new Intent(this, ForumActivity.class));
                 break;
-            case R.id.sign_in:
+            /*case R.id.sign_in:
                 startActivity(new Intent(this, SignInActivity.class));
-                break;
+                break;*/
         }
 
         return true;

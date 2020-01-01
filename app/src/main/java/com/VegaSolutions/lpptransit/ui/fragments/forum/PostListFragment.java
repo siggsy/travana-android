@@ -30,13 +30,16 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObje
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.activities.forum.PostActivity;
+import com.VegaSolutions.lpptransit.ui.activities.forum.SignInActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Arrays;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PostListFragment extends Fragment {
@@ -52,9 +55,12 @@ public class PostListFragment extends Fragment {
     private int type;
 
     // UI elements
-    private RecyclerView rv;
+    @BindView(R.id.post_list_rv) RecyclerView rv;
+    @BindView(R.id.refresh_layout) SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.sign_in_text) TextView signInText;
+    @BindView(R.id.sign_in_btn) TextView signInBtn;
+
     private Adapter adapter;
-    private SwipeRefreshLayout refreshLayout;
     private FragmentHeaderCallback fragmentHeaderCallback;
 
     private TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>> callback = (apiResponse, statusCode, success1) -> {
@@ -63,15 +69,19 @@ public class PostListFragment extends Fragment {
             return;
         a.runOnUiThread(() -> {
             refreshLayout.setRefreshing(false);
-            if (success1) {
-                Log.i("following json", Arrays.toString(apiResponse.getData()));
-                adapter.setMessages(apiResponse.getData());
+            if (success1 && apiResponse.isSuccess()) {
+                if (apiResponse.getData() == null)
+                    adapter.setMessages(new LiveUpdateMessage[0]);
+                else {
+                    adapter.setMessages(apiResponse.getData());
+                    signInText.setVisibility(View.GONE);
+                    signInBtn.setVisibility(View.GONE);
+                }
                 adapter.notifyDataSetChanged();
             } else {
-                if (apiResponse != null)
-                    Log.i("failed json", apiResponse.getInternal_error());
-                else Log.i("failed connection", statusCode + "");
-                new CustomToast(a).showDefault(statusCode);
+                if (!success1)
+                    new CustomToast(a).showDefault(statusCode);
+                else new CustomToast(a).showStringError(apiResponse.getInternal_error());
             }
         });
 
@@ -119,11 +129,9 @@ public class PostListFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_post_list, container, false);
 
-        rv = root.findViewById(R.id.post_list_rv);
+        ButterKnife.bind(this, root);
 
-        refreshLayout = root.findViewById(R.id.refresh_layout);
-
-        adapter = new Adapter();
+        adapter = new Adapter(getActivity(), rv);
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -142,27 +150,60 @@ public class PostListFragment extends Fragment {
 
         }));
 
-        FirebaseManager.getFirebaseToken((data, error, success) -> {
-            if (type == TYPE_ALL)
-                TravanaAPI.messagesMeta(data, callback);
-            else TravanaAPI.followedMessagesMeta(data, callback);
-        });
+        if (FirebaseManager.isSignedIn()) {
+            signInText.setVisibility(View.GONE);
+            signInBtn.setVisibility(View.GONE);
+            FirebaseManager.getFirebaseToken((data, error, success) -> {
+                if (type == TYPE_ALL)
+                    TravanaAPI.messagesMeta(data, callback);
+                else TravanaAPI.followedMessagesMeta(data, callback);
+            });
+        } else {
+            if (type == TYPE_ALL) {
+                TravanaAPI.messagesMeta(callback);
+                signInText.setVisibility(View.GONE);
+                signInBtn.setVisibility(View.GONE);
+            }
+            else {
+                refreshLayout.setRefreshing(false);
+                signInText.setVisibility(View.VISIBLE);
+                signInBtn.setVisibility(View.VISIBLE);
+                signInBtn.setOnClickListener(v -> startActivity(new Intent(getContext(), SignInActivity.class)));
+            }
+        }
 
         return root;
     }
 
-    public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private void showSignIn() {
+        Snackbar snack = Snackbar
+                .make(rv, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
+                .setAction(R.string.sign_in_text, v -> startActivity(new Intent(getContext(), SignInActivity.class)));
+        View view = snack.getView();
+        TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+        snack.show();
+    }
+
+    public static class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private LiveUpdateMessage[] messages = new LiveUpdateMessage[0];
+        private Activity context;
+        private RecyclerView rv;
 
-        void setMessages(LiveUpdateMessage[] messages) {
+        public Adapter(Activity context, RecyclerView rv) {
+            this.context = context;
+            this.rv = rv;
+        }
+
+        public void setMessages(LiveUpdateMessage[] messages) {
             this.messages = messages;
         }
 
         @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(getLayoutInflater().inflate(R.layout.template_forum_post, parent, false));
+            return new ViewHolder(context.getLayoutInflater().inflate(R.layout.template_forum_post, parent, false));
         }
 
         @Override
@@ -186,14 +227,14 @@ public class PostListFragment extends Fragment {
             }
 
             viewHolder.postLikes.setText(String.valueOf(message.getLikes()));
-            viewHolder.postComments.setText(getString(R.string.post_comments, message.getComments_int()));
-            viewHolder.postTime.setText(getString(R.string.posted_time, message.getTime_ago()));
+            viewHolder.postComments.setText(context.getString(R.string.post_comments, message.getComments_int()));
+            viewHolder.postTime.setText(context.getString(R.string.posted_time, message.getTime_ago()));
             viewHolder.postContent.setText(message.getMessage_content());
 
             viewHolder.postTags.removeAllViews();
             if (message.getTags() != null)
                 for (MessageTag tag : message.getTags()) {
-                    TextView v = (TextView) getLayoutInflater().inflate(R.layout.template_tag, viewHolder.postTags, false);
+                    TextView v = (TextView) context.getLayoutInflater().inflate(R.layout.template_tag, viewHolder.postTags, false);
                     v.getBackground().setTint(Color.parseColor(tag.getColor()));
                     v.setText("#" + tag.getTag());
                     viewHolder.postTags.addView(v);
@@ -202,32 +243,41 @@ public class PostListFragment extends Fragment {
             viewHolder.setLiked(message.isLiked(), message);
 
             viewHolder.likeContainer.setOnClickListener(v -> {
+
+                if (!FirebaseManager.isSignedIn()) {
+                    showSignIn();
+                    return;
+                }
+
                 if (!message.isLiked()) {
                     viewHolder.setLiked(true, message);
                 } else {
                     viewHolder.setLiked(false, message);
                 }
-
                 FirebaseManager.getFirebaseToken((data, error, success) -> {
                     if (success) {
                         TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
                             Log.i("Liked",  apiResponse + " " + statusCode);
-                            if (success1 && apiResponse.equals("Successful")) {
-                                ((Activity) getContext()).runOnUiThread(() -> {
-                                    CustomToast customToast = new CustomToast(getContext());
-                                    customToast.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+                            Activity activity = context;
+                            if (activity == null)
+                                return;
+                            if (success1 && apiResponse.isSuccess()) {
+                                activity.runOnUiThread(() -> {
+                                    CustomToast customToast = new CustomToast(context);
+                                    customToast.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
                                     customToast.setIconColor(Color.WHITE);
                                     customToast.setTextColor(Color.WHITE);
-                                    customToast.setText("Success!");
-                                    customToast.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_check_black_24dp));
+                                    customToast.setText("");
+                                    customToast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_check_black_24dp));
                                     customToast.show(Toast.LENGTH_SHORT);
                                     message.setLikes(message.isLiked() ? (message.getLikes() + 1) : (message.getLikes() - 1));
                                     viewHolder.postLikes.setText(message.getLikes() + "");
                                 });
                             } else {
-                                ((Activity) getContext()).runOnUiThread(() -> {
-                                    CustomToast customToast = new CustomToast(getContext());
-                                    customToast.showDefault(statusCode);
+                                activity.runOnUiThread(() -> {
+                                    if (!success1)
+                                        new CustomToast(activity).showDefault(statusCode);
+                                    else new CustomToast(activity).showStringError(apiResponse.getInternal_error());
                                     viewHolder.setLiked(!message.isLiked(), message);
                                     viewHolder.postLikes.setText(message.getLikes() + "");
                                 });
@@ -238,17 +288,17 @@ public class PostListFragment extends Fragment {
             });
 
             TravanaAPI.getUserImage(message.getUser().getUser_photo_url(), (bitmap, statusCode, success) -> {
-                getActivity().runOnUiThread(() -> {
+                context.runOnUiThread(() -> {
                     if (success)
                         viewHolder.userImage.setImageBitmap(bitmap);
-                    else new CustomToast(getContext()).showDefault(Toast.LENGTH_SHORT);
+                    else new CustomToast(context).showDefault(Toast.LENGTH_SHORT);
                 });
             });
 
             viewHolder.postRoot.setOnClickListener(v -> {
-                Intent i = new Intent(getContext(), PostActivity.class);
+                Intent i = new Intent(context, PostActivity.class);
                 i.putExtra(PostActivity.MESSAGE_ID, message.get_id());
-                startActivity(i);
+                context.startActivity(i);
             });
 
         }
@@ -258,7 +308,17 @@ public class PostListFragment extends Fragment {
             return messages.length;
         }
 
-        private class ViewHolder extends RecyclerView.ViewHolder {
+        private void showSignIn() {
+            Snackbar snack = Snackbar
+                    .make(rv, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
+                    .setAction(R.string.sign_in_text, v -> context.startActivity(new Intent(context, SignInActivity.class)));
+            View view = snack.getView();
+            TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+            tv.setTextColor(Color.WHITE);
+            snack.show();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
 
             private TextView userName, userTag, postContent, postLikes, postComments, postTime;
             private CircleImageView userImage;
@@ -274,7 +334,7 @@ public class PostListFragment extends Fragment {
                 userTag = itemView.findViewById(R.id.user_tag);
                 postContent = itemView.findViewById(R.id.post_content);
                 postLikes = itemView.findViewById(R.id.post_likes);
-                postComments = itemView.findViewById(R.id.post_comments);
+                postComments = itemView.findViewById(R.id.post_replies);
                 postTime = itemView.findViewById(R.id.posted_time);
                 userImage = itemView.findViewById(R.id.user_image);
                 postTags = itemView.findViewById(R.id.post_tags);
@@ -287,15 +347,15 @@ public class PostListFragment extends Fragment {
 
             private void setLiked(boolean value, LiveUpdateMessage message) {
                 if (value) {
-                    likeContainer.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.stretched_circle));
-                    likeContainer.getBackground().setTint(ContextCompat.getColor(getContext(), R.color.colorAccent));
+                    likeContainer.setBackground(ContextCompat.getDrawable(context, R.drawable.stretched_circle));
+                    likeContainer.getBackground().setTint(ContextCompat.getColor(context, R.color.colorAccent));
                     postLikes.setTextColor(Color.WHITE);
                     likeImage.setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
                     message.setLiked(true);
 
                 } else {
-                    int color = ViewGroupUtils.isDarkTheme(getContext()) ? Color.WHITE : Color.BLACK;
-                    likeContainer.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.like_container));
+                    int color = ViewGroupUtils.isDarkTheme(context) ? Color.WHITE : Color.BLACK;
+                    likeContainer.setBackground(ContextCompat.getDrawable(context, R.drawable.like_container));
                     postLikes.setTextColor(color);
                     likeImage.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
                     message.setLiked(false);

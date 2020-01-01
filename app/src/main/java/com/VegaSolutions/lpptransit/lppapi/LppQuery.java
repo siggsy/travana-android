@@ -90,7 +90,7 @@ public class LppQuery extends Thread {
     public void run() {
 
             try {
-                Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(10000).execute(); //.header("apikey", BuildConfig.LPP_API_KEY)
+                Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(20000).execute(); //.header("apikey", BuildConfig.LPP_API_KEY)
                 Log.i(TAG, r.body());
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
             } catch (HttpStatusException e) {

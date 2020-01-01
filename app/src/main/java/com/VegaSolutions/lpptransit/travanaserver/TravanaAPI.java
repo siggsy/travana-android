@@ -136,8 +136,6 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        Log.e(TAG, response + "");
-
                         ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
                         callback.onComplete(r, statusCode, true);
                     } else {
@@ -184,8 +182,6 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-
-                        Log.e(TAG, response);
 
                         ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
                         callback.onComplete(r, statusCode, true);
@@ -278,13 +274,15 @@ public class TravanaAPI {
      * false, 4001, "Error: cannot follow tag
      * true, 200
      */
-    public static void followTag(String token, String tag_id, TravanaApiCallback<String> callback) {
+    public static void followTag(String token, String tag_id, TravanaApiCallback<ResponseObjectCommit> callback) {
 
         new TravanaQuery(TravanaQuery.FOLLOW_TAG, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
+                    Log.i("FollowTag", response);
                     if (success) {
-                        callback.onComplete(response, statusCode, true);
+                        ResponseObjectCommit objectCommit = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(objectCommit, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -298,13 +296,13 @@ public class TravanaAPI {
      * false, 4001, "Error: cannot follow tag
      * true, 200
      */
-    public static void removeTag(String token, String tag_id, TravanaApiCallback<String> callback) {
+    public static void removeTag(String token, String tag_id, TravanaApiCallback<ResponseObjectCommit> callback) {
 
         new TravanaQuery(TravanaQuery.REMOVE_FOLLOW_TAG, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
-
                     if (success) {
-                        callback.onComplete(response, statusCode, true);
+                        ResponseObjectCommit objectCommit = new Gson().fromJson(response, ResponseObjectCommit.class);
+                        callback.onComplete(objectCommit, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -420,7 +418,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -525,7 +523,7 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
                         callback.onComplete(null, statusCode, false);
@@ -547,7 +545,7 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
 
                         callback.onComplete(r, statusCode, true);
                     } else {
@@ -568,7 +566,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-
+                        Log.i("TAGS", response);
                         ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {
@@ -588,9 +586,7 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-
-                        Log.e(TAG, response);
-
+                        Log.i("TAGS", response);
                         ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
                         callback.onComplete(r, statusCode, true);
                     } else {

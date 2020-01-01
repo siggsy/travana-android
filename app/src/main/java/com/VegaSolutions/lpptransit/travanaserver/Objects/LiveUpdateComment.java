@@ -5,12 +5,15 @@ import java.util.Date;
 public class LiveUpdateComment {
 
     private String user_id;
-    private UserData user;
+
     //private String photo_path;
+    private UserData user;
     private String comment_id;
     private String comment_content;
+    private LiveUpdateComment[] subcomments;
     private String created_date;
     private int likes;
+    private boolean liked;
     private String time_ago;
     private long time_ago_millis;
 
@@ -21,8 +24,24 @@ public class LiveUpdateComment {
 
     }
 
+    public LiveUpdateComment[] getSubcomments() {
+        return subcomments;
+    }
+
     public UserData getUser() {
         return user;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
     }
 
     public String getUser_id() {

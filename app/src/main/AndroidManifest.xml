@@ -13,24 +13,42 @@
         android:allowBackup="false"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:icon="@mipmap/ic_launcher_dark"
+        android:roundIcon="@mipmap/ic_launcher_dark_round"
         android:theme="@style/WhiteTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.activities.LauncherActivity" />
-        <activity android:name=".ui.activities.forum.TagMessageActivity"/>
-        <activity android:name=".ui.activities.forum.TagsActivity" />
+
+        <activity android:name=".ui.activities.LauncherActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/DarkTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.activities.forum.TagMessageActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activities.forum.TagsActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.forum.NewMessageActivity"
             android:exported="true"
-            android:theme="@style/DarkTheme" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.TestActivity"
-            android:exported="true" />
-        <activity android:name=".ui.activities.forum.PostActivity" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activities.forum.PostActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.forum.ForumActivity"
-            android:exported="true" />
-        <activity android:name=".ui.activities.SettingsActivity" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activities.SettingsActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.activities.WelcomeActivity"
             android:exported="true"
@@ -50,11 +68,6 @@
             android:name=".ui.activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".ui.activities.forum.SignInActivity"
