@@ -33,14 +33,12 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView7"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_marginStart="100dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textView_app_name"
+            app:layout_constraintStart_toEndOf="@+id/textView_app_name"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@mipmap/ic_launcher_foreground" />
+            app:srcCompat="@drawable/ic_logo_svg_transparent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

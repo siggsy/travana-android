@@ -54,6 +54,7 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         // Setup generic UI
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
 
         // Set location button location callback.

@@ -65,7 +65,6 @@ public class PostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post);
         ButterKnife.bind(this);
 
-
         id = getIntent().getStringExtra(MESSAGE_ID);
 
         FirebaseManager.getFirebaseToken((data, error, success) -> {
@@ -79,8 +78,6 @@ public class PostActivity extends AppCompatActivity {
                 }
             }));
         });
-
-
 
     }
 
@@ -142,6 +139,7 @@ public class PostActivity extends AppCompatActivity {
 
         // Comment on the post
         newCommentPost.setOnClickListener(v -> {
+            newCommentPost.setOnClickListener(null);
             if (newComment.getText().length() == 0)
                 return;
             FirebaseManager.getFirebaseToken((data, error, success) -> {
@@ -206,7 +204,9 @@ public class PostActivity extends AppCompatActivity {
             ImageView likeImage = convertView.findViewById(R.id.post_like_image);
 
             name.setText(comment.getUser().getName());
-            tag.getBackground().setTint(Color.parseColor(comment.getUser().getTag().getColor()));
+            if (comment.getUser().getTag() != null)
+                tag.getBackground().setTint(Color.parseColor(comment.getUser().getTag().getColor()));
+            else tag.getBackground().setTint(Color.TRANSPARENT);
             timeAgo.setText(comment.getTime_ago());
             content.setText(comment.getComment_content());
             if (comment.getSubcomments() != null) {

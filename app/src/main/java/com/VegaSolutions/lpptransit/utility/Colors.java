@@ -22,7 +22,7 @@ public class Colors {
         colors.add(Color.HSVToColor(new float[] {176.146f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {197.873f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {160.978f , 0.7f, 0.9f}));
-        colors.add(Color.HSVToColor(new float[] {82.309f , 0.7f, 0.9f}));
+        colors.add(Color.HSVToColor(new float[] {40f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {101.913f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {65.928f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {155.743f , 0.7f, 0.9f}));
@@ -32,7 +32,7 @@ public class Colors {
         colors.add(Color.HSVToColor(new float[] {100.274f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {119.690f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {60.539f , 0.7f, 0.9f}));
-        colors.add(Color.HSVToColor(new float[] {160.867f , 0.7f, 0.9f}));
+        colors.add(Color.HSVToColor(new float[] {102.0f , 0.7f, 0.902f}));
         colors.add(Color.HSVToColor(new float[] {141.184f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {62.842f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {128.247f , 0.7f, 0.9f}));
@@ -62,7 +62,7 @@ public class Colors {
         colors.add(Color.HSVToColor(new float[] {115.844f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {67.136f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {160.410f , 0.7f, 0.9f}));
-        colors.add(Color.HSVToColor(new float[] {54.287f , 0.7f, 0.9f}));
+        colors.add(Color.HSVToColor(new float[] {195.0f , 0.7f, 0.902f}));
         colors.add(Color.HSVToColor(new float[] {88.968f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {73.093f , 0.7f, 0.9f}));
         colors.add(Color.HSVToColor(new float[] {159.361f , 0.7f, 0.9f}));
