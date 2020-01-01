@@ -5,7 +5,7 @@ import java.util.Date;
 public class LiveUpdateComment {
 
     private String user_id;
-
+    private UserData user;
     //private String photo_path;
     private String comment_id;
     private String comment_content;
@@ -19,6 +19,10 @@ public class LiveUpdateComment {
 
         this.comment_content = comment_content;
 
+    }
+
+    public UserData getUser() {
+        return user;
     }
 
     public String getUser_id() {

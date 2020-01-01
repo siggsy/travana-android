@@ -4,17 +4,8 @@ public class UserData {
 
     private String _id;
     private String name;
-    private String email;
     private String user_photo_url;
     private UserTag tag;
-
-
-    public UserData(String _id, String name, String email, String user_photo_url) {
-        this._id = _id;
-        this.name = name;
-        this.email = email;
-        this.user_photo_url = user_photo_url;
-    }
 
     public String get_id() {
         return _id;
@@ -30,14 +21,6 @@ public class UserData {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getUser_photo_url() {
@@ -61,7 +44,6 @@ public class UserData {
         return "UserData{" +
                 "_id='" + _id + '\'' +
                 ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
                 ", user_photo_url='" + user_photo_url + '\'' +
                 ", tag='" + tag + '\'' +
                 '}';
