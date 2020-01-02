@@ -63,13 +63,7 @@ public class NewMessageActivity extends AppCompatActivity {
         // To add a tag
         add.setOnClickListener(v -> {
             if (tagList.size() >= 3) {
-                CustomToast customToast = new CustomToast(NewMessageActivity.this);
-                customToast.setBackgroundColor(ContextCompat.getColor(NewMessageActivity.this, R.color.colorAccent));
-                customToast.setIconColor(Color.WHITE);
-                customToast.setTextColor(Color.WHITE);
-                customToast.setText(NewMessageActivity.this.getString(R.string.too_many_tags_error));
-                customToast.setIcon(ContextCompat.getDrawable(NewMessageActivity.this, R.drawable.ic_error_outline_black_24dp));
-                customToast.show(Toast.LENGTH_SHORT);
+                new CustomToast(NewMessageActivity.this).showStringError(getString(R.string.too_many_tags_error));
             } else NewMessageActivity.this.startActivityForResult(new Intent(NewMessageActivity.this, TagsActivity.class), 100);
         });
 
