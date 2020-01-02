@@ -126,7 +126,7 @@ public class RoutesOnStationFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
 
                 if (success) adapter.setRoutes(apiResponse.getData());
-                else new CustomToast(context).showDefault(Toast.LENGTH_SHORT);
+                else new CustomToast(context).showDefault(statusCode);
 
             });
 

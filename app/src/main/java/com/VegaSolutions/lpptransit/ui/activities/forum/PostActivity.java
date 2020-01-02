@@ -100,7 +100,6 @@ public class PostActivity extends AppCompatActivity {
         content.setText(message.getMessage_content());
 
         // Set photos
-
         String[] photos = message.getPhoto_ids();
         if (photos != null && photos.length != 0) {
             pictureContainer.setVisibility(View.VISIBLE);

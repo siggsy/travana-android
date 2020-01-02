@@ -38,6 +38,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class TagsActivity extends AppCompatActivity {
 
     public static final int SELECTED = 11;
@@ -46,9 +49,11 @@ public class TagsActivity extends AppCompatActivity {
 
     int type;
 
-    private RecyclerView tags;
-    private SearchView searchView;
-    private View back, header;
+    @BindView(R.id.search_activity_rv) RecyclerView tags;
+    @BindView(R.id.search_activity_search) SearchView searchView;
+    @BindView(R.id.search_activity_back) View back;
+    @BindView(R.id.search_activity_header) View header;
+
     private Adapter adapter;
 
     private String filter = "";
@@ -91,14 +96,12 @@ public class TagsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_tags);
+        ButterKnife.bind(this);
+
+
 
         type = getIntent().getIntExtra("TYPE", 0);
         Log.i("type", type + "");
-
-        back = findViewById(R.id.search_activity_back);
-        searchView = findViewById(R.id.search_activity_search);
-        tags = findViewById(R.id.search_activity_rv);
-        header = findViewById(R.id.search_activity_header);
 
         setupUI();
 
