@@ -106,7 +106,8 @@
                 android:id="@+id/post_pictures_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -146,8 +147,7 @@
                 android:id="@+id/post_comment_count"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/post_comments" />
+                android:layout_marginStart="16dp" />
 
             <ListView
                 android:id="@+id/post_replies"

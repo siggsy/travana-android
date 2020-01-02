@@ -150,20 +150,17 @@ public class PostListFragment extends Fragment {
 
         }));
 
+        signInText.setVisibility(View.GONE);
+        signInBtn.setVisibility(View.GONE);
         if (FirebaseManager.isSignedIn()) {
-            signInText.setVisibility(View.GONE);
-            signInBtn.setVisibility(View.GONE);
             FirebaseManager.getFirebaseToken((data, error, success) -> {
                 if (type == TYPE_ALL)
                     TravanaAPI.messagesMeta(data, callback);
                 else TravanaAPI.followedMessagesMeta(data, callback);
             });
         } else {
-            if (type == TYPE_ALL) {
+            if (type == TYPE_ALL)
                 TravanaAPI.messagesMeta(callback);
-                signInText.setVisibility(View.GONE);
-                signInBtn.setVisibility(View.GONE);
-            }
             else {
                 refreshLayout.setRefreshing(false);
                 signInText.setVisibility(View.VISIBLE);
@@ -249,11 +246,7 @@ public class PostListFragment extends Fragment {
                     return;
                 }
 
-                if (!message.isLiked()) {
-                    viewHolder.setLiked(true, message);
-                } else {
-                    viewHolder.setLiked(false, message);
-                }
+                viewHolder.setLiked(!message.isLiked(), message);
                 FirebaseManager.getFirebaseToken((data, error, success) -> {
                     if (success) {
                         TravanaAPI.messagesLike(data, message.get_id(), message.isLiked(), (apiResponse, statusCode, success1) -> {
@@ -263,13 +256,13 @@ public class PostListFragment extends Fragment {
                                 return;
                             if (success1 && apiResponse.isSuccess()) {
                                 activity.runOnUiThread(() -> {
-                                    CustomToast customToast = new CustomToast(context);
-                                    customToast.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
-                                    customToast.setIconColor(Color.WHITE);
-                                    customToast.setTextColor(Color.WHITE);
-                                    customToast.setText("");
-                                    customToast.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_check_black_24dp));
-                                    customToast.show(Toast.LENGTH_SHORT);
+                                    new CustomToast(context)
+                                            .setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                                            .setIconColor(Color.WHITE)
+                                            .setTextColor(Color.WHITE)
+                                            .setText("")
+                                            .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_check_black_24dp))
+                                            .show(Toast.LENGTH_SHORT);
                                     message.setLikes(message.isLiked() ? (message.getLikes() + 1) : (message.getLikes() - 1));
                                     viewHolder.postLikes.setText(message.getLikes() + "");
                                 });
@@ -291,7 +284,7 @@ public class PostListFragment extends Fragment {
                 context.runOnUiThread(() -> {
                     if (success)
                         viewHolder.userImage.setImageBitmap(bitmap);
-                    else new CustomToast(context).showDefault(Toast.LENGTH_SHORT);
+                    else new CustomToast(context).showDefault(statusCode);
                 });
             });
 

@@ -46,7 +46,7 @@ public class NewMessageActivity extends AppCompatActivity {
         back.setOnClickListener(v -> onBackPressed());
         post.setOnClickListener(v -> FirebaseManager.getFirebaseToken((data, error, success) -> {
             if (success) {
-                // TODO: implement pictures
+                // TODO: implement pictures (probably redundant).
                 LiveUpdateMessage message = new LiveUpdateMessage(messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
                 TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
                     if (success1 && apiResponse.isSuccess()) {
@@ -59,15 +59,11 @@ public class NewMessageActivity extends AppCompatActivity {
                 }));
             }
         }));
+
+        // To add a tag
         add.setOnClickListener(v -> {
             if (tagList.size() >= 3) {
-                CustomToast customToast = new CustomToast(NewMessageActivity.this);
-                customToast.setBackgroundColor(ContextCompat.getColor(NewMessageActivity.this, R.color.colorAccent));
-                customToast.setIconColor(Color.WHITE);
-                customToast.setTextColor(Color.WHITE);
-                customToast.setText(NewMessageActivity.this.getString(R.string.too_many_tags_error));
-                customToast.setIcon(ContextCompat.getDrawable(NewMessageActivity.this, R.drawable.ic_error_outline_black_24dp));
-                customToast.show(Toast.LENGTH_SHORT);
+                new CustomToast(NewMessageActivity.this).showStringError(getString(R.string.too_many_tags_error));
             } else NewMessageActivity.this.startActivityForResult(new Intent(NewMessageActivity.this, TagsActivity.class), 100);
         });
 
@@ -88,6 +84,7 @@ public class NewMessageActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Add a tag to the tag list
         if (resultCode == TagsActivity.SELECTED) {
 
             MessageTag tag = data.getParcelableExtra("TAG");

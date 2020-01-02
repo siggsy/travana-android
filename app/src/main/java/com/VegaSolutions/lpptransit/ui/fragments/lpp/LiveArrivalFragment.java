@@ -83,7 +83,7 @@ public class LiveArrivalFragment extends Fragment {
                 noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
                 adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
 
-            } else new CustomToast(context).showDefault(Toast.LENGTH_SHORT);
+            } else new CustomToast(context).showDefault(statusCode);
         });
 
     };
@@ -112,6 +112,7 @@ public class LiveArrivalFragment extends Fragment {
         backColor = array.getColor(1, Color.WHITE);
         color = array.getColor(0, Color.BLACK);
         array.recycle();
+
     }
 
     @Override

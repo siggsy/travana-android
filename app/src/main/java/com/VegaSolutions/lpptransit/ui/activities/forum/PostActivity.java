@@ -100,7 +100,6 @@ public class PostActivity extends AppCompatActivity {
         content.setText(message.getMessage_content());
 
         // Set photos
-
         String[] photos = message.getPhoto_ids();
         if (photos != null && photos.length != 0) {
             pictureContainer.setVisibility(View.VISIBLE);
@@ -124,7 +123,16 @@ public class PostActivity extends AppCompatActivity {
                 TextView v = (TextView) getLayoutInflater().inflate(R.layout.template_tag, mTags, false);
                 v.getBackground().setTint(Color.parseColor(messageTag.getColor()));
                 v.setText("#" + messageTag.getTag());
+                v.setClickable(true);
+                v.setFocusable(true);
+                v.setOnClickListener(v1 -> {
+                    Intent i = new Intent(this, TagMessageActivity.class);
+                    i.putExtra(TagMessageActivity.TAG_ID, messageTag.get_id());
+                    i.putExtra(TagMessageActivity.TAG_NAME, messageTag.getTag());
+                    startActivity(i);
+                });
                 mTags.addView(v);
+
             }
         }
 

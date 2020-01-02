@@ -53,6 +53,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class RouteActivity extends MapFragmentActivity {
 
 
@@ -70,21 +73,19 @@ public class RouteActivity extends MapFragmentActivity {
     private String stationId;
 
     // Activity UI elements
-    private ImageView backBtn;
-    private TextView number;
-    private TextView name;
-    private View circle;
-    private TopMessage routeLoading;
-    private RecyclerView recyclerView;
-    private Adapter adapter;
-    private View header;
-    private View bottomSheet;
-    private BottomSheetBehavior behavior;
-    private ImageButton opposite;
-    private ElevationAnimation elevationAnimation;
+    @BindView(R.id.back) ImageView backBtn;
+    @BindView(R.id.route_station_number) TextView number;
+    @BindView(R.id.route_name) TextView name;
+    @BindView(R.id.route_circle) View circle;
+    @BindView(R.id.loading_msg) TopMessage routeLoading;
+    @BindView(R.id.station_list) RecyclerView recyclerView;
+    @BindView(R.id.header) View header;
+    @BindView(R.id.bottom_sheet) View bottomSheet;
+    @BindView(R.id.route_opposite_btn) ImageButton opposite;
 
-    private MyLocationManager locationManager;
-    private LocationMarkerManager markerManager;
+    private ElevationAnimation elevationAnimation;
+    private Adapter adapter;
+    private BottomSheetBehavior behavior;
 
     // Google maps parameters
     private final int UPDATE_TIME = 2000;
@@ -258,7 +259,7 @@ public class RouteActivity extends MapFragmentActivity {
                     });
                 }
 
-            } else runOnUiThread(() -> new CustomToast(this).showDefault(Toast.LENGTH_SHORT));
+            } else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
         }));
 
     }
@@ -268,6 +269,7 @@ public class RouteActivity extends MapFragmentActivity {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_route);
+        ButterKnife.bind(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -280,17 +282,8 @@ public class RouteActivity extends MapFragmentActivity {
         stationId = getIntent().getStringExtra(STATION_ID);
         if (stationId == null) stationId = "0";
 
-        // Find all UI elements
-        backBtn = findViewById(R.id.back);
-        name = findViewById(R.id.route_name);
-        number = findViewById(R.id.route_station_number);
-        circle = findViewById(R.id.route_circle);
-        routeLoading = findViewById(R.id.loading_msg);
         locationIcon = findViewById(R.id.maps_location_icon);
-        recyclerView = findViewById(R.id.station_list);
-        header = findViewById(R.id.header);
-        bottomSheet = findViewById(R.id.bottom_sheet);
-        opposite = findViewById(R.id.route_opposite_btn);
+
 
         behavior = BottomSheetBehavior.from(bottomSheet);
 
