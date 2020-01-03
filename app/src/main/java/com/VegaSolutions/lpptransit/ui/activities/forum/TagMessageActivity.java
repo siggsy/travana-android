@@ -67,19 +67,20 @@ public class TagMessageActivity extends AppCompatActivity {
 
         if (FirebaseManager.isSignedIn())
             FirebaseManager.getFirebaseToken((data, error, success) -> {
-                TravanaAPI.messagesByTagMeta(data, tagId, (apiResponse, statusCode, success1) -> {
-                    if (success && apiResponse.isSuccess()) {
-                        runOnUiThread(() -> {
-                            adapter.setMessages(apiResponse.getData());
-                            adapter.notifyDataSetChanged();
-                        });
-                        Log.i("TagMesageActivity", "success");
-                    }
-                    else {
-                        if (!success) new CustomToast(this).showDefault(statusCode);
-                        else new CustomToast(this).showDefault(apiResponse.getResponse_code());
-                    }
-                });
+                if (success) {
+                    TravanaAPI.messagesByTagMeta(data, tagId, (apiResponse, statusCode, success1) -> {
+                        if (success && apiResponse.isSuccess()) {
+                            runOnUiThread(() -> {
+                                adapter.setMessages(apiResponse.getData());
+                                adapter.notifyDataSetChanged();
+                            });
+                            Log.i("TagMesageActivity", "success");
+                        } else {
+                            if (!success) new CustomToast(this).showDefault(statusCode);
+                            else new CustomToast(this).showDefault(apiResponse.getResponse_code());
+                        }
+                    });
+                }
             });
         else TravanaAPI.messagesByTagMeta(tagId, (apiResponse, statusCode, success) -> {
             if (success && apiResponse.isSuccess())

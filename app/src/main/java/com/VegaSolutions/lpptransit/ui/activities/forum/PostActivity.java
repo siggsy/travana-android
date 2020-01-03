@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -56,6 +57,7 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.new_comment_post) ImageView newCommentPost;
     @BindView(R.id.post_replies) ListView comments;
     @BindView(R.id.root) ConstraintLayout root;
+    @BindView(R.id.header) ConstraintLayout header;
 
 
     @Override
@@ -67,16 +69,31 @@ public class PostActivity extends AppCompatActivity {
 
         id = getIntent().getStringExtra(MESSAGE_ID);
 
+        comments.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                // Nothing.
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                header.setSelected(view.canScrollVertically(-1));
+            }
+        });
+        comments.setVerticalScrollBarEnabled(false);
+
         FirebaseManager.getFirebaseToken((data, error, success) -> {
-            TravanaAPI.messageid(id, data, (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
-                if (success1 && apiResponse.isSuccess()) {
-                    updateUI(apiResponse.getData());
-                } else {
-                    if (!success1)
-                        new CustomToast(this).showDefault(statusCode);
-                    else new CustomToast(this).showStringError(apiResponse.getInternal_error());
-                }
-            }));
+            if (success) {
+                TravanaAPI.messageid(id, data, (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                    if (success1 && apiResponse.isSuccess()) {
+                        updateUI(apiResponse.getData());
+                    } else {
+                        if (!success1)
+                            new CustomToast(this).showDefault(statusCode);
+                        else new CustomToast(this).showStringError(apiResponse.getInternal_error());
+                    }
+                }));
+            }
         });
 
     }
@@ -151,7 +168,7 @@ public class PostActivity extends AppCompatActivity {
             if (newComment.getText().length() == 0)
                 return;
             FirebaseManager.getFirebaseToken((data, error, success) -> {
-                if (error != null)
+                if (!success)
                     return;
                 TravanaAPI.addComment(data, message.get_id(), new LiveUpdateComment(newComment.getText().toString()), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
                     if (success1 && apiResponse.isSuccess()) {
