@@ -143,20 +143,32 @@ public class PostListFragment extends Fragment {
         });
 
         refreshLayout.setRefreshing(true);
-        refreshLayout.setOnRefreshListener(() -> FirebaseManager.getFirebaseToken((data, error, success) -> {
-            if (type == TYPE_ALL)
-                 TravanaAPI.messagesMeta(data, callback);
-            else TravanaAPI.followedMessagesMeta(data, callback);
-
-        }));
+        refreshLayout.setOnRefreshListener(() -> {
+            if (FirebaseManager.isSignedIn()) {
+                FirebaseManager.getFirebaseToken((data, error, success) -> {
+                    if (success) {
+                        if (type == TYPE_ALL)
+                            TravanaAPI.messagesMeta(data, callback);
+                        else TravanaAPI.followedMessagesMeta(data, callback);
+                    }
+                });
+            } else {
+                if (type == TYPE_FOLLOWING) {
+                    showSignIn();
+                    refreshLayout.setRefreshing(false);
+                } else TravanaAPI.messagesMeta(callback);
+            }
+        });
 
         signInText.setVisibility(View.GONE);
         signInBtn.setVisibility(View.GONE);
         if (FirebaseManager.isSignedIn()) {
             FirebaseManager.getFirebaseToken((data, error, success) -> {
-                if (type == TYPE_ALL)
-                    TravanaAPI.messagesMeta(data, callback);
-                else TravanaAPI.followedMessagesMeta(data, callback);
+                if (success) {
+                    if (type == TYPE_ALL)
+                        TravanaAPI.messagesMeta(data, callback);
+                    else TravanaAPI.followedMessagesMeta(data, callback);
+                }
             });
         } else {
             if (type == TYPE_ALL)
