@@ -62,6 +62,6 @@
     <string name="sign_in_text">Prijava</string>
     <string name="sign_in_error">Prijavite se za ogled sledljivih objav</string>
     <string name="comment_replies">%1$d • odgovorov</string>
-
+    <string name="msg_content_error">Objava mora vsebovati vsaj 3 znake.</string>
 
 </resources>

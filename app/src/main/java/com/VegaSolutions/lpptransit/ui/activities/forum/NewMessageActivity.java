@@ -46,6 +46,12 @@ public class NewMessageActivity extends AppCompatActivity {
         back.setOnClickListener(v -> onBackPressed());
         post.setOnClickListener(v -> FirebaseManager.getFirebaseToken((data, error, success) -> {
             if (success) {
+
+                if (messageContent.getText().length() < 3) {
+                    runOnUiThread(() -> new CustomToast(this).showStringError(getString(R.string.msg_content_error)));
+                    return;
+                }
+
                 // TODO: implement pictures (probably redundant).
                 LiveUpdateMessage message = new LiveUpdateMessage(messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
                 TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
