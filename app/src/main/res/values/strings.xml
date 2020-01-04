@@ -71,5 +71,5 @@
     <string name="sign_in_alert">You must be signed in to perform this action</string>
     <string name="sign_in_text">Sign in</string>
     <string name="sign_in_error">Sign in to see followed posts</string>
-
+    <string name="msg_content_error">Post must contain at least 3 characters.</string>
 </resources>

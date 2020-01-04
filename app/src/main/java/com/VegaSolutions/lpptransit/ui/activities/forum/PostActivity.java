@@ -29,7 +29,9 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.UserTag;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
@@ -59,6 +61,16 @@ public class PostActivity extends AppCompatActivity {
     @BindView(R.id.root) ConstraintLayout root;
     @BindView(R.id.header) ConstraintLayout header;
 
+    private TravanaApiCallback<ResponseObject<LiveUpdateMessage>> callback = (apiResponse, statusCode, success) -> runOnUiThread(() -> {
+        if (success && apiResponse.isSuccess()) {
+            updateUI(apiResponse.getData());
+        } else {
+            if (!success)
+                new CustomToast(this).showDefault(statusCode);
+            else new CustomToast(this).showStringError(apiResponse.getInternal_error());
+        }
+    });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,19 +94,11 @@ public class PostActivity extends AppCompatActivity {
         });
         comments.setVerticalScrollBarEnabled(false);
 
-        FirebaseManager.getFirebaseToken((data, error, success) -> {
-            if (success) {
-                TravanaAPI.messageid(id, data, (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
-                    if (success1 && apiResponse.isSuccess()) {
-                        updateUI(apiResponse.getData());
-                    } else {
-                        if (!success1)
-                            new CustomToast(this).showDefault(statusCode);
-                        else new CustomToast(this).showStringError(apiResponse.getInternal_error());
-                    }
-                }));
-            }
+        if (FirebaseManager.isSignedIn()) FirebaseManager.getFirebaseToken((data, error, success) -> {
+            if (success)
+                TravanaAPI.messageid(id, data, (callback));
         });
+        else TravanaAPI.messageid(id, callback);
 
     }
 
@@ -207,7 +211,7 @@ public class PostActivity extends AppCompatActivity {
     private class Adapter extends ArrayAdapter<LiveUpdateComment> {
 
 
-        public Adapter(Context context, LiveUpdateComment[] comments) {
+        private Adapter(Context context, LiveUpdateComment[] comments) {
             super(context, 0, comments);
         }
 

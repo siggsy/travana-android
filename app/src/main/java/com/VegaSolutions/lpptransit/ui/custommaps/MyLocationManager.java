@@ -35,8 +35,8 @@ public class MyLocationManager {
 
             Log.i(TAG, "location updated: " + location.toString());
 
-            /*if (location.getAccuracy() > 500)
-                return;*/
+            if (location.getAccuracy() > 500)
+                return;
 
             live = true;
 
