@@ -249,7 +249,7 @@ public class TagsActivity extends AppCompatActivity {
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
                                             customToast.setIconColor(Color.WHITE);
                                             customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("Success!");
+                                            customToast.setText("");
                                             customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
                                             customToast.show(Toast.LENGTH_SHORT);
                                             uTag.setFollowed(false);
@@ -267,7 +267,7 @@ public class TagsActivity extends AppCompatActivity {
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
                                             customToast.setIconColor(Color.WHITE);
                                             customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("Success!");
+                                            customToast.setText("");
                                             customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
                                             customToast.show(Toast.LENGTH_SHORT);
                                             uTag.setFollowed(true);
@@ -297,6 +297,10 @@ public class TagsActivity extends AppCompatActivity {
                 vh.following.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (!FirebaseManager.isSignedIn()) {
+                            showSignIn();
+                            return;
+                        }
                         vh.following.setOnClickListener(null);
                         FirebaseManager.getFirebaseToken((data, error, success) -> {
                             if (success) {
@@ -307,7 +311,7 @@ public class TagsActivity extends AppCompatActivity {
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
                                             customToast.setIconColor(Color.WHITE);
                                             customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("Success!");
+                                            customToast.setText("");
                                             customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
                                             customToast.show(Toast.LENGTH_SHORT);
                                             mTag.setFollowed(false);
@@ -324,7 +328,7 @@ public class TagsActivity extends AppCompatActivity {
                                             customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
                                             customToast.setIconColor(Color.WHITE);
                                             customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("Success!");
+                                            customToast.setText("");
                                             customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
                                             customToast.show(Toast.LENGTH_SHORT);
                                             mTag.setFollowed(true);
