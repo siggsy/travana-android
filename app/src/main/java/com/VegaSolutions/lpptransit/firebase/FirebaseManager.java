@@ -14,8 +14,6 @@ public class FirebaseManager {
 
     private static String TAG = "FirebaseManager";
 
-    private static String token = null;
-
     /**
      * @return Signed in user (null if not signed in)
      */
@@ -38,23 +36,23 @@ public class FirebaseManager {
      */
     public static void getFirebaseToken(FirebaseCallback callback){
 
-        if(token == null) {
-            FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
-            if (mUser == null) {
-                callback.onComplete("NotSignedIn", null, false);
 
-            }
-            mUser.getIdToken(true)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            token = task.getResult().getToken();
-                            callback.onComplete(token, null, true);
-                        } else {
-                            callback.onComplete(null, task.getException(), false);
-                            Log.e(TAG, task.getException().getMessage());
-                        }
-                    });
-        } else callback.onComplete(token, null, true);
+        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (mUser == null) {
+            callback.onComplete("", null, false);
+            return;
+        }
+        mUser.getIdToken(true)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String token = task.getResult().getToken();
+                        callback.onComplete(token, null, true);
+                    } else {
+                        callback.onComplete(null, task.getException(), false);
+                        Log.e(TAG, task.getException().getMessage());
+                    }
+                });
+
 
     }
 

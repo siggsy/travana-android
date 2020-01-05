@@ -183,6 +183,7 @@ public class PostActivity extends AppCompatActivity {
                         customToast.setText("");
                         customToast.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_check_black_24dp));
                         customToast.show(Toast.LENGTH_SHORT);
+                        newComment.setText("");
                         TravanaAPI.messageid(id, data, (apiResponse1, statusCode1, success2) -> runOnUiThread(() -> {
                             if (success2 && apiResponse1.isSuccess()) {
                                 updateUI(apiResponse1.getData());
