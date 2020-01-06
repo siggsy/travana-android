@@ -171,6 +171,7 @@ public class PostActivity extends AppCompatActivity {
             newCommentPost.setOnClickListener(null);
             if (newComment.getText().length() == 0)
                 return;
+            newComment.setText("");
             FirebaseManager.getFirebaseToken((data, error, success) -> {
                 if (!success)
                     return;
