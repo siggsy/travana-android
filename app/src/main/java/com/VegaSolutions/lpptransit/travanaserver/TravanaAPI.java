@@ -367,11 +367,11 @@ public class TravanaAPI {
 
                         try {
 
-                            ResponseObject<Warning> r = new Gson().fromJson(response, ResponseObject.class);
+                            ResponseObject<Warning> r = new Gson().fromJson(response, new TypeToken<ResponseObject<Warning>>(){}.getType());
 
                             callback.onComplete(r, statusCode, true);
 
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
                         }
                     } else {

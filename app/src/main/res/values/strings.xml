@@ -82,5 +82,7 @@
     <string name="alert_update_urgent">You have an outdated version. Please update the app.</string>
     <string name="alert_update_button">Update</string>
     <string name="alert_cancel_button">Cancel</string>
+    <string name="alert_ok_button">Ok</string>
+
 
 </resources>

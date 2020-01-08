@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -29,6 +30,7 @@ import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
@@ -52,6 +54,7 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
@@ -127,8 +130,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         TravanaAPI.updates((apiResponse, statusCode, success) -> runOnUiThread(() -> {
             if (success && apiResponse.isSuccess()) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getString(R.string.alert_title));
+                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
+                builder.setTitle(R.string.alert_title);
 
                 int cV = BuildConfig.VERSION_CODE;
 
@@ -162,6 +165,20 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
 
+            }
+        }));
+
+        TravanaAPI.warning((apiResponse, statusCode, success) -> runOnUiThread(() -> {
+            Log.i("warning", apiResponse + "");
+            if (success && apiResponse.isSuccess()) {
+                Log.i("warning", apiResponse.getData().getContent_slo());
+                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
+                builder.setTitle(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getTitle_slo() : apiResponse.getData().getTitle_en());
+                builder.setMessage(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getContent_slo() : apiResponse.getData().getContent_en());
+                builder.setCancelable(true);
+                builder.setPositiveButton(R.string.alert_ok_button, (dialog, which) -> dialog.cancel());
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
         }));
 

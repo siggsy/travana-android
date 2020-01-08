@@ -73,5 +73,6 @@
     <string name="alert_update_urgent">Imate zastarelo različico. Posodobite aplikacijo.</string>
     <string name="alert_update_button">Posodobi</string>
     <string name="alert_cancel_button">Prekliči</string>
+    <string name="alert_ok_button">Vredu</string>
 
 </resources>
