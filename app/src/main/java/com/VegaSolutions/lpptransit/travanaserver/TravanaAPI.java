@@ -358,7 +358,7 @@ public class TravanaAPI {
      * empty data or unsuccessfull callback
      * true, 200
      */
-    public static void warnings(TravanaApiCallback<ResponseObject<Warning[]>> callback) {
+    public static void warning(TravanaApiCallback<ResponseObject<Warning>> callback) {
 
         new TravanaQuery(TravanaQuery.WARNINGS_URL)
                 .setOnCompleteListener((response, statusCode, success) -> {
@@ -367,7 +367,7 @@ public class TravanaAPI {
 
                         try {
 
-                            ResponseObject<Warning[]> r = new Gson().fromJson(response, ResponseObject.class);
+                            ResponseObject<Warning> r = new Gson().fromJson(response, ResponseObject.class);
 
                             callback.onComplete(r, statusCode, true);
 
