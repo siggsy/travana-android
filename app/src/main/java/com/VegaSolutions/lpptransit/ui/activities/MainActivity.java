@@ -33,6 +33,7 @@ import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.HomeFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments.StationsSubFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -47,7 +48,7 @@ import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, NavigationView.OnNavigationItemSelectedListener {
 
     private final int locationRequestCode = 1000;
 
@@ -107,7 +108,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         loading.setErrorIconColor(Color.WHITE);
         loading.setRefreshClickEvent(v -> {
             loading.showLoading(true);
-            Api.stationDetails(false, callback);
+            ((StationsFragment) fragments.peek()).refresh();
             switchFragment(StationsFragment.newInstance());
         });
 
@@ -133,9 +134,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
             i.putExtra(StationActivity.STATION, station);
             startActivity(i);
         });
-
-        // Query for stations.
-        Api.stationDetails(false, callback);
 
     }
 

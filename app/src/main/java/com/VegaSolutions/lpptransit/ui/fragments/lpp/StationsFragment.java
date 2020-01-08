@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.lppapi.Api;
+import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
@@ -41,6 +43,20 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     private ElevationAnimation animation;
 
     private StationsFragmentListener mListener;
+    private OnFragmentCreatedListener createdListener = null;
+
+    private ApiCallback<List<Station>> callback = (apiResponse, statusCode, success) -> {
+
+        if (context == null)
+            return;
+
+        mListener.onStationsUpdated(apiResponse.getData(), success, statusCode);
+        if (adapter.registeredFragments.size() == 2)
+            for (int i = 0; i < adapter.registeredFragments.size(); i++)
+                adapter.registeredFragments.get(i).setStations(apiResponse.getData(), statusCode, success);
+        else createdListener = fragment -> fragment.setStations(apiResponse.getData(), statusCode, success);
+
+    };
 
 
     public static StationsFragment newInstance() {
@@ -148,7 +164,13 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
         setupUI();
 
+        Api.stationDetails(false, callback);
+
         return root;
+    }
+
+    public void refresh() {
+        Api.stationDetails(false, callback);
     }
 
 
@@ -180,7 +202,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
     private class Adapter extends FragmentPagerAdapter {
 
-        SparseArray<Fragment> registeredFragments = new SparseArray<>();
+        SparseArray<StationsSubFragment> registeredFragments = new SparseArray<>();
 
         private Adapter(@NonNull FragmentManager fm, int behavior) {
             super(fm, behavior);
@@ -210,7 +232,12 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
-            registeredFragments.put(position, fragment);
+            registeredFragments.put(position, (StationsSubFragment) fragment);
+            if (createdListener != null) {
+                createdListener.onFragmentCreated((StationsSubFragment) fragment);
+                if (registeredFragments.size() == 2)
+                    createdListener = null;
+            }
             return fragment;
         }
 
@@ -232,6 +259,10 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     public interface StationsFragmentListener {
         void onStationsUpdated(List<Station> stations, boolean success, int responseCode);
         void onTabClicked();
+    }
+
+    interface OnFragmentCreatedListener {
+        void onFragmentCreated(StationsSubFragment fragment);
     }
 
 }

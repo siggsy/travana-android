@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
@@ -43,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -76,7 +76,7 @@ public class LiveArrivalFragment extends Fragment {
         // Set UI
         ((Activity)context).runOnUiThread(() -> {
             refreshLayout.setRefreshing(false);
-            if (success) {
+            if (success && apiResponse != null) {
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
 
                 // Check if arrival list is not empty and refresh rv adapter
@@ -135,9 +135,6 @@ public class LiveArrivalFragment extends Fragment {
 
         setupUI();
 
-        // Query arrivals.
-        Api.arrival(stationId, callback);
-
         return root;
 
     }
@@ -169,6 +166,8 @@ public class LiveArrivalFragment extends Fragment {
     public void onResume() {
         super.onResume();
         onHeaderChanged(rv.canScrollVertically(-1));
+        refreshLayout.setRefreshing(true);
+        Api.arrival(stationId, callback);
     }
 
 
@@ -223,7 +222,7 @@ public class LiveArrivalFragment extends Fragment {
                 ImageView arrival_event_icon = v.findViewById(R.id.arrival_time_event_rss);
                 View back = v.findViewById(R.id.arrival_time_back);
 
-                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                 // Set preferred time format
                 arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));

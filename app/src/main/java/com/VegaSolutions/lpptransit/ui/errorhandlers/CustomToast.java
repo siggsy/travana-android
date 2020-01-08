@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.ui.activities.forum.TagsActivity;
 
 public class CustomToast {
 
@@ -95,6 +96,15 @@ public class CustomToast {
         setIconColor(Color.WHITE);
         setText(error);
         setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+        show(Toast.LENGTH_SHORT);
+    }
+
+    public void showCheck() {
+        setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary));
+        setIconColor(Color.WHITE);
+        setTextColor(Color.WHITE);
+        setText("");
+        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_check_black_24dp));
         show(Toast.LENGTH_SHORT);
     }
 

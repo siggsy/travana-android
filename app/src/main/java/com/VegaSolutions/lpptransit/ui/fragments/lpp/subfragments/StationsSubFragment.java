@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.ContentFrameLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -65,6 +66,8 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     private FloatingActionButton locationRefresh;
     private Adapter adapter = new Adapter();
     private FragmentHeaderCallback callback;
+
+    private OnAttachListener onAttachListener = null;
 
     private void updateLocationList(LatLng location) {
 
@@ -163,52 +166,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
         setupUI();
 
-        // Query all station details
-        Api.stationDetails(false, (apiResponse, statusCode, success) -> {
-
-            // Cancel UI update if fragment not attached
-            if (context == null)
-                return;
-
-            // Update UI
-            ((Activity)context).runOnUiThread(() -> {
-                progressBar.setVisibility(View.GONE);
-                if (success && apiResponse != null) {
-
-                    stations = apiResponse.getData();
-
-                    // Show favourite stations
-                    if (type == TYPE_FAVOURITE) {
-                        setFavouriteStations(apiResponse.getData());
-                        progressBar.setVisibility(View.GONE);
-                    }
-
-                    // Show nearby stations
-                    else if (type == TYPE_NEARBY) {
-
-                        // Check permissions
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            if (!MapUtility.checkIfAtLeastOnePermissionPermitted(context)) {
-                                locErr.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                                return;
-                            }
-                        }
-
-                        // Setup location for updates
-                        locationManager = new MyLocationManager(context);
-                        if (!locationManager.isMainProviderEnabled())
-                            locationManager.addListener(this);
-                        locErr.setVisibility(View.GONE);
-                        updateLocationList(locationManager.getLatest());
-                        locationRefresh.setVisibility(View.VISIBLE);
-
-                    }
-                }
-            });
-
-        });
-
         return root;
     }
 
@@ -282,6 +239,57 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+        if (onAttachListener != null) {
+            onAttachListener.onAttach();
+            onAttachListener = null;
+        }
+    }
+
+    public void setStations(List<Station> apiResponse, int statusCode, boolean success) {
+
+        // Cancel UI update if fragment not attached
+        if (context == null) {
+            onAttachListener = () -> setStations(apiResponse, statusCode, success);
+            return;
+        }
+
+        // Update UI
+        ((Activity) context).runOnUiThread(() -> {
+            progressBar.setVisibility(View.GONE);
+            if (success && apiResponse != null) {
+
+                stations = apiResponse;
+
+                // Show favourite stations
+                if (type == TYPE_FAVOURITE) {
+                    setFavouriteStations(apiResponse);
+                    progressBar.setVisibility(View.GONE);
+                }
+
+                // Show nearby stations
+                else if (type == TYPE_NEARBY) {
+
+                    // Check permissions
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (!MapUtility.checkIfAtLeastOnePermissionPermitted(context)) {
+                            locErr.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                            return;
+                        }
+                    }
+
+                    // Setup location for updates
+                    locationManager = new MyLocationManager(context);
+                    if (!locationManager.isMainProviderEnabled())
+                        locationManager.addListener(this);
+                    locErr.setVisibility(View.GONE);
+                    updateLocationList(locationManager.getLatest());
+                    locationRefresh.setVisibility(View.VISIBLE);
+
+                }
+            }
+        });
+
     }
 
     @Override
@@ -479,6 +487,9 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
     }
 
+    interface OnAttachListener {
+        void onAttach();
+    }
 
 
 }

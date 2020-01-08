@@ -245,15 +245,8 @@ public class TagsActivity extends AppCompatActivity {
                                 if (uTag.isFollowed()) TravanaAPI.removeTag(data, uTag.get_id(), (apiResponse, statusCode, success12) -> {
                                     if (success12 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
-                                            CustomToast customToast = new CustomToast(TagsActivity.this);
-                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
-                                            customToast.setIconColor(Color.WHITE);
-                                            customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("");
-                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
-                                            customToast.show(Toast.LENGTH_SHORT);
+                                            new CustomToast(TagsActivity.this).showCheck();
                                             uTag.setFollowed(false);
-
                                             vh.following.setOnClickListener(this);
                                             vh.following.setText(R.string.follow);
                                         });
@@ -263,15 +256,8 @@ public class TagsActivity extends AppCompatActivity {
                                 else TravanaAPI.followTag(data, uTag.get_id(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
                                     if (success1 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
-                                            CustomToast customToast = new CustomToast(TagsActivity.this);
-                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
-                                            customToast.setIconColor(Color.WHITE);
-                                            customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("");
-                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
-                                            customToast.show(Toast.LENGTH_SHORT);
+                                            new CustomToast(TagsActivity.this).showCheck();
                                             uTag.setFollowed(true);
-
                                             vh.following.setOnClickListener(this);
                                             vh.following.setText(R.string.following);
                                         });
@@ -307,15 +293,8 @@ public class TagsActivity extends AppCompatActivity {
                                 if (mTag.isFollowed()) TravanaAPI.removeTag(data, mTag.get_id(), (apiResponse, statusCode, success12) -> {
                                     if (success12 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
-                                            CustomToast customToast = new CustomToast(TagsActivity.this);
-                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
-                                            customToast.setIconColor(Color.WHITE);
-                                            customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("");
-                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
-                                            customToast.show(Toast.LENGTH_SHORT);
+                                            new CustomToast(TagsActivity.this).showCheck();
                                             mTag.setFollowed(false);
-
                                             vh.following.setOnClickListener(this);
                                             vh.following.setText(R.string.follow);
                                         });
@@ -324,15 +303,8 @@ public class TagsActivity extends AppCompatActivity {
                                 else TravanaAPI.followTag(data, mTag.get_id(), (apiResponse, statusCode, success1) -> {
                                     if (success1 && apiResponse.isSuccess()) {
                                         runOnUiThread(() -> {
-                                            CustomToast customToast = new CustomToast(TagsActivity.this);
-                                            customToast.setBackgroundColor(ContextCompat.getColor(TagsActivity.this, R.color.colorPrimary));
-                                            customToast.setIconColor(Color.WHITE);
-                                            customToast.setTextColor(Color.WHITE);
-                                            customToast.setText("");
-                                            customToast.setIcon(ContextCompat.getDrawable(TagsActivity.this, R.drawable.ic_check_black_24dp));
-                                            customToast.show(Toast.LENGTH_SHORT);
+                                            new CustomToast(TagsActivity.this).showCheck();
                                             mTag.setFollowed(true);
-
                                             vh.following.setOnClickListener(this);
                                             vh.following.setText(R.string.following);
                                         });
@@ -342,8 +314,9 @@ public class TagsActivity extends AppCompatActivity {
                         });
                     }
                 });
-
             }
+
+            vh.following.setVisibility(type == TagsActivity.TYPE_NORMAL ? View.VISIBLE : View.GONE);
 
         }
 

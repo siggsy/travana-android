@@ -21,7 +21,7 @@ public class ViewGroupUtils {
      */
     public static boolean isDarkTheme(Context activity) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences("settings", MODE_PRIVATE);
-        return sharedPreferences.getBoolean("app_theme", false);
+        return sharedPreferences.getBoolean("app_theme", true);
     }
 
 }
