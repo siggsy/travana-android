@@ -48,7 +48,7 @@
     <string name="opposite_error">Nasprotna postaja ne obstaja.</string>
     <string name="network_error">Brez internetne povezave.</string>
     <string name="timed_out_error">Povezava je potekla.</string>
-    <string name="unknown_error">Nekaj je šlo narobe. Obrnite se na razvijalce. - %1$d</string>
+    <string name="unknown_error">Nekaj je šlo narobe. Prosimo poizkusite še enkrat. - %1$d</string>
     <string name="refresh">Osveži</string>
     <string name="create_a_new_post">Create a new post</string>
     <string name="too_many_tags_error">Dosegli ste mejo števila oznak.</string>
@@ -63,5 +63,10 @@
     <string name="sign_in_error">Prijavite se za ogled sledljivih objav</string>
     <string name="comment_replies">%1$d • odgovorov</string>
     <string name="msg_content_error">Objava mora vsebovati vsaj 3 znake.</string>
+    <string name="login_to">"Prijava v "</string>
+    <string name="conditions_s1">Z prijavo se strinjam z </string>
+    <string name="tearms_of_service">Pogoji uporabe </string>
+    <string name="privacy_policy">Politiko zasebnosti.</string>
+    <string name="and">in</string>
 
 </resources>

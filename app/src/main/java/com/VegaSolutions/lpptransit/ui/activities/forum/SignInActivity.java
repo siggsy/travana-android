@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.lang.UCharacter;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -19,9 +21,17 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
+import com.VegaSolutions.lpptransit.ui.activities.LauncherActivity;
+import com.VegaSolutions.lpptransit.ui.activities.MainActivity;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -45,10 +55,15 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
 
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 public class SignInActivity extends AppCompatActivity {
 
+    @BindViews({R.id.v1, R.id.v2, R.id.v3, R.id.v4}) View[] v;
+
     private static final String TAG = "SignInActivity";
-    private View[] views = new View[36];
+    //private View[] views = new View[36];
 
     private FirebaseAuth mAuth;
 
@@ -60,36 +75,23 @@ public class SignInActivity extends AppCompatActivity {
 
     private static String uidToken;
 
+    private boolean loading = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_sign_in);
+        ButterKnife.bind(this);
 
-        getwarnings();
+        createAnimation();
 
-        createCircleAnimation();
+        //getwarnings();
+
+        //createCircleAnimation();
         ImageButton back_btn = (ImageButton)findViewById(R.id.sign_in_activity_back_btn);
         back_btn.setOnClickListener(e1 -> {
             finish();
-        });
-
-        TextView help_contact_btn = (TextView) findViewById(R.id.textView5);
-        help_contact_btn.setOnClickListener(e2 ->{
-
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto", this.getString(R.string.developer_help_contact), null));
-            startActivity(Intent.createChooser(emailIntent, "Send email..."));
-
-        });
-
-        TextView help_contact_btn1 = (TextView) findViewById(R.id.textView4);
-        help_contact_btn.setOnClickListener(e3 ->{
-
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto", this.getString(R.string.developer_help_contact), null));
-            startActivity(Intent.createChooser(emailIntent, "Send email..."));
-
         });
 
         mAuth = FirebaseAuth.getInstance();
@@ -153,7 +155,6 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        createCircleAnimation();
     }
 
     private void signInWithGoogle() {
@@ -304,7 +305,16 @@ public class SignInActivity extends AppCompatActivity {
         FirebaseManager.getFirebaseToken((token, statusCode, success) -> {
                     if(success){
 
+                        /*
+                        TravanaAPI.tags(FirebaseManager.getSignedUser().getUid(), new TravanaApiCallback<ResponseObject<TagsBox>>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObject<TagsBox> apiResponse, int statusCode, boolean success) {
 
+                                Log.e(TAG, apiResponse + "");
+
+                            }
+                        });
+                        */
                         /*
                         TravanaAPI.messagesMeta(token, new TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>>() {
                             @Override
@@ -365,17 +375,15 @@ public class SignInActivity extends AppCompatActivity {
 
                          */
 
-
+                        /*
                         MessageTag[] tags = new MessageTag[1];
                         tags[0] = new MessageTag("xyz#115678", "xyz", "#123456");
 
 
                         String[] links = new String[1];
-                        links[0] = "/blaadasdolsadpsa.com";
+                        links[0] = "imagetestDOomenWedDec04205001CET2019.png";
 
-                        FirebaseUser basic_user_firebase_data = FirebaseManager.getSignedUser();
-
-                        LiveUpdateMessage message = new LiveUpdateMessage("new massage", tags, links);
+                        LiveUpdateMessage message = new LiveUpdateMessage("sporočilo 5", tags, links);
 
                         TravanaAPI.addMessage(token, message, (data, statusCode1, success1) -> {
 
@@ -387,11 +395,67 @@ public class SignInActivity extends AppCompatActivity {
 
                         });
 
+                         */
+
+                        TravanaAPI.updates(new TravanaApiCallback<ResponseObject<Update>>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObject<Update> apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, apiResponse + "");
+
+                            }
+                        });
+
+                        /*
+                        TravanaAPI.followTag(token, "Parkirišča##ebe134", new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, apiResponse + "");
+
+                            }
+                        });*/
+
+
+                        /*
+                        TravanaAPI.tags(new TravanaApiCallback<ResponseObject<TagsBox>>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObject<TagsBox> apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG + "AAAAAAAAA", apiResponse + "");
+
+                            }
+
+                        });
+
+                        Log.e(TAG + " id",  FirebaseManager.getSignedUser().getUid() + "");
+
+                        TravanaAPI.tags(FirebaseManager.getSignedUser().getUid(), new TravanaApiCallback<ResponseObject<TagsBox>>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObject<TagsBox> apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG + "AAAAAAAAA", apiResponse + "");
+
+                            }
+
+                        });*
+
+                         */
+                        /*
+                        TravanaAPI.followTag(token, "tagblab", new TravanaApiCallback<String>() {
+                            @Override
+                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+                                Log.e(TAG + "AAAAAAAAA", apiResponse + "");
+                            }
+                        });*/
+
+                        //TravanaAPI.addComment(token, "mess_genbpBLhCajxnM9yNqjX9cmYNK258r12020-01-01_12:18:50", new LiveUpdateComment());
+
 
                         /*
                         Log.e(TAG, token);
 
-                        TravanaAPI.followTag(token, "domenjecar#12321", new TravanaApiCallback<String>() {
+                        TravanaAPI.followTag(token, "BicikeLJ#4feb34", new TravanaApiCallback<String>() {
                             @Override
                             public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
 
@@ -482,23 +546,19 @@ public class SignInActivity extends AppCompatActivity {
 
 
                         /*
-                        LiveUpdateComment comment = new LiveUpdateComment(FirebaseManager.getSignedUser().getUid(), "komentar teglavič");
+                        LiveUpdateComment comment = new LiveUpdateComment("komentar 2");
 
-                        TravanaAPI.addComment(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-06_17:31:40", comment, new TravanaApiCallback<String>() {
-                            @Override
-                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+                        TravanaAPI.addComment(token, "mess_genbpBLhCajxnM9yNqjX9cmYNK258r12020-01-01_12:18:50", comment, new TravanaApiCallback<ResponseObjectCommit>() {
+                                    @Override
+                                    public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
 
-                                if(success){
-                                    Log.e(TAG, "add comment" + apiResponse);
-                                }else{
-                                    Log.e(TAG, statusCode + "error");
-                                }
+                                        Log.e("Tag", apiResponse + "");
 
-                            }
+                                    }
+                                });
+                           */
 
-                    });
 
-                         */
 
 
                         /*
@@ -518,38 +578,51 @@ public class SignInActivity extends AppCompatActivity {
                          });*/
 
                         /*
-                        LiveUpdateComment comment = new LiveUpdateComment("basdsadasdasd bl asa s ");
+                        LiveUpdateComment comment = new LiveUpdateComment("komentar novo leto");
 
-                         TravanaAPI.addCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:32:44GMT01:002019", comment, new TravanaApiCallback<String>() {
-                             @Override
-                             public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+                         TravanaAPI.addCommentComment(token, "comm_genbpBLhCajxnM9yNqjX9cmYNK258r12020-01-01_13:56:09", comment, new TravanaApiCallback<ResponseObjectCommit>() {
+                                     @Override
+                                     public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
 
-                                 if(success){
-                                     Log.e(TAG, "add subcomment" + apiResponse);
-                                 }else{
-                                     Log.e(TAG, statusCode + "error");
-                                 }
+                                         Log.e(TAG, "" + apiResponse);
 
-                             }
-                         });
-                           */
+                                     }
+                                 });
+                        */
+                        /*
+                        TravanaAPI.messageid("mess_genbpBLhCajxnM9yNqjX9cmYNK258r12020-01-01_12:18:50", new TravanaApiCallback<ResponseObject<LiveUpdateMessage>>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObject<LiveUpdateMessage> apiResponse, int statusCode, boolean success) {
+
+                                Log.e("user", apiResponse.getData().getUser().getName());
+
+                            }
+                        });
+                        */
+                        /*
+                        TravanaAPI.likeComment(token, "comm_gensqlDy069LNfqSoOvq6VA0HvnXFf22020-01-01_15:13:03", true, new TravanaApiCallback<ResponseObjectCommit>() {
+                                    @Override
+                                    public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
+                                        Log.e("like", apiResponse + "");
+                                    }
+                                });
+                        */
+
+
 
 
                         /*
-                        TravanaAPI.likeCommentComment(token, "comm_gen2CPPj3qcIsPOOyHueenh6WZsX922FriDec0617:58:27GMT01:002019", true, new TravanaApiCallback<String>() {
+                        TravanaAPI.tags("nek kao token", new TravanaApiCallback<ResponseObject<TagsBox>>() {
                             @Override
-                            public void onComplete(@Nullable String apiResponse, int statusCode, boolean success) {
+                            public void onComplete(@Nullable ResponseObject<TagsBox> apiResponse, int statusCode, boolean success) {
 
-                                if(success){
-                                    Log.e(TAG, "like subcomment" + apiResponse);
-                                }else{
-                                    Log.e(TAG, statusCode + "error");
-                                }
+                                Log.e(TAG + " tags",  apiResponse + "");
 
                             }
                         });
 
-                         */
+
+
 
 
 
@@ -567,19 +640,29 @@ public class SignInActivity extends AppCompatActivity {
 
                         });*/
 
-
-
                         /*
-                        TravanaAPI.followedMessagesMeta(token, new TravanaApiCallback<LiveUpdateMessage[]>() {
+                        TravanaAPI.messagesLike(token, "mess_gensqlDy069LNfqSoOvq6VA0HvnXFf22020-01-01_13:21:40", true, new TravanaApiCallback<ResponseObjectCommit>() {
                             @Override
-                            public void onComplete(@Nullable LiveUpdateMessage[] apiResponse, int statusCode, boolean success) {
+                            public void onComplete(@Nullable ResponseObjectCommit apiResponse, int statusCode, boolean success) {
 
-                                Log.e(TAG, Arrays.toString(apiResponse) + "");
+                                Log.e(TAG, apiResponse + "");
 
                             }
                         });
+                        */
 
-                         */
+
+                        /*
+                        TravanaAPI.followedMessagesMeta(token, new TravanaApiCallback<ResponseObject<LiveUpdateMessage[]>>() {
+                                    @Override
+                                    public void onComplete(@Nullable ResponseObject<LiveUpdateMessage[]> apiResponse, int statusCode, boolean success) {
+
+                                        Log.e(TAG, Arrays.toString(apiResponse.getData()) + " ");
+
+                                    }
+                                });
+                        */
+
 
                         /*
                         TravanaAPI.messagesMarkSeen(token, "mess_gen2CPPj3qcIsPOOyHueenh6WZsX9222019-12-07_17:01:42", false, new TravanaApiCallback<String>() {
@@ -647,8 +730,29 @@ public class SignInActivity extends AppCompatActivity {
 
     }
 
-    //--------------------------------------Animations
+    private void createAnimation(){
 
+                Animation animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(0);
+                v[0].setAnimation(animation);
+
+                animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(200);
+                v[1].setAnimation(animation);
+
+                animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(400);
+                v[2].setAnimation(animation);
+
+                animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(600);
+                v[3].setAnimation(animation);
+
+    }
+
+    //--------------------------------------Animations
+    /*
+    @Depricated
     private void initializeCircleTextViews(){
 
         views[0] = findViewById(R.id.circle1);
@@ -711,4 +815,6 @@ public class SignInActivity extends AppCompatActivity {
 
         }
     }
+
+     */
 }

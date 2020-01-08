@@ -10,7 +10,7 @@ public class LiveUpdateMessage {
     private String _id;
     private String user_id;
     private UserData user;
-    private String[] photo_ids;
+    private String[] photos_ids;
     private String created_time;
     private String message_content;
     private MessageTag[] tags;
@@ -23,11 +23,11 @@ public class LiveUpdateMessage {
     private long time_ago_millis;
 
     public LiveUpdateMessage(
-                             String message_content, MessageTag[] tags, String[] photo_ids) {
+                             String message_content, MessageTag[] tags, String[] photos_ids) {
 
         this.message_content = message_content;
         this.tags = tags;
-        this.photo_ids = photo_ids;
+        this.photos_ids = photos_ids;
 
     }
 
@@ -104,12 +104,12 @@ public class LiveUpdateMessage {
         this.comments_int = comments_int;
     }
 
-    public String[] getPhoto_ids() {
-        return photo_ids;
+    public String[] getPhotos_ids() {
+        return photos_ids;
     }
 
-    public void setPhoto_ids(String[] photo_ids) {
-        this.photo_ids = photo_ids;
+    public void setPhotos_ids(String[] photos_ids) {
+        this.photos_ids = photos_ids;
     }
 
     public boolean isLiked() {
@@ -150,7 +150,7 @@ public class LiveUpdateMessage {
                 "_id='" + _id + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", user=" + user +
-                ", photo_ids=" + Arrays.toString(photo_ids) +
+                ", photo_ids=" + Arrays.toString(photos_ids) +
                 ", created_time='" + created_time + '\'' +
                 ", message_content='" + message_content + '\'' +
                 ", tags=" + Arrays.toString(tags) +
