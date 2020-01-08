@@ -171,7 +171,13 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         TravanaAPI.warning((apiResponse, statusCode, success) -> runOnUiThread(() -> {
             Log.i("warning", apiResponse + "");
             if (success && apiResponse.isSuccess()) {
-                Log.i("warning", apiResponse.getData().getContent_slo());
+
+                if (apiResponse.getData().getTitle_slo() == null ||
+                    apiResponse.getData().getTitle_en() == null ||
+                    apiResponse.getData().getContent_slo() == null ||
+                    apiResponse.getData().getContent_en() == null)
+                    return;
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
                 builder.setTitle(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getTitle_slo() : apiResponse.getData().getTitle_en());
                 builder.setMessage(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getContent_slo() : apiResponse.getData().getContent_en());
