@@ -172,10 +172,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
             Log.i("warning", apiResponse + "");
             if (success && apiResponse.isSuccess()) {
 
-                if (apiResponse.getData().getTitle_slo() == null ||
-                    apiResponse.getData().getTitle_en() == null ||
-                    apiResponse.getData().getContent_slo() == null ||
-                    apiResponse.getData().getContent_en() == null)
+                if (apiResponse.getData() == null)
                     return;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
