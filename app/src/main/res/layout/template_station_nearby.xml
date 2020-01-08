@@ -30,7 +30,7 @@
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/station_nearby_favourite"
+            android:id="@+id/route_favourite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"

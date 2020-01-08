@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -24,7 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
-        boolean dark_theme = sharedPreferences.getBoolean("app_theme", false);
+        boolean dark_theme = ViewGroupUtils.isDarkTheme(this);
         boolean hour = sharedPreferences.getBoolean("hour", false);
         setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_settings);

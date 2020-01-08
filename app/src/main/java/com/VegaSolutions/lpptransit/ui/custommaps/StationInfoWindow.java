@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.utility.Colors;
+import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -47,8 +48,7 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         View divider;
         LinearLayout root;
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences("station_favourites", MODE_PRIVATE);
-        Map<String, Boolean> favourites = (Map<String, Boolean>) sharedPreferences.getAll();
+        Map<String, Boolean> favourites = LppHelper.getFavouriteStations(context);
         Boolean f = favourites.get(station.getRef_id());
         if (f == null) f = false;
 
@@ -56,7 +56,7 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         distance = view.findViewById(R.id.station_nearby_distance);
         routes = view.findViewById(R.id.station_nearby_ll);
         center = view.findViewById(R.id.station_nearby_center);
-        fav = view.findViewById(R.id.station_nearby_favourite);
+        fav = view.findViewById(R.id.route_favourite);
         divider = view.findViewById(R.id.station_nearby_devider);
         root = view.findViewById(R.id.station_nearby_card);
 

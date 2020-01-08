@@ -14,13 +14,13 @@
     <string name="you_canceled_the_proccess">Storniral si proces.</string>
     <string name="you_have_successfuly_logged_in">Uspešno si se prijavil</string>
     <string name="need_help">Potrebuješ pomoč?</string>
-    <string name="nearby_stations">Postaje v bližini</string>
+    <string name="nearby_stations">Postajališča v bližini</string>
     <string name="detour">obvoz</string>
     <string name="parking">Parkirišče</string>
     <string name="transport">Prevoz,</string>
     <string name="into_center">V CENTER</string>
     <string name="meant_to_be">mora biti.</string>
-    <string name="stations">Postaje</string>
+    <string name="stations">Postajališča</string>
     <string name="garage">garaža</string>
     <string name="arrivals">Prihodi</string>
     <string name="settings">Nastavitve</string>
@@ -53,8 +53,7 @@
     <string name="create_a_new_post">Create a new post</string>
     <string name="too_many_tags_error">Dosegli ste mejo števila oznak.</string>
     <string name="select_route">Izberite linijo</string>
-    <string name="officially">Uradno</string>
-    <string name="approved_by">odobril</string>
+    <string name="officially">V sodelovanju z</string>
     <string name="attachments">Priponke</string>
     <string name="connection_refused">Povezava zavrnjena.</string>
     <string name="comment_on_the_post">Komentiraj na objavo …</string>
@@ -68,5 +67,11 @@
     <string name="tearms_of_service">Pogoji uporabe </string>
     <string name="privacy_policy">Politiko zasebnosti.</string>
     <string name="and">in</string>
+
+    <string name="alert_title">Posodobitev</string>
+    <string name="alert_update">Prišla je nova posodobitev.</string>
+    <string name="alert_update_urgent">Imate zastarelo različico. Posodobite aplikacijo.</string>
+    <string name="alert_update_button">Posodobi</string>
+    <string name="alert_cancel_button">Prekliči</string>
 
 </resources>

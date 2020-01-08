@@ -29,6 +29,7 @@ import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.LiveArrivalFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.RoutesOnStationFragment;
+import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -90,7 +91,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
         // Get Intent data
         station = getIntent().getParcelableExtra(STATION);
-        favourite = getSharedPreferences("station_favourites", MODE_PRIVATE).getBoolean(station.getRef_id(), false);
+        favourite = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE).getBoolean(station.getRef_id(), false);
 
         setupUI();
 
@@ -125,7 +126,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         // Favourite button toggle
         fav.setImageDrawable(getDrawable(favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
         fav.setOnClickListener(v1 -> {
-            SharedPreferences sharedPreferences = getSharedPreferences("station_favourites", MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(station.getRef_id(), !favourite);
             favourite = !favourite;

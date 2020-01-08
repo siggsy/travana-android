@@ -178,13 +178,7 @@ public class PostActivity extends AppCompatActivity {
                     return;
                 TravanaAPI.addComment(data, message.get_id(), new LiveUpdateComment(newComment.getText().toString()), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
                     if (success1 && apiResponse.isSuccess()) {
-                        CustomToast customToast = new CustomToast(this);
-                        customToast.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
-                        customToast.setIconColor(Color.WHITE);
-                        customToast.setTextColor(Color.WHITE);
-                        customToast.setText("");
-                        customToast.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_check_black_24dp));
-                        customToast.show(Toast.LENGTH_SHORT);
+                         new CustomToast(this).showCheck();
                         newComment.setText("");
                         TravanaAPI.messageid(id, data, (apiResponse1, statusCode1, success2) -> runOnUiThread(() -> {
                             if (success2 && apiResponse1.isSuccess()) {

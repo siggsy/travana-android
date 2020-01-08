@@ -394,7 +394,7 @@ public class TravanaAPI {
 
                             try {
 
-                                ResponseObject<Update> r = new Gson().fromJson(response, ResponseObject.class);
+                                ResponseObject<Update> r = new Gson().fromJson(response,  new TypeToken<ResponseObject<Update>>(){}.getType());
 
                                 callback.onComplete(r, statusCode, true);
 

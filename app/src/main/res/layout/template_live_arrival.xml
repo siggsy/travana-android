@@ -27,10 +27,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
+            android:layout_weight="1"
             android:text="Rudnik"
             android:textColor="?android:textColor"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/route_favourite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:minWidth="24dp"
+            android:minHeight="24dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_favorite_black_24dp"
+            android:tint="@color/colorAccent" />
     </LinearLayout>
 
     <com.google.android.flexbox.FlexboxLayout

@@ -32,6 +32,7 @@ import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -81,7 +82,7 @@ public class LiveArrivalFragment extends Fragment {
 
                 // Check if arrival list is not empty and refresh rv adapter
                 noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
-                adapter.setArrivals(RouteWrapper.getFromArrivals(arrivalWrapper.getArrivals()));
+                adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
 
             } else new CustomToast(context).showDefault(statusCode);
         });
@@ -176,6 +177,7 @@ public class LiveArrivalFragment extends Fragment {
             headerCallback.onHeaderChanged(value);
     }
 
+
     private class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         List<RouteWrapper> routes = new ArrayList<>();
@@ -201,6 +203,7 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.name.setText(route.name);
             viewHolder.number.setText(route.arrivalObject.getRoute_name());
             viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRoute_name()));
+            viewHolder.favourite.setImageDrawable(context.getDrawable(route.favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
             viewHolder.route.setOnClickListener(v -> {
                 Intent i = new Intent(context, RouteActivity.class);
                 i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
@@ -209,6 +212,15 @@ public class LiveArrivalFragment extends Fragment {
                 i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTrip_id());
                 i.putExtra(RouteActivity.STATION_ID, stationId);
                 startActivity(i);
+            });
+
+            viewHolder.favourite.setOnClickListener(v1 -> {
+                SharedPreferences sharedPreferences = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(route.arrivalObject.getRoute_id(), !route.favourite);
+                route.favourite= !route.favourite;
+                viewHolder.favourite.setImageDrawable(getResources().getDrawable(route.favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
+                editor.apply();
             });
 
             // Set live arrivals.
@@ -286,6 +298,7 @@ public class LiveArrivalFragment extends Fragment {
 
             TextView name, number;
             View circle;
+            ImageView favourite;
 
             LinearLayout route;
             FlexboxLayout arrivals;
@@ -298,6 +311,7 @@ public class LiveArrivalFragment extends Fragment {
                 circle = itemView.findViewById(R.id.route_station_circle);
                 arrivals = itemView.findViewById(R.id.live_arrival_arrivals);
                 route = itemView.findViewById(R.id.live_arrival_ll);
+                favourite = itemView.findViewById(R.id.route_favourite);
 
             }
         }
@@ -308,8 +322,9 @@ public class LiveArrivalFragment extends Fragment {
         List<ArrivalWrapper.Arrival> arrivals = new ArrayList<>();
         String name;
         ArrivalWrapper.Arrival arrivalObject;
+        boolean favourite;
 
-        private static List<RouteWrapper> getFromArrivals(List<ArrivalWrapper.Arrival> arrivals) {
+        private static List<RouteWrapper> getFromArrivals(Context context, List<ArrivalWrapper.Arrival> arrivals) {
 
             // Sort by route number
             Collections.sort(arrivals, (o1, o2) -> {
@@ -321,20 +336,32 @@ public class LiveArrivalFragment extends Fragment {
                 return Integer.compare(o1V, o2V);
             });
 
+            Map<String, Boolean> fav = LppHelper.getFavouriteRoutes(context);
+            int k = 0;
+            for (int i = 0; i < arrivals.size(); i++) {
+                ArrivalWrapper.Arrival arrival = arrivals.get(i);
+                Boolean f = fav.get(arrival.getRoute_id());
+                if (f != null && f) {
+                    arrivals.remove(i);
+                    arrivals.add(k, arrival);
+                    k++;
+                }
+            }
+
             Map<String, RouteWrapper> map = new LinkedHashMap<>();
             for (ArrivalWrapper.Arrival arrival : arrivals) {
                 RouteWrapper route = map.get(arrival.getTrip_id());
                 if (route == null) {
                     route = new RouteWrapper();
-
+                    route.favourite = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE).getBoolean(arrival.getRoute_id(), false);
                     ArrivalWrapper.Arrival.Stations stations = arrival.getStations();
                     route.name = stations != null && stations.getArrival() != null && !stations.getArrival().equals("") ? stations.getArrival() : arrival.getTrip_name();
-
                     route.arrivalObject = arrival;
                     map.put(arrival.getTrip_id(), route);
                 }
                 route.arrivals.add(arrival);
             }
+
             return new ArrayList<>(map.values());
 
         }

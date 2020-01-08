@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.ContentFrameLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,12 +21,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
+import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
@@ -171,7 +170,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
     private void setFavouriteStations(List<Station> stations) {
 
-        Map<String, Boolean> favourites = getFavourite();
+        Map<String, Boolean> favourites = LppHelper.getFavouriteStations(context);
 
         ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
 
@@ -195,7 +194,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     }
 
     private void setNearbyStations(List<Station> stations) {
-        Map<String, Boolean> favourites = getFavourite();
+        Map<String, Boolean> favourites = LppHelper.getFavouriteStations(context);
 
         ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
 
@@ -228,11 +227,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
         }
 
-    }
-
-    private Map<String, Boolean> getFavourite() {
-        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("station_favourites", MODE_PRIVATE);
-        return (Map<String, Boolean>) sharedPreferences.getAll();
     }
 
     @Override
@@ -464,7 +458,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 routes = itemView.findViewById(R.id.station_nearby_ll);
                 card = itemView.findViewById(R.id.station_nearby_card);
                 center = itemView.findViewById(R.id.station_nearby_center);
-                fav = itemView.findViewById(R.id.station_nearby_favourite);
+                fav = itemView.findViewById(R.id.route_favourite);
 
             }
         }

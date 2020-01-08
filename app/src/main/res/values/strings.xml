@@ -19,8 +19,7 @@
     <string name="detour">detour</string>
     <string name="by_developers">By Domen Kralj, Žiga Leskovec</string>
     <string name="app_slogan_welcome_activity">better public transport.</string>
-    <string name="officially">Officially</string>
-    <string name="approved_by">approved by</string>
+    <string name="officially">In collaboration with</string>
 
     <string name="test_text" translatable="false">Zaradi popolne prometne zapore na javni poti JP 752181 (Sp. Pirniče 38 - 44), ima linija 15 od srede, 23. 10. 2019 od izvoza do zaključka gradbenih del »OBVOZ«.\n\nZačasno je ukinjeno postajališče »Zavrh« v obe smeri.</string>
 
@@ -77,4 +76,11 @@
     <string name="tearms_of_service">Terms of service </string>
     <string name="privacy_policy">Privacy policy </string>
     <string name="and">and</string>
+
+    <string name="alert_title">Update</string>
+    <string name="alert_update">There is a new update.</string>
+    <string name="alert_update_urgent">You have an outdated version. Please update the app.</string>
+    <string name="alert_update_button">Update</string>
+    <string name="alert_cancel_button">Cancel</string>
+
 </resources>

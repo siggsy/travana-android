@@ -11,19 +11,27 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.VegaSolutions.lpptransit.BuildConfig;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
+import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.ui.activities.forum.ForumActivity;
 import com.VegaSolutions.lpptransit.ui.activities.forum.SignInActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
@@ -116,6 +124,46 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         // Switch bottom sheet fragment.
         switchFragment(StationsFragment.newInstance());
+
+        TravanaAPI.updates((apiResponse, statusCode, success) -> runOnUiThread(() -> {
+            if (success && apiResponse.isSuccess()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.alert_title));
+
+                int cV = BuildConfig.VERSION_CODE;
+
+                if (apiResponse.getData().getLast_version() == cV)
+                    return;
+
+
+                boolean supported = false;
+                for (int a : apiResponse.getData().getStill_supported_versions())
+                    if (a == cV) supported = true;
+
+                if (supported) {
+                    builder.setMessage(R.string.alert_update);
+                    builder.setCancelable(true);
+                    builder.setPositiveButton(R.string.alert_update_button, (dialog, which) -> {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(apiResponse.getData().getPlay_store_link()));
+                        startActivity(i);
+                    });
+                } else {
+                    builder.setMessage(R.string.alert_update_urgent);
+                    builder.setCancelable(false);
+                    builder.setPositiveButton(R.string.alert_update_button, (dialog, which) -> {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(apiResponse.getData().getPlay_store_link()));
+                        startActivity(i);
+                        finish();
+                    });
+                }
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+            }
+        }));
 
     }
 
