@@ -27,6 +27,9 @@ import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallbackSpecial;
@@ -60,7 +63,7 @@ public class TestActivity extends AppCompatActivity {
         Button b = findViewById(R.id.button2);
 
 
-            ImageView i = (ImageView)findViewById(R.id.imageView5);
+           // ImageView i = (ImageView)findViewById(R.id.imageView5);
 
 
 
@@ -84,7 +87,7 @@ public class TestActivity extends AppCompatActivity {
 
              */
 
-
+            /*
             TravanaAPI.getUserImage("https://lh3.googleusercontent.com/-6zz3MuLYmv8/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3reL87K3FaDuynldu3oLhVwM1mINOA/s96-c/photo.jpg", new TravanaApiCallbackSpecial() {
                 @Override
                 public void onComplete(@Nullable Bitmap bitmap, int statusCode, boolean success) {
@@ -104,7 +107,26 @@ public class TestActivity extends AppCompatActivity {
 
                 }
             });
+            */
 
+
+            TravanaAPI.updates(new TravanaApiCallback<ResponseObject<Update>>() {
+                @Override
+                public void onComplete(@Nullable ResponseObject<Update> apiResponse, int statusCode, boolean success) {
+
+                    Log.e(TAG, apiResponse + "");
+
+                }
+            });
+
+            TravanaAPI.warning(new TravanaApiCallback<ResponseObject<Warning>>() {
+                @Override
+                public void onComplete(@Nullable ResponseObject<Warning> apiResponse, int statusCode, boolean success) {
+
+                    Log.e(TAG, apiResponse + "");
+
+                }
+            });
 
 
 
