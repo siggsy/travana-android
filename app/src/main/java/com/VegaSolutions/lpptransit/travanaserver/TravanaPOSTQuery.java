@@ -26,9 +26,9 @@ public class TravanaPOSTQuery extends Thread {
 
     private static final String TAG = TravanaPOSTQuery.class.getSimpleName();
 
-    //public static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
+    public static OkHttpClient client = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(10, TimeUnit.SECONDS).build();
 
-    public static OkHttpClient client = TravanaQuery.getUnsafeOkHttpClient();
+    //public static OkHttpClient client = TravanaQuery.getUnsafeOkHttpClient();
 
     public static final String SERVER_URL = TravanaQuery.SERVER_URL;
 

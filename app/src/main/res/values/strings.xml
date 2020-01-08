@@ -60,7 +60,7 @@
     <string name="opposite_error">Opposite station does not exist.</string>
     <string name="network_error">No internet connection.</string>
     <string name="timed_out_error">Connection timed out.</string>
-    <string name="unknown_error">Something went wrong. Please contact developers. - %1$d</string>
+    <string name="unknown_error">Something went wrong. Please try again. - %1$d</string>
     <string name="refresh">Refresh</string>
     <string name="create_a_new_post">Create a new post</string>
     <string name="too_many_tags_error">You have reached tag count limit.</string>
@@ -72,4 +72,9 @@
     <string name="sign_in_text">Sign in</string>
     <string name="sign_in_error">Sign in to see followed posts</string>
     <string name="msg_content_error">Post must contain at least 3 characters.</string>
+    <string name="login_to">Login to</string>
+    <string name="conditions_s1">With loging to this application you agree with </string>
+    <string name="tearms_of_service">Terms of service </string>
+    <string name="privacy_policy">Privacy policy </string>
+    <string name="and">and</string>
 </resources>

@@ -25,7 +25,7 @@
             android:foregroundGravity="center"
             android:gravity="center_vertical"
             android:text="@string/app_name"
-            android:textSize="40sp"
+            android:textSize="45sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias=".35"
@@ -33,8 +33,8 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/textView_app_name"
             app:layout_constraintTop_toTopOf="parent"
@@ -96,32 +96,32 @@
 
         <View
             android:id="@+id/v1"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/color_main_orange" />
 
         <View
             android:id="@+id/v2"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/main_blue" />
 
         <View
             android:id="@+id/v3"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/main_yellow" />
 
         <View
             android:id="@+id/v4"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/main_green" />
     </LinearLayout>

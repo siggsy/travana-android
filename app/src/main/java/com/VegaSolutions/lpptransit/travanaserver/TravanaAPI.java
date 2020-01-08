@@ -43,7 +43,9 @@ public class TravanaAPI {
 
     /*
     *Responses
-    * false, 4002, 'Error: posting to often.            -> if user has more than 3 posts in last 24 hours OR the last massage has been posted less than 10 min ago !(now - for testing it is set to 1 min)!
+    * false, 4007, "Error: message is too long."
+    * false, 4006, "Error: message is too short.
+    * false, 4002, 'Error: posting too often.            -> if user has more than 3 posts in last 24 hours OR the last massage has been posted less than 10 min ago !(now - for testing it is set to 1 min)!
     * false, 4001, "Error: cannot add message
     * true, 200
     */
@@ -110,8 +112,12 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -122,6 +128,8 @@ public class TravanaAPI {
 
     /*
      *Responses
+     * false, 4004, "Error: comment is too long."
+     * false, 4003, "Error: comment is too short."
      * false, x, "Error: posting too much (15 min limit)" -> todo, not implemented yet
      * false, 4001, "Error: during inserting comment into database
      * false, 4002, "Error: cannot find meesage with this _id
@@ -136,8 +144,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -158,8 +170,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -183,8 +199,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -210,8 +230,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -233,8 +257,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -257,8 +285,12 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(r, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -281,8 +313,12 @@ public class TravanaAPI {
 
                     Log.i("FollowTag", response);
                     if (success) {
-                        ResponseObjectCommit objectCommit = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(objectCommit, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -301,8 +337,12 @@ public class TravanaAPI {
         new TravanaQuery(TravanaQuery.REMOVE_FOLLOW_TAG, TRAVANA_API_KEY, token)
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
-                        ResponseObjectCommit objectCommit = new Gson().fromJson(response, ResponseObjectCommit.class);
-                        callback.onComplete(objectCommit, statusCode, true);
+                        try {
+                            ResponseObjectCommit r = new Gson().fromJson(response, ResponseObjectCommit.class);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObjectCommit(false, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -325,9 +365,15 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<Warning[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        try {
 
-                        callback.onComplete(r, statusCode, true);
+                            ResponseObject<Warning[]> r = new Gson().fromJson(response, ResponseObject.class);
+
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -344,29 +390,18 @@ public class TravanaAPI {
         new TravanaQuery(TravanaQuery.UPDATES_URL)
                 .setOnCompleteListener((response, statusCode, success) -> {
 
-                    ResponseObject<Update> r = new Gson().fromJson(response, ResponseObject.class);
-                    if (success) {
-                        callback.onComplete(r, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                }).start();
-    }
-
-    /*
-     *Responses
-     * empty data or unsuccessfull callback
-     * true, 200
-     */
-    public static void play_store_link(TravanaApiCallback<ResponseObject<String>> callback) {
-
-        new TravanaQuery(TravanaQuery.PLAY_STORE_LINK)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
                     if (success) {
 
-                        ResponseObject<String> r = new Gson().fromJson(response, ResponseObject.class);
-                        callback.onComplete(r, statusCode, true);
+                            try {
+
+                                ResponseObject<Update> r = new Gson().fromJson(response, ResponseObject.class);
+
+                                callback.onComplete(r, statusCode, true);
+
+                            }catch (Exception e){
+                                callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                            }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -418,8 +453,16 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -437,8 +480,16 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -458,8 +509,16 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -479,8 +538,16 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject<LiveUpdateMessage> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -501,8 +568,16 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -523,8 +598,15 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+                        try {
+
+                            ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -545,9 +627,15 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
+                        try {
 
-                        callback.onComplete(r, statusCode, true);
+                            ResponseObject<LiveUpdateMessage[]> r = new Gson().fromJson(response, new TypeToken<ResponseObject<LiveUpdateMessage[]>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -566,9 +654,16 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        Log.i("TAGS", response);
-                        ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -586,38 +681,21 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        Log.i("TAGS", response);
-                        ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject<TagsBox> r = new Gson().fromJson(response, new TypeToken<ResponseObject<TagsBox>>(){}.getType());
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
                 })
                 .addHeaderValues("user_id", user_id)
-                .start();
-    }
-
-    @Deprecated
-    //TODO -> TESTING
-    public static void uploadImage(String token, byte[] bytes, String file_type, TravanaApiCallback<ResponseObject<String>> callback) {
-
-        RequestBody rbody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("file", "image",
-                        RequestBody.create(MediaType.parse("image/png"), bytes))
-                .build();
-
-        new TravanaPOSTQuery(TravanaPOSTQuery.MESSAGES_UPLOAD_FILE, TRAVANA_API_KEY, token, rbody)
-                .setOnCompleteListener((response, statusCode, success) -> {
-
-                    if (success) {
-
-                        ResponseObject r = new Gson().fromJson(response, ResponseObject.class);
-                        callback.onComplete(r, statusCode, true);
-                    } else {
-                        callback.onComplete(null, statusCode, false);
-                    }
-                })
-                .addHeaderValues("file_type", file_type)
                 .start();
     }
 
@@ -662,8 +740,15 @@ public class TravanaAPI {
                 .setOnCompleteListener((response, statusCode, success) -> {
 
                     if (success) {
-                        ResponseObject r = new Gson().fromJson(response, ResponseObject.class);
-                        callback.onComplete(r, statusCode, true);
+
+                        try {
+
+                            ResponseObject r = new Gson().fromJson(response, ResponseObject.class);
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -683,9 +768,15 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStreamResponse);
+                        try{
 
-                        callback.onComplete(bitmap, statusCode, true);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStreamResponse);
+
+                            callback.onComplete(bitmap, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(null, statusCode, false);
+                        }
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }
@@ -708,9 +799,16 @@ public class TravanaAPI {
 
                     if (success) {
 
-                        ResponseObject<CalBusInfo[]> r = new Gson().fromJson(response, ResponseObject.class);
+                        try {
 
-                        callback.onComplete(r, statusCode, true);
+                            ResponseObject<CalBusInfo[]> r = new Gson().fromJson(response, ResponseObject.class);
+
+                            callback.onComplete(r, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(new ResponseObject(false, null, -3, "Error: during parsing response to object."), statusCode, false);
+                        }
+
                     } else {
                         callback.onComplete(null, statusCode, false);
                     }

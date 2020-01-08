@@ -54,23 +54,15 @@ public class TravanaQuery extends Thread  {
 
     public static final String UPDATES_URL = "/alerts/updates";                                     //returns needed upates and still supported verisons ex "{"lastVerison": 110,"stillSupportedVersions": 101,102,...
 
-    public static final String PLAY_STORE_LINK = "/alerts/play_store_link";                         //returns playstore update/download link ex "https://play.google.com/store/apps/details?id=com.easistent.family"
-
     public static final String MESSAGES = "/live_updates/messages";
 
     public static final String MESSAGES_REMOVE = "/live_updates/messages/remove";
-
-    public static final String MESSAGES_ADMIN = "/live_updates/messages_admin";
-
-    public static final String MESSAGES_UPDATE = "/live_updates/messages/update";                   //Messages are stored in ram, in case you have changed data directly in database, call url.
 
     public static final String MESSAGES_REMOVE_COMMENT = "/live_updates/messages/remove_comment";
 
     public static final String MESSAGES_REMOVE_COMMENT_COMMENT = "/live_updates/messages/remove_comment_comment";
 
     public static final String MESSAGES_LIKE_COMMENT_COMMENT = "/live_updates/messages/like_comment_comment";
-
-    public static final String BAN_USER = "/users/banUser";
 
     public static final String MESSAGE_LIKE = "/live_updates/like_message";
 

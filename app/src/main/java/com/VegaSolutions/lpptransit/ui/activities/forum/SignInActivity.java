@@ -12,6 +12,7 @@ import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -24,10 +25,13 @@ import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.MessageTag;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.TagsBox;
+import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObjectCommit;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
 import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
+import com.VegaSolutions.lpptransit.ui.activities.LauncherActivity;
+import com.VegaSolutions.lpptransit.ui.activities.MainActivity;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -51,10 +55,15 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
 
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+
 public class SignInActivity extends AppCompatActivity {
 
+    @BindViews({R.id.v1, R.id.v2, R.id.v3, R.id.v4}) View[] v;
+
     private static final String TAG = "SignInActivity";
-    private View[] views = new View[36];
+    //private View[] views = new View[36];
 
     private FirebaseAuth mAuth;
 
@@ -66,36 +75,23 @@ public class SignInActivity extends AppCompatActivity {
 
     private static String uidToken;
 
+    private boolean loading = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_sign_in);
+        ButterKnife.bind(this);
 
-        getwarnings();
+        createAnimation();
 
-        createCircleAnimation();
+        //getwarnings();
+
+        //createCircleAnimation();
         ImageButton back_btn = (ImageButton)findViewById(R.id.sign_in_activity_back_btn);
         back_btn.setOnClickListener(e1 -> {
             finish();
-        });
-
-        TextView help_contact_btn = (TextView) findViewById(R.id.textView5);
-        help_contact_btn.setOnClickListener(e2 ->{
-
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto", this.getString(R.string.developer_help_contact), null));
-            startActivity(Intent.createChooser(emailIntent, "Send email..."));
-
-        });
-
-        TextView help_contact_btn1 = (TextView) findViewById(R.id.textView4);
-        help_contact_btn.setOnClickListener(e3 ->{
-
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto", this.getString(R.string.developer_help_contact), null));
-            startActivity(Intent.createChooser(emailIntent, "Send email..."));
-
         });
 
         mAuth = FirebaseAuth.getInstance();
@@ -159,7 +155,6 @@ public class SignInActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        createCircleAnimation();
     }
 
     private void signInWithGoogle() {
@@ -380,15 +375,13 @@ public class SignInActivity extends AppCompatActivity {
 
                          */
 
-
+                        /*
                         MessageTag[] tags = new MessageTag[1];
                         tags[0] = new MessageTag("xyz#115678", "xyz", "#123456");
 
 
                         String[] links = new String[1];
                         links[0] = "imagetestDOomenWedDec04205001CET2019.png";
-
-                        FirebaseUser basic_user_firebase_data = FirebaseManager.getSignedUser();
 
                         LiveUpdateMessage message = new LiveUpdateMessage("sporočilo 5", tags, links);
 
@@ -400,6 +393,17 @@ public class SignInActivity extends AppCompatActivity {
                                 Log.e(TAG, "error" + statusCode1);
                             }
 
+                        });
+
+                         */
+
+                        TravanaAPI.updates(new TravanaApiCallback<ResponseObject<Update>>() {
+                            @Override
+                            public void onComplete(@Nullable ResponseObject<Update> apiResponse, int statusCode, boolean success) {
+
+                                Log.e(TAG, apiResponse + "");
+
+                            }
                         });
 
                         /*
@@ -726,8 +730,29 @@ public class SignInActivity extends AppCompatActivity {
 
     }
 
-    //--------------------------------------Animations
+    private void createAnimation(){
 
+                Animation animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(0);
+                v[0].setAnimation(animation);
+
+                animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(200);
+                v[1].setAnimation(animation);
+
+                animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(400);
+                v[2].setAnimation(animation);
+
+                animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
+                animation.setStartOffset(600);
+                v[3].setAnimation(animation);
+
+    }
+
+    //--------------------------------------Animations
+    /*
+    @Depricated
     private void initializeCircleTextViews(){
 
         views[0] = findViewById(R.id.circle1);
@@ -790,4 +815,6 @@ public class SignInActivity extends AppCompatActivity {
 
         }
     }
+
+     */
 }
