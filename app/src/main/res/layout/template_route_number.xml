@@ -19,8 +19,8 @@
         android:minEms="2"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:text="19"
         android:textAlignment="center"
         android:textColor="?backgroundViewColor"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:textStyle="bold" />
 </FrameLayout>

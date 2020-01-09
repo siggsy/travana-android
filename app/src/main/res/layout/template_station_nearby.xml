@@ -58,8 +58,9 @@
             android:paddingEnd="8dp"
             android:paddingBottom="4dp"
             android:text="@string/into_center"
-            android:textColor="@android:color/white"
-            android:textSize="12sp" />
+            android:textColor="?backgroundViewColor"
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/station_nearby_distance"

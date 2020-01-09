@@ -37,12 +37,14 @@ public class DepartureActivity extends AppCompatActivity {
     public static final String STATION_NAME = "station_name";
     public static final String ROUTE_NUMBER = "route_number";
     public static final String ROUTE_NAME = "route_name";
+    public static final String ROUTE_GARAGE = "route_garage";
 
     // Activity parameters
     private String station_code;
     private String station_name;
     private String route_number;
     private String route_name;
+    private boolean route_garage;
 
     // Activity UI elements
     @BindView(R.id.departure_route_name) TextView routeName;
@@ -80,9 +82,12 @@ public class DepartureActivity extends AppCompatActivity {
         station_name = getIntent().getStringExtra(STATION_NAME);
         route_number = getIntent().getStringExtra(ROUTE_NUMBER);
         route_name = getIntent().getStringExtra(ROUTE_NAME);
+        route_garage = getIntent().getBooleanExtra(ROUTE_GARAGE, false);
 
         // Set UI elements
-        routeName.setText(route_name);
+        if (route_garage)
+            route_name += " (" + getString(R.string.garage).toUpperCase() + ")";
+        routeName.setText(route_name );
         routeNumber.setText(route_number);
         routeNumber.setTextSize(16f);
         stationName.setText(station_name);

@@ -7,6 +7,7 @@ public class RouteOnStation {
     private String route_number;
     private String route_name;
     private String route_group_name;
+    private boolean is_garage;
 
 
     public String getTrip_id() {
@@ -29,4 +30,7 @@ public class RouteOnStation {
         return route_group_name;
     }
 
+    public boolean isGarage() {
+        return is_garage;
+    }
 }

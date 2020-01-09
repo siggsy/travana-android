@@ -203,7 +203,7 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.name.setText(route.name);
             viewHolder.number.setText(route.arrivalObject.getRoute_name());
             viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRoute_name()));
-            viewHolder.favourite.setImageDrawable(context.getDrawable(route.favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
+            viewHolder.favourite.setImageDrawable(context.getDrawable(route.favourite? R.drawable.ic_bookmark_24px : R.drawable.ic_bookmark_border_24px));
             viewHolder.route.setOnClickListener(v -> {
                 Intent i = new Intent(context, RouteActivity.class);
                 i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
@@ -219,7 +219,7 @@ public class LiveArrivalFragment extends Fragment {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(route.arrivalObject.getRoute_id(), !route.favourite);
                 route.favourite= !route.favourite;
-                viewHolder.favourite.setImageDrawable(getResources().getDrawable(route.favourite? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
+                viewHolder.favourite.setImageDrawable(getResources().getDrawable(route.favourite? R.drawable.ic_bookmark_24px : R.drawable.ic_bookmark_border_24px));
                 editor.apply();
             });
 
@@ -242,7 +242,6 @@ public class LiveArrivalFragment extends Fragment {
                 back.getBackground().setTint(backColor);
 
                 // (0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
-
                 switch (arrival.getType()) {
                     case 0:
                         arrival_event_icon.setVisibility(View.VISIBLE);

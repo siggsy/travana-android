@@ -75,4 +75,10 @@
     <string name="alert_cancel_button">Prekliči</string>
     <string name="alert_ok_button">Vredu</string>
 
+    <string name="privacy_policy_content">
+        <![CDATA[
+        <p>Z prijavo se strinjate z<a href="https://travana.si/pogoji_uporabe">Pogoji uporabe</a> in <a href="https://travana.si/politika_zasebnosti">Politiko Zasebnosti</a></p>
+        ]]>
+        </string>
+
 </resources>

@@ -77,12 +77,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
     private ClusterManager<StationMarker> clusterManager;
 
-    // Map updater
-    private ApiCallback<List<Station>> callback = (apiResponse, statusCode, success) -> {
-        if (success) onStationsUpdated(apiResponse.getData(), true, statusCode);
-        else onStationsUpdated(null, false, statusCode);
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +122,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         // Switch bottom sheet fragment.
         switchFragment(StationsFragment.newInstance());
 
+        // Notify user about updates.
         TravanaAPI.updates((apiResponse, statusCode, success) -> runOnUiThread(() -> {
             if (success && apiResponse.isSuccess()) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
@@ -135,9 +130,19 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
                 int cV = BuildConfig.VERSION_CODE;
 
-                if (apiResponse.getData().getLast_version() == cV)
+                // Clear notified flag from updates, if current version latest;
+                if (apiResponse.getData().getLast_version() == cV) {
+                    getSharedPreferences("notifications", MODE_PRIVATE).edit().putBoolean("update", false).apply();
+                    return;
+                }
+
+                boolean notified = getSharedPreferences("notifications", MODE_PRIVATE).getBoolean("update", false);
+
+                // Return if this update was already shown
+                if (notified)
                     return;
 
+                getSharedPreferences("notifications", MODE_PRIVATE).edit().putBoolean("update", true).apply();
 
                 boolean supported = false;
                 for (int a : apiResponse.getData().getStill_supported_versions())
@@ -168,12 +173,22 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
             }
         }));
 
+        // Show user a warning
         TravanaAPI.warning((apiResponse, statusCode, success) -> runOnUiThread(() -> {
-            Log.i("warning", apiResponse + "");
             if (success && apiResponse.isSuccess()) {
 
                 if (apiResponse.getData() == null)
                     return;
+
+                String previous = getSharedPreferences("notifications", MODE_PRIVATE).getString("warning", "");
+
+                Log.i("saved", previous + " previous");
+                Log.i("current", apiResponse.getData().get_id() + " current");
+
+                if (previous.equals(apiResponse.getData().get_id()))
+                    return;
+
+                getSharedPreferences("notifications", MODE_PRIVATE).edit().putString("warning", apiResponse.getData().get_id()).apply();
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
                 builder.setTitle(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getTitle_slo() : apiResponse.getData().getTitle_en());
@@ -182,6 +197,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 builder.setPositiveButton(R.string.alert_ok_button, (dialog, which) -> dialog.cancel());
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
+
             }
         }));
 

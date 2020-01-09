@@ -169,20 +169,21 @@ public class PostActivity extends AppCompatActivity {
 
         // Comment on the post
         newCommentPost.setOnClickListener(v -> {
-            newCommentPost.setOnClickListener(null);
             if (newComment.getText().length() == 0)
                 return;
-            newComment.setText("");
+            newCommentPost.setOnClickListener(null);
+            String content = newComment.getText().toString();
             FirebaseManager.getFirebaseToken((data, error, success) -> {
                 if (!success)
                     return;
-                TravanaAPI.addComment(data, message.get_id(), new LiveUpdateComment(newComment.getText().toString()), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                TravanaAPI.addComment(data, message.get_id(), new LiveUpdateComment(content), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
                     if (success1 && apiResponse.isSuccess()) {
                          new CustomToast(this).showCheck();
                         newComment.setText("");
                         TravanaAPI.messageid(id, data, (apiResponse1, statusCode1, success2) -> runOnUiThread(() -> {
                             if (success2 && apiResponse1.isSuccess()) {
                                 updateUI(apiResponse1.getData());
+                                newComment.setText("");
                             } else {
                                 if (!success2)
                                     new CustomToast(this).showDefault(statusCode1);

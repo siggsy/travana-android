@@ -166,7 +166,11 @@ public class RoutesOnStationFragment extends Fragment {
             RouteOnStation route = routes.get(position);
 
             // Set route name and number
-            holder.name.setText(route.getRoute_group_name());
+
+            String name = route.getRoute_group_name();
+            if (route.isGarage())
+                name += " (" + getString(R.string.garage).toUpperCase() + ")";
+            holder.name.setText(name);
             holder.number.setText(route.getRoute_number());
 
             // Set route color
@@ -179,6 +183,7 @@ public class RoutesOnStationFragment extends Fragment {
                 intent.putExtra(DepartureActivity.ROUTE_NUMBER, route.getRoute_number());
                 intent.putExtra(DepartureActivity.STATION_NAME, stationName);
                 intent.putExtra(DepartureActivity.STATION_CODE, stationId);
+                intent.putExtra(DepartureActivity.ROUTE_GARAGE, route.isGarage());
                 startActivity(intent);
             });
 

@@ -10,8 +10,6 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;

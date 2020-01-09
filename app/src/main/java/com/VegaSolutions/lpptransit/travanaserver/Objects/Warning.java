@@ -2,10 +2,15 @@ package com.VegaSolutions.lpptransit.travanaserver.Objects;
 
 public class Warning {
 
+    private String _id;
     private String title_en;
     private String title_slo;
     private String content_en;
     private String content_slo;
+
+    public String get_id() {
+        return _id;
+    }
 
     public String getTitle_en() {
         return title_en;

@@ -569,7 +569,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    With loging to this application you agree with
+    <TextView
+        android:id="@+id/privacy_policy"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="@+id/google_btn"
+        app:layout_constraintStart_toStartOf="@+id/google_btn"
+        app:layout_constraintTop_toBottomOf="@+id/google_btn" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

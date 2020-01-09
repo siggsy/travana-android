@@ -10,6 +10,8 @@ import android.icu.lang.UCharacter;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -55,12 +57,14 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.Arrays;
 
+import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 public class SignInActivity extends AppCompatActivity {
 
     @BindViews({R.id.v1, R.id.v2, R.id.v3, R.id.v4}) View[] v;
+    @BindView(R.id.privacy_policy) TextView privacy;
 
     private static final String TAG = "SignInActivity";
     //private View[] views = new View[36];
@@ -83,6 +87,9 @@ public class SignInActivity extends AppCompatActivity {
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_sign_in);
         ButterKnife.bind(this);
+
+        privacy.setText(Html.fromHtml(getString(R.string.privacy_policy_content)));
+        privacy.setMovementMethod(LinkMovementMethod.getInstance());
 
         createAnimation();
 
