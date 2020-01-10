@@ -40,19 +40,34 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private List<MessageTag> tagList = new ArrayList<>();
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+        setContentView(R.layout.activity_new_message);
+        ButterKnife.bind(this);
+
+        setupUI();
+
+    }
 
     private void setupUI() {
 
+        // Set back button to close activity.
         back.setOnClickListener(v -> onBackPressed());
+
+        // Set post button to post message.
         post.setOnClickListener(v -> FirebaseManager.getFirebaseToken((data, error, success) -> {
+
             if (success) {
 
+                // Show error if message is to short.
                 if (messageContent.getText().length() < 3) {
                     runOnUiThread(() -> new CustomToast(this).showStringError(getString(R.string.msg_content_error)));
                     return;
                 }
 
-                // TODO: implement pictures (probably redundant).
+                // Create message and post it.
                 LiveUpdateMessage message = new LiveUpdateMessage(messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
                 TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
                     if (success1 && apiResponse.isSuccess()) {
@@ -66,7 +81,7 @@ public class NewMessageActivity extends AppCompatActivity {
             }
         }));
 
-        // To add a tag
+        // Set add tag button.
         add.setOnClickListener(v -> {
             if (tagList.size() >= 3) {
                 new CustomToast(NewMessageActivity.this).showStringError(getString(R.string.too_many_tags_error));
@@ -75,23 +90,17 @@ public class NewMessageActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
-        setContentView(R.layout.activity_new_message);
-        ButterKnife.bind(this);
 
-        setupUI();
-
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Add a tag to the tag list
+        // Add a tag to the tag list.
         if (resultCode == TagsActivity.SELECTED) {
+
+            if (data == null)
+                return;
 
             MessageTag tag = data.getParcelableExtra("TAG");
 

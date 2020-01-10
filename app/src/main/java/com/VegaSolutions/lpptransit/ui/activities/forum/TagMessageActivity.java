@@ -49,10 +49,11 @@ public class TagMessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tag_message);
         ButterKnife.bind(this);
 
+        // Get tag name and id.
         String tagId = getIntent().getStringExtra(TAG_ID);
         String tagName = getIntent().getStringExtra(TAG_NAME);
 
-
+        // Set message list and adapter.
         adapter = new PostListFragment.Adapter(this, rv);
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -63,36 +64,34 @@ public class TagMessageActivity extends AppCompatActivity {
                 header.setSelected(recyclerView.canScrollVertically(-1));
             }
         });
+
+
         title.setText("#" + tagName);
 
+        // Call the correct method if user is signed in.
         if (FirebaseManager.isSignedIn())
             FirebaseManager.getFirebaseToken((data, error, success) -> {
                 if (success) {
-                    TravanaAPI.messagesByTagMeta(data, tagId, (apiResponse, statusCode, success1) -> {
-                        if (success && apiResponse.isSuccess()) {
-                            runOnUiThread(() -> {
-                                adapter.setMessages(apiResponse.getData());
-                                adapter.notifyDataSetChanged();
-                            });
-                            Log.i("TagMesageActivity", "success");
+                    TravanaAPI.messagesByTagMeta(data, tagId, (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
+                        if (success1 && apiResponse.isSuccess()) {
+                            adapter.setMessages(apiResponse.getData());
+                            adapter.notifyDataSetChanged();
                         } else {
-                            if (!success) new CustomToast(this).showDefault(statusCode);
+                            if (!success1) new CustomToast(this).showDefault(statusCode);
                             else new CustomToast(this).showDefault(apiResponse.getResponse_code());
                         }
-                    });
+                    }));
                 }
             });
-        else TravanaAPI.messagesByTagMeta(tagId, (apiResponse, statusCode, success) -> {
-            if (success && apiResponse.isSuccess())
-                runOnUiThread(() -> {
-                    adapter.setMessages(apiResponse.getData());
-                    adapter.notifyDataSetChanged();
-                });
-            else {
+        else TravanaAPI.messagesByTagMeta(tagId, (apiResponse, statusCode, success) -> runOnUiThread(() -> {
+            if (success && apiResponse.isSuccess()) {
+                adapter.setMessages(apiResponse.getData());
+                adapter.notifyDataSetChanged();
+            } else {
                 if (!success) new CustomToast(this).showDefault(statusCode);
                 else new CustomToast(this).showDefault(apiResponse.getResponse_code());
             }
-        });
+        }));
 
     }
 }

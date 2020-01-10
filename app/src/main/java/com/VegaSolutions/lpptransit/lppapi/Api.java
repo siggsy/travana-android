@@ -23,7 +23,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Bus>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Bus>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -36,7 +36,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<Bus> data = new Gson().fromJson(response, new TypeToken<ApiResponse<Bus>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -47,7 +47,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Bus>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Bus>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -59,7 +59,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<BusOnRoute>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<BusOnRoute>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -70,7 +70,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Route>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Route>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -81,7 +81,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Route>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Route>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -93,7 +93,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Route>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Route>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -105,7 +105,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<StationOnRoute>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<StationOnRoute>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -118,7 +118,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<ArrivalWrapper> data = new Gson().fromJson(response, new TypeToken<ApiResponse<ArrivalWrapper>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -130,7 +130,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<RouteOnStation>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<RouteOnStation>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -143,7 +143,7 @@ public class Api {
                     .setOnCompleteListener((response, statusCode, success) -> {
                         if (success) {
                             ApiResponse<Station> data = new Gson().fromJson(response, new TypeToken<ApiResponse<Station>>(){}.getType());
-                            callback.onComplete(data, statusCode, true);
+                            callback.onComplete(data, statusCode, data != null);
                         } else callback.onComplete(null, statusCode, false);
                     })
                     .start();
@@ -155,7 +155,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<List<Station>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<Station>>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();
@@ -169,7 +169,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<TimetableWrapper> data = new Gson().fromJson(response, new TypeToken<ApiResponse<TimetableWrapper>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 });
         for (int gnum : route_group_numbers)
@@ -185,7 +185,7 @@ public class Api {
                 .setOnCompleteListener((response, statusCode, success) -> {
                     if (success) {
                         ApiResponse<DepartureWrapper> data = new Gson().fromJson(response, new TypeToken<ApiResponse<DepartureWrapper>>(){}.getType());
-                        callback.onComplete(data, statusCode, true);
+                        callback.onComplete(data, statusCode, data != null);
                     } else callback.onComplete(null, statusCode, false);
                 })
                 .start();

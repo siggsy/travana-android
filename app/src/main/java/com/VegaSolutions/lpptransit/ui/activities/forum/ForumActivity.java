@@ -41,27 +41,6 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
     ElevationAnimation elevationAnimation;
     ViewPagerAdapter adapter;
 
-
-    private void setupUI() {
-
-        elevationAnimation = new ElevationAnimation(header, 16);
-
-        adapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-
-        newMessage.setOnClickListener(v -> {
-            if (FirebaseManager.isSignedIn())
-                startActivity(new Intent(this, NewMessageActivity.class));
-            else showSignIn();
-        });
-
-        final Intent tagSearch = new Intent(this, TagsActivity.class);
-        tagSearch.putExtra("TYPE", TagsActivity.TYPE_NORMAL);
-        searchButton.setOnClickListener(v -> startActivity(tagSearch));
-
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,22 +52,36 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
 
     }
 
-    private void showSignIn() {
-        Snackbar snack = Snackbar
-                .make(viewPager, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
-                .setAction(R.string.sign_in_text, v -> startActivity(new Intent(this, SignInActivity.class)));
-        View view = snack.getView();
-        TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
-        tv.setTextColor(Color.WHITE);
-        snack.show();
+    private void setupUI() {
+
+        // Header elevator
+        elevationAnimation = new ElevationAnimation(header, 16);
+
+        // Set adapter for displaying messages.
+        adapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+
+        // Start activity for creating a new post/message.
+        newMessage.setOnClickListener(v -> {
+            if (FirebaseManager.isSignedIn())
+                startActivity(new Intent(this, NewMessageActivity.class));
+            else showSignIn();
+        });
+
+        // Start activity for tag search
+        final Intent tagSearch = new Intent(this, TagsActivity.class);
+        tagSearch.putExtra("TYPE", TagsActivity.TYPE_NORMAL);
+        searchButton.setOnClickListener(v -> startActivity(tagSearch));
+
     }
 
     @Override
     public void onHeaderChanged(boolean selected) {
+        // Toggle message button and animate header
         newMessage.setVisibility(selected ? View.GONE : View.VISIBLE);
         elevationAnimation.elevate(selected);
     }
-
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
 
@@ -116,6 +109,19 @@ public class ForumActivity extends AppCompatActivity implements FragmentHeaderCa
             }
             return super.getPageTitle(position);
         }
+    }
+
+    /**
+     * Show Snackbar with sign in button
+     */
+    private void showSignIn() {
+        Snackbar snack = Snackbar
+                .make(viewPager, R.string.sign_in_alert, BaseTransientBottomBar.LENGTH_LONG)
+                .setAction(R.string.sign_in_text, v -> startActivity(new Intent(this, SignInActivity.class)));
+        View view = snack.getView();
+        TextView tv = view.findViewById(com.google.android.material.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+        snack.show();
     }
 
 }

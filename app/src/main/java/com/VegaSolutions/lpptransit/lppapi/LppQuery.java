@@ -74,14 +74,14 @@ public class LppQuery extends Thread {
      * @param value the value
      * @return current instance for chaining
      */
-    public LppQuery addParams(@NonNull String key, @NonNull String value) {
+    LppQuery addParams(@NonNull String key, @NonNull String value) {
         if (params.length() == 0) params.append("?");
         else params.append("&");
         params.append(key).append('=').append(value);
         return this;
     }
 
-    public LppQuery setOnCompleteListener(@NonNull LppQuery.OnCompleteListener onCompleteListener) {
+    LppQuery setOnCompleteListener(@NonNull LppQuery.OnCompleteListener onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
         return this;
     }
@@ -90,7 +90,7 @@ public class LppQuery extends Thread {
     public void run() {
 
             try {
-                Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(20000).execute(); //.header("apikey", BuildConfig.LPP_API_KEY)
+                Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(20000).execute();
                 Log.i(TAG, r.body());
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
             } catch (HttpStatusException e) {

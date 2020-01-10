@@ -86,8 +86,9 @@
 
     <string name="privacy_policy_content">
         <![CDATA[
-        <p>By logging in you agree with <a href="https://travana.si/pogoji_uporabe">Terms of service</a> and <a href="https://travana.si/politika_zasebnosti">Privacy Policy</a></p>
+        <p>By logging in you agree with <a href="https://travana.si/pogoji_uporabe">Terms of service</a> and <a href="https://travana.si/politika_zasebnosti">Privacy Policy</a>.</p>
         ]]>
         </string>
+    <string name="departures">TIMETABLE</string>
 
 </resources>

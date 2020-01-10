@@ -106,10 +106,10 @@ public class PostActivity extends AppCompatActivity {
     void updateUI(LiveUpdateMessage message) {
 
 
-        // Set name
+        // Set name.
         name.setText(message.getUser().getName());
 
-        // Set tag
+        // Set tag.
         UserTag uTag = message.getUser().getTag();
         if (uTag != null && !uTag.getTag().equals("")) {
             tag.setVisibility(View.VISIBLE);
@@ -117,11 +117,10 @@ public class PostActivity extends AppCompatActivity {
             tag.getBackground().setTint(Color.parseColor(uTag.getColor()));
         } else tag.setVisibility(View.GONE);
 
-        // Set content
+        // Set content.
         content.setText(message.getMessage_content());
 
-        // Set photos
-
+        // Set photos.
         String[] photos = message.getPhotos_ids();
         if (photos != null && photos.length != 0) {
             pictureContainer.setVisibility(View.VISIBLE);
@@ -137,7 +136,7 @@ public class PostActivity extends AppCompatActivity {
             }
         } else pictureContainer.setVisibility(View.GONE);
 
-        // Set message tags
+        // Set message tags.
         MessageTag[] messageTags = message.getTags();
         if (messageTags.length != 0) {
             mTags.removeAllViews();
@@ -158,16 +157,17 @@ public class PostActivity extends AppCompatActivity {
             }
         }
 
+        // Set comment count.
         commentCount.setText(getString(R.string.post_comments, message.comments.size()));
 
-        // Load user image
+        // Load user image.
         TravanaAPI.getUserImage(message.getUser().getUser_photo_url(), (bitmap, statusCode, success) -> runOnUiThread(() -> {
              if (success)
                  userImage.setImageBitmap(bitmap);
              else new CustomToast(this).showDefault(statusCode);
          }));
 
-        // Comment on the post
+        // Comment on the post.
         newCommentPost.setOnClickListener(v -> {
             if (newComment.getText().length() == 0)
                 return;
@@ -200,7 +200,7 @@ public class PostActivity extends AppCompatActivity {
         });
 
 
-        // Load comments on the list
+        // Load comments on the list.
         Adapter adapter = new Adapter(this, message.comments.toArray(new LiveUpdateComment[0]));
         comments.setAdapter(adapter);
 
@@ -219,9 +219,11 @@ public class PostActivity extends AppCompatActivity {
 
             LiveUpdateComment comment = getItem(position);
 
+            // Inflate new if empty.
             if (convertView == null)
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.template_comment, parent, false);
 
+            // Get references.
             TextView name = convertView.findViewById(R.id.user_name);
             TextView tag = convertView.findViewById(R.id.user_tag);
             TextView timeAgo = convertView.findViewById(R.id.posted_time);
@@ -230,11 +232,18 @@ public class PostActivity extends AppCompatActivity {
             TextView likes = convertView.findViewById(R.id.post_likes);
             ImageView likeImage = convertView.findViewById(R.id.post_like_image);
 
+            // Set name.
             name.setText(comment.getUser().getName());
+
+            // Set user tag as a colored circle
             if (comment.getUser().getTag() != null)
                 tag.getBackground().setTint(Color.parseColor(comment.getUser().getTag().getColor()));
             else tag.getBackground().setTint(Color.TRANSPARENT);
+
+            // Set time posted.
             timeAgo.setText(comment.getTime_ago());
+
+            // Set comment content and reply count.
             content.setText(comment.getComment_content());
             if (comment.getSubcomments() != null) {
                 replies.setText(getString(R.string.comment_replies, comment.getSubcomments().length));
@@ -242,48 +251,43 @@ public class PostActivity extends AppCompatActivity {
                     replies.setVisibility(View.VISIBLE);
                 else replies.setVisibility(View.GONE);
             } else replies.setVisibility(View.GONE);
+
+            // Set like count.
             likes.setText("" + comment.getLikes());
             likeImage.setColorFilter(comment.isLiked() ? ContextCompat.getColor(PostActivity.this, R.color.colorAccent) : ViewGroupUtils.isDarkTheme(PostActivity.this) ? Color.WHITE : Color.BLACK);
 
 
+            // Set like button event.
             likeImage.setOnClickListener(v -> {
 
+                // Ignore if user is not signed in.
                 if (!FirebaseManager.isSignedIn()) {
                     showSignIn();
                     return;
                 }
 
-                if (!comment.isLiked()) {
+                // Set liked boolean and view.
+                if (!comment.isLiked())
                     setLiked(true, comment, likeImage);
-                } else {
-                    setLiked(false, comment, likeImage);
-                }
+                else setLiked(false, comment, likeImage);
+
+                // Get token and refresh UI.
                 FirebaseManager.getFirebaseToken((data, error, success) -> {
                     if (success) {
-                        TravanaAPI.likeComment(data, comment.getComment_id(), comment.isLiked(), (apiResponse, statusCode, success1) -> {
+                        TravanaAPI.likeComment(data, comment.getComment_id(), comment.isLiked(), (apiResponse, statusCode, success1) -> runOnUiThread(() -> {
                             Log.i("Liked",  apiResponse + " " + statusCode);
                             if (success1 && apiResponse.isSuccess()) {
-                                runOnUiThread(() -> {
-                                    CustomToast customToast = new CustomToast(getContext());
-                                    customToast.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-                                    customToast.setIconColor(Color.WHITE);
-                                    customToast.setTextColor(Color.WHITE);
-                                    customToast.setText("");
-                                    customToast.setIcon(ContextCompat.getDrawable(getContext(), R.drawable.ic_check_black_24dp));
-                                    customToast.show(Toast.LENGTH_SHORT);
-                                    comment.setLikes(comment.isLiked() ? (comment.getLikes() + 1) : (comment.getLikes() - 1));
-                                    likes.setText(comment.getLikes() + "");
-                                });
+                                new CustomToast(getContext()).showCheck();
+                                comment.setLikes(comment.isLiked() ? (comment.getLikes() + 1) : (comment.getLikes() - 1));
+                                likes.setText(comment.getLikes() + "");
                             } else {
-                                runOnUiThread(() -> {
-                                    if (!success1)
-                                        new CustomToast(PostActivity.this).showDefault(statusCode);
-                                    else new CustomToast(PostActivity.this).showStringError(apiResponse.getInternal_error());
-                                    setLiked(!comment.isLiked(), comment, likeImage);
-                                    likes.setText(comment.getLikes() + "");
-                                });
+                                if (!success1)
+                                    new CustomToast(PostActivity.this).showDefault(statusCode);
+                                else new CustomToast(PostActivity.this).showStringError(apiResponse.getInternal_error());
+                                setLiked(!comment.isLiked(), comment, likeImage);
+                                likes.setText(comment.getLikes() + "");
                             }
-                        });
+                        }));
                     }
                 });
             });
@@ -292,7 +296,9 @@ public class PostActivity extends AppCompatActivity {
 
         }
 
-        void setLiked(boolean value, LiveUpdateComment comment, ImageView likeContainer) {
+        private void setLiked(boolean value, LiveUpdateComment comment, ImageView likeContainer) {
+
+            // Update UI and LiveUpdateComment object.
             if (value) {
                 likeContainer.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent));
                 comment.setLiked(true);
@@ -303,6 +309,7 @@ public class PostActivity extends AppCompatActivity {
             }
         }
     }
+
 
     private void showSignIn() {
         Snackbar snack = Snackbar

@@ -40,9 +40,11 @@
             android:background="@android:color/transparent"
             android:minWidth="24dp"
             android:minHeight="24dp"
-            android:padding="4dp"
+            android:paddingStart="4dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="4dp"
             android:src="@drawable/ic_bookmark_border_24px"
-            android:tint="?android:textColor"/>
+            android:tint="?android:textColor" />
     </LinearLayout>
 
     <com.google.android.flexbox.FlexboxLayout

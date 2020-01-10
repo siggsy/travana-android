@@ -10,6 +10,7 @@ import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 
+import com.VegaSolutions.lpptransit.BuildConfig;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.CalBusInfo;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateComment;
 import com.VegaSolutions.lpptransit.travanaserver.Objects.LiveUpdateMessage;
@@ -35,7 +36,7 @@ import okhttp3.RequestBody;
 public class TravanaAPI {
 
     private static String TAG = "TravanaAPI";
-    private static String TRAVANA_API_KEY = "mlrX6m18wsmb8UF9dQd0wcYxhE47UyYc";
+    private static String TRAVANA_API_KEY = BuildConfig.TRAVANA_API_KEY;
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
