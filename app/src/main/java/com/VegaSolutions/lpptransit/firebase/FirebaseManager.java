@@ -52,7 +52,15 @@ public class FirebaseManager {
                         Log.e(TAG, task.getException().getMessage());
                     }
                 });
+    }
 
+    /**
+     * sign out firebase user
+     */
+
+    public static void signOut(){
+
+        FirebaseAuth.getInstance().signOut();
 
     }
 

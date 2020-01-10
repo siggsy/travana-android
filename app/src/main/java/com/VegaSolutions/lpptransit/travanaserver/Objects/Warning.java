@@ -31,7 +31,8 @@ public class Warning {
     @Override
     public String toString() {
         return "Warning{" +
-                "title_en='" + title_en + '\'' +
+                "_id='" + _id + '\'' +
+                ", title_en='" + title_en + '\'' +
                 ", title_slo='" + title_slo + '\'' +
                 ", content_en='" + content_en + '\'' +
                 ", content_slo='" + content_slo + '\'' +

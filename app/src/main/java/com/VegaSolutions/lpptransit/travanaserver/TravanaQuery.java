@@ -42,7 +42,7 @@ public class TravanaQuery extends Thread  {
 
     //public static final String SERVER_IP_ADDRESS = "193.77.85.172:8443";
 
-    //public static final String SERVER_IP_ADDRESS = "192.168.1.11:8081";
+    //public static final String SERVER_IP_ADDRESS = "192.168.1.14:8081";
 
     public static final String SERVER_IP_ADDRESS = "travana.si:8443";
 
