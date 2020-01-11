@@ -133,10 +133,10 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     @Override
     public void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
+
         callback.onHeaderChanged(list.canScrollVertically(-1));
         if (stations != null) {
-            if (type == TYPE_FAVOURITE) setFavouriteStations(stations);
+            if (type == TYPE_FAVOURITE) { adapter.notifyDataSetChanged(); setFavouriteStations(stations); }
             else if (locationManager != null) updateLocationList(locationManager.getLatest());
         }
         if (type == TYPE_NEARBY && locationManager != null && !locationManager.isMainProviderEnabled()) {
