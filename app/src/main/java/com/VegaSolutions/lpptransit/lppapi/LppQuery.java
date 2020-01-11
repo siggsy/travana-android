@@ -41,6 +41,7 @@ public class LppQuery extends Thread {
     public static final String ACTIVE_ROUTES = "/route/active-routes";              //
     public static final String ROUTES = "/route/routes";                            // (?route-id=A48D5D5E-1A10-4616-86BE-65B059E0A371)
     public static final String STATIONS_ON_ROUTE = "/route/stations-on-route";      // (?trip-id=A3295EA8-3404-4D34-9C6A-1604EFD15E40)
+    public static final String ARRIVALS_ON_ROUTE = "/route/arrivals-on-route";      // (?trip-id=A3295EA8-3404-4D34-9C6A-1604EFD15E40)
 
     // Station
     public static final String ARRIVAL = "/station/arrival";                        // (!station-code=600011)

@@ -156,7 +156,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                         i.setData(Uri.parse(apiResponse.getData().getPlay_store_link()));
                         startActivity(i);
                     });
-                } else {
+                    builder.setNegativeButton(R.string.alert_cancel_button, (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+                } else if (cV < apiResponse.getData().getLast_version()) {
                     builder.setMessage(R.string.alert_update_urgent);
                     builder.setCancelable(false);
                     builder.setPositiveButton(R.string.alert_update_button, (dialog, which) -> {
@@ -165,7 +168,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                         startActivity(i);
                         finish();
                     });
-                }
+                } else return;
+
 
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();

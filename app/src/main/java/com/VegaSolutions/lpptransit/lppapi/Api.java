@@ -1,6 +1,7 @@
 package com.VegaSolutions.lpptransit.lppapi;
 
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
@@ -110,6 +111,18 @@ public class Api {
                 })
                 .start();
 
+    }
+
+    public static void arrivalsOnRoute(String trip_id, ApiCallback<List<ArrivalOnRoute>> callback) {
+        new LppQuery(LppQuery.ARRIVALS_ON_ROUTE)
+                .addParams("trip-id", trip_id)
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+                        ApiResponse<List<ArrivalOnRoute>> data = new Gson().fromJson(response, new TypeToken<ApiResponse<List<ArrivalOnRoute>>>(){}.getType());
+                        callback.onComplete(data, statusCode, data != null);
+                    } else callback.onComplete(null, statusCode, false);
+                })
+                .start();
     }
 
     public static void arrival(String station_code, ApiCallback<ArrivalWrapper> callback) {

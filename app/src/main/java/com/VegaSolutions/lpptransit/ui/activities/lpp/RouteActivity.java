@@ -5,10 +5,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -24,6 +27,8 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
@@ -37,6 +42,7 @@ import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -49,9 +55,13 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.maps.android.ui.IconGenerator;
 
+import org.joda.time.DateTime;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -95,6 +105,10 @@ public class RouteActivity extends MapFragmentActivity {
     private MarkerOptions busOptions;
     private MarkerOptions stationOptions;
 
+    private boolean hour;
+    private int backColor;
+    private int color;
+
     // Bus updater query
     private ApiCallback<List<BusOnRoute>> busQuery = new ApiCallback<List<BusOnRoute>>() {
         @Override
@@ -125,10 +139,10 @@ public class RouteActivity extends MapFragmentActivity {
     private Runnable runnable = () -> Api.busesOnRoute(routeNumber, busQuery);
 
     // Stations on route query
-    private ApiCallback<List<StationOnRoute>> callback = (apiResponse, statusCode, success) -> {
+    private ApiCallback<List<ArrivalOnRoute>> callback = (apiResponse, statusCode, success) -> {
 
         if (success) {
-            List<StationOnRoute> stationsOnRoute = apiResponse.getData();
+            List<ArrivalOnRoute> stationsOnRoute = apiResponse.getData();
 
             // Sort stations.
             Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
@@ -199,7 +213,7 @@ public class RouteActivity extends MapFragmentActivity {
         routeLoading.setErrorIconColor(Color.WHITE);
         routeLoading.setRefreshClickEvent(vi -> {
             routeLoading.showLoading(true);
-            Api.stationsOnRoute(tripId, callback);
+            Api.arrivalsOnRoute(tripId, callback);
         });
         name.setText(routeName);
         name.setSelected(true);
@@ -274,6 +288,9 @@ public class RouteActivity extends MapFragmentActivity {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+        hour = sharedPreferences.getBoolean("hour", false);
+
         // Get activity parameters
         routeName = getIntent().getStringExtra(ROUTE_NAME);
         routeNumber = getIntent().getStringExtra(ROUTE_NUMBER);
@@ -286,6 +303,12 @@ public class RouteActivity extends MapFragmentActivity {
 
 
         behavior = BottomSheetBehavior.from(bottomSheet);
+
+        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
+        TypedArray array = obtainStyledAttributes(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
+        backColor = array.getColor(1, Color.WHITE);
+        color = ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK;
+        array.recycle();
 
         setupUI();
 
@@ -350,16 +373,16 @@ public class RouteActivity extends MapFragmentActivity {
         }));
 
         // Query stations on route and display them on the map.
-        Api.stationsOnRoute(tripId, callback);
+        Api.arrivalsOnRoute(tripId, callback);
 
     }
 
     class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
 
-        List<StationOnRoute> stationsOnRoute = new ArrayList<>();
+        List<ArrivalOnRoute> stationsOnRoute = new ArrayList<>();
 
-        public void setStationsOnRoute(List<StationOnRoute> stationsOnRoute) {
+        public void setStationsOnRoute(List<ArrivalOnRoute> stationsOnRoute) {
             this.stationsOnRoute = stationsOnRoute;
         }
 
@@ -372,7 +395,7 @@ public class RouteActivity extends MapFragmentActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-            StationOnRoute station = stationsOnRoute.get(position);
+            ArrivalOnRoute station = stationsOnRoute.get(position);
 
             // Get line color
             int color = Colors.getColorFromString(routeNumber);
@@ -393,7 +416,7 @@ public class RouteActivity extends MapFragmentActivity {
                 params.height = 64;
                 params.width = 64;
             } else {
-                holder.name.setTypeface(null, Typeface.NORMAL);
+                holder.name.setTypeface(null, Typeface.BOLD);
                 holder.name.setTextSize(14f);
                 params.height = 32;
                 params.width = 32;
@@ -414,6 +437,56 @@ public class RouteActivity extends MapFragmentActivity {
                 } else runOnUiThread(() -> new CustomToast(RouteActivity.this).showDefault(statusCode));
             }));
 
+            holder.liveArrivals.removeAllViews();
+            List<ArrivalOnRoute.Arrival> arrivals = station.getArrivals();
+            int size = arrivals.size() <= 2 ? arrivals.size() : 2;
+            if (size != 0)
+                for (int i = 0; i < size; i++) {
+                    ArrivalOnRoute.Arrival arrival = arrivals.get(i);
+
+                    // Inflate view
+                    View v = getLayoutInflater().inflate(R.layout.template_live_arrival_special, holder.liveArrivals, false);
+                    TextView arrival_time = v.findViewById(R.id.arrival_time_time);
+                    View back = v.findViewById(R.id.arrival_time_back);
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+                    // Set preferred time format
+                    arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
+                    arrival_time.setTextColor(RouteActivity.this.color);
+                    back.getBackground().setTint(backColor);
+
+                    // (0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
+                    switch (arrival.getType()) {
+                        case 0:
+                            break;
+                        case 2:
+                            arrival_time.setText(getString(R.string.arrival).toUpperCase());
+                            break;
+                        case 3:
+                            arrival_time.setText(getString(R.string.detour).toUpperCase());
+                            break;
+                    }
+
+                    // Ignore "ghost" arrivals
+                    if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                        holder.liveArrivals.addView(v);
+
+                    // Show only one if type is "detour"
+                    if (arrival.getType() == 3) break;
+
+                }
+            else {
+                View v = getLayoutInflater().inflate(R.layout.template_live_arrival_special, holder.liveArrivals, false);
+                TextView arrival_time = v.findViewById(R.id.arrival_time_time);
+                View back = v.findViewById(R.id.arrival_time_back);
+                back.getBackground().setTint(backColor);
+
+                arrival_time.setText("/");
+                holder.liveArrivals.addView(v);
+
+            }
+
         }
 
         @Override
@@ -426,6 +499,7 @@ public class RouteActivity extends MapFragmentActivity {
             View topConnector, bottomConnector, background;
             TextView name;
             ImageView node;
+            FlexboxLayout liveArrivals;
 
             private ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -435,6 +509,7 @@ public class RouteActivity extends MapFragmentActivity {
                 node = itemView.findViewById(R.id.node_icon);
                 background = itemView.findViewById(R.id.station_node_background);
                 name = itemView.findViewById(R.id.station_name);
+                liveArrivals = itemView.findViewById(R.id.station_arrivals);
 
             }
         }

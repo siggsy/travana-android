@@ -9,6 +9,7 @@ public class StationOnRoute {
     private int order_no;
     private double latitude;
     private double longitude;
+    private int station_int_id;
 
     public String getName() {
         return name;
@@ -32,5 +33,13 @@ public class StationOnRoute {
 
     public LatLng getLatLng() {
         return new LatLng(latitude, longitude);
+    }
+
+    public int getStation_code() {
+        return station_code;
+    }
+
+    public int getStation_int_id() {
+        return station_int_id;
     }
 }
