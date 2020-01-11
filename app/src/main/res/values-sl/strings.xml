@@ -81,5 +81,8 @@
         ]]>
         </string>
     <string name="departures">VOZNI RED</string>
+    <string name="sign_out">Odjava</string>
+    <string name="signed_out">Odjava uspešna</string>
+    <string name="not_signed_id">Niste prijavljeni</string>
 
 </resources>

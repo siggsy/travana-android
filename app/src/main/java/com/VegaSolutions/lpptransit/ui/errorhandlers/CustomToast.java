@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.ui.activities.forum.TagsActivity;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 public class CustomToast {
 
@@ -105,6 +106,16 @@ public class CustomToast {
         setTextColor(Color.WHITE);
         setText("");
         setIcon(ContextCompat.getDrawable(context, R.drawable.ic_check_black_24dp));
+        show(Toast.LENGTH_SHORT);
+    }
+
+    public void showStringNormal(String message) {
+        boolean isDark = ViewGroupUtils.isDarkTheme(context);
+        setBackgroundColor(isDark ? Color.BLACK : Color.WHITE);
+        setTextColor(isDark ? Color.WHITE : Color.BLACK);
+        setIconColor(isDark ? Color.WHITE : Color.BLACK);
+        setText(message);
+        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_info_outline_black_24dp));
         show(Toast.LENGTH_SHORT);
     }
 

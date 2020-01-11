@@ -7,8 +7,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
+import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -19,6 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
     ImageView back;
 
     RadioButton buttonWhite, buttonDark, buttonMin, buttonHour;
+    TextView signOut;
 
 
     @Override
@@ -37,6 +41,8 @@ public class SettingsActivity extends AppCompatActivity {
         buttonWhite = findViewById(R.id.radio_white);
         buttonMin = findViewById(R.id.radio_minute);
         buttonHour = findViewById(R.id.radio_hour);
+
+        signOut = findViewById(R.id.sign_out_btn);
 
         if (dark_theme) buttonDark.setChecked(true);
         else buttonWhite.setChecked(true);
@@ -111,6 +117,15 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
 
+        });
+
+        signOut.setOnClickListener(v -> {
+            if (FirebaseManager.isSignedIn()) {
+                FirebaseManager.signOut();
+                new CustomToast(this).showStringNormal(getString(R.string.signed_out));
+            } else {
+                new CustomToast(this).showStringNormal(getString(R.string.not_signed_id));
+            }
         });
 
     }

@@ -90,5 +90,8 @@
         ]]>
         </string>
     <string name="departures">TIMETABLE</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="signed_out">Signed Out</string>
+    <string name="not_signed_id">Not Signed In</string>
 
 </resources>
