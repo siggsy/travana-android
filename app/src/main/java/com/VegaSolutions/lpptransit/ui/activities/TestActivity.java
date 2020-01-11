@@ -109,7 +109,7 @@ public class TestActivity extends AppCompatActivity {
             });
             */
 
-
+            /*
             TravanaAPI.updates(new TravanaApiCallback<ResponseObject<Update>>() {
                 @Override
                 public void onComplete(@Nullable ResponseObject<Update> apiResponse, int statusCode, boolean success) {
@@ -119,6 +119,8 @@ public class TestActivity extends AppCompatActivity {
                 }
             });
 
+
+             */
             TravanaAPI.warning(new TravanaApiCallback<ResponseObject<Warning>>() {
                 @Override
                 public void onComplete(@Nullable ResponseObject<Warning> apiResponse, int statusCode, boolean success) {
@@ -130,7 +132,12 @@ public class TestActivity extends AppCompatActivity {
 
 
 
+
+
+
         b.setOnClickListener(e -> {
+
+                FirebaseManager.signOut();
 
                 if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(getApplication(), Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
