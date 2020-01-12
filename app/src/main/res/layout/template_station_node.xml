@@ -44,7 +44,7 @@
         android:id="@+id/station_arrivals"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="16dp"
         app:alignItems="flex_start"
         app:flexWrap="wrap"
         app:layout_constraintBottom_toBottomOf="@+id/station_name"

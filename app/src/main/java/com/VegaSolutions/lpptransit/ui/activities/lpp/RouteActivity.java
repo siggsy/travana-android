@@ -14,8 +14,10 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -60,6 +62,7 @@ import org.joda.time.DateTime;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -98,7 +101,7 @@ public class RouteActivity extends MapFragmentActivity {
     private BottomSheetBehavior behavior;
 
     // Google maps parameters
-    private final int UPDATE_TIME = 2000;
+    private final int UPDATE_TIME = 5000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
     private Handler handler;
     private BusMarkerManager busManager;
@@ -125,6 +128,7 @@ public class RouteActivity extends MapFragmentActivity {
 
                     // Update markers and queue another update.
                     busManager.update(buses);
+                    Api.arrivalsOnRoute(tripId, callback);
                     handler.postDelayed(runnable, UPDATE_TIME);
 
                 } else {
@@ -136,51 +140,71 @@ public class RouteActivity extends MapFragmentActivity {
         }
     };
 
-    private Runnable runnable = () -> Api.busesOnRoute(routeNumber, busQuery);
-
     // Stations on route query
-    private ApiCallback<List<ArrivalOnRoute>> callback = (apiResponse, statusCode, success) -> {
+    private ApiCallback<List<ArrivalOnRoute>> callback = new ApiCallback<List<ArrivalOnRoute>>() {
+        @Override
+        public void onComplete(@Nullable ApiResponse<List<ArrivalOnRoute>> apiResponse, int statusCode, boolean success) {
 
-        if (success) {
-            List<ArrivalOnRoute> stationsOnRoute = apiResponse.getData();
+            if (success) {
+                List<ArrivalOnRoute> stationsOnRoute = apiResponse.getData();
 
-            // Sort stations.
-            Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
-            adapter.stationsOnRoute = stationsOnRoute;
-            runOnUiThread(() -> adapter.notifyDataSetChanged());
-            List<LatLng> latLngs = new ArrayList<>();
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                // Sort stations.
+                Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
+                for (ArrivalOnRoute station : stationsOnRoute) {
+                    Collections.sort(station.getArrivals(), (o1, o2) -> Integer.compare(o1.getEta_min(), o2.getEta_min()));
+                }
+                adapter.setStationsOnRoute(stationsOnRoute);
+                RouteActivity.this.runOnUiThread(() -> adapter.notifyDataSetChanged());
 
-            // Add station markers.
-            for (StationOnRoute stationOnRoute : stationsOnRoute) {
-                LatLng latLng = stationOnRoute.getLatLng();
-                latLngs.add(latLng);
-                builder.include(latLng);
-                runOnUiThread(() -> {
-                    Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
-                    marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
-                    if (Integer.valueOf(stationId)/10 == stationOnRoute.getCode_id()/10) {
-                        marker.showInfoWindow();
+                if (handler == null) {
+                    List<LatLng> latLngs = new ArrayList<>();
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                    // Add station markers.
+                    for (StationOnRoute stationOnRoute : stationsOnRoute) {
+                        LatLng latLng = stationOnRoute.getLatLng();
+                        latLngs.add(latLng);
+                        builder.include(latLng);
+                        RouteActivity.this.runOnUiThread(() -> {
+                            Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
+                            marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
+                            if (Integer.valueOf(stationId) / 10 == stationOnRoute.getCode_id() / 10) {
+                                marker.showInfoWindow();
+                            }
+                        });
                     }
-                });
-            }
 
-            // Connect stations with polyline and move the camera.
-            runOnUiThread(() -> {
-            if (!stationsOnRoute.isEmpty()) {
-                LatLngBounds bounds = builder.build();
+                    // Connect stations with polyline and move the camera.
+                    RouteActivity.this.runOnUiThread(() -> {
+                        if (!stationsOnRoute.isEmpty()) {
+                            LatLngBounds bounds = builder.build();
 
-                    mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(Colors.getColorFromString(routeNumber))); // ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
+                            mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(Colors.getColorFromString(routeNumber))); // ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
 
-            } else mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
-            });
+                        } else mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
+                    });
 
-            // Start bus updater.
-            handler.post(runnable);
+                    // Start bus updater.
 
-        } else runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
+                    runOnUiThread(() -> {
+                        handler = new Handler();
+                        handler.post(runnable);
+                    });
+                }
+
+            } else RouteActivity.this.runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
+        }
     };
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            Api.busesOnRoute(routeNumber, busQuery);
+        }
+    };
+
+
 
 
 
@@ -301,6 +325,7 @@ public class RouteActivity extends MapFragmentActivity {
 
         locationIcon = findViewById(R.id.maps_location_icon);
 
+        Log.i("TRIP ID", tripId);
 
         behavior = BottomSheetBehavior.from(bottomSheet);
 
@@ -349,7 +374,6 @@ public class RouteActivity extends MapFragmentActivity {
         mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
 
         // Setup handlers.
-        handler = new Handler();
         busManager = new BusMarkerManager(mMap, busOptions);
 
         // Set station InfoWindow click listener
@@ -381,8 +405,44 @@ public class RouteActivity extends MapFragmentActivity {
 
 
         List<ArrivalOnRoute> stationsOnRoute = new ArrayList<>();
+        List<Integer> toAnimate; // 0 - nothing, 1 - the first one, 2 - the second one
+        boolean[] isBus;
 
-        public void setStationsOnRoute(List<ArrivalOnRoute> stationsOnRoute) {
+        private void setStationsOnRoute(List<ArrivalOnRoute> stationsOnRoute) {
+            isBus = new boolean[stationsOnRoute.size()];
+            toAnimate = new ArrayList<>();
+            int previousTime = 61;
+            int previousTime2 = 61;
+            for (int i = 0; i < stationsOnRoute.size(); i++) {
+                List<ArrivalOnRoute.Arrival> arrivals = stationsOnRoute.get(i).getArrivals();
+                int a = 0;
+                ArrivalOnRoute.Arrival a1 = null;
+                ArrivalOnRoute.Arrival a2 = null;
+                if (arrivals.size() > 0)
+                    a1 = arrivals.get(0);
+                if (arrivals.size() > 1)
+                    a2 = arrivals.get(1);
+
+                boolean b1 = a1 != null && (previousTime > a1.getEta_min() && a1.getType() == 0);
+                boolean b2 = false;
+                if (!b1) b2 = a2 != null && (previousTime2 > a2.getEta_min() && a2.getType() == 0);
+
+                if (b1) a = 1;
+                else if (b2 && (a1 != null && a1.getType() != 2)) a = 2;
+
+                if (((b1 || b2) && i != 0) && (a1 != null && a1.getType() != 2))
+                    isBus[i - 1] = true;
+                if ((a1 != null && a1.getType() == 2))
+                    isBus[i] = true;
+
+                toAnimate.add(a);
+
+                if (a1 != null && a1.getType() != 2)
+                    previousTime = a1.getEta_min();
+                if (a2 != null && a2.getType() != 2)
+                    previousTime2 = a2.getEta_min();
+
+            }
             this.stationsOnRoute = stationsOnRoute;
         }
 
@@ -438,6 +498,14 @@ public class RouteActivity extends MapFragmentActivity {
             }));
 
             holder.liveArrivals.removeAllViews();
+
+            if (isBus[position]) {
+                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.stretched_circle));
+                holder.node.setColorFilter(ContextCompat.getColor(RouteActivity.this, R.color.colorAccent), android.graphics.PorterDuff.Mode.SRC_IN);
+            } else {
+                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle_node));
+            }
+
             List<ArrivalOnRoute.Arrival> arrivals = station.getArrivals();
             int size = arrivals.size() <= 2 ? arrivals.size() : 2;
             if (size != 0)
@@ -448,6 +516,14 @@ public class RouteActivity extends MapFragmentActivity {
                     View v = getLayoutInflater().inflate(R.layout.template_live_arrival_special, holder.liveArrivals, false);
                     TextView arrival_time = v.findViewById(R.id.arrival_time_time);
                     View back = v.findViewById(R.id.arrival_time_back);
+                    ImageView rss = v.findViewById(R.id.live_icon);
+                    TextView garage = v.findViewById(R.id.garage_text);
+
+                    if ((i == 0 && toAnimate.get(position) == 1) || (i == 1 && toAnimate.get(position) == 2)) {
+                        AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(RouteActivity.this, R.drawable.rss_3layer);
+                        rss.setImageDrawable(drawable);
+                        drawable.start();
+                    } else rss.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.ic_rss_feed_24px));
 
                     SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
@@ -455,18 +531,29 @@ public class RouteActivity extends MapFragmentActivity {
                     arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
                     arrival_time.setTextColor(RouteActivity.this.color);
                     back.getBackground().setTint(backColor);
+                    rss.setVisibility(View.GONE);
+                    arrival_time.setTypeface(null, Typeface.NORMAL);
 
                     // (0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
                     switch (arrival.getType()) {
                         case 0:
+                            rss.setVisibility(View.VISIBLE);
                             break;
                         case 2:
                             arrival_time.setText(getString(R.string.arrival).toUpperCase());
+                            arrival_time.setTypeface(null, Typeface.BOLD);
                             break;
                         case 3:
                             arrival_time.setText(getString(R.string.detour).toUpperCase());
+                            arrival_time.setTypeface(null, Typeface.BOLD);
                             break;
                     }
+
+
+                    if (arrival.getDepot() == 1)
+                        garage.setVisibility(View.VISIBLE);
+                    else garage.setVisibility(View.GONE);
+
 
                     // Ignore "ghost" arrivals
                     if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
