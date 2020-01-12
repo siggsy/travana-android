@@ -11,8 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -218,8 +220,8 @@ public class RouteActivity extends MapFragmentActivity {
 
         // Set bus and station marker style
         View v = getLayoutInflater().inflate(R.layout.station_node_maps, null);
-        v.findViewById(R.id.stroke).getBackground().setTint(color);
-        v.findViewById(R.id.solid).getBackground().setTint(ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background));
+        v.findViewById(R.id.stroke).getBackground().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
+        v.findViewById(R.id.solid).getBackground().setColorFilter(ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background), PorterDuff.Mode.SRC_IN);
         IconGenerator generator = new IconGenerator(this);
         generator.setBackground(null);
         generator.setContentView(v);
@@ -344,7 +346,7 @@ public class RouteActivity extends MapFragmentActivity {
         super.onResume();
         // Resume bus updates
         if (handler != null)
-            handler.postDelayed(runnable, UPDATE_TIME);
+            handler.post(runnable);
     }
 
     @Override
@@ -461,16 +463,20 @@ public class RouteActivity extends MapFragmentActivity {
             int color = Colors.getColorFromString(routeNumber);
 
             // Color line
-            holder.topConnector.getBackground().setTint(color);
-            holder.bottomConnector.getBackground().setTint(color);
+            holder.topConnector.setBackgroundColor(color);
+            holder.bottomConnector.setBackgroundColor(color);
             holder.node.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
 
             // Set station name and text style
             holder.name.setText(station.getName());
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.node.getLayoutParams();
-
+            holder.name.setTypeface(null, Typeface.BOLD);
+            holder.name.setTextSize(14f);
+            params.height = 32;
+            params.width = 32;
+            holder.node.setLayoutParams(params);
             // Set bold and bigger text for previous activity station
-            if (Integer.valueOf(stationId)/10 == station.getCode_id()/10) {
+            /*if (Integer.valueOf(stationId)/10 == station.getCode_id()/10) {
                 holder.name.setTypeface(null, Typeface.BOLD);
                 holder.name.setTextSize(18f);
                 params.height = 64;
@@ -482,7 +488,7 @@ public class RouteActivity extends MapFragmentActivity {
                 params.width = 32;
             }
             holder.node.setLayoutParams(params);
-
+            */
             // Remove redundant top and bottom connectors
             holder.topConnector.setVisibility(position == 0 ? View.INVISIBLE : View.VISIBLE);
             holder.bottomConnector.setVisibility(position == getItemCount() - 1 ? View.INVISIBLE : View.VISIBLE);
@@ -500,8 +506,15 @@ public class RouteActivity extends MapFragmentActivity {
             holder.liveArrivals.removeAllViews();
 
             if (isBus[position]) {
-                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.stretched_circle));
-                holder.node.setColorFilter(ContextCompat.getColor(RouteActivity.this, R.color.colorAccent), android.graphics.PorterDuff.Mode.SRC_IN);
+
+                // Set bold and bigger text for previous activity station
+
+                holder.name.setTypeface(null, Typeface.BOLD);
+                params.height = 80;
+                params.width = 80;
+                holder.node.setLayoutParams(params);
+                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_pointer));
+                holder.node.setColorFilter(null);
             } else {
                 holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle_node));
             }

@@ -12,33 +12,28 @@
     <View
         android:id="@+id/top_node_connection"
         android:layout_width="4dp"
-        android:layout_height="16dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="6dp"
         android:background="?android:textColor"
+        app:layout_constraintBottom_toBottomOf="@+id/node_icon"
         app:layout_constraintEnd_toEndOf="@+id/node_icon"
         app:layout_constraintStart_toStartOf="@+id/node_icon"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/node_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/station_circle_node"
-        app:layout_constraintEnd_toStartOf="@+id/station_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/top_node_connection" />
 
     <TextView
         android:id="@+id/station_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:text="Barje"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/node_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/station_arrivals"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/top_node_connection" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/station_arrivals"
@@ -54,9 +49,21 @@
     <View
         android:id="@+id/bottom_node_connection"
         android:layout_width="4dp"
-        android:layout_height="16dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="6dp"
         android:background="?android:textColor"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/node_icon"
         app:layout_constraintStart_toStartOf="@+id/node_icon"
-        app:layout_constraintTop_toBottomOf="@+id/node_icon" />
+        app:layout_constraintTop_toTopOf="@+id/node_icon" />
+
+    <ImageView
+        android:id="@+id/node_icon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/station_circle_node"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/station_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
