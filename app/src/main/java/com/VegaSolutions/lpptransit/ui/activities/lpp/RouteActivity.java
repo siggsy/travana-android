@@ -108,7 +108,7 @@ public class RouteActivity extends MapFragmentActivity {
     private BottomSheetBehavior behavior;
 
     // Google maps parameters
-    private final int UPDATE_TIME = 5000;
+    private final int UPDATE_TIME = 8000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
     private Handler handler;
     private BusMarkerManager busManager;
@@ -206,7 +206,10 @@ public class RouteActivity extends MapFragmentActivity {
                     handler.postDelayed(runnable, UPDATE_TIME);
                 }
 
-            } else RouteActivity.this.runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
+            } else {
+                handler.removeCallbacks(runnable);
+                RouteActivity.this.runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
+            }
         }
     };
 
@@ -426,9 +429,10 @@ public class RouteActivity extends MapFragmentActivity {
             Map<String, Pair<Integer, Pair<Integer, Integer>>> toAnimateMap = new LinkedHashMap<>();
             for (int i = 0; i < stationsOnRoute.size(); i++) {
                 List<ArrivalOnRoute.Arrival> arrivals = stationsOnRoute.get(i).getArrivals();
-                for (int j = 0; j < arrivals.size(); j++) {
+                int size = arrivals.size() <= 2 ? arrivals.size() : 2;
+                for (int j = 0; j < size; j++) {
                     ArrivalOnRoute.Arrival arrival = arrivals.get(j);
-                    if (arrival.getType() == 0 || arrival.getType() == 2) {
+                    if (arrival.getType() != 3) {
                         Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
                         if (arrivalsToAnimate == null) {
                             toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));
@@ -456,12 +460,11 @@ public class RouteActivity extends MapFragmentActivity {
                 }
 
                 int a = value.second.first;
-                int size = a <= 2 ? a : 2;
-
-                tA[size] = true;
-                if (value.second.second == 2)
+                if (a < 2)
+                    tA[a] = true;
+                if (value.second.second == 2 || value.first == 0)
                     isBus[value.first]++;
-                else if (value.first > 0) {
+                else {
                     isBus[value.first - 1]++;
                 }
             }
