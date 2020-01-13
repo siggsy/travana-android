@@ -8,6 +8,7 @@
 
     <!-- global colors -->
     <color name="colorRipple">#1AD81B60</color>
+    <color name="colorRipple_map">#1A45BEE6</color>
     <color name="markerAccent">#01D81B60</color>
     <color name="gray">#66000000</color>
     <color name="light_gray">#11000000</color>

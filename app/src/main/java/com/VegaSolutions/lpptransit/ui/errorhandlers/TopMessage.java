@@ -110,7 +110,7 @@ public class TopMessage extends ConstraintLayout {
                 showMsg(context.getString(R.string.network_error), ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px));
                 break;
             default:
-                showMsg(context.getString(R.string.unknown_error), ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                showMsg(context.getString(R.string.unknown_error, statusCode), ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
                 break;
         }
     }

@@ -65,6 +65,7 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         name.setTextColor(Color.BLACK);
         distance.setText("");
         center.setVisibility(Integer.valueOf(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
+        center.setTextColor(Color.WHITE);
         fav.setVisibility(f ? View.VISIBLE : View.GONE);
 
         for (String route : station.getRoute_groups_on_station()) {

@@ -20,6 +20,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -63,10 +64,14 @@ import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -130,8 +135,7 @@ public class RouteActivity extends MapFragmentActivity {
 
                     // Update markers and queue another update.
                     busManager.update(buses);
-                    Api.arrivalsOnRoute(tripId, callback);
-                    handler.postDelayed(runnable, UPDATE_TIME);
+
 
                 } else {
                     // Remove update queue and show error message
@@ -153,7 +157,11 @@ public class RouteActivity extends MapFragmentActivity {
                 // Sort stations.
                 Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
                 for (ArrivalOnRoute station : stationsOnRoute) {
-                    Collections.sort(station.getArrivals(), (o1, o2) -> Integer.compare(o1.getEta_min(), o2.getEta_min()));
+                    Collections.sort(station.getArrivals(), (o1, o2) -> {
+                        if (o1.getType() == 2) return -1;
+                        else if (o2.getType() == 2) return 1;
+                        else return Integer.compare(o1.getEta_min(), o2.getEta_min());
+                    });
                 }
                 adapter.setStationsOnRoute(stationsOnRoute);
                 RouteActivity.this.runOnUiThread(() -> adapter.notifyDataSetChanged());
@@ -193,6 +201,9 @@ public class RouteActivity extends MapFragmentActivity {
                         handler = new Handler();
                         handler.post(runnable);
                     });
+                } else {
+                    Api.busesOnRoute(routeNumber, busQuery);
+                    handler.postDelayed(runnable, UPDATE_TIME);
                 }
 
             } else RouteActivity.this.runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
@@ -202,7 +213,7 @@ public class RouteActivity extends MapFragmentActivity {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            Api.busesOnRoute(routeNumber, busQuery);
+            Api.arrivalsOnRoute(tripId, callback);
         }
     };
 
@@ -225,7 +236,7 @@ public class RouteActivity extends MapFragmentActivity {
         IconGenerator generator = new IconGenerator(this);
         generator.setBackground(null);
         generator.setContentView(v);
-        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.ic_bus_24dp))).flat(true);
+        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_map))).flat(true);
         stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true);
 
         // Setup views.
@@ -407,45 +418,56 @@ public class RouteActivity extends MapFragmentActivity {
 
 
         List<ArrivalOnRoute> stationsOnRoute = new ArrayList<>();
-        List<Integer> toAnimate; // 0 - nothing, 1 - the first one, 2 - the second one
-        boolean[] isBus;
+        boolean[][] toAnimate;
+        int[] isBus;
 
         private void setStationsOnRoute(List<ArrivalOnRoute> stationsOnRoute) {
-            isBus = new boolean[stationsOnRoute.size()];
-            toAnimate = new ArrayList<>();
-            int previousTime = 61;
-            int previousTime2 = 61;
+
+            Map<String, Pair<Integer, Pair<Integer, Integer>>> toAnimateMap = new LinkedHashMap<>();
             for (int i = 0; i < stationsOnRoute.size(); i++) {
                 List<ArrivalOnRoute.Arrival> arrivals = stationsOnRoute.get(i).getArrivals();
-                int a = 0;
-                ArrivalOnRoute.Arrival a1 = null;
-                ArrivalOnRoute.Arrival a2 = null;
-                if (arrivals.size() > 0)
-                    a1 = arrivals.get(0);
-                if (arrivals.size() > 1)
-                    a2 = arrivals.get(1);
-
-                boolean b1 = a1 != null && (previousTime > a1.getEta_min() && a1.getType() == 0);
-                boolean b2 = false;
-                if (!b1) b2 = a2 != null && (previousTime2 > a2.getEta_min() && a2.getType() == 0);
-
-                if (b1) a = 1;
-                else if (b2 && (a1 != null && a1.getType() != 2)) a = 2;
-
-                if (((b1 || b2) && i != 0) && (a1 != null && a1.getType() != 2))
-                    isBus[i - 1] = true;
-                if ((a1 != null && a1.getType() == 2))
-                    isBus[i] = true;
-
-                toAnimate.add(a);
-
-                if (a1 != null && a1.getType() != 2)
-                    previousTime = a1.getEta_min();
-                if (a2 != null && a2.getType() != 2)
-                    previousTime2 = a2.getEta_min();
-
+                for (int j = 0; j < arrivals.size(); j++) {
+                    ArrivalOnRoute.Arrival arrival = arrivals.get(j);
+                    if (arrival.getType() == 0 || arrival.getType() == 2) {
+                        Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
+                        if (arrivalsToAnimate == null) {
+                            toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));
+                        }
+                    }
+                }
             }
+
+            isBus = new int[stationsOnRoute.size()];
+            toAnimate = new boolean[stationsOnRoute.size()][2];
+            for (Map.Entry<String, Pair<Integer, Pair<Integer, Integer>>> entry : toAnimateMap.entrySet()) {
+                Pair<Integer, Pair<Integer, Integer>> value = entry.getValue();
+                int pos;
+                if (value.second.second == 2) {
+                    if (value.first < stationsOnRoute.size() - 1)
+                        pos = value.first + 1;
+                    else pos = value.first;
+
+                } else pos = value.first;
+                boolean[] tA = toAnimate[pos];
+
+                if (tA == null) {
+                    tA = new boolean[2];
+                    toAnimate[pos] = tA;
+                }
+
+                int a = value.second.first;
+                int size = a <= 2 ? a : 2;
+
+                tA[size] = true;
+                if (value.second.second == 2)
+                    isBus[value.first]++;
+                else if (value.first > 0) {
+                    isBus[value.first - 1]++;
+                }
+            }
+
             this.stationsOnRoute = stationsOnRoute;
+
         }
 
         @NonNull
@@ -475,20 +497,7 @@ public class RouteActivity extends MapFragmentActivity {
             params.height = 32;
             params.width = 32;
             holder.node.setLayoutParams(params);
-            // Set bold and bigger text for previous activity station
-            /*if (Integer.valueOf(stationId)/10 == station.getCode_id()/10) {
-                holder.name.setTypeface(null, Typeface.BOLD);
-                holder.name.setTextSize(18f);
-                params.height = 64;
-                params.width = 64;
-            } else {
-                holder.name.setTypeface(null, Typeface.BOLD);
-                holder.name.setTextSize(14f);
-                params.height = 32;
-                params.width = 32;
-            }
-            holder.node.setLayoutParams(params);
-            */
+
             // Remove redundant top and bottom connectors
             holder.topConnector.setVisibility(position == 0 ? View.INVISIBLE : View.VISIBLE);
             holder.bottomConnector.setVisibility(position == getItemCount() - 1 ? View.INVISIBLE : View.VISIBLE);
@@ -505,15 +514,14 @@ public class RouteActivity extends MapFragmentActivity {
 
             holder.liveArrivals.removeAllViews();
 
-            if (isBus[position]) {
+            if (isBus[position] > 0) {
 
                 // Set bold and bigger text for previous activity station
-
                 holder.name.setTypeface(null, Typeface.BOLD);
                 params.height = 80;
                 params.width = 80;
                 holder.node.setLayoutParams(params);
-                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_pointer));
+                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position] == 1 ? R.drawable.bus_pointer : R.drawable.bus_pointer_2));
                 holder.node.setColorFilter(null);
             } else {
                 holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle_node));
@@ -532,7 +540,7 @@ public class RouteActivity extends MapFragmentActivity {
                     ImageView rss = v.findViewById(R.id.live_icon);
                     TextView garage = v.findViewById(R.id.garage_text);
 
-                    if ((i == 0 && toAnimate.get(position) == 1) || (i == 1 && toAnimate.get(position) == 2)) {
+                    if (toAnimate[position][i]) {
                         AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(RouteActivity.this, R.drawable.rss_3layer);
                         rss.setImageDrawable(drawable);
                         drawable.start();

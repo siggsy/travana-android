@@ -53,10 +53,11 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
             if (success)
                 mListener.onStationsUpdated(apiResponse.getData(), true, statusCode);
             else mListener.onStationsUpdated(null, false, statusCode);
-            if (adapter.registeredFragments.size() == 2)
-                for (int i = 0; i < adapter.registeredFragments.size(); i++)
-                    adapter.registeredFragments.get(i).setStations(apiResponse.getData(), statusCode, success);
-            else createdListener = fragment -> fragment.setStations(apiResponse.getData(), statusCode, success);
+            if (adapter.registeredFragments.size() == 2) {
+                if (success)
+                    for (int i = 0; i < adapter.registeredFragments.size(); i++)
+                        adapter.registeredFragments.get(i).setStations(apiResponse.getData(), statusCode, true);
+            } else if (success) createdListener = fragment -> fragment.setStations(apiResponse.getData(), statusCode, true);
 
     };
 

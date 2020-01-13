@@ -7,7 +7,7 @@
             <gradient
                 android:type="radial"
                 android:gradientRadius="12dp"
-                android:startColor="@color/colorAccent"
+                android:startColor="@color/main_blue"
                 android:endColor="@color/markerAccent" />
         </shape>
     </item>
@@ -18,7 +18,7 @@
         android:right="2dp"
         android:left="2dp">
         <shape android:shape="oval">
-            <solid android:color="@color/colorAccent" />
+            <solid android:color="@color/main_blue" />
             <stroke android:width="3dp"
                 android:color="@android:color/white"/>
             <size
