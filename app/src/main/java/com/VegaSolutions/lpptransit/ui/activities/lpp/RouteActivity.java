@@ -239,7 +239,7 @@ public class RouteActivity extends MapFragmentActivity {
         IconGenerator generator = new IconGenerator(this);
         generator.setBackground(null);
         generator.setContentView(v);
-        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.bus_pointer_map))).flat(true);
+        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.ic_water_drop_svgrepo_com_1))).flat(true);
         stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true);
 
         // Setup views.
@@ -524,7 +524,7 @@ public class RouteActivity extends MapFragmentActivity {
                 params.height = 80;
                 params.width = 80;
                 holder.node.setLayoutParams(params);
-                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position] == 1 ? R.drawable.bus_pointer : R.drawable.bus_pointer_2));
+                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position] == 1 ? R.drawable.bus_icon_2 : R.drawable.bus_icon_3));
                 holder.node.setColorFilter(null);
             } else {
                 holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle_node));
