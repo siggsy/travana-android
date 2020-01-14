@@ -207,7 +207,8 @@ public class RouteActivity extends MapFragmentActivity {
                 }
 
             } else {
-                handler.removeCallbacks(runnable);
+                if (handler != null)
+                    handler.removeCallbacks(runnable);
                 RouteActivity.this.runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
             }
         }
@@ -422,7 +423,7 @@ public class RouteActivity extends MapFragmentActivity {
 
         List<ArrivalOnRoute> stationsOnRoute = new ArrayList<>();
         boolean[][] toAnimate;
-        int[] isBus;
+        int[][] isBus;
 
         private void setStationsOnRoute(List<ArrivalOnRoute> stationsOnRoute) {
 
@@ -433,15 +434,17 @@ public class RouteActivity extends MapFragmentActivity {
                 for (int j = 0; j < size; j++) {
                     ArrivalOnRoute.Arrival arrival = arrivals.get(j);
                     if (arrival.getType() != 3) {
-                        Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
-                        if (arrivalsToAnimate == null) {
-                            toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));
+                        if (!(arrival.getEta_min() > 8 && arrival.getType() == 1)) {
+                            Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
+                            if (arrivalsToAnimate == null)
+                                toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));
+
                         }
                     }
                 }
             }
 
-            isBus = new int[stationsOnRoute.size()];
+            isBus = new int[stationsOnRoute.size()][3];
             toAnimate = new boolean[stationsOnRoute.size()][2];
             for (Map.Entry<String, Pair<Integer, Pair<Integer, Integer>>> entry : toAnimateMap.entrySet()) {
                 Pair<Integer, Pair<Integer, Integer>> value = entry.getValue();
@@ -462,10 +465,13 @@ public class RouteActivity extends MapFragmentActivity {
                 int a = value.second.first;
                 if (a < 2)
                     tA[a] = true;
-                if (value.second.second == 2 || value.first == 0)
-                    isBus[value.first]++;
+                if (value.second.second == 2 || value.first == 0) {
+                    int b = isBus[value.first][0]++;
+                    isBus[value.first][b + 1] = value.second.second;
+                }
                 else {
-                    isBus[value.first - 1]++;
+                    int b = isBus[value.first - 1][0]++;
+                    isBus[value.first - 1][b + 1] = value.second.second;
                 }
             }
 
@@ -517,14 +523,24 @@ public class RouteActivity extends MapFragmentActivity {
 
             holder.liveArrivals.removeAllViews();
 
-            if (isBus[position] > 0) {
+            if (isBus[position][0] > 0) {
 
                 // Set bold and bigger text for previous activity station
                 holder.name.setTypeface(null, Typeface.BOLD);
                 params.height = 80;
                 params.width = 80;
                 holder.node.setLayoutParams(params);
-                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position] == 1 ? R.drawable.bus_icon_2 : R.drawable.bus_icon_3));
+                if (isBus[position][0] == 2) {
+                    if (isBus[position][1] == 1) {
+                        if (isBus[position][2] == 1)
+                            holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3_offline3));
+                        else holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3_offline1));
+                    } else {
+                        if (isBus[position][2] == 1)
+                            holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3_offline2));
+                        else holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3));
+                    }
+                } else holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position][1] == 1 ? R.drawable.bus_icon_2_offline : R.drawable.bus_icon_2));
                 holder.node.setColorFilter(null);
             } else {
                 holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle_node));
