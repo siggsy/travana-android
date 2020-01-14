@@ -70,10 +70,13 @@ public class PostListFragment extends Fragment {
         a.runOnUiThread(() -> {
             refreshLayout.setRefreshing(false);
             if (success1 && apiResponse.isSuccess()) {
-                if (apiResponse.getData() == null)
+                if (apiResponse.getData() == null) {
                     adapter.setMessages(new LiveUpdateMessage[0]);
+                }
                 else {
                     adapter.setMessages(apiResponse.getData());
+                    if (apiResponse.getData().length == 0)
+                        new CustomToast(a).showStringNormal(getString(R.string.no_messages));
                     signInText.setVisibility(View.GONE);
                     signInBtn.setVisibility(View.GONE);
                 }

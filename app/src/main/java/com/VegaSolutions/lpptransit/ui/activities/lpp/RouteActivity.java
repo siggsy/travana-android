@@ -108,7 +108,7 @@ public class RouteActivity extends MapFragmentActivity {
     private BottomSheetBehavior behavior;
 
     // Google maps parameters
-    private final int UPDATE_TIME = 8000;
+    private final int UPDATE_TIME = 10000;
     private LatLng ljubljana = new LatLng(46.056319, 14.505381);
     private Handler handler;
     private BusMarkerManager busManager;
@@ -434,7 +434,7 @@ public class RouteActivity extends MapFragmentActivity {
                 for (int j = 0; j < size; j++) {
                     ArrivalOnRoute.Arrival arrival = arrivals.get(j);
                     if (arrival.getType() != 3) {
-                        if (!(arrival.getEta_min() > 8 && arrival.getType() == 1)) {
+                        if (!(arrival.getEta_min() > 10 && arrival.getType() == 1)) {
                             Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
                             if (arrivalsToAnimate == null)
                                 toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));

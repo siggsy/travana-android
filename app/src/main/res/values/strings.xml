@@ -10,7 +10,7 @@
     <string name="sign_in_with_fb">Sign in with Facebook</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="need_help">Need help?</string>
-    <string name="contact_us"> Contact us.</string>
+    <string name="contact_us"> Contact us</string>
     <string name="transport">Transport,</string>
     <string name="the_way_it_was">the way it was</string>
     <string name="meant_to_be">meant to be.</string>
@@ -93,5 +93,6 @@
     <string name="sign_out">Sign Out</string>
     <string name="signed_out">Signed Out</string>
     <string name="not_signed_id">Not Signed In</string>
+    <string name="no_messages">No posts found.</string>
 
 </resources>

@@ -3,8 +3,8 @@
     <string name="app_name">Travana</string>
     <string name="app_slogan_welcome_activity">boljši javni prevoz.</string>
     <string name="arrival">PRIHOD</string>
-    <string name="by_developers">Avtorja Domen Kralj, Žiga Leskovec</string>
-    <string name="contact_us">Kontaktiraj nas.</string>
+    <string name="by_developers">Razvijalca Domen Kralj, Žiga Leskovec</string>
+    <string name="contact_us">Kontaktiraj nas</string>
     <string name="routes">Linije</string>
     <string name="sign_in_with_fb">Prijava s Facebook</string>
     <string name="sign_in_with_google">Prijava z Google</string>
@@ -65,7 +65,7 @@
     <string name="login_to">"Prijava v "</string>
     <string name="conditions_s1">Z prijavo se strinjam z </string>
     <string name="tearms_of_service">Pogoji uporabe </string>
-    <string name="privacy_policy">Politiko zasebnosti.</string>
+    <string name="privacy_policy">Politika zasebnosti</string>
     <string name="and">in</string>
 
     <string name="alert_title">Posodobitev</string>
@@ -84,5 +84,6 @@
     <string name="sign_out">Odjava</string>
     <string name="signed_out">Odjava uspešna</string>
     <string name="not_signed_id">Niste prijavljeni</string>
+    <string name="no_messages">Ni objav.</string>
 
 </resources>

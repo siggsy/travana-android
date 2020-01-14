@@ -5,18 +5,20 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- maybe remove that. --> <!-- NO -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="false"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
         android:icon="@mipmap/ic_launcher_dark"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_dark_round"
+        android:supportsRtl="true"
         android:theme="@style/WhiteTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity
+            android:name=".ui.activities.AboutActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.LauncherActivity"
             android:exported="true"
@@ -25,32 +27,32 @@
             android:theme="@style/DarkTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.activities.forum.TagMessageActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.forum.TagsActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.forum.NewMessageActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.TestActivity"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.forum.PostActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.forum.ForumActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.SettingsActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.WelcomeActivity"
             android:exported="true"
@@ -75,7 +77,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.SearchActivity"
-            android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.lpp.StationActivity"
