@@ -74,6 +74,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     DrawerLayout dl;
     NavigationView nv;
     View bottomSheet;
+    View header;
 
     private ClusterManager<StationMarker> clusterManager;
 
@@ -98,6 +99,11 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         shadow = findViewById(R.id.shadow);
         loading = findViewById(R.id.top_message);
         bottomSheet = findViewById(R.id.bottom_sheet);
+        header = findViewById(R.id.header);
+
+        toHide.add(bottomSheet);
+        toHide.add(header);
+        toHide.add(shadow);
 
         // Setup UI elements.
         nv.setNavigationItemSelectedListener(this);
@@ -212,7 +218,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         super.onMapReady(googleMap);
 
         // Setup google maps UI.
-        mMap.setPadding(12, 200, 12, behavior.getPeekHeight());
+        setPadding(12, 200, 12, behavior.getPeekHeight());
         setupClusterManager();
 
         // Set Station InfoWindow click listener.

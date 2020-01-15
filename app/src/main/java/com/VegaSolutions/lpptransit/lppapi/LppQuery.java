@@ -52,6 +52,16 @@ public class LppQuery extends Thread {
     // Timetable
     public static final String ROUTE_DEPARTURES = "/timetable/route-departures";    // (!trip-id=a3295EA8-3404-4D34-9C6A-1604EFD15E40) & (!route-id=117C48BE-5CB3-4030-92FC-E22371A0779F)
 
+    private static Map<String, String> headers = new HashMap<>();
+    static {
+        headers.put("apikey", BuildConfig.LPP_API_KEY);
+        headers.put("Content-Type", "application/json");
+        headers.put("User-Agent", "OkHttp Bot");
+        headers.put("Accept", "");
+        headers.put("Cache-Control", "no-cache");
+        headers.put("Accept-Encoding", "gzip, deflate");
+    }
+
     public LppQuery(String URL){
         this.URL = URL;
     }
@@ -91,15 +101,6 @@ public class LppQuery extends Thread {
     public void run() {
 
             try {
-
-                Map<String, String> headers = new HashMap<>();
-                headers.put("apikey", BuildConfig.LPP_API_KEY);
-                headers.put("Content-Type", "application/json");  // add request headers
-                headers.put("User-Agent", "OkHttp Bot");
-                headers.put("Accept","");
-                headers.put("Cache-Control", "no-cache");
-                headers.put("Accept-Encoding", "gzip, deflate");
-
                 Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).headers(headers).timeout(20000).execute();
                 Log.i(TAG, r.body());
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);

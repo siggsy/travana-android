@@ -102,6 +102,7 @@ public class RouteActivity extends MapFragmentActivity {
     @BindView(R.id.header) View header;
     @BindView(R.id.bottom_sheet) View bottomSheet;
     @BindView(R.id.route_opposite_btn) ImageButton opposite;
+    @BindView(R.id.shadow) View shadow;
 
     private ElevationAnimation elevationAnimation;
     private Adapter adapter;
@@ -342,6 +343,9 @@ public class RouteActivity extends MapFragmentActivity {
 
         locationIcon = findViewById(R.id.maps_location_icon);
 
+        toHide.add(bottomSheet);
+        toHide.add(shadow);
+
         Log.i("TRIP ID", tripId);
 
         behavior = BottomSheetBehavior.from(bottomSheet);
@@ -387,7 +391,7 @@ public class RouteActivity extends MapFragmentActivity {
         super.onMapReady(googleMap);
 
         // Setup Google maps UI
-        mMap.setPadding(0, 0, 0, behavior.getPeekHeight());
+        setPadding(0, 0, 0, behavior.getPeekHeight());
         mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
 
         // Setup handlers.
@@ -438,7 +442,6 @@ public class RouteActivity extends MapFragmentActivity {
                             Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
                             if (arrivalsToAnimate == null)
                                 toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));
-
                         }
                     }
                 }
@@ -467,11 +470,13 @@ public class RouteActivity extends MapFragmentActivity {
                     tA[a] = true;
                 if (value.second.second == 2 || value.first == 0) {
                     int b = isBus[value.first][0]++;
-                    isBus[value.first][b + 1] = value.second.second;
+                    if (b <= 1)
+                        isBus[value.first][b + 1] = value.second.second;
                 }
                 else {
                     int b = isBus[value.first - 1][0]++;
-                    isBus[value.first - 1][b + 1] = value.second.second;
+                    if (b <= 1)
+                        isBus[value.first - 1][b + 1] = value.second.second;
                 }
             }
 
@@ -527,8 +532,8 @@ public class RouteActivity extends MapFragmentActivity {
 
                 // Set bold and bigger text for previous activity station
                 holder.name.setTypeface(null, Typeface.BOLD);
-                params.height = 75;
-                params.width = 75;
+                params.height = 76;
+                params.width = 76;
                 holder.node.setLayoutParams(params);
                 if (isBus[position][0] == 2) {
                     if (isBus[position][1] == 1) {

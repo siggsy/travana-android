@@ -1,9 +1,15 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -21,6 +27,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class MapFragmentActivity extends FragmentActivity implements OnMapReadyCallback, MyLocationManager.MyLocationListener {
 
     protected GoogleMap mMap;
@@ -31,6 +40,13 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
 
     protected ImageView locationIcon;
 
+    protected List<View> toHide = new ArrayList<>();
+    protected boolean hidden = false;
+
+    private int paddingTop = 0;
+    private int paddingBottom = 0;
+    private int paddingLeft = 0;
+    private int paddingRight = 0;
 
     @Override
     protected void onPause() {
@@ -50,6 +66,8 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+
+        toHide.add(locationIcon);
 
         // Setup generic UI
         mMap.getUiSettings().setCompassEnabled(true);
@@ -79,9 +97,70 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
 
         }
 
+        mMap.setOnMapClickListener(latLng -> setHide(!hidden));
+
         // Set camera to Ljubljana.
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
+    }
+
+    private void setHide(boolean value) {
+        for (View v : toHide)
+            show(v, value);
+        hidden = !hidden;
+    }
+
+    private void show(View view, boolean value) {
+
+        if (!value) {
+            view.setVisibility(View.VISIBLE);
+            animatePadding(true);
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
+            objectAnimator.setDuration(200);
+            objectAnimator.setInterpolator(new LinearInterpolator());
+            objectAnimator.start();
+        } else {
+            animatePadding(false);
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
+            objectAnimator.setDuration(200);
+            objectAnimator.setInterpolator(new LinearInterpolator());
+            objectAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    view.setVisibility(View.GONE);
+                }
+            });
+            objectAnimator.start();
+        }
+    }
+
+    private void animatePadding(boolean value) {
+
+        ValueAnimator animator;
+        if (value) {
+            animator = ValueAnimator.ofInt(0, paddingBottom);
+            animator.setDuration(200);
+        } else {
+            animator = ValueAnimator.ofInt(paddingBottom, 0);
+            animator.setDuration(200);
+        }
+
+        animator.addUpdateListener(animation -> {
+            int value1 = (int) animation.getAnimatedValue();
+            mMap.setPadding(paddingLeft, paddingTop, paddingRight, value1);
+        });
+
+        animator.start();
+
+    }
+
+    protected void setPadding(int left, int top, int right, int bottom) {
+        mMap.setPadding(left, top, right, bottom);
+        paddingBottom = bottom;
+        paddingLeft = left;
+        paddingTop = top;
+        paddingRight = right;
     }
 
     @Override

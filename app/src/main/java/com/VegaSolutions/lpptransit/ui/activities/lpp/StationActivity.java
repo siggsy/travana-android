@@ -53,6 +53,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
     ViewPager viewPager;
     TabLayout tabLayout;
     BottomSheetBehavior bottomSheetBehavior;
+    View shadow;
 
     Adapter adapter;
 
@@ -88,6 +89,10 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         tabLayout = findViewById(R.id.station_tab_layout);
         back = findViewById(R.id.back);
         locationIcon = findViewById(R.id.maps_location_icon);
+        shadow = findViewById(R.id.shadow);
+
+        toHide.add(root);
+        toHide.add(shadow);
 
         // Get Intent data
         station = getIntent().getParcelableExtra(STATION);
@@ -102,7 +107,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         super.onMapReady(googleMap);
 
         // Setup Google maps UI
-        mMap.setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
+        setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
 
         mMap.setInfoWindowAdapter(new StationInfoWindow(this));
         Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
