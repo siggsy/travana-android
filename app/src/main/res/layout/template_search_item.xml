@@ -34,6 +34,7 @@
         android:layout_weight="4"
         android:text="Bavarski dvor"
         android:textStyle="bold" />
+
     <TextView
         android:id="@+id/station_center"
         android:layout_width="wrap_content"
@@ -47,7 +48,7 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:text="@string/into_center"
-        android:textColor="@android:color/white"
+        android:textColor="?backgroundViewColor"
         android:textSize="12sp" />
 
 </LinearLayout>

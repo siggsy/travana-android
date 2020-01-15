@@ -22,7 +22,7 @@ public class LppQuery extends Thread {
     //http://194.33.12.32/doc/                                                      //documentation
 
     private static final String TAG = LppQuery.class.getSimpleName();
-    public static final String SERVER_URL = "http://194.33.12.32/api";
+    public static final String SERVER_URL = "https://data.lpp.si/api";
 
     // API PARAMETERS:
     // '?' -> optional,
@@ -91,7 +91,16 @@ public class LppQuery extends Thread {
     public void run() {
 
             try {
-                Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).header("apikey", BuildConfig.LPP_API_KEY).timeout(20000).execute();
+
+                Map<String, String> headers = new HashMap<>();
+                headers.put("apikey", BuildConfig.LPP_API_KEY);
+                headers.put("Content-Type", "application/json");  // add request headers
+                headers.put("User-Agent", "OkHttp Bot");
+                headers.put("Accept","");
+                headers.put("Cache-Control", "no-cache");
+                headers.put("Accept-Encoding", "gzip, deflate");
+
+                Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).headers(headers).timeout(20000).execute();
                 Log.i(TAG, r.body());
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
             } catch (HttpStatusException e) {
@@ -103,6 +112,9 @@ public class LppQuery extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
                 onCompleteListener.onComplete(null, -1, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+                onCompleteListener.onComplete(null, -3, false);
             }
 
     }

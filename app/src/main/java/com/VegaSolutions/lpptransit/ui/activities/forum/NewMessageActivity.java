@@ -57,29 +57,38 @@ public class NewMessageActivity extends AppCompatActivity {
         back.setOnClickListener(v -> onBackPressed());
 
         // Set post button to post message.
-        post.setOnClickListener(v -> FirebaseManager.getFirebaseToken((data, error, success) -> {
+        post.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseManager.getFirebaseToken((data, error, success) -> {
 
-            if (success) {
+                    post.setOnClickListener(null);
 
-                // Show error if message is to short.
-                if (messageContent.getText().length() < 3) {
-                    runOnUiThread(() -> new CustomToast(this).showStringError(getString(R.string.msg_content_error)));
-                    return;
-                }
+                    if (success) {
 
-                // Create message and post it.
-                LiveUpdateMessage message = new LiveUpdateMessage(messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
-                TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
-                    if (success1 && apiResponse.isSuccess()) {
-                        NewMessageActivity.this.finish();
-                    } else {
-                        if (!success1)
-                            new CustomToast(NewMessageActivity.this).showDefault(statusCode);
-                        else new CustomToast(NewMessageActivity.this).showStringError(apiResponse.getInternal_error());
+                        // Show error if message is to short.
+                        if (messageContent.getText().length() < 3) {
+                            NewMessageActivity.this.runOnUiThread(() -> new CustomToast(NewMessageActivity.this).showStringError(NewMessageActivity.this.getString(R.string.msg_content_error)));
+                            return;
+                        }
+
+                        // Create message and post it.
+                        LiveUpdateMessage message = new LiveUpdateMessage(messageContent.getText().toString(), tagList.toArray(new MessageTag[0]), new String[0]);
+                        TravanaAPI.addMessage(data, message, (apiResponse, statusCode, success1) -> NewMessageActivity.this.runOnUiThread(() -> {
+                            if (success1 && apiResponse.isSuccess()) {
+                                NewMessageActivity.this.finish();
+                            } else {
+                                if (!success1)
+                                    new CustomToast(NewMessageActivity.this).showDefault(statusCode);
+                                else
+                                    new CustomToast(NewMessageActivity.this).showStringError(apiResponse.getInternal_error());
+                                post.setOnClickListener(this);
+                            }
+                        }));
                     }
-                }));
+                });
             }
-        }));
+        });
 
         // Set add tag button.
         add.setOnClickListener(v -> {

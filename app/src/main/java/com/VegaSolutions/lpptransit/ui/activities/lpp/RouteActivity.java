@@ -527,8 +527,8 @@ public class RouteActivity extends MapFragmentActivity {
 
                 // Set bold and bigger text for previous activity station
                 holder.name.setTypeface(null, Typeface.BOLD);
-                params.height = 80;
-                params.width = 80;
+                params.height = 75;
+                params.width = 75;
                 holder.node.setLayoutParams(params);
                 if (isBus[position][0] == 2) {
                     if (isBus[position][1] == 1) {
