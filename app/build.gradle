@@ -8,7 +8,7 @@ android {
         applicationId "com.VegaSolutions.lpptransit"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 8
+        versionCode 15
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,7 +50,7 @@ dependencies {
     implementation 'com.github.zagum:Android-ExpandIcon:1.2.1'
     implementation 'com.google.android:flexbox:1.1.1'
     // Add the Firebase SDK for Google Analytics
-    implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
     // Add the SDKs for any other Firebase products you want to use in your app
     // For example, to use Firebase Authentication and Cloud Firestore
     implementation 'com.google.firebase:firebase-auth:19.2.0'

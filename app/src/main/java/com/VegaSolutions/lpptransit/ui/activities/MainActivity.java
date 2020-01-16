@@ -144,10 +144,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
                 boolean notified = getSharedPreferences("notifications", MODE_PRIVATE).getBoolean("update", false);
 
-                // Return if this update was already shown
-                if (notified)
-                    return;
-
                 getSharedPreferences("notifications", MODE_PRIVATE).edit().putBoolean("update", true).apply();
 
                 boolean supported = false;
@@ -165,6 +161,9 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                     builder.setNegativeButton(R.string.alert_cancel_button, (dialog, which) -> {
                         dialog.dismiss();
                     });
+
+                    if (notified)
+                        return;
                 } else if (cV < apiResponse.getData().getLast_version()) {
                     builder.setMessage(R.string.alert_update_urgent);
                     builder.setCancelable(false);
@@ -266,19 +265,21 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
     private void setupClusterManager() {
 
-        clusterManager = new ClusterManager<>(this, mMap);
-        CustomClusterRenderer customClusterRenderer = new CustomClusterRenderer(this, mMap, clusterManager);
-        clusterManager.setRenderer(customClusterRenderer);
+        if (clusterManager == null) {
+            clusterManager = new ClusterManager<>(this, mMap);
+            CustomClusterRenderer customClusterRenderer = new CustomClusterRenderer(this, mMap, clusterManager);
+            clusterManager.setRenderer(customClusterRenderer);
 
-        // Set cluster expand animation.
-        clusterManager.setOnClusterClickListener(cluster -> {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cluster.getPosition(), mMap.getCameraPosition().zoom + 2f));
-            return true;
-        });
+            // Set cluster expand animation.
+            clusterManager.setOnClusterClickListener(cluster -> {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cluster.getPosition(), mMap.getCameraPosition().zoom + 2f));
+                return true;
+            });
 
-        // Set cluster manager as camera listener.
-        mMap.setOnCameraIdleListener(clusterManager);
-        mMap.setOnMarkerClickListener(clusterManager);
+            // Set cluster manager as camera listener.
+            mMap.setOnCameraIdleListener(clusterManager);
+            mMap.setOnMarkerClickListener(clusterManager);
+        }
 
     }
 
@@ -364,8 +365,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         if (requestCode == locationRequestCode) {
             // If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (mMap != null)
+                if (mMap != null) {
                     onMapReady(mMap);
+                    switchFragment(new StationsFragment());
+                }
             } else Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
         }
     }
