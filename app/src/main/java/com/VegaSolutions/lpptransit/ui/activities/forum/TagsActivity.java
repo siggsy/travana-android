@@ -320,7 +320,7 @@ public class TagsActivity extends AppCompatActivity {
 
         }
 
-        private void applyFilter(String text) {
+        private synchronized void applyFilter(String text) {
 
             ArrayList<Object> items = new ArrayList<>();
 

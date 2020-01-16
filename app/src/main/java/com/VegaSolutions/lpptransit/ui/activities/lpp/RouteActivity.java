@@ -297,7 +297,11 @@ public class RouteActivity extends MapFragmentActivity {
                             startActivity(i);
                             finish();
                         }));
-                        builder.show();
+
+                        if(!isFinishing()) {
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        }
                     });
 
                 } else {

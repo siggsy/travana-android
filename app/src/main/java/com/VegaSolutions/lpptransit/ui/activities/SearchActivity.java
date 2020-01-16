@@ -92,7 +92,7 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    void applyFilter(String text) {
+    synchronized void applyFilter(String text) {
 
         if(text.isEmpty()) {
             adapter.items.clear();

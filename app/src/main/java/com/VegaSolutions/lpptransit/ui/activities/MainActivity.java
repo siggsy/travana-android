@@ -176,9 +176,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                     });
                 } else return;
 
-
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+                if(!isFinishing()) {
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
 
             }
         }));
@@ -205,8 +206,11 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 builder.setMessage(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getContent_slo() : apiResponse.getData().getContent_en());
                 builder.setCancelable(true);
                 builder.setPositiveButton(R.string.alert_ok_button, (dialog, which) -> dialog.cancel());
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+
+                if(!isFinishing()) {
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
 
             }
         }));
