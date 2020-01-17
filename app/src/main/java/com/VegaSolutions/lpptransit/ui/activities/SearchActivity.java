@@ -28,6 +28,7 @@ import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
@@ -42,7 +43,7 @@ public class SearchActivity extends AppCompatActivity {
     // Search objects
     SearchAdapter adapter;
     String filter = "";
-    List<SearchItem> items = new ArrayList<>();
+    final List<SearchItem> items = Collections.synchronizedList(new ArrayList<>());
 
     void setupUI() {
 
@@ -92,7 +93,7 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    synchronized void applyFilter(String text) {
+    void applyFilter(String text) {
 
         if(text.isEmpty()) {
             adapter.items.clear();
@@ -103,16 +104,19 @@ public class SearchActivity extends AppCompatActivity {
             text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
 
             // Find an item and add to the list
-            for(SearchItem item : this.items) {
-                String itemName = item.searchText.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
-                if (itemName.contains(text))
-                    items.add(item);
+            synchronized (this.items) {
+                for (SearchItem item : this.items) {
+                    String itemName = item.searchText.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
+                    if (itemName.contains(text))
+                        items.add(item);
+                }
+                adapter.setItems(items);
             }
-            adapter.setItems(items);
         }
         adapter.notifyDataSetChanged();
 
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +143,6 @@ public class SearchActivity extends AppCompatActivity {
                     }
                     else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
                     runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-
                 });
             }
             else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));

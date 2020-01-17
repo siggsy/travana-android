@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
@@ -112,7 +113,9 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
 
     private void show(View view, boolean value) {
 
+        // Animate view alpha.
         if (!value) {
+            // Show view.
             view.setVisibility(View.VISIBLE);
             animatePadding(true);
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
@@ -120,6 +123,7 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
             objectAnimator.setInterpolator(new LinearInterpolator());
             objectAnimator.start();
         } else {
+            // Hide view.
             animatePadding(false);
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
             objectAnimator.setDuration(200);

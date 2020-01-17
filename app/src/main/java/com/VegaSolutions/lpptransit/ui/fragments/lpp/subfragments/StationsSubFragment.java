@@ -3,7 +3,6 @@ package com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +22,7 @@ import android.widget.TextView;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
+import com.VegaSolutions.lpptransit.ui.customviews.NullSafeView;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
@@ -37,8 +37,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class StationsSubFragment extends Fragment implements MyLocationManager.MyLocationListener {
 
@@ -60,9 +58,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     private List<Station> stations;
 
     // UI elements
-    private RecyclerView list;
-    private View favErr, locErr, progressBar;
-    private FloatingActionButton locationRefresh;
+    private NullSafeView<RecyclerView> list = new NullSafeView<>();
+    private NullSafeView<View> favErr = new NullSafeView<>();
+    private NullSafeView<View> locErr = new NullSafeView<>();
+    private NullSafeView<View> progressBar = new NullSafeView<>();
+    private NullSafeView<FloatingActionButton> locationRefresh = new NullSafeView<>();
     private Adapter adapter = new Adapter();
     private FragmentHeaderCallback callback;
 
@@ -76,12 +76,12 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
         // Update UI
         ((Activity) context).runOnUiThread(() -> {
-            progressBar.setVisibility(View.GONE);
+            progressBar.addTask(v -> v.setVisibility(View.GONE));
             if (location != null) {
                 this.location = location;
                 setNearbyStations(stations);
-                locErr.setVisibility(View.GONE);
-            } else locErr.setVisibility(View.VISIBLE);
+                locErr.addTask(v -> v.setVisibility(View.GONE));
+            } else locErr.addTask(v -> v.setVisibility(View.VISIBLE));
         });
 
     }
@@ -98,11 +98,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     private void setupUI() {
 
         // RV
-        list.setAdapter(adapter);
-        list.setLayoutManager(new LinearLayoutManager(context));
-        list.setItemViewCacheSize(30);
-        list.setHasFixedSize(true);
-        list.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        list.getView().setAdapter(adapter);
+        list.getView().setLayoutManager(new LinearLayoutManager(context));
+        list.getView().setItemViewCacheSize(30);
+        list.getView().setHasFixedSize(true);
+        list.getView().addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -111,11 +111,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         });
 
         // Setup location refresh button
-        locationRefresh.setVisibility(View.GONE);
+        locationRefresh.getView().setVisibility(View.GONE);
         if (type == TYPE_NEARBY) {
-            locationRefresh.setOnClickListener((v) -> {
-                locErr.setVisibility(View.GONE);
-                progressBar.setVisibility(View.VISIBLE);
+            locationRefresh.getView().setOnClickListener((v) -> {
+                locErr.getView().setVisibility(View.GONE);
+                progressBar.getView().setVisibility(View.VISIBLE);
                 updateLocationList(locationManager.getLatest());
             });
         }
@@ -134,7 +134,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     public void onResume() {
         super.onResume();
 
-        callback.onHeaderChanged(list.canScrollVertically(-1));
+        callback.onHeaderChanged(list.getView().canScrollVertically(-1));
         if (stations != null) {
             if (type == TYPE_FAVOURITE) { adapter.notifyDataSetChanged(); setFavouriteStations(stations); }
             else if (locationManager != null) updateLocationList(locationManager.getLatest());
@@ -158,11 +158,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         View root = inflater.inflate(R.layout.fragment_stations_sub, container, false);
 
         // Find all UI elements
-        list = root.findViewById(R.id.stations_sub_list);
-        locErr = root.findViewById(R.id.stations_sub_list_nearby_error);
-        favErr = root.findViewById(R.id.stations_sub_list_favourite_error);
-        progressBar = root.findViewById(R.id.stations_sub_progress);
-        locationRefresh = root.findViewById(R.id.location_refresh_fab);
+        list.setView(root.findViewById(R.id.stations_sub_list));
+        locErr.setView(root.findViewById(R.id.stations_sub_list_nearby_error));
+        favErr.setView(root.findViewById(R.id.stations_sub_list_favourite_error));
+        progressBar.setView(root.findViewById(R.id.stations_sub_progress));
+        locationRefresh.setView(root.findViewById(R.id.location_refresh_fab));
 
         setupUI();
 
@@ -183,12 +183,12 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
         // Show error if favourites list is empty
         if (stationWrappersFav.size() == 0) {
-            locErr.setVisibility(View.GONE);
-            favErr.setVisibility(View.VISIBLE);
+            locErr.addTask(v -> v.setVisibility(View.GONE));
+            favErr.addTask(v -> v.setVisibility(View.VISIBLE));
             adapter.setStations(stationWrappersFav);
         } else {
-            favErr.setVisibility(View.GONE);
-            locErr.setVisibility(View.GONE);
+            favErr.addTask(v -> v.setVisibility(View.GONE));
+            locErr.addTask(v -> v.setVisibility(View.GONE));
             adapter.setStations(stationWrappersFav);
         }
 
@@ -202,8 +202,8 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         // Check for location availability
         if (location == null) {
             adapter.setStations(new ArrayList<>());
-            favErr.setVisibility(View.GONE);
-            locErr.setVisibility(View.VISIBLE);
+            favErr.addTask(v -> v.setVisibility(View.GONE));
+            locErr.addTask(v -> v.setVisibility(View.VISIBLE));
         } else {
 
             // Sort stations by current location
@@ -221,8 +221,8 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
             }
 
             // Show on recyclerView
-            favErr.setVisibility(View.GONE);
-            locErr.setVisibility(View.GONE);
+            favErr.addTask(v -> v.setVisibility(View.GONE));
+            locErr.addTask(v -> v.setVisibility(View.GONE));
             adapter.setStations(stationWrappersFav.subList(0, 30));
             adapter.refreshStations(stationWrappersFav.subList(0, 30));
 
@@ -250,7 +250,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
 
         // Update UI
         ((Activity) context).runOnUiThread(() -> {
-            progressBar.setVisibility(View.GONE);
+            progressBar.addTask(v -> v.setVisibility(View.GONE));
             if (success && apiResponse != null) {
 
                 stations = apiResponse;
@@ -258,7 +258,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 // Show favourite stations
                 if (type == TYPE_FAVOURITE) {
                     setFavouriteStations(apiResponse);
-                    progressBar.setVisibility(View.GONE);
+                    progressBar.addTask(v -> v.setVisibility(View.GONE));
                 }
 
                 // Show nearby stations
@@ -267,8 +267,8 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                     // Check permissions
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (!MapUtility.checkIfAtLeastOnePermissionPermitted(context)) {
-                            locErr.setVisibility(View.VISIBLE);
-                            progressBar.setVisibility(View.GONE);
+                            locErr.addTask(v -> v.setVisibility(View.VISIBLE));
+                            progressBar.addTask(v -> v.setVisibility(View.GONE));
                             return;
                         }
                     }
@@ -277,9 +277,9 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                     locationManager = new MyLocationManager(context);
                     if (!locationManager.isMainProviderEnabled())
                         locationManager.addListener(this);
-                    locErr.setVisibility(View.GONE);
+                    locErr.addTask(v -> v.setVisibility(View.GONE));
                     updateLocationList(locationManager.getLatest());
-                    locationRefresh.setVisibility(View.VISIBLE);
+                    locationRefresh.addTask(v -> v.setVisibility(View.VISIBLE));
 
                 }
             }
@@ -382,7 +382,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                     i--;
                 }
             }
-            list.scrollToPosition(0);
+            list.getView().scrollToPosition(0);
         }
 
         public ArrayList<Station> getStations() {

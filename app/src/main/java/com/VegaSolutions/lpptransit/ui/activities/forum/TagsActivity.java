@@ -320,7 +320,7 @@ public class TagsActivity extends AppCompatActivity {
 
         }
 
-        private synchronized void applyFilter(String text) {
+        private void applyFilter(String text) {
 
             ArrayList<Object> items = new ArrayList<>();
 
@@ -328,7 +328,8 @@ public class TagsActivity extends AppCompatActivity {
             text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z').replace("#", "");
 
             // Find an item and add to the list
-            for(Object item : allTags) {
+
+            for (Object item : allTags) {
                 if (item instanceof UserTag) {
                     UserTag uTag = (UserTag) item;
                     String itemName = uTag.getTag().toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');

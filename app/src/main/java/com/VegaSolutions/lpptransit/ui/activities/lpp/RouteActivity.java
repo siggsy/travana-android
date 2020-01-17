@@ -179,7 +179,7 @@ public class RouteActivity extends MapFragmentActivity {
                         RouteActivity.this.runOnUiThread(() -> {
                             Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
                             marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
-                            if (Integer.valueOf(stationId) / 10 == stationOnRoute.getCode_id() / 10) {
+                            if (Integer.valueOf(stationId) == stationOnRoute.getCode_id()) {
                                 marker.showInfoWindow();
                             }
                         });
@@ -197,11 +197,11 @@ public class RouteActivity extends MapFragmentActivity {
                     });
 
                     // Start bus updater.
-
                     runOnUiThread(() -> {
                         handler = new Handler();
                         handler.post(runnable);
                     });
+
                 } else {
                     Api.busesOnRoute(routeNumber, busQuery);
                     handler.postDelayed(runnable, UPDATE_TIME);
@@ -510,10 +510,18 @@ public class RouteActivity extends MapFragmentActivity {
             // Set station name and text style
             holder.name.setText(station.getName());
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.node.getLayoutParams();
-            holder.name.setTypeface(null, Typeface.BOLD);
-            holder.name.setTextSize(14f);
-            params.height = 32;
-            params.width = 32;
+
+            if (Integer.valueOf(stationId) == station.getStation_code()) {
+                holder.name.setTypeface(null, Typeface.BOLD);
+                holder.name.setTextSize(20f);
+                params.height = 56;
+                params.width = 56;
+            } else {
+                holder.name.setTypeface(null, Typeface.NORMAL);
+                holder.name.setTextSize(14f);
+                params.height = 32;
+                params.width = 32;
+            }
             holder.node.setLayoutParams(params);
 
             // Remove redundant top and bottom connectors
@@ -535,9 +543,14 @@ public class RouteActivity extends MapFragmentActivity {
             if (isBus[position][0] > 0) {
 
                 // Set bold and bigger text for previous activity station
-                holder.name.setTypeface(null, Typeface.BOLD);
-                params.height = 76;
-                params.width = 76;
+
+                if (Integer.valueOf(stationId) == station.getStation_code()) {
+                    params.height = 94;
+                    params.width = 94;
+                } else {
+                    params.height = 76;
+                    params.width = 76;
+                }
                 holder.node.setLayoutParams(params);
                 if (isBus[position][0] == 2) {
                     if (isBus[position][1] == 1) {
