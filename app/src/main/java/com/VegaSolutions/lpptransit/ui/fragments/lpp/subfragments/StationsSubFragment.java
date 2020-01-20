@@ -3,15 +3,22 @@ package com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +27,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.lppapi.Api;
+import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
 import com.VegaSolutions.lpptransit.ui.customviews.NullSafeView;
@@ -28,15 +39,22 @@ import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.joda.time.DateTime;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class StationsSubFragment extends Fragment implements MyLocationManager.MyLocationListener {
 
@@ -65,6 +83,8 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     private NullSafeView<FloatingActionButton> locationRefresh = new NullSafeView<>();
     private Adapter adapter = new Adapter();
     private FragmentHeaderCallback callback;
+    private int color, backColor;
+    private boolean hour;
 
     private OnAttachListener onAttachListener = null;
 
@@ -119,6 +139,13 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 updateLocationList(locationManager.getLatest());
             });
         }
+
+        // Save default theme colors
+        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
+        TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
+        backColor = array.getColor(1, Color.WHITE);
+        color = array.getColor(0, Color.BLACK);
+        array.recycle();
     }
 
     @Override
@@ -143,6 +170,14 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
             if (stations != null)
                 locationManager.addListener(this);
         }
+        if (adapter != null) {
+            List<StationWrapper> stationWrappers = adapter.stations;
+            for (int i = 0, stationWrappersSize = stationWrappers.size(); i < stationWrappersSize; i++) {
+                StationWrapper stationWrapper = stationWrappers.get(i);
+                if (stationWrapper.run != null)
+                    stationWrapper.handler.postDelayed(stationWrapper.run, i * 500);
+            }
+        }
     }
 
     @Override
@@ -150,6 +185,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         super.onPause();
         if (type == TYPE_NEARBY && locationManager != null)
             locationManager.removeListener(this);
+        if (adapter != null) {
+            for (StationWrapper stationWrapper : adapter.stations)
+                if (stationWrapper.run != null)
+                    stationWrapper.handler.removeCallbacks(stationWrapper.run);
+        }
     }
 
     @Override
@@ -163,6 +203,9 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         favErr.setView(root.findViewById(R.id.stations_sub_list_favourite_error));
         progressBar.setView(root.findViewById(R.id.stations_sub_progress));
         locationRefresh.setView(root.findViewById(R.id.location_refresh_fab));
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
+        hour = sharedPreferences.getBoolean("hour", false);
 
         setupUI();
 
@@ -290,6 +333,10 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     @Override
     public void onDetach() {
         super.onDetach();
+        for (StationWrapper stationWrapper : adapter.stations) {
+            if (stationWrapper.run != null)
+                stationWrapper.handler.removeCallbacks(stationWrapper.run);
+        }
         context = null;
     }
 
@@ -435,6 +482,99 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 viewHolder.routes.addView(v);
             }
 
+            if (station.favourite && station.run == null) {
+                station.run = () -> Api.arrival(station.station.getRef_id(), (apiResponse, statusCode, success) -> {
+                    Activity a = (Activity) context;
+                    if (a == null) return;
+                    a.runOnUiThread(() -> {
+                        station.arrivals.clear();
+                        if (success) {
+                            Map<String, Boolean> favRoutes = LppHelper.getFavouriteRoutes(context);
+                            Map<String, Boolean> alreadyAdded = new HashMap<>();
+                            for (ArrivalWrapper.Arrival arrival : apiResponse.getData().getArrivals()) {
+                                Boolean f = favRoutes.get(arrival.getRoute_id());
+                                if (f != null && f) {
+                                    Boolean added = alreadyAdded.get(arrival.getTrip_id());
+                                    if (added == null || !added) {
+                                        station.arrivals.add(arrival);
+                                        alreadyAdded.put(arrival.getTrip_id(), true);
+                                    }
+                                }
+                            }
+                        }
+                        station.handler.postDelayed(station.run, 30000 + position * 1000);
+                        notifyItemChanged(position);
+                    });
+                });
+                station.handler.postDelayed(station.run, position * 250);
+            }
+
+            viewHolder.arrivals.removeAllViews();
+            for (ArrivalWrapper.Arrival arrival : station.arrivals) {
+
+                // Inflate view
+                View v = getLayoutInflater().inflate(R.layout.template_arrival_time_special, viewHolder.arrivals, false);
+                TextView arrival_time = v.findViewById(R.id.arrival_time_time);
+                TextView arrival_event = v.findViewById(R.id.arrival_time_event);
+                ImageView arrival_event_icon = v.findViewById(R.id.arrival_time_event_rss);
+                View back = v.findViewById(R.id.arrival_time_back);
+                TextView number = v.findViewById(R.id.route_station_number);
+                View circle = v.findViewById(R.id.route_station_circle);
+                number.setText(arrival.getRoute_name());
+                number.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                circle.getBackground().setTint(Colors.getColorFromString(arrival.getRoute_name()));
+
+                SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+                // Set preferred time format
+                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
+                arrival_time.setTextColor(color);
+                back.getBackground().setTint(backColor);
+
+                // (0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))
+                switch (arrival.getType()) {
+                    case 0:
+                        arrival_event_icon.setVisibility(View.VISIBLE);
+                        break;
+                    case 2:
+                        arrival_event.setVisibility(View.GONE);
+                        arrival_event_icon.setVisibility(View.GONE);
+                        arrival_time.setText(getString(R.string.arrival).toUpperCase());
+                        arrival_time.setTextColor(Color.WHITE);
+                        back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_arrival, null));
+                        break;
+                    case 3:
+                        arrival_event.setVisibility(View.GONE);
+                        arrival_event_icon.setVisibility(View.GONE);
+                        arrival_time.setText(getString(R.string.detour).toUpperCase());
+                        arrival_time.setTextColor(Color.WHITE);
+                        back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
+                        break;
+                    default:
+                        arrival_event.setVisibility(View.GONE);
+                        arrival_event_icon.setVisibility(View.GONE);
+                }
+
+                // Ignore "ghost" arrivals
+                if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                    viewHolder.arrivals.addView(v);
+
+                // Add "garage" flag
+                if (arrival.getDepot() == 1) {
+                    arrival_event.setText(getString(R.string.garage));
+                    arrival_event.setTextColor(color);
+                    arrival_event.getBackground().setTint(backColor);
+                    arrival_event.setVisibility(View.VISIBLE);
+                } else {
+                    arrival_event.setText("");
+                    arrival_event.getBackground().setTint(backColor);
+                    arrival_event.setVisibility(View.GONE);
+                }
+
+                // Show only one if type is "detour"
+                if (arrival.getType() == 3) break;
+
+            }
 
         }
 
@@ -446,7 +586,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         private class ViewHolder extends RecyclerView.ViewHolder {
 
             TextView name, distance, center;
-            FlexboxLayout routes;
+            FlexboxLayout routes, arrivals;
             ImageView fav;
 
             LinearLayout card;
@@ -460,6 +600,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 card = itemView.findViewById(R.id.station_nearby_card);
                 center = itemView.findViewById(R.id.station_nearby_center);
                 fav = itemView.findViewById(R.id.route_favourite);
+                arrivals = itemView.findViewById(R.id.route_arrivals);
 
             }
         }
@@ -470,6 +611,9 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         int distance;
         boolean favourite;
         Station station;
+        Handler handler;
+        Runnable run = null;
+        List<ArrivalWrapper.Arrival> arrivals = new ArrayList<>();
 
         private StationWrapper(Station station, boolean favourite) {
             this(station, favourite, -1);
@@ -478,6 +622,7 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
             this.distance = distance;
             this.favourite = favourite;
             this.station = station;
+            handler = new Handler();
         }
 
     }

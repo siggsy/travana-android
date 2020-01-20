@@ -80,6 +80,16 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="22dp"
         android:layout_marginEnd="22dp"
+        android:layout_marginBottom="8dp"
+        app:alignItems="flex_start"
+        app:flexWrap="wrap" />
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/route_arrivals"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:layout_marginEnd="22dp"
         android:layout_marginBottom="16dp"
         app:alignItems="flex_start"
         app:flexWrap="wrap" />
