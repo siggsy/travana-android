@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +70,16 @@ public class LiveArrivalFragment extends Fragment {
     private boolean hour;
     private int color, backColor;
 
+    private Handler handler;
+
+    private Runnable updater = new Runnable() {
+        @Override
+        public void run() {
+            refreshLayout.setRefreshing(true);
+            Api.arrival(stationId, callback);
+            handler.postDelayed(updater, 30000);
+        }
+    };
     private ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
 
         // Cancel UI update if fragment is not attached to activity
@@ -84,11 +95,14 @@ public class LiveArrivalFragment extends Fragment {
                 // Check if arrival list is not empty and refresh rv adapter
                 noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
                 adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
-
+                handler.removeCallbacks(updater);
+                handler.postDelayed(updater, 30000);
             } else new CustomToast(context).showDefault(statusCode);
         });
 
     };
+
+
 
     private void setupUI() {
 
@@ -115,6 +129,7 @@ public class LiveArrivalFragment extends Fragment {
         color = array.getColor(0, Color.BLACK);
         array.recycle();
 
+        handler = new Handler();
     }
 
     @Override
@@ -172,6 +187,11 @@ public class LiveArrivalFragment extends Fragment {
         Api.arrival(stationId, callback);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        handler.removeCallbacks(updater);
+    }
 
     private void onHeaderChanged(boolean value) {
         if (headerCallback != null)
@@ -325,6 +345,9 @@ public class LiveArrivalFragment extends Fragment {
         boolean favourite;
 
         private static List<RouteWrapper> getFromArrivals(Context context, List<ArrivalWrapper.Arrival> arrivals) {
+
+            if (context == null)
+                return new ArrayList<>();
 
             // Sort by route number
             Collections.sort(arrivals, (o1, o2) -> {

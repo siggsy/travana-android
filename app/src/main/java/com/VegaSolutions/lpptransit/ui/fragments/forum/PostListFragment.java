@@ -76,7 +76,10 @@ public class PostListFragment extends Fragment {
                 else {
                     adapter.setMessages(apiResponse.getData());
                     if (apiResponse.getData().length == 0)
-                        new CustomToast(a).showStringNormal(getString(R.string.no_messages));
+                        try {
+                            new CustomToast(a).showStringNormal(getString(R.string.no_messages));
+                        } catch (IllegalStateException ignored) {}
+
                     signInText.setVisibility(View.GONE);
                     signInBtn.setVisibility(View.GONE);
                 }
