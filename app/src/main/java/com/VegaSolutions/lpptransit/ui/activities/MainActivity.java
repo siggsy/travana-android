@@ -49,6 +49,8 @@ import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -75,6 +77,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     NavigationView nv;
     View bottomSheet;
     View header;
+
+    LatLng lastValidMapCenter = ljubljana;
 
     private ClusterManager<StationMarker> clusterManager;
 
@@ -124,6 +128,25 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         });
 
         behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
+
+        behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                switch (behavior.getState()) {
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        setMapPaddingBotttom(slideOffset);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
+                        break;
+                }
+            }
+        });
+
 
         // Switch bottom sheet fragment.
         switchFragment(StationsFragment.newInstance());
@@ -216,13 +239,22 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
     }
 
+    private void setMapPaddingBotttom(Float offset) {
+        float maxMapPaddingBottom = (float) behavior.getPeekHeight();
+        setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
 
         // Setup google maps UI.
-        setPadding(12, 200, 12, behavior.getPeekHeight());
+
         setupClusterManager();
+
+        setPadding(12, 200, 12, behavior.getPeekHeight());
+        setMapPaddingBotttom(0f);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
         // Set Station InfoWindow click listener.
         mMap.setOnInfoWindowClickListener(marker -> {
@@ -231,6 +263,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
             i.putExtra(StationActivity.STATION, station);
             startActivity(i);
         });
+
+        mMap.setOnCameraMoveListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
 
     }
 

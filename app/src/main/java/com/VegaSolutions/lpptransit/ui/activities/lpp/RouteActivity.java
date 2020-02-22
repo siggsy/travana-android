@@ -73,6 +73,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -106,15 +107,15 @@ public class RouteActivity extends MapFragmentActivity {
 
     private ElevationAnimation elevationAnimation;
     private Adapter adapter;
-    private BottomSheetBehavior behavior;
+    private ViewPagerBottomSheetBehavior behavior;
 
     // Google maps parameters
     private final int UPDATE_TIME = 10000;
-    private LatLng ljubljana = new LatLng(46.056319, 14.505381);
     private Handler handler;
     private BusMarkerManager busManager;
     private MarkerOptions busOptions;
     private MarkerOptions stationOptions;
+    LatLng lastValidMapCenter = ljubljana;
 
     private boolean hour;
     private int backColor;
@@ -352,7 +353,25 @@ public class RouteActivity extends MapFragmentActivity {
 
         Log.i("TRIP ID", tripId);
 
-        behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
+
+        behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                switch (behavior.getState()) {
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        setMapPaddingBotttom(slideOffset);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
+                        break;
+                }
+            }
+        });
 
         int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
         TypedArray array = obtainStyledAttributes(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
@@ -362,6 +381,11 @@ public class RouteActivity extends MapFragmentActivity {
 
         setupUI();
 
+    }
+
+    private void setMapPaddingBotttom(Float offset) {
+        float maxMapPaddingBottom = (float) behavior.getPeekHeight();
+        setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
     }
 
     @Override
@@ -384,8 +408,8 @@ public class RouteActivity extends MapFragmentActivity {
     public void onBackPressed() {
 
         // Collapse bottom sheet if expanded
-        if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
-            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED)
+            behavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
         else super.onBackPressed();
 
     }
@@ -396,7 +420,10 @@ public class RouteActivity extends MapFragmentActivity {
 
         // Setup Google maps UI
         setPadding(0, 0, 0, behavior.getPeekHeight());
+        setMapPaddingBotttom(0f);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
         mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
+        mMap.setOnCameraMoveListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
 
         // Setup handlers.
         busManager = new BusMarkerManager(mMap, busOptions);
@@ -420,6 +447,8 @@ public class RouteActivity extends MapFragmentActivity {
                 });
             }
         }));
+
+
 
         // Query stations on route and display them on the map.
         Api.arrivalsOnRoute(tripId, callback);

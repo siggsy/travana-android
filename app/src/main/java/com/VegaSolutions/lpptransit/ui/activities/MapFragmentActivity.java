@@ -100,8 +100,6 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
 
         mMap.setOnMapClickListener(latLng -> setHide(!hidden));
 
-        // Set camera to Ljubljana.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
     }
 

@@ -16,6 +16,7 @@
         android:theme="@style/WhiteTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ui.activities.lpp.BusActivity"></activity>
         <activity
             android:name=".ui.activities.AboutActivity"
             android:screenOrientation="portrait" />
