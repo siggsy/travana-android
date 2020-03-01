@@ -24,8 +24,11 @@ import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.BindViews;
@@ -111,7 +114,12 @@ public class DepartureActivity extends AppCompatActivity {
         // Get group number
         String group = route_number.replaceAll("[^0-9]", "");
 
-        Api.timetable(Integer.valueOf(station_code), 100, 100, (apiResponse, statusCode, success) -> {
+        // Calculate for request
+        DateTime now = DateTime.now();
+        int next = 28 - now.getHourOfDay();
+        int prev = now.getHourOfDay() - 6;
+
+        Api.timetable(Integer.parseInt(station_code), 8, 8, (apiResponse, statusCode, success) -> {
             runOnUiThread(() -> {
 
                 // Remove progress bar
@@ -142,7 +150,7 @@ public class DepartureActivity extends AppCompatActivity {
                 else new CustomToast(this).showDefault(statusCode);
 
             });
-        }, Integer.valueOf(group));
+        }, Integer.parseInt(group));
 
     }
 
@@ -173,7 +181,7 @@ public class DepartureActivity extends AppCompatActivity {
             // Set minutes in an hour
             for (int min : timetable.getMinutes()) {
                 TextView textView = (TextView) getLayoutInflater().inflate(R.layout.template_departure_min, holder.minutes, false);
-                textView.setText(String.valueOf(min));
+                textView.setText(String.format(Locale.getDefault(), "%02d", min));
                 textView.setTextColor(timetable.isCurrent() ? Color.WHITE : textColor);
                 holder.minutes.addView(textView);
             }

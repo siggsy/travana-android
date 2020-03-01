@@ -423,7 +423,7 @@ public class RouteActivity extends MapFragmentActivity {
         setMapPaddingBotttom(0f);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
         mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
-        mMap.setOnCameraMoveListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
+        mMap.setOnCameraIdleListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
 
         // Setup handlers.
         busManager = new BusMarkerManager(mMap, busOptions);
