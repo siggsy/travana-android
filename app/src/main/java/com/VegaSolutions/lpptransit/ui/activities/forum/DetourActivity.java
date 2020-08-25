@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -32,8 +33,8 @@ public class DetourActivity extends AppCompatActivity {
 
     DetoursAdapter detoursAdapter;
     RecyclerView rv;
-    ProgressBar pb;
     ImageView back;
+    SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,36 +43,39 @@ public class DetourActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detur);
         initComponents();
         initList();
-        pb.setProgress(1);
+        refreshLayout.setRefreshing(true);
 
         back.setOnClickListener(view -> {
             finish();
         });
 
-        Api.getDetours((apiResponse, statusCode, success) -> {
-
-            Log.e(TAG, String.valueOf(apiResponse.getData().size()));
-
-            runOnUiThread(() -> {
-
-                if (success) {
-                    pb.setActivated(false);
-                    pb.setVisibility(View.GONE);
-                    updateList(apiResponse.getData());
-
-                } else {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_loading), Toast.LENGTH_LONG).show();
+        refreshLayout.setOnRefreshListener(
+                () -> {
+                    loadDetours();
                 }
-            });
+        );
 
-        });
+        loadDetours();
 
     }
 
+    private void loadDetours() {
+        Api.getDetours((apiResponse, statusCode, success) -> {
+            runOnUiThread(() -> {
+                if (success) {
+                    updateList(apiResponse.getData());
+                } else {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.error_loading), Toast.LENGTH_LONG).show();
+                }
+                refreshLayout.setRefreshing(false);
+            });
+        });
+    }
+
     private void initComponents() {
-        pb = findViewById(R.id.progressBar_detours);
         rv = findViewById(R.id.rv_detours);
         back = findViewById(R.id.iv_back);
+        refreshLayout = findViewById(R.id.swiperefresh);
     }
 
     private void initList() {
@@ -146,6 +150,4 @@ public class DetourActivity extends AppCompatActivity {
         }
 
     }
-
-
 }
