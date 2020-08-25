@@ -30,15 +30,15 @@ public class LauncherActivity extends AppCompatActivity {
         v[0].setAnimation(animation);
 
         animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
-        animation.setStartOffset(200);
+        animation.setStartOffset(250);
         v[1].setAnimation(animation);
 
         animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
-        animation.setStartOffset(400);
+        animation.setStartOffset(500);
         v[2].setAnimation(animation);
 
         animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
-        animation.setStartOffset(600);
+        animation.setStartOffset(750);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {}

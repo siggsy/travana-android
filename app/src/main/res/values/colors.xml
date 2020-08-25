@@ -6,6 +6,8 @@
     <color name="colorPrimaryDark">#D81B60</color> <!-- #00574B-->
     <color name="colorAccent">#D81B60</color>
 
+    <color name="color_lpp">#1e7b4b</color>
+
     <!-- global colors -->
     <color name="colorRipple">#1AD81B60</color>
     <color name="colorRipple_map">#1A45BEE6</color>

@@ -1,11 +1,14 @@
 package com.VegaSolutions.lpptransit.lppapi;
 
+import android.util.Log;
+
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DepartureWrapper;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.DetourInfo;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
@@ -13,9 +16,20 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+
 public class Api {
+
+    public static final String TAG = "Api";
+    private OkHttpClient httpClient;
+
+    public Api(OkHttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
 
     public static void busDetails_name(String bus_name, ApiCallback<List<Bus>> callback) {
 
@@ -204,4 +218,82 @@ public class Api {
                 .start();
     }
 
+    public static void getDetours(ApiCallback<List<DetourInfo>> callback) {
+        new LppQuery2(LppQuery2.DETOURS)
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+
+                        try{
+                            List<DetourInfo> data = getDetours(response);
+                            ApiResponse<List<DetourInfo>> r = new ApiResponse<List<DetourInfo>>(true, data);
+                            callback.onComplete(r, statusCode, true);
+                        }catch (Exception e){
+                            callback.onComplete(null, statusCode, false);
+                        }
+                    } else callback.onComplete(null, statusCode, false);
+                })
+                .start();
+    }
+
+    public static void getDetourDetailed(String link, String title, String time, ApiCallback<DetourInfo> callback) {
+        new LppQuery2(LppQuery2.DETOURS + link)
+                .setOnCompleteListener((response, statusCode, success) -> {
+                    if (success) {
+
+                        try{
+
+                            DetourInfo di = new DetourInfo(title, time, null, response, null);
+                            ApiResponse<DetourInfo> apiResponse = new ApiResponse<>(true, di);
+
+                            callback.onComplete(apiResponse, statusCode, true);
+
+                        }catch (Exception e){
+                            callback.onComplete(null, statusCode, false);
+                        }
+                    } else callback.onComplete(null, statusCode, false);
+                })
+                .start();
+    }
+
+    private static String getHtmlContent(String html){
+
+        String fist_main_word = "<div id=\"block-system-main\" class=\"block block-system\">";
+        String second_main_word = "";
+
+        return null;
+    }
+
+    private static List<DetourInfo> getDetours(String html) throws Exception {
+
+        String s = html;
+
+        List<DetourInfo> list = new ArrayList<>();
+
+        String main_html_word = "views-field views-field-nothing";
+        String main_html_word_title = "content__box--title";
+        String main_html_word_time = "content__box--date";
+
+        while(s.contains(main_html_word)) {
+
+            s = s.substring(s.indexOf(main_html_word) + main_html_word.length());
+            s = s.substring(s.indexOf(main_html_word_title) + main_html_word_title.length());
+            s = s.substring(s.indexOf("href"));
+
+            String href = s.substring(s.indexOf("href") + 6, s.indexOf(">") -1);
+            s = s.substring(s.indexOf(href) + href.length());
+
+            String title = s.substring(s.indexOf(">") + 1, s.indexOf("<"));
+
+            s = s.substring(s.indexOf(title) + title.length());
+            s = s.substring(s.indexOf(main_html_word_time) + main_html_word_title.length() + 1);
+
+            String date = s.substring(0, s.indexOf("<"));
+
+            DetourInfo df = new DetourInfo(title, date, href);
+
+            list.add(df);
+        }
+
+    return list;
+    }
 }

@@ -1,6 +1,5 @@
 package com.VegaSolutions.lpptransit.lppapi;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,57 +11,33 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LppQuery extends Thread {
+public class LppQuery2 extends Thread {
 
     //http://194.33.12.32/doc/                                                      //documentation
 
-    private static final String TAG = LppQuery.class.getSimpleName();
-    public static final String SERVER_URL = "https://data.lpp.si/api";
+    private static final String TAG = LppQuery2.class.getSimpleName();
+    public static final String SERVER_URL = "https://www.lpp.si";
 
-    // API PARAMETERS:
-    // '?' -> optional,
-    // '!' -> required,
-    // '!|' -> xor,
-    // '|' -> or,
-    // '&' -> and.
-    // '#' -> multiple allowed;
-
-    // Bus
-    public static final String BUS_DETAILS = "/bus/bus-details";                    // (?bus-name=468) !| (?bus-vin=ZCFC270C305997503) !| (?bus-id=?)
-    public static final String BUSES_ON_ROUTE = "/bus/buses-on-route";
-    public static final String DRIVER = "/bus/driver";                              // (?driver-id=36066995138405380)
-
-    // Route
-    public static final String ACTIVE_ROUTES = "/route/active-routes";              //
-    public static final String ROUTES = "/route/routes";                            // (?route-id=A48D5D5E-1A10-4616-86BE-65B059E0A371)
-    public static final String STATIONS_ON_ROUTE = "/route/stations-on-route";      // (?trip-id=A3295EA8-3404-4D34-9C6A-1604EFD15E40)
-    public static final String ARRIVALS_ON_ROUTE = "/route/arrivals-on-route";      // (?trip-id=A3295EA8-3404-4D34-9C6A-1604EFD15E40)
-
-    // Station
-    public static final String ARRIVAL = "/station/arrival";                        // (!station-code=600011)
-    public static final String ROUTES_ON_STATION = "/station/routes-on-station";    // (!station-code=600011)
-    public static final String STATION_DETAILS = "/station/station-details";        // (?station-code=600011) | (?show-subroutes=1)
     public static final String TIMETABLE = "/station/timetable";                    // (!station-code=600011) & (!#route-group-number=6) | (?next-hours=4) | (?previous-hours=2)
 
     // Timetable
-    public static final String ROUTE_DEPARTURES = "/timetable/route-departures";    // (!trip-id=a3295EA8-3404-4D34-9C6A-1604EFD15E40) & (!route-id=117C48BE-5CB3-4030-92FC-E22371A0779F)
+    public static final String DETOURS = "/javni-prevoz/obvozi/";
 
     private static Map<String, String> headers = new HashMap<>();
     static {
         headers.put("apikey", BuildConfig.LPP_API_KEY);
-        headers.put("Content-Type", "application/json");
+        //headers.put("Content-Type", "application/json");
         headers.put("User-Agent", "OkHttp Bot");
         headers.put("Accept", "");
         headers.put("Cache-Control", "no-cache");
         headers.put("Accept-Encoding", "gzip, deflate");
     }
 
-    public LppQuery(String URL){
+    public LppQuery2(String URL){
         this.URL = URL;
     }
 
@@ -70,7 +45,7 @@ public class LppQuery extends Thread {
     // Url parameters
     private StringBuilder params = new StringBuilder();
     // Default onCompleteListener
-    private LppQuery.OnCompleteListener onCompleteListener = (data, returnCode, success) -> {
+    private LppQuery2.OnCompleteListener onCompleteListener = (data, returnCode, success) -> {
         if (success) {
             Log.i(TAG, "Return Code: " + returnCode);
             Log.i(TAG, "Body : " + returnCode);
@@ -85,14 +60,14 @@ public class LppQuery extends Thread {
      * @param value the value
      * @return current instance for chaining
      */
-    LppQuery addParams(@NonNull String key, @NonNull String value) {
+    LppQuery2 addParams(@NonNull String key, @NonNull String value) {
         if (params.length() == 0) params.append("?");
         else params.append("&");
         params.append(key).append('=').append(value);
         return this;
     }
 
-    LppQuery setOnCompleteListener(@NonNull LppQuery.OnCompleteListener onCompleteListener) {
+    LppQuery2 setOnCompleteListener(@NonNull LppQuery2.OnCompleteListener onCompleteListener) {
         this.onCompleteListener = onCompleteListener;
         return this;
     }
@@ -102,6 +77,7 @@ public class LppQuery extends Thread {
 
             try {
                 Connection.Response r = Jsoup.connect(SERVER_URL + URL + params).ignoreContentType(true).headers(headers).timeout(20000).execute();
+                //Log.i(TAG, r.body());
                 onCompleteListener.onComplete(r.body(), r.statusCode(), true);
             } catch (HttpStatusException e) {
                 e.printStackTrace();

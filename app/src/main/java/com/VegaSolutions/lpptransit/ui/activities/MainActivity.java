@@ -11,39 +11,25 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.VegaSolutions.lpptransit.BuildConfig;
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.Update;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.Warning;
-import com.VegaSolutions.lpptransit.travanaserver.Objects.responses.ResponseObject;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaAPI;
-import com.VegaSolutions.lpptransit.travanaserver.TravanaApiCallback;
-import com.VegaSolutions.lpptransit.ui.activities.forum.ForumActivity;
-import com.VegaSolutions.lpptransit.ui.activities.forum.SignInActivity;
+import com.VegaSolutions.lpptransit.ui.activities.forum.DetourActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
-import com.VegaSolutions.lpptransit.ui.fragments.lpp.HomeFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
-import com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments.StationsSubFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,12 +42,11 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.EmptyStackException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, HomeFragment.HomeFragmentListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, NavigationView.OnNavigationItemSelectedListener {
 
     private final int locationRequestCode = 1000;
 
@@ -150,92 +135,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         // Switch bottom sheet fragment.
         switchFragment(StationsFragment.newInstance());
-
-        // Notify user about updates.
-        TravanaAPI.updates((apiResponse, statusCode, success) -> runOnUiThread(() -> {
-            if (success && apiResponse.isSuccess()) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
-                builder.setTitle(R.string.alert_title);
-
-                int cV = BuildConfig.VERSION_CODE;
-
-                // Clear notified flag from updates, if current version latest;
-                if (apiResponse.getData().getLast_version() == cV) {
-                    getSharedPreferences("notifications", MODE_PRIVATE).edit().putBoolean("update", false).apply();
-                    return;
-                }
-
-                boolean notified = getSharedPreferences("notifications", MODE_PRIVATE).getBoolean("update", false);
-
-                getSharedPreferences("notifications", MODE_PRIVATE).edit().putBoolean("update", true).apply();
-
-                boolean supported = false;
-                for (int a : apiResponse.getData().getStill_supported_versions())
-                    if (a == cV) supported = true;
-
-                if (supported) {
-                    builder.setMessage(R.string.alert_update);
-                    builder.setCancelable(true);
-                    builder.setPositiveButton(R.string.alert_update_button, (dialog, which) -> {
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(apiResponse.getData().getPlay_store_link()));
-                        startActivity(i);
-                    });
-                    builder.setNegativeButton(R.string.alert_cancel_button, (dialog, which) -> {
-                        dialog.dismiss();
-                    });
-
-                    if (notified)
-                        return;
-                } else if (cV < apiResponse.getData().getLast_version()) {
-                    builder.setMessage(R.string.alert_update_urgent);
-                    builder.setCancelable(false);
-                    builder.setPositiveButton(R.string.alert_update_button, (dialog, which) -> {
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(apiResponse.getData().getPlay_store_link()));
-                        startActivity(i);
-                        finish();
-                    });
-                } else return;
-
-                if(!isFinishing()) {
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                }
-
-            }
-        }));
-
-        // Show user a warning
-        TravanaAPI.warning((apiResponse, statusCode, success) -> runOnUiThread(() -> {
-            if (success && apiResponse.isSuccess()) {
-
-                if (apiResponse.getData() == null)
-                    return;
-
-                String previous = getSharedPreferences("notifications", MODE_PRIVATE).getString("warning", "");
-
-                Log.i("saved", previous + " previous");
-                Log.i("current", apiResponse.getData().get_id() + " current");
-
-                if (previous.equals(apiResponse.getData().get_id()))
-                    return;
-
-                getSharedPreferences("notifications", MODE_PRIVATE).edit().putString("warning", apiResponse.getData().get_id()).apply();
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialog);
-                builder.setTitle(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getTitle_slo() : apiResponse.getData().getTitle_en());
-                builder.setMessage(Locale.getDefault().getLanguage().equals("sl") ? apiResponse.getData().getContent_slo() : apiResponse.getData().getContent_en());
-                builder.setCancelable(true);
-                builder.setPositiveButton(R.string.alert_ok_button, (dialog, which) -> dialog.cancel());
-
-                if(!isFinishing()) {
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                }
-
-            }
-        }));
 
     }
 
@@ -364,25 +263,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
     }
 
-    @Override
-    public void onButtonPressed(int b) {
-
-        // Old Home fragment interface (not in use ATM)
-
-        /*switch (b) {
-            case BUS:
-                switchFragment(StationsFragment.newInstance());
-                behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-                break;
-            case TRAIN:
-            case BIKE:
-            case PARKING:
-            default:
-                Log.i("MainActivity", b + " is not yet implemented!");
-        }*/
-
-    }
-
     private void switchFragment(Fragment fragment) {
 
         FragmentManager fm = getSupportFragmentManager();
@@ -417,8 +297,11 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), 0);
                 break;
-            case R.id.forum:
-                startActivity(new Intent(this, ForumActivity.class));
+            case R.id.news:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(this.getResources().getString(R.string.lpp_news_webside))));
+                break;
+            case R.id.deturs:
+                startActivity(new Intent(this, DetourActivity.class));
                 break;
             case R.id.about:
                 startActivity(new Intent(this, AboutActivity.class));

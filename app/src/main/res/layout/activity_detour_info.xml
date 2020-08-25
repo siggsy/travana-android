@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.VegaSolutions.lpptransit.ui.activities.forum.DetourInfoActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:padding="25dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/posted_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/posted_time"
+            android:layout_alignParentRight="true"/>
+
+
+        <RelativeLayout
+            android:id="@+id/rl_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/logo_small_lpp"
+                />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/lpp_main_name"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_toRightOf="@+id/rl_icon"
+            android:layout_marginTop="13dp" />
+
+    </RelativeLayout>
+
+</ScrollView>

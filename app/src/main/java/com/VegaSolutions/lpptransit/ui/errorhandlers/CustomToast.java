@@ -12,7 +12,6 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.ui.activities.forum.TagsActivity;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 public class CustomToast {
