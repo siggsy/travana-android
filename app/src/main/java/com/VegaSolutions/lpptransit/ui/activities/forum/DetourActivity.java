@@ -35,6 +35,7 @@ public class DetourActivity extends AppCompatActivity {
     RecyclerView rv;
     ImageView back;
     SwipeRefreshLayout refreshLayout;
+    TextView whereIsDataFromTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,11 @@ public class DetourActivity extends AppCompatActivity {
                     loadDetours();
                 }
         );
+
+        whereIsDataFromTextView.setOnClickListener(view -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.lpp.si/javni-prevoz/obvozi"));
+            startActivity(browserIntent);
+        });
 
         loadDetours();
 
@@ -76,6 +82,7 @@ public class DetourActivity extends AppCompatActivity {
         rv = findViewById(R.id.rv_detours);
         back = findViewById(R.id.iv_back);
         refreshLayout = findViewById(R.id.swiperefresh);
+        whereIsDataFromTextView = findViewById(R.id.tv_where_is_data_from);
     }
 
     private void initList() {
@@ -83,8 +90,6 @@ public class DetourActivity extends AppCompatActivity {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(layoutManager);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rv.getContext(), DividerItemDecoration.VERTICAL);
-        rv.addItemDecoration(dividerItemDecoration);
         detoursAdapter = new DetoursAdapter(null);
         rv.setAdapter(detoursAdapter);
     }
