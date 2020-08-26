@@ -1,5 +1,8 @@
 package com.VegaSolutions.lpptransit.lppapi;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
@@ -14,11 +17,14 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
+import com.VegaSolutions.lpptransit.ui.activities.SearchActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import okhttp3.OkHttpClient;
 
@@ -255,12 +261,42 @@ public class Api {
                 .start();
     }
 
-    private static String getHtmlContent(String html){
+    public static List<String> getSavedSearchItemsIds(Activity activity) {
+        SharedPreferences sharedPref = activity.getSharedPreferences("app", Context.MODE_PRIVATE);
+        Set<String> searchItems = sharedPref.getStringSet("saved_search_items", null);
 
-        String fist_main_word = "<div id=\"block-system-main\" class=\"block block-system\">";
-        String second_main_word = "";
+        if (searchItems == null) {
+            return new ArrayList<>();
+        }
 
-        return null;
+        return new ArrayList<String>(searchItems);
+    }
+
+    public static void addSavedSearchedItemsIds(String id, Activity activity) {
+
+        SharedPreferences sharedPref = activity.getSharedPreferences("app", Context.MODE_PRIVATE);
+        Set<String> searchItems = sharedPref.getStringSet("saved_search_items", null);
+
+        if (searchItems == null) {
+            searchItems = new HashSet<String>();
+        }
+
+        ArrayList<String> searchItemsArrayList = new ArrayList<>(searchItems);
+
+        //Add item to the end if it was recently added
+        searchItemsArrayList.add(id);
+
+        if (searchItemsArrayList.size() > 20) {
+            searchItemsArrayList.remove(0);
+        }
+
+        searchItems.clear();
+        searchItems.addAll(searchItemsArrayList);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.putStringSet("saved_search_items", searchItems);
+        editor.apply();
     }
 
     private static List<DetourInfo> getDetours(String html) throws Exception {

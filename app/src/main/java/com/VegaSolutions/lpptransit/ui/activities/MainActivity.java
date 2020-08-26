@@ -62,6 +62,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     NavigationView nv;
     View bottomSheet;
     View header;
+    GoogleMap googleMap;
 
     LatLng lastValidMapCenter = ljubljana;
 
@@ -125,7 +126,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 switch (behavior.getState()) {
                     case BottomSheetBehavior.STATE_DRAGGING:
                     case BottomSheetBehavior.STATE_SETTLING:
-                        setMapPaddingBotttom(slideOffset);
+                        setMapPaddingBottom(slideOffset);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
                         break;
                 }
@@ -138,9 +139,12 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
     }
 
-    private void setMapPaddingBotttom(Float offset) {
+    private void setMapPaddingBottom(Float offset) {
         float maxMapPaddingBottom = (float) behavior.getPeekHeight();
-        setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
+
+        if (googleMap != null) {
+            setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
+        }
     }
 
     @Override
@@ -148,11 +152,12 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         super.onMapReady(googleMap);
 
         // Setup google maps UI.
+        this.googleMap = googleMap;
 
         setupClusterManager();
 
         setPadding(12, 200, 12, behavior.getPeekHeight());
-        setMapPaddingBotttom(0f);
+        setMapPaddingBottom(0f);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
 
         // Set Station InfoWindow click listener.

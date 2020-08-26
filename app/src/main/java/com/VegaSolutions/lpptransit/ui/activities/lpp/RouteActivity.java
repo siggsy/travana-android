@@ -346,6 +346,8 @@ public class RouteActivity extends MapFragmentActivity {
         stationId = getIntent().getStringExtra(STATION_ID);
         if (stationId == null) stationId = "0";
 
+        Api.addSavedSearchedItemsIds(tripId, this);
+
         locationIcon = findViewById(R.id.maps_location_icon);
 
         toHide.add(bottomSheet);

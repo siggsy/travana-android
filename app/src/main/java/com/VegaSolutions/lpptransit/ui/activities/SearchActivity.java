@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
@@ -28,10 +30,13 @@ import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class SearchActivity extends AppCompatActivity {
+
+    public static final String TAG = "SearchActivity";
 
     // Activity UI elements
     RecyclerView searchList;
@@ -95,25 +100,44 @@ public class SearchActivity extends AppCompatActivity {
 
     void applyFilter(String text) {
 
+        ArrayList<SearchItem> filteredItems = new ArrayList<>();
+
         if(text.isEmpty()) {
-            adapter.items.clear();
+            //Load saved items
+            List<String> searchItemsIds = Api.getSavedSearchItemsIds(this);
+
+            for (int i = searchItemsIds.size() - 1; i >= 0; i--) {
+                String searchItemId = searchItemsIds.get(i);
+                for (SearchItem item : this.items) {
+                    if (item.getType() == SearchItem.STATION) {
+                        StationItem stationItem = (StationItem) item;
+                        if (stationItem.getStation().getRef_id().equals(searchItemId)) {
+                            filteredItems.add(item);
+                        }
+                    } else {
+                        RouteItem routeItem = (RouteItem) item;
+                        if (routeItem.getRoute().getTrip_id().equals(searchItemId)) {
+                            filteredItems.add(item);
+                        }
+                    }
+                }
+            }
         } else {
-            ArrayList<SearchItem> items = new ArrayList<>();
 
             // Ignore all special Slovene characters
-            text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
+            text = text.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z').trim();
 
             // Find an item and add to the list
             synchronized (this.items) {
                 for (SearchItem item : this.items) {
-                    String itemName = item.searchText.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z');
+                    String itemName = item.searchText.toLowerCase().replace('č', 'c').replace('š', 's').replace('ž', 'z').trim();
                     if (itemName.contains(text))
-                        items.add(item);
+                        filteredItems.add(item);
                 }
-                adapter.setItems(items);
             }
         }
-        adapter.notifyDataSetChanged();
+        adapter.setItems(filteredItems);
+        this.runOnUiThread(() -> adapter.notifyDataSetChanged());
 
     }
 
@@ -263,6 +287,9 @@ public class SearchActivity extends AppCompatActivity {
             return STATION;
         }
 
+        public Station getStation() {
+            return station;
+        }
     }
 
     class RouteItem extends SearchItem {
@@ -279,6 +306,9 @@ public class SearchActivity extends AppCompatActivity {
             return ROUTE;
         }
 
+        public Route getRoute() {
+            return route;
+        }
     }
 
 }

@@ -68,8 +68,6 @@ public class Station implements Parcelable {
         return Integer.valueOf(ref_id) % 2 != 0;
     }
 
-
-
     @Override
     public int describeContents() {
         return 0;
@@ -84,6 +82,17 @@ public class Station implements Parcelable {
         dest.writeString(ref_id);
         dest.writeStringList(route_groups_on_station);
 
+    }
 
+    @Override
+    public String toString() {
+        return "Station{" +
+                "name='" + name + '\'' +
+                ", int_id=" + int_id +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", ref_id='" + ref_id + '\'' +
+                ", route_groups_on_station=" + route_groups_on_station +
+                '}';
     }
 }
