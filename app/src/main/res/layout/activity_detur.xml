@@ -10,8 +10,7 @@
         android:id="@+id/detour_activity_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="7dp"
-        android:paddingStart="7dp">
+        android:paddingTop="7dp">
 
         <ImageView
             android:id="@+id/iv_back"
@@ -20,6 +19,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:padding="7dp"
+            android:layout_marginStart="10dp"
             android:src="@drawable/ic_back_arrow"
             android:tint="?android:textColor" />
 

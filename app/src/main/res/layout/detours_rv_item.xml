@@ -35,8 +35,7 @@
         android:layout_marginTop="13dp"
         android:layout_toEndOf="@+id/rl_icon"
         android:text="@string/lpp_main_name"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/post_content"
@@ -45,7 +44,8 @@
         android:layout_below="@+id/rl_icon"
         android:layout_marginStart="15dp"
         android:layout_marginTop="12dp"
-        android:textSize="17sp"
+        android:textSize="18sp"
+        android:textStyle="bold"
         tools:text="vsebina" />
 
     <TextView
