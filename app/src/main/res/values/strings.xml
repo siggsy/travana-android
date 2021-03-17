@@ -83,16 +83,19 @@
     <string name="alert_update_button">Update</string>
     <string name="alert_cancel_button">Cancel</string>
     <string name="alert_ok_button">Ok</string>
-
-    <string name="privacy_policy_content">
-        <![CDATA[
-        <p>By logging in you agree with <a href="https://travana.si/pogoji_uporabe">Terms of service</a> and <a href="https://travana.si/politika_zasebnosti">Privacy Policy</a>.</p>
-        ]]>
-        </string>
     <string name="departures">TIMETABLE</string>
     <string name="sign_out">Sign Out</string>
     <string name="signed_out">Signed Out</string>
     <string name="not_signed_id">Not Signed In</string>
     <string name="no_messages">No posts found.</string>
+    <string name="lpp_main_name">Ljubljanski potniški promet</string>
+    <string name="lpp">LPP</string>
+    <string name="detours">Detours</string>
+    <string name="data_is_from">Data about detours are obtained from <b>www.lpp.si/obvozi</b></string>
+    <string name="click_for_more">Click for more.</string>
+    <string name="error_loading">Error during loading, try again.</string>
+    <string name="news">News</string>
+    <string name="lpp_news_webside">https://www.lpp.si/novice-kategorija/aktualno</string>
+
 
 </resources>

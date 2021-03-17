@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -42,7 +43,7 @@ import com.google.android.material.tabs.TabLayout;
 
 public class StationActivity extends MapFragmentActivity implements FragmentHeaderCallback {
 
-
+    public static final String TAG = "StationActivity";
     public static final String STATION = "station";
 
     // Views
@@ -99,7 +100,12 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         favourite = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE).getBoolean(station.getRef_id(), false);
 
         setupUI();
+        saveRecentSearchedStation();
 
+    }
+
+    private void saveRecentSearchedStation() {
+        Api.addSavedSearchedItemsIds(station.getRef_id(), this);
     }
 
     @Override

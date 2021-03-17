@@ -2,9 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/forum"
-        android:icon="@drawable/ic_rss_feed_24px"
-        android:title="@string/forum" />
+        android:id="@+id/deturs"
+        android:icon="@drawable/ic_baseline_details_24"
+        android:title="@string/detours" />
+
+    <item
+        android:id="@+id/news"
+        android:icon="@drawable/ic_baseline_message_24"
+        android:title="@string/news" />
 
     <item
         android:id="@+id/settings"

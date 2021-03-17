@@ -10,7 +10,6 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.firebase.FirebaseManager;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
@@ -117,15 +116,6 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
 
-        });
-
-        signOut.setOnClickListener(v -> {
-            if (FirebaseManager.isSignedIn()) {
-                FirebaseManager.signOut();
-                new CustomToast(this).showStringNormal(getString(R.string.signed_out));
-            } else {
-                new CustomToast(this).showStringNormal(getString(R.string.not_signed_id));
-            }
         });
 
     }

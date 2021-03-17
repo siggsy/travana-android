@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?backgroundViewColor"
-    tools:context=".ui.activities.WelcomeActivity">
+    android:background="?backgroundViewColor">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -49,7 +48,7 @@
         android:layout_marginBottom="32dp"
         android:alpha="0.5"
         android:text="@string/by_developers"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -86,32 +85,32 @@
 
         <View
             android:id="@+id/v1"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/color_main_orange" />
 
         <View
             android:id="@+id/v2"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/main_blue" />
 
         <View
             android:id="@+id/v3"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/main_yellow" />
 
         <View
             android:id="@+id/v4"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:background="@drawable/circle"
             android:backgroundTint="@color/main_green" />
     </LinearLayout>

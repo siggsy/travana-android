@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/search_item_ll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:paddingTop="12dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="12dp">
 
     <include
         layout="@layout/template_route_number"
@@ -15,6 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_weight="0" />
+
     <ImageView
         android:id="@+id/search_item_type"
         android:layout_width="wrap_content"
@@ -22,8 +25,8 @@
         android:layout_marginStart="16dp"
         android:layout_weight="0"
         android:tint="?android:textColor"
-        app:srcCompat="@drawable/ic_directions_bus_black_24dp"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_directions_bus_black_24dp" />
 
     <TextView
         android:id="@+id/search_item_name"
@@ -32,8 +35,8 @@
         android:layout_gravity="center|center_horizontal"
         android:layout_marginStart="32dp"
         android:layout_weight="4"
-        android:text="Bavarski dvor"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="Bavarski dvor" />
 
     <TextView
         android:id="@+id/station_center"

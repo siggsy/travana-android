@@ -14,9 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_dark_round"
         android:supportsRtl="true"
         android:theme="@style/WhiteTheme"
-        android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.activities.lpp.BusActivity"></activity>
+        <activity android:name=".ui.activities.forum.DetourActivity" />
+        <activity android:name=".ui.activities.lpp.BusActivity" />
         <activity
             android:name=".ui.activities.AboutActivity"
             android:screenOrientation="portrait" />
@@ -33,30 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.forum.TagMessageActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.forum.TagsActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.forum.NewMessageActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.TestActivity"
-            android:exported="true"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.forum.PostActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.forum.ForumActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ui.activities.SettingsActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.WelcomeActivity"
-            android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.lpp.DepartureActivity"
@@ -71,10 +48,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.MainActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.forum.SignInActivity"
-            android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.SearchActivity"
