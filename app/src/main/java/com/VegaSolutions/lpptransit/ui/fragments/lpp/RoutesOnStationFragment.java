@@ -115,7 +115,7 @@ public class RoutesOnStationFragment extends Fragment {
         });
 
         // Query all routes on station
-        Api.routesOnStation(Integer.valueOf(stationId), (apiResponse, statusCode, success) -> {
+        Api.routesOnStation(stationId, (apiResponse, statusCode, success) -> {
 
             // Cancel UI update if fragment not attached
             if (context == null)
