@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,8 +36,6 @@ import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okio.GzipSource;
-import okio.Okio;
 
 public class Api {
 
@@ -83,6 +80,7 @@ public class Api {
         "Content-Type", "application/json",
         "User-Agent", "OkHttp Bot",
         "Accept", "",
+        "Accept-Encoding", "identity",
         "Cache-Control", "no-cache",
         "Accept-Encoding", "gzip, deflate"
     );
@@ -188,7 +186,7 @@ public class Api {
                         ApiResponse<List<DetourInfo>> apiResponse = new ApiResponse<>(true, data);
                         callback.onComplete(apiResponse, response.code(), true);
                     } catch (Exception e) {
-                        callback.onComplete(null, response.code(), false);
+                        callback.onComplete(null, -4, false);
                     }
                 } else {
                     callback.onComplete(null, response.code(), false);
@@ -212,7 +210,7 @@ public class Api {
                         ApiResponse<DetourInfo> apiResponse = new ApiResponse<>(true, di);
                         callback.onComplete(apiResponse, response.code(), true);
                     } catch (Exception e) {
-                        callback.onComplete(null, response.code(), false);
+                        callback.onComplete(null, -4, false);
                     }
                 } else {
                     callback.onComplete(null, response.code(), false);
@@ -304,12 +302,15 @@ public class Api {
             public void onResponse(@NotNull Call call, @NotNull Response response) {
                 if (response.isSuccessful()) {
                     try {
-                        GzipSource gzipSource = new GzipSource(response.body().source());
-                        String r = Okio.buffer(gzipSource).readUtf8();
+                        String r = response.body().string();
                         ApiResponse<T> data = new Gson().fromJson(r, type);
                         callback.onComplete(data, response.code(), true);
                     } catch (IOException e) {
-                        callback.onComplete(null, -1, false);
+
+                        e.printStackTrace();
+                        Log.i(TAG, response.request().url().toString());
+                        callback.onComplete(null, -4, false);
+
                     }
                 } else {
                     callback.onComplete(null, response.code(), false);
