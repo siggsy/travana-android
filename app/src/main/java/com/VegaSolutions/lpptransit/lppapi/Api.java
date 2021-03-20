@@ -13,7 +13,6 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DepartureWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DetourInfo;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.GzipInterceptor;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
