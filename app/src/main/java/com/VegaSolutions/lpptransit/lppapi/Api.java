@@ -39,36 +39,29 @@ import okhttp3.Response;
 
 public class Api {
 
-    // API PARAMETERS:
-    // '?' -> optional,
-    // '!' -> required,
-    // '!|' -> xor,
-    // '|' -> or,
-    // '&' -> and.
-    // '#' -> multiple allowed;
-
+    // Documentation: http://194.33.12.32/doc/
     public static final String DATA_URL = "https://data.lpp.si/api";
     public static final String DETOUR_URL = "https://www.lpp.si";
 
     // Bus
-    public static final String BUS_DETAILS = "/bus/bus-details";                    // (?bus-name=468) !| (?bus-vin=ZCFC270C305997503) !| (?bus-id=?)
+    public static final String BUS_DETAILS = "/bus/bus-details";
     public static final String BUSES_ON_ROUTE = "/bus/buses-on-route";
-    public static final String DRIVER = "/bus/driver";                              // (?driver-id=36066995138405380)
+    public static final String DRIVER = "/bus/driver";
 
     // Route
-    public static final String ACTIVE_ROUTES = "/route/active-routes";              //
-    public static final String ROUTES = "/route/routes";                            // (?route-id=A48D5D5E-1A10-4616-86BE-65B059E0A371)
-    public static final String STATIONS_ON_ROUTE = "/route/stations-on-route";      // (?trip-id=A3295EA8-3404-4D34-9C6A-1604EFD15E40)
-    public static final String ARRIVALS_ON_ROUTE = "/route/arrivals-on-route";      // (?trip-id=A3295EA8-3404-4D34-9C6A-1604EFD15E40)
+    public static final String ACTIVE_ROUTES = "/route/active-routes";
+    public static final String ROUTES = "/route/routes";
+    public static final String STATIONS_ON_ROUTE = "/route/stations-on-route";
+    public static final String ARRIVALS_ON_ROUTE = "/route/arrivals-on-route";
 
     // Station
-    public static final String ARRIVAL = "/station/arrival";                        // (!station-code=600011)
-    public static final String ROUTES_ON_STATION = "/station/routes-on-station";    // (!station-code=600011)
-    public static final String STATION_DETAILS = "/station/station-details";        // (?station-code=600011) | (?show-subroutes=1)
-    public static final String TIMETABLE = "/station/timetable";                    // (!station-code=600011) & (!#route-group-number=6) | (?next-hours=4) | (?previous-hours=2)
+    public static final String ARRIVAL = "/station/arrival";
+    public static final String ROUTES_ON_STATION = "/station/routes-on-station";
+    public static final String STATION_DETAILS = "/station/station-details";
+    public static final String TIMETABLE = "/station/timetable";
 
     // Timetable
-    public static final String ROUTE_DEPARTURES = "/timetable/route-departures";    // (!trip-id=a3295EA8-3404-4D34-9C6A-1604EFD15E40) & (!route-id=117C48BE-5CB3-4030-92FC-E22371A0779F)
+    public static final String ROUTE_DEPARTURES = "/timetable/route-departures";
 
     // Detours
     public static final String DETOURS = "/javni-prevoz/obvozi/";
@@ -86,89 +79,110 @@ public class Api {
     );
 
     public static void busDetailsName(String busName, ApiCallback<List<Bus>> callback) {
-        request(DATA_URL + BUS_DETAILS, defaultCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()),
+        request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()),
                 "bus-name", busName
         );
     }
     public static void busDetailsVin(String busVin, ApiCallback<Bus> callback) {
-        request(DATA_URL + BUS_DETAILS, defaultCallback(callback, new TypeToken<ApiResponse<Bus>>(){}.getType()),
+        request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<Bus>>(){}.getType()),
                 "bus-vin", busVin);
     }
     public static void busDetailsAll(ApiCallback<List<Bus>> callback) {
-        request(DATA_URL + BUS_DETAILS, defaultCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()));
+        request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()));
     }
     public static void busesOnRoute(String routeGroupNumber, ApiCallback<List<BusOnRoute>> callback) {
-        request(DATA_URL + BUSES_ON_ROUTE, defaultCallback(callback, new TypeToken<ApiResponse<List<BusOnRoute>>>(){}.getType()),
+        request(DATA_URL + BUSES_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<BusOnRoute>>>(){}.getType()),
                 "route-group-number", routeGroupNumber);
     }
 
     public static void activeRoutes(ApiCallback<List<Route>> callback) {
-        request(DATA_URL + ACTIVE_ROUTES, defaultCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
+        request(DATA_URL + ACTIVE_ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
     }
 
     public static void routes(ApiCallback<List<Route>> callback) {
-        request(DATA_URL + ROUTES, defaultCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
+        request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
     }
 
     public static void routes(String routeId, ApiCallback<List<Route>> callback) {
-        request(DATA_URL + ROUTES, defaultCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
+        request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
                 "route-id", routeId);
     }
 
     public static void stationsOnRoute(String tripId, ApiCallback<List<StationOnRoute>> callback) {
-        request(DATA_URL + STATIONS_ON_ROUTE, defaultCallback(callback, new TypeToken<ApiResponse<List<StationOnRoute>>>(){}.getType()),
+        request(DATA_URL + STATIONS_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<StationOnRoute>>>(){}.getType()),
                 "trip-id", tripId);
     }
 
     public static void arrivalsOnRoute(String tripId, ApiCallback<List<ArrivalOnRoute>> callback) {
-        request(DATA_URL + ARRIVALS_ON_ROUTE, defaultCallback(callback, new TypeToken<ApiResponse<List<ArrivalOnRoute>>>(){}.getType()),
+        request(DATA_URL + ARRIVALS_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<ArrivalOnRoute>>>(){}.getType()),
                 "trip-id", tripId);
     }
 
     public static void arrival(String stationCode, ApiCallback<ArrivalWrapper> callback) {
-        request(DATA_URL + ARRIVAL, defaultCallback(callback, new TypeToken<ApiResponse<ArrivalWrapper>>(){}.getType()),
+        request(DATA_URL + ARRIVAL, jsonCallback(callback, new TypeToken<ApiResponse<ArrivalWrapper>>(){}.getType()),
                 "station-code", stationCode);
     }
 
     public static void routesOnStation(String stationCode, ApiCallback<List<RouteOnStation>> callback) {
-        request(DATA_URL + ROUTES_ON_STATION, defaultCallback(callback, new TypeToken<ApiResponse<List<RouteOnStation>>>(){}.getType()),
+        request(DATA_URL + ROUTES_ON_STATION, jsonCallback(callback, new TypeToken<ApiResponse<List<RouteOnStation>>>(){}.getType()),
                 "station-code", stationCode);
     }
 
     public static void stationDetails(String stationCode, boolean showSubroutes, ApiCallback<Station> callback) {
-        request(DATA_URL + STATION_DETAILS, defaultCallback(callback, new TypeToken<ApiResponse<Station>>(){}.getType()),
+        request(DATA_URL + STATION_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<Station>>(){}.getType()),
                 "station-code", stationCode,
                 "show-subroutes", showSubroutes ? "1" : "0");
     }
 
     public static void stationDetails(boolean showSubroutes, ApiCallback<List<Station>> callback) {
-        request(DATA_URL + STATION_DETAILS, defaultCallback(callback, new TypeToken<ApiResponse<List<Station>>>(){}.getType()),
-                "show-subroutes", showSubroutes ? "1" : "0");
+        request(
+                DATA_URL + STATION_DETAILS,
+                jsonCallback(callback, new TypeToken<ApiResponse<List<Station>>>(){}.getType()),
+                "show-subroutes", showSubroutes ? "1" : "0"
+        );
     }
 
-    public static void timetable(String stationCode, int nextHours, int previousHours, ApiCallback<TimetableWrapper> callback, int... routeGroupNumbers) {
+    public static void timetable(
+            String stationCode,
+            int nextHours,
+            int previousHours,
+            ApiCallback<TimetableWrapper> callback,
+            int... routeGroupNumbers
+    ) {
+        String[] params = {
+                "station-code", stationCode,
+                "next-hours", String.valueOf(nextHours),
+                "previous-hours", String.valueOf(previousHours),
+        };
 
-        String[] params = new String[(3 + routeGroupNumbers.length) * 2];
-        params[0] = "station-code";
-        params[1] = stationCode;
-        params[2] = "next-hours";
-        params[3] = String.valueOf(nextHours);
-        params[4] = "previous-hours";
-        params[5] = String.valueOf(previousHours);
-
-        for (int i = 6, j = 0; i < params.length && j < routeGroupNumbers.length; i++, j++) {
-            params[i] = "route-group-number";
-            params[i+1] = String.valueOf(routeGroupNumbers[j]);
+        String[] dynamicParams = new String[routeGroupNumbers.length * 2];
+        for (int i = 0, j = 0; i < routeGroupNumbers.length * 2 && j < routeGroupNumbers.length; i += 2, j++) {
+            dynamicParams[i] = "route-group-number";
+            dynamicParams[i+1] = String.valueOf(routeGroupNumbers[j]);
         }
 
-        request(DATA_URL + TIMETABLE, defaultCallback(callback, new TypeToken<ApiResponse<TimetableWrapper>>(){}.getType()), params);
+        // Concatenate parameters
+        String[] finalParams = new String[params.length + dynamicParams.length];
+        int index = 0;
+        for (String param : params) {
+            finalParams[index] = param;
+            index++;
+        }
+        for (String param : dynamicParams) {
+            finalParams[index] = param;
+            index++;
+        }
 
+        request(DATA_URL + TIMETABLE, jsonCallback(callback, new TypeToken<ApiResponse<TimetableWrapper>>(){}.getType()), finalParams);
     }
 
     public static void routeDepartures(String tripId, String routeId, ApiCallback<DepartureWrapper> callback) {
-        request(DATA_URL + ROUTE_DEPARTURES, defaultCallback(callback, new TypeToken<ApiResponse<DepartureWrapper>>(){}.getType()),
+        request(
+                DATA_URL + ROUTE_DEPARTURES,
+                jsonCallback(callback, new TypeToken<ApiResponse<DepartureWrapper>>(){}.getType()),
                 "trip-id", tripId,
-                "route-id", routeId);
+                "route-id", routeId
+        );
     }
 
     public static void getDetours(ApiCallback<List<DetourInfo>> callback) {
@@ -257,7 +271,7 @@ public class Api {
         editor.apply();
     }
 
-    private static List<DetourInfo> getDetours(String html) throws Exception {
+    private static List<DetourInfo> getDetours(String html) {
 
         String s = html;
 
@@ -291,7 +305,7 @@ public class Api {
         return list;
     }
 
-    private static <T> Callback defaultCallback(ApiCallback<T> callback, Type type) {
+    private static <T> Callback jsonCallback(ApiCallback<T> callback, Type type) {
         return new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
