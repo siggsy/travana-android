@@ -155,7 +155,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
             else code = Integer.valueOf(station.getRef_id()) + 1;
 
             // Query opposite station details
-            Api.stationDetails(code, true, (apiResponse, statusCode, success) -> runOnUiThread(() -> {
+            Api.stationDetails(String.valueOf(code), true, (apiResponse, statusCode, success) -> runOnUiThread(() -> {
                 if (success) {
                     // Start opposite route StationActivity and finish current
                     Intent intent = getIntent();

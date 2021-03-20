@@ -431,7 +431,7 @@ public class RouteActivity extends MapFragmentActivity {
         busManager = new BusMarkerManager(mMap, busOptions);
 
         // Set station InfoWindow click listener
-        mMap.setOnInfoWindowClickListener(marker -> Api.stationDetails(Integer.valueOf((String) marker.getTag()), true, (apiResponse, statusCode, success) -> {
+        mMap.setOnInfoWindowClickListener(marker -> Api.stationDetails((String) marker.getTag(), true, (apiResponse, statusCode, success) -> {
             if (success) {
                 // Start StationActivity
                 Intent i = new Intent(this, StationActivity.class);
@@ -560,7 +560,7 @@ public class RouteActivity extends MapFragmentActivity {
             holder.bottomConnector.setVisibility(position == getItemCount() - 1 ? View.INVISIBLE : View.VISIBLE);
 
             // Set node click event
-            holder.background.setOnClickListener(v -> Api.stationDetails(station.getCode_id(), true, (apiResponse, statusCode, success) -> {
+            holder.background.setOnClickListener(v -> Api.stationDetails(String.valueOf(station.getCode_id()), true, (apiResponse, statusCode, success) -> {
                 if (success) {
                     // Start StationActivity
                     Intent i = new Intent(RouteActivity.this, StationActivity.class);
