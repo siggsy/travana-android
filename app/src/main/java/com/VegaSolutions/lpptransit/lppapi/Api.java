@@ -13,6 +13,7 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.Bus;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DepartureWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DetourInfo;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.GzipInterceptor;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -67,13 +70,14 @@ public class Api {
     public static final String DETOURS = "/javni-prevoz/obvozi/";
 
     public static final String TAG = "Api";
-    private static final OkHttpClient httpClient = new OkHttpClient();
+    private static final OkHttpClient httpClient = new OkHttpClient.Builder()
+            .addInterceptor(new GzipInterceptor())
+            .build();
     private static final Headers headers = Headers.of(
         "apikey", BuildConfig.LPP_API_KEY,
-        "Content-Type", "application/json",
         "User-Agent", "OkHttp Bot",
         "Accept", "",
-        "Accept-Encoding", "identity",
+        "Accept-Encoding", "gzip",
         "Cache-Control", "no-cache",
         "Accept-Encoding", "gzip, deflate"
     );
@@ -209,30 +213,6 @@ public class Api {
         });
     }
 
-    public static void getDetourDetailed(String link, String title, String time, ApiCallback<DetourInfo> callback) {
-        request(DETOUR_URL + DETOURS + link, new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                callback.onComplete(null, -1, false);
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    try {
-                        DetourInfo di = new DetourInfo(title, time, null, response.body().string(), null);
-                        ApiResponse<DetourInfo> apiResponse = new ApiResponse<>(true, di);
-                        callback.onComplete(apiResponse, response.code(), true);
-                    } catch (Exception e) {
-                        callback.onComplete(null, -4, false);
-                    }
-                } else {
-                    callback.onComplete(null, response.code(), false);
-                }
-            }
-        });
-    }
-
     public static List<String> getSavedSearchItemsIds(Activity activity) {
         SharedPreferences sharedPref = activity.getSharedPreferences("app", Context.MODE_PRIVATE);
         Set<String> searchItems = sharedPref.getStringSet("saved_search_items", null);
@@ -273,36 +253,21 @@ public class Api {
 
     private static List<DetourInfo> getDetours(String html) {
 
-        String s = html;
+        Log.i(TAG, html);
 
         List<DetourInfo> list = new ArrayList<>();
 
-        String main_html_word = "views-field views-field-nothing";
-        String main_html_word_title = "content__box--title";
-        String main_html_word_time = "content__box--date";
-
-        while(s.contains(main_html_word)) {
-
-            s = s.substring(s.indexOf(main_html_word) + main_html_word.length());
-            s = s.substring(s.indexOf(main_html_word_title) + main_html_word_title.length());
-            s = s.substring(s.indexOf("href"));
-
-            String href = s.substring(s.indexOf("href") + 6, s.indexOf(">") -1);
-            s = s.substring(s.indexOf(href) + href.length());
-
-            String title = s.substring(s.indexOf(">") + 1, s.indexOf("<"));
-
-            s = s.substring(s.indexOf(title) + title.length());
-            s = s.substring(s.indexOf(main_html_word_time) + main_html_word_title.length() + 1);
-
-            String date = s.substring(0, s.indexOf("<"));
-
-            DetourInfo df = new DetourInfo(title, date, href);
-
-            list.add(df);
+        Pattern detourPattern = Pattern.compile("<div class=\"content__box--title\"><a href=\"(.*)\">(.*)</a></div>[\\s\\S]*?<div class=\"content__box--date\">(.*)</div>");
+        Matcher detourMatcher = detourPattern.matcher(html);
+        while (detourMatcher.find()) {
+            String href = detourMatcher.group(1);
+            String title = detourMatcher.group(2);
+            String date = detourMatcher.group(3);
+            list.add(new DetourInfo(title, date, href));
         }
 
         return list;
+
     }
 
     private static <T> Callback jsonCallback(ApiCallback<T> callback, Type type) {
@@ -332,6 +297,7 @@ public class Api {
             }
         };
     }
+
     private static void request(String url, Callback callback, String... params) {
         String paramString = getParamString(params);
         Request request = new Request.Builder()
@@ -341,6 +307,7 @@ public class Api {
 
         httpClient.newCall(request).enqueue(callback);
     }
+
     private static String getParamString(String[] params) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < params.length - 1; i++) {
