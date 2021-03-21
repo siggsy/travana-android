@@ -62,7 +62,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     private NullSafeView<View> favErr = new NullSafeView<>();
     private NullSafeView<View> locErr = new NullSafeView<>();
     private NullSafeView<View> progressBar = new NullSafeView<>();
-    private NullSafeView<FloatingActionButton> locationRefresh = new NullSafeView<>();
     private Adapter adapter = new Adapter();
     private FragmentHeaderCallback callback;
 
@@ -110,15 +109,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
             }
         });
 
-        // Setup location refresh button
-        locationRefresh.getView().setVisibility(View.GONE);
-        if (type == TYPE_NEARBY) {
-            locationRefresh.getView().setOnClickListener((v) -> {
-                locErr.getView().setVisibility(View.GONE);
-                progressBar.getView().setVisibility(View.VISIBLE);
-                updateLocationList(locationManager.getLatest());
-            });
-        }
     }
 
     @Override
@@ -162,7 +152,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         locErr.setView(root.findViewById(R.id.stations_sub_list_nearby_error));
         favErr.setView(root.findViewById(R.id.stations_sub_list_favourite_error));
         progressBar.setView(root.findViewById(R.id.stations_sub_progress));
-        locationRefresh.setView(root.findViewById(R.id.location_refresh_fab));
 
         setupUI();
 
@@ -206,12 +195,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
             locErr.addTask(v -> v.setVisibility(View.VISIBLE));
         } else {
 
-            // Sort stations by current location
-            Collections.sort(stations, (o1, o2) -> {
-                double o1D = MapUtility.calculationByDistance(location, o1.getLatLng());
-                double o2D = MapUtility.calculationByDistance(location, o2.getLatLng());
-                return Double.compare(o1D, o2D);
-            });
 
             // Add "favourite" flag and calculate distance
             for (Station station : stations) {
@@ -219,6 +202,9 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 if (f == null) f = false;
                 stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(location, station.getLatLng()) * 1000)));
             }
+
+            // Sort stations by current location
+            Collections.sort(stationWrappersFav, (o1, o2) -> Double.compare(o1.distance, o2.distance));
 
             // Show on recyclerView
             favErr.addTask(v -> v.setVisibility(View.GONE));
@@ -279,7 +265,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                         locationManager.addListener(this);
                     locErr.addTask(v -> v.setVisibility(View.GONE));
                     updateLocationList(locationManager.getLatest());
-                    locationRefresh.addTask(v -> v.setVisibility(View.VISIBLE));
 
                 }
             }
