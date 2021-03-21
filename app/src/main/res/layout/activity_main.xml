@@ -20,7 +20,6 @@
         android:id="@+id/map_filter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:alpha="0"
         android:background="?backgroundViewColor" />
 
     <androidx.cardview.widget.CardView
@@ -63,9 +62,8 @@
                 android:id="@+id/textView43"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_directions_bus_black_24dp"
                 android:drawablePadding="8dp"
-                android:text="LPP"
+                android:text="@string/stations"
                 android:textAlignment="center"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -99,10 +97,5 @@
         android:elevation="7dp"
         android:translationZ="7dp" />
 
-    <com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage
-        android:id="@+id/top_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="65dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

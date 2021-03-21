@@ -115,6 +115,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         });
 
         behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
