@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <style name="MyTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">false</item>
@@ -27,9 +27,9 @@
         <item name="elevation">2dp</item>
     </style>
 
-    <style name="WhiteTheme" parent="Theme.AppCompat.Light.NoActionBar.FullScreen"/>
+    <style name="WhiteTheme" parent="MyTheme"/>
 
-    <style name="DarkTheme" parent="Theme.AppCompat.Light.NoActionBar.FullScreen">
+    <style name="DarkTheme" parent="MyTheme">
         <item name="backgroundViewColor">@color/color_main_background_dark</item>
         <item name="android:textColor">@color/color_text_dark</item>
         <item name="containerBackground">@drawable/stretched_circle</item>
@@ -78,5 +78,11 @@
         <item name="android:textColor">@color/colorAccent</item>
     </style>
 
+
+    <!-- styles.xml -->
+    <style name="AppTheme.Tabs.TextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
 
 </resources>

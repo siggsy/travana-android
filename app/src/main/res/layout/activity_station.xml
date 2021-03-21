@@ -175,9 +175,14 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    android:background="@drawable/tab_layout_bg"
+                    app:tabTextColor="@color/text_hint"
+                    app:tabRippleColor="@android:color/transparent"
+                    app:tabIndicator="@drawable/tab_indicator"
+                    app:tabIndicatorFullWidth="false"
                     app:tabIndicatorColor="@color/colorAccent"
-                    app:tabRippleColor="@color/colorRipple"
-                    app:tabTextColor="?android:textColor" />
+                    app:tabSelectedTextColor="@color/colorAccent"
+                    app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
 

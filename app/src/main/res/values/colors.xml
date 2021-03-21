@@ -3,8 +3,8 @@
 
     <!-- not using these -->
     <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#D81B60</color> <!-- #00574B-->
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimaryDark">#EC407A</color> <!-- #00574B-->
+    <color name="colorAccent">#EC407A</color>
 
     <color name="color_lpp">#1e7b4b</color>
 
@@ -25,7 +25,7 @@
     <color name="color_main_orange">#FFBB33</color>
 
     <color name="event_live">#008577</color>
-    <color name="event_arrival">#D81B60</color>
+    <color name="event_arrival">#EC407A</color>
     <color name="event_detour">#ffff8800</color>
 
     <color name="transparent">#00000000</color>

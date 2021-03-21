@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <style name="MyTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">false</item>
@@ -22,7 +22,7 @@
         <item name="elevation">2dp</item>
     </style>
 
-    <style name="DarkTheme" parent="Theme.AppCompat.Light.NoActionBar.FullScreen">
+    <style name="DarkTheme" parent="MyTheme">
         <item name="backgroundViewColor">@color/color_main_background_dark</item>
         <item name="android:textColor">@color/color_text_dark</item>
         <item name="containerBackground">@drawable/stretched_circle</item>

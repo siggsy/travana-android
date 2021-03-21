@@ -79,45 +79,14 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        // Set tab layout icons
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            switch (i) {
-                case 0:
-                    int color = ContextCompat.getColor(context, R.color.colorAccent);
-                    TabLayout.Tab tab = tabLayout.getTabAt(i);
-                    tab.setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_favorite_black_24dp, null));
-                    tab.getIcon().setTint(color);
-                    break;
-                case 1:
-                    tab = tabLayout.getTabAt(i);
-                    tab.setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_location_on_black_24dp, null));
-                    tab.getIcon().setTint(Color.GRAY);
-                    break;
-            }
-        }
-
         // Set tab layout icon color switcher
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                int color;
-                switch (tab.getPosition()) {
-                    case 0:
-                        color = ContextCompat.getColor(context, R.color.colorAccent);
-                        break;
-                    case 1:
-                        color = ContextCompat.getColor(context, R.color.main_blue_dark);
-                        break;
-                    default:
-                        color = Color.GRAY;
-                }
-                tab.getIcon().setTint(color);
                 mListener.onTabClicked();
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                int color = Color.GRAY;
-                tab.getIcon().setTint(color);
             }
             @Override
             public void onTabReselected(TabLayout.Tab tab) {

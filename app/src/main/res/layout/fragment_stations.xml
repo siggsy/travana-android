@@ -27,23 +27,15 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                android:background="@drawable/tab_layout_bg"
+                app:tabTextColor="@color/text_hint"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabIndicator="@drawable/tab_indicator"
+                app:tabIndicatorFullWidth="false"
                 app:tabIndicatorColor="@color/colorAccent"
-                app:tabRippleColor="@color/colorRipple"
-                app:tabTextColor="?android:textColor" />
+                app:tabSelectedTextColor="@color/colorAccent"
+                app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance" />
 
-            <TextView
-                android:id="@+id/station_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="4dp"
-                android:text="@string/stations"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@id/tab_layout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:id="@+id/view"
