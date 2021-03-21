@@ -63,6 +63,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     View bottomSheet;
     View header;
     GoogleMap googleMap;
+    View mapFilter;
 
     LatLng lastValidMapCenter = ljubljana;
 
@@ -90,6 +91,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         loading = findViewById(R.id.top_message);
         bottomSheet = findViewById(R.id.bottom_sheet);
         header = findViewById(R.id.header);
+        mapFilter = findViewById(R.id.map_filter);
 
         toHide.add(bottomSheet);
         toHide.add(header);
@@ -101,7 +103,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
         navBarBtn.setOnClickListener(view -> dl.openDrawer(GravityCompat.START));
 
-        locationIcon.setVisibility(MapUtility.checkIfAtLeastOnePermissionPermitted(this)? View.VISIBLE : View.GONE);
 
         loading.showLoading(true);
         loading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
@@ -127,6 +128,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                     case BottomSheetBehavior.STATE_DRAGGING:
                     case BottomSheetBehavior.STATE_SETTLING:
                         setMapPaddingBottom(slideOffset);
+                        mapFilter.setAlpha(slideOffset);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
                         break;
                 }
