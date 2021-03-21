@@ -73,7 +73,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
         animation = new ElevationAnimation(header, 16);
 
-        adapter = new Adapter(getFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        adapter = new Adapter(getParentFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
         // ViewPager with TabLayout
         viewPager.setAdapter(adapter);
@@ -101,19 +101,17 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
      */
     private void removeFragments() {
 
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getParentFragmentManager();
 
-        if (fm != null) {
-            for (Fragment fragment : fm.getFragments())
-                if (fragment instanceof StationsSubFragment) {
-                    try {
-                        fm.beginTransaction().remove(fragment).commit();
-                    } catch (IllegalStateException e) {
-                        return;
-                    }
-
+        for (Fragment fragment : fm.getFragments())
+            if (fragment instanceof StationsSubFragment) {
+                try {
+                    fm.beginTransaction().remove(fragment).commit();
+                } catch (IllegalStateException e) {
+                    return;
                 }
-        }
+
+            }
 
     }
 
