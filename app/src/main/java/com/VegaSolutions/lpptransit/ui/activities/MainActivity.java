@@ -115,21 +115,22 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         });
 
         behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
-        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
 
+        float headerElevation = 12f;
         behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 switch (behavior.getState()) {
-                    case BottomSheetBehavior.STATE_DRAGGING:
-                    case BottomSheetBehavior.STATE_SETTLING:
+                    case ViewPagerBottomSheetBehavior.STATE_DRAGGING:
+                    case ViewPagerBottomSheetBehavior.STATE_SETTLING:
                         setMapPaddingBottom(slideOffset);
                         mapFilter.setAlpha(slideOffset);
+                        header.setElevation((1 - slideOffset) * headerElevation);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
                         break;
                 }
