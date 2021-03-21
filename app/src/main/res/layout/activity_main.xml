@@ -8,7 +8,6 @@
     tools:context=".ui.activities.MainActivity"
     tools:ignore="ContentDescription">
 
-
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -48,7 +47,7 @@
                 android:layout_height="45dp"
                 android:background="@drawable/stretched_circle"
                 android:backgroundTint="?backgroundViewColor"
-                android:padding="6dp"
+                android:padding="8dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_menu_black_24dp"
                 android:tint="?android:textColor"
@@ -86,7 +85,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-
     <include
         android:id="@+id/bottom_main"
         layout="@layout/activity_main_bottom"
@@ -95,6 +93,5 @@
         android:layout_marginTop="80dp"
         android:elevation="7dp"
         android:translationZ="7dp" />
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

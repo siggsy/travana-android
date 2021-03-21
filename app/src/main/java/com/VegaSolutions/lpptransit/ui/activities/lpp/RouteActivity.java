@@ -1,27 +1,14 @@
 package com.VegaSolutions.lpptransit.ui.activities.lpp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,25 +17,32 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.ui.activities.MapFragmentActivity;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
-import com.VegaSolutions.lpptransit.ui.custommaps.LocationMarkerManager;
-import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
-import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
@@ -68,14 +62,12 @@ import org.joda.time.DateTime;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 import butterknife.BindView;
@@ -230,7 +222,7 @@ public class RouteActivity extends MapFragmentActivity {
     };
 
     private void setupUI() {
-
+        // TODO remove depricated
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -257,12 +249,16 @@ public class RouteActivity extends MapFragmentActivity {
 
         // Set bus and station marker style
         View v = getLayoutInflater().inflate(R.layout.station_node_maps, null);
-        v.findViewById(R.id.stroke).getBackground().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-        v.findViewById(R.id.solid).getBackground().setColorFilter(ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background), PorterDuff.Mode.SRC_IN);
+
+        v.findViewById(R.id.stroke).getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN));
+        v.findViewById(R.id.solid).getBackground().setColorFilter(
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background), BlendModeCompat.SRC_IN));
         IconGenerator generator = new IconGenerator(this);
         generator.setBackground(null);
         generator.setContentView(v);
-        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.ic_water_drop_svgrepo_com_1))).flat(true);
+        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(
+                Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.ic_water_drop_svgrepo_com_1)), 80, 80)).flat(true);
         stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true);
 
         // Setup views.
@@ -373,8 +369,6 @@ public class RouteActivity extends MapFragmentActivity {
         toHide.add(bottomSheet);
         toHide.add(shadow);
 
-        Log.i("TRIP ID", tripId);
-
         behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
 
         View mapFilter = findViewById(R.id.map_filter);
@@ -389,7 +383,7 @@ public class RouteActivity extends MapFragmentActivity {
                 switch (behavior.getState()) {
                     case BottomSheetBehavior.STATE_DRAGGING:
                     case BottomSheetBehavior.STATE_SETTLING:
-                        setMapPaddingBotttom(slideOffset);
+                        setMapPaddingBottom(slideOffset);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
                         mapFilter.setAlpha(slideOffset);
                         break;
@@ -407,7 +401,7 @@ public class RouteActivity extends MapFragmentActivity {
 
     }
 
-    private void setMapPaddingBotttom(Float offset) {
+    private void setMapPaddingBottom(Float offset) {
         float maxMapPaddingBottom = (float) behavior.getPeekHeight();
         setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
     }
@@ -444,7 +438,7 @@ public class RouteActivity extends MapFragmentActivity {
 
         // Setup Google maps UI
         setPadding(0, 0, 0, behavior.getPeekHeight());
-        setMapPaddingBotttom(0f);
+        setMapPaddingBottom(0f);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
         mMap.setOnMarkerClickListener(marker -> marker.getTitle() == null);
         mMap.setOnCameraIdleListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
@@ -564,7 +558,7 @@ public class RouteActivity extends MapFragmentActivity {
             holder.name.setText(station.getName());
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.node.getLayoutParams();
 
-            if (Integer.valueOf(stationId) == station.getStation_code()) {
+            if (Integer.parseInt(stationId) == station.getStation_code()) {
                 holder.name.setTypeface(null, Typeface.BOLD);
                 holder.name.setTextSize(20f);
                 params.height = 56;
@@ -596,8 +590,7 @@ public class RouteActivity extends MapFragmentActivity {
             if (isBus[position][0] > 0) {
 
                 // Set bold and bigger text for previous activity station
-
-                if (Integer.valueOf(stationId) == station.getStation_code()) {
+                if (Integer.parseInt(stationId) == station.getStation_code()) {
                     params.height = 94;
                     params.width = 94;
                 } else {
@@ -622,7 +615,7 @@ public class RouteActivity extends MapFragmentActivity {
             }
 
             List<ArrivalOnRoute.Arrival> arrivals = station.getArrivals();
-            int size = arrivals.size() <= 2 ? arrivals.size() : 2;
+            int size = Math.min(arrivals.size(), 2);
             if (size != 0)
                 for (int i = 0; i < size; i++) {
                     ArrivalOnRoute.Arrival arrival = arrivals.get(i);
@@ -637,6 +630,7 @@ public class RouteActivity extends MapFragmentActivity {
                     if (toAnimate[position][i]) {
                         AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(RouteActivity.this, R.drawable.rss_3layer);
                         rss.setImageDrawable(drawable);
+                        assert drawable != null;
                         drawable.start();
                     } else rss.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.ic_rss_feed_24px));
 

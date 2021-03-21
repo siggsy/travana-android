@@ -1,30 +1,26 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DetourInfo;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DetourActivity extends AppCompatActivity {
@@ -81,7 +77,7 @@ public class DetourActivity extends AppCompatActivity {
     private void initComponents() {
         rv = findViewById(R.id.rv_detours);
         back = findViewById(R.id.iv_back);
-        refreshLayout = findViewById(R.id.swiperefresh);
+        refreshLayout = findViewById(R.id.swipe_refresh);
         whereIsDataFromTextView = findViewById(R.id.tv_where_is_data_from);
     }
 
@@ -122,10 +118,9 @@ public class DetourActivity extends AppCompatActivity {
             holder.tv_date.setText(list.get(position).getDate());
             holder.rl.setOnClickListener(view -> {
 
+                Intent i = new Intent(getApplicationContext(), WebViewActivity.class);
                 String url = "https://www.lpp.si" + list.get(position).getMore_data_url();
-                Log.e(TAG, url);
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
+                i.putExtra("LINK", url);
                 startActivity(i);
 
             });

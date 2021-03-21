@@ -1,5 +1,19 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -10,21 +24,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
@@ -49,7 +48,7 @@ import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener {
 
     private final int locationRequestCode = 1000;
 
@@ -68,6 +67,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     GoogleMap googleMap;
     View mapFilter;
     View bottom;
+    RelativeLayout detours_rl;
+    RelativeLayout news_rl;
+    RelativeLayout settings_rl;
+    RelativeLayout about_rl;
     int bottomTopMargin = 0;
     int headerTopMargin = 0;
 
@@ -83,7 +86,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
+        // TODO - remove depricated
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -120,6 +123,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         header = findViewById(R.id.header);
         bottom = findViewById(R.id.bottom_main);
         mapFilter = findViewById(R.id.map_filter);
+        detours_rl = findViewById(R.id.rl_detour);
+        news_rl = findViewById(R.id.rl_news);
+        settings_rl = findViewById(R.id.rl_settings);
+        about_rl = findViewById(R.id.rl_about);
 
         ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
         bottomTopMargin = bottomParams.topMargin;
@@ -130,8 +137,23 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         toHide.add(header);
         toHide.add(shadow);
 
+
+        detours_rl.setOnClickListener(view -> {
+            startActivity(new Intent(this, DetourActivity.class));
+        });
+        news_rl.setOnClickListener(view -> {
+            Intent i = new Intent(this, WebViewActivity.class);
+            i.putExtra("LINK", this.getResources().getString(R.string.lpp_news_webside));
+            startActivity(i);
+        });
+        settings_rl.setOnClickListener(view -> {
+            startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+        });
+        about_rl.setOnClickListener(view -> {
+            startActivity(new Intent(this, AboutActivity.class));
+        });
+
         // Setup UI elements.
-        nv.setNavigationItemSelectedListener(this);
 
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
         navBarBtn.setOnClickListener(view -> dl.openDrawer(GravityCompat.START));
@@ -325,30 +347,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 }
             } else Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        int id = item.getItemId();
-
-        // Side drawer interaction
-        switch (id) {
-            case R.id.settings:
-                startActivityForResult(new Intent(this, SettingsActivity.class), 0);
-                break;
-            case R.id.news:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(this.getResources().getString(R.string.lpp_news_webside))));
-                break;
-            case R.id.deturs:
-                startActivity(new Intent(this, DetourActivity.class));
-                break;
-            case R.id.about:
-                startActivity(new Intent(this, AboutActivity.class));
-                break;
-        }
-
-        return true;
     }
 
 }

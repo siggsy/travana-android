@@ -77,8 +77,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
+                android:tint="?android:textColor"
                 app:srcCompat="@drawable/ic_wifi_off_24px"
-                app:tint="?android:textColor" />
+                tools:ignore="UseAppTint" />
 
             <TextView
                 android:id="@+id/msg_text"

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <fragment
         android:id="@+id/map"
@@ -26,7 +25,8 @@
         android:focusable="true"
         android:scaleType="center"
         android:src="@drawable/ic_my_location_black_24dp"
-        android:tint="?android:textColor" />
+        android:tint="?android:textColor"
+        tools:ignore="UseAppTint" />
 
     <View
         android:id="@+id/shadow"
@@ -40,25 +40,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        android:clickable="true"
+        android:focusable="true"
+        android:translationZ="6dp"
         app:behavior_hideable="false"
         app:behavior_peekHeight="100dp"
-        android:translationZ="6dp"
-        android:clickable="true"
-        android:focusable="true">
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/station_pager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:nestedScrollingEnabled="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/header"
-            app:layout_constraintVertical_bias="0.0"
-            android:nestedScrollingEnabled="true"/>
+            app:layout_constraintVertical_bias="0.0" />
 
         <FrameLayout
             android:id="@+id/header"
@@ -90,7 +90,8 @@
                     android:src="@drawable/ic_arrow_back_black_24dp"
                     android:tint="?android:textColor"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="UseAppTint" />
 
                 <View
                     android:id="@+id/view"
@@ -141,13 +142,13 @@
 
                 <ImageButton
                     android:id="@+id/station_opposite_btn"
-                    android:src="@drawable/ic_swap_vert_black_24dp"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:elevation="2dp"
+                    android:src="@drawable/ic_swap_vert_black_24dp"
                     android:tint="?android:textColor"
                     app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -166,23 +167,24 @@
                     app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
                     app:layout_constraintEnd_toStartOf="@+id/station_opposite_btn"
                     app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
-                    app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
+                    app:srcCompat="@drawable/ic_favorite_border_black_24dp"
+                    tools:ignore="UseAppTint" />
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/station_tab_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/tab_layout_bg"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:background="@drawable/tab_layout_bg"
-                    app:tabTextColor="@color/text_hint"
-                    app:tabRippleColor="@android:color/transparent"
                     app:tabIndicator="@drawable/tab_indicator"
-                    app:tabIndicatorFullWidth="false"
                     app:tabIndicatorColor="@color/colorAccent"
+                    app:tabIndicatorFullWidth="false"
+                    app:tabRippleColor="@android:color/transparent"
                     app:tabSelectedTextColor="@color/colorAccent"
-                    app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance" />
+                    app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance"
+                    app:tabTextColor="@color/text_hint" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
 

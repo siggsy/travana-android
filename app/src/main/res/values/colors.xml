@@ -38,13 +38,7 @@
     <color name="color_main_gray">#534F4F</color>
     <color name="color_main_shaddow">#242424</color>
 
-    <color name="color_facebook_blue">#3C5A99</color>
-    <color name="color_facebook_button_white">#FCFCFC</color>
-
-    <color name="color_google_button_white">#FFFFFF</color>
-    <color name="color_sign_in_buttons_boders">#707070</color>
     <color name="color_black">#000000</color>
-
 
     <!-- dark theme -->
     <color name="color_main_background_dark">#212529</color>

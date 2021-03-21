@@ -6,20 +6,9 @@
     <string name="by_developers">Razvijalca Domen Kralj, Žiga Leskovec</string>
     <string name="contact_us">Kontaktiraj nas</string>
     <string name="routes">Linije</string>
-    <string name="sign_in_with_fb">Prijava s Facebook</string>
-    <string name="sign_in_with_google">Prijava z Google</string>
-    <string name="something_went_wrong_try_again">Nekaj je šlo narobe, poizkusi še enkrat ali pa nam piši.</string>
-    <string name="the_way_it_was">kot</string>
-    <string name="you_are_already_logined">Si že prijavljen.</string>
-    <string name="you_canceled_the_proccess">Storniral si proces.</string>
-    <string name="you_have_successfuly_logged_in">Uspešno si se prijavil</string>
-    <string name="need_help">Potrebuješ pomoč?</string>
     <string name="nearby_stations">Postajališča v bližini</string>
     <string name="detour">obvoz</string>
-    <string name="parking">Parkirišče</string>
-    <string name="transport">Prevoz,</string>
     <string name="into_center">V CENTER</string>
-    <string name="meant_to_be">mora biti.</string>
     <string name="stations">Postajališča</string>
     <string name="garage">garaža</string>
     <string name="arrivals">Prihodi</string>
@@ -35,55 +24,24 @@
     <string name="favourite_error">Ni priljubljenih postaj.</string>
     <string name="location_error">Lokacija ni vklopljena.</string>
     <string name="location_changed">Lokacija spremenjena</string>
-    <string name="update">Posodobi</string>
     <string name="no_arrival_error">Ni bližnjih prihodov.</string>
     <string name="no_departures">Za danes ni napovedanih prihodov.</string>
-    <string name="loading_buses">Nalaganje avtobusov</string>
-    <string name="following">sledenje</string>
-    <string name="follow">sledi</string>
-    <string name="all">vse</string>
-    <string name="posted_time">objavljeno • %1$s</string>
-    <string name="post_comments">%1$d • komentarjev</string>
     <string name="loading">nalaganje</string>
     <string name="opposite_error">Nasprotna postaja ne obstaja.</string>
     <string name="network_error">Brez internetne povezave.</string>
     <string name="timed_out_error">Povezava je potekla.</string>
     <string name="unknown_error">Nekaj je šlo narobe. Prosimo poizkusite še enkrat. - %1$d</string>
     <string name="refresh">Osveži</string>
-    <string name="create_a_new_post">Create a new post</string>
-    <string name="too_many_tags_error">Dosegli ste mejo števila oznak.</string>
-    <string name="select_route">Izberite linijo</string>
     <string name="officially">V sodelovanju z</string>
-    <string name="attachments">Priponke</string>
     <string name="connection_refused">Povezava zavrnjena.</string>
-    <string name="comment_on_the_post">Komentiraj na objavo …</string>
-    <string name="sign_in_alert">Za izvedbo tega dejanje morate biti prijavljeni</string>
-    <string name="sign_in_text">Prijava</string>
-    <string name="sign_in_error">Prijavite se za ogled sledljivih objav</string>
-    <string name="comment_replies">%1$d • odgovorov</string>
-    <string name="msg_content_error">Objava mora vsebovati vsaj 3 znake.</string>
-    <string name="login_to">"Prijava v "</string>
-    <string name="conditions_s1">Z prijavo se strinjam z </string>
-    <string name="tearms_of_service">Pogoji uporabe </string>
-    <string name="privacy_policy">Politika zasebnosti</string>
-    <string name="and">in</string>
-
-    <string name="alert_title">Posodobitev</string>
-    <string name="alert_update">Prišla je nova posodobitev.</string>
-    <string name="alert_update_urgent">Imate zastarelo različico. Posodobite aplikacijo.</string>
-    <string name="alert_update_button">Posodobi</string>
-    <string name="alert_cancel_button">Prekliči</string>
-    <string name="alert_ok_button">Vredu</string>
-
-    <string name="privacy_policy_content">
-        <![CDATA[
-        <p>Z prijavo se strinjate z<a href="https://travana.si/pogoji_uporabe">Pogoji uporabe</a> in <a href="https://travana.si/politika_zasebnosti">Politiko Zasebnosti</a>.</p>
-        ]]>
-        </string>
     <string name="departures">VOZNI RED</string>
-    <string name="sign_out">Odjava</string>
-    <string name="signed_out">Odjava uspešna</string>
-    <string name="not_signed_id">Niste prijavljeni</string>
-    <string name="no_messages">Ni objav.</string>
+    <string name="detours">Obvozi</string>
+    <string name="data_is_from">Podatki o obvozih so pridobljeni iz <b>www.lpp.si/obvozi</b>.</string>
+    <string name="click_for_more">Klikni za več.</string>
+    <string name="error_loading">Napaka pri nalganju, poizkusi še enkrat.</string>
+    <string name="news">Novice</string>
+    <string name="app_version">Verzija 2.0.0</string>
+    <string name="relative_time">Relativen (npr. 7 min)</string>
+    <string name="absolute_time">Absoluten (npr. 15:30)</string>
 
 </resources>

@@ -47,10 +47,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_favorite_black_24dp"
+            android:tint="?android:textColorHint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/textView41"
             app:layout_constraintStart_toStartOf="@+id/textView41"
-            app:tint="?android:textColorHint" />
+            tools:ignore="UseAppTint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -81,10 +82,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_location_on_black_24dp"
+            android:tint="?android:textColorHint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/textView42"
             app:layout_constraintStart_toStartOf="@+id/textView42"
-            app:tint="?android:textColorHint" />
+            tools:ignore="UseAppTint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ProgressBar
