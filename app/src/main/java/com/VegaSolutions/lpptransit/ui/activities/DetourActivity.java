@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities.forum;
+package com.VegaSolutions.lpptransit.ui.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -123,7 +123,6 @@ public class DetourActivity extends AppCompatActivity {
             holder.rl.setOnClickListener(view -> {
 
                 String url = "https://www.lpp.si" + list.get(position).getMore_data_url();
-                //String url = "https://www.lpp.si/obvoz/linije-lpp-na-obvozu-9";
                 Log.e(TAG, url);
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));

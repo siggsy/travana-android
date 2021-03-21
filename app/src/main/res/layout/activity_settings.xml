@@ -32,10 +32,10 @@
                 android:backgroundTint="?backgroundViewColor"
                 android:scaleType="center"
                 android:src="@drawable/ic_arrow_back_black_24dp"
-                android:tint="?android:textColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?android:textColor" />
 
             <TextView
                 android:id="@+id/textView"
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/settings"
-                android:textSize="30sp"
+                android:textSize="24sp"
                 app:layout_constraintBottom_toBottomOf="@+id/back"
                 app:layout_constraintStart_toEndOf="@+id/back"
                 app:layout_constraintTop_toTopOf="@+id/back" />
@@ -101,7 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:buttonTint="?android:textColor"
-            android:text="@string/minutes"
+            android:text="@string/relative_time"
             android:textColor="?android:textColor" />
 
         <RadioButton
@@ -109,7 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:buttonTint="?android:textColor"
-            android:text="@string/hours"
+            android:text="@string/absolute_time"
             android:textColor="?android:textColor" />
     </RadioGroup>
 
@@ -123,37 +123,5 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:text="@string/forum"
-        android:textStyle="bold"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup2" />
-
-    <TextView
-        android:id="@+id/sign_out_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:visibility="gone"
-        android:background="@drawable/stretched_circle"
-        android:backgroundTint="@color/colorAccent"
-        android:clickable="true"
-        android:elevation="2dp"
-        android:focusable="true"
-        android:padding="6dp"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:text="@string/sign_out"
-        android:textColor="@android:color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -44,7 +44,7 @@
             android:paddingTop="4dp"
             android:paddingEnd="4dp"
             android:src="@drawable/ic_bookmark_border_24px"
-            android:tint="?android:textColor" />
+            app:tint="?android:textColor" />
     </LinearLayout>
 
     <com.google.android.flexbox.FlexboxLayout

@@ -17,8 +17,8 @@
         android:layout_weight="1"
         android:minWidth="24dp"
         android:minHeight="24dp"
-        android:tint="?android:textColor"
-        app:srcCompat="@drawable/ic_swap_vert_black_24dp" />
+        app:srcCompat="@drawable/ic_swap_vert_black_24dp"
+        app:tint="?android:textColor" />
 
     <TextView
         android:id="@+id/custom_toast_text"

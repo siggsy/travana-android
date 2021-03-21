@@ -96,6 +96,10 @@
     <string name="error_loading">Error during loading, try again.</string>
     <string name="news">News</string>
     <string name="lpp_news_webside">https://www.lpp.si/novice-kategorija/aktualno</string>
+    <string name="app_version">Version 1.0.0</string>
+    <string name="travana_contact_mail">info@travana.si</string>
+    <string name="relative_time">Relative (7 min)</string>
+    <string name="absolute_time">Absolute (15:30)</string>
 
 
 </resources>
