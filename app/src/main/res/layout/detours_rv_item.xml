@@ -4,6 +4,7 @@
     android:id="@+id/rl_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?backgroundViewColor"
     android:paddingLeft="24dp"
     android:paddingTop="20dp"
     android:paddingRight="24dp">
@@ -65,6 +66,6 @@
         android:layout_below="@id/tv_click_more"
         android:layout_marginTop="20dp"
         android:background="@android:color/black"
-        android:backgroundTint="@color/light_gray_2" />
+        android:backgroundTint="?dividerColor" />
 
 </RelativeLayout>
