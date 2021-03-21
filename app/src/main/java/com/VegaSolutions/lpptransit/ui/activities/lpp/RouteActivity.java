@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,12 +18,15 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -104,6 +108,8 @@ public class RouteActivity extends MapFragmentActivity {
     @BindView(R.id.bottom_sheet) View bottomSheet;
     @BindView(R.id.route_opposite_btn) ImageButton opposite;
     @BindView(R.id.shadow) View shadow;
+
+    View bottom;
 
     private ElevationAnimation elevationAnimation;
     private Adapter adapter;
@@ -223,11 +229,25 @@ public class RouteActivity extends MapFragmentActivity {
         }
     };
 
-
-
-
-
     private void setupUI() {
+
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+        } else {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        bottom = findViewById(R.id.bottom_route);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+            bottomParams.setMargins(0, insets.getSystemWindowInsetTop(), 0, 0);
+            bottom.setLayoutParams(bottomParams);
+            return insets.consumeSystemWindowInsets();
+        });
 
         // Header elevation animation
         elevationAnimation = new ElevationAnimation(header, 16);
@@ -357,6 +377,7 @@ public class RouteActivity extends MapFragmentActivity {
 
         behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
 
+        View mapFilter = findViewById(R.id.map_filter);
         behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -370,6 +391,7 @@ public class RouteActivity extends MapFragmentActivity {
                     case BottomSheetBehavior.STATE_SETTLING:
                         setMapPaddingBotttom(slideOffset);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
+                        mapFilter.setAlpha(slideOffset);
                         break;
                 }
             }

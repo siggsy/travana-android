@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -15,10 +16,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.VegaSolutions.lpptransit.R;
@@ -30,18 +37,23 @@ import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
+import com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments.StationsSubFragment;
+import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
@@ -64,6 +76,9 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     View header;
     GoogleMap googleMap;
     View mapFilter;
+    View bottom;
+    int bottomTopMargin = 0;
+    int headerTopMargin = 0;
 
     LatLng lastValidMapCenter = ljubljana;
 
@@ -76,6 +91,27 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         setContentView(R.layout.app_nav_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+        } else {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
+            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+            headerParams.setMargins(0, headerTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            bottomParams.setMargins(0, bottomTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            header.setLayoutParams(headerParams);
+            bottom.setLayoutParams(bottomParams);
+            return insets.consumeSystemWindowInsets();
+        });
 
         // Check for permission.
         if (!MapUtility.checkIfAtLeastOnePermissionPermitted(this))
@@ -91,7 +127,13 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         loading = findViewById(R.id.top_message);
         bottomSheet = findViewById(R.id.bottom_sheet);
         header = findViewById(R.id.header);
+        bottom = findViewById(R.id.bottom_main);
         mapFilter = findViewById(R.id.map_filter);
+
+        ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+        bottomTopMargin = bottomParams.topMargin;
+        ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
+        headerTopMargin = headerParams.topMargin;
 
         toHide.add(bottomSheet);
         toHide.add(header);
@@ -246,8 +288,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 loading.showLoading(false);
                 if (mMap != null) {
 
-                    // Clear map and add station markers
-                    // mMap.clear(); // TODO: (fix) Removes current location
                     mMap.setInfoWindowAdapter(new StationInfoWindow(this));
 
                     // Refresh clusters
