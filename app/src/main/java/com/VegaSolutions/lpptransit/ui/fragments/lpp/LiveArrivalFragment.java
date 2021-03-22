@@ -106,6 +106,13 @@ public class LiveArrivalFragment extends Fragment {
 
     private void setupUI() {
 
+        // Save default theme colors
+        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundElevatedColor };
+        TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
+        backColor = array.getColor(1, Color.WHITE);
+        color = array.getColor(0, Color.BLACK);
+        array.recycle();
+
         adapter = new Adapter();
         rv.setLayoutManager(new LinearLayoutManager(context));
         rv.setAdapter(adapter);
@@ -121,13 +128,7 @@ public class LiveArrivalFragment extends Fragment {
         refreshLayout.setRefreshing(true);
         refreshLayout.setOnRefreshListener(() -> Api.arrival(stationId, callback));
         refreshLayout.setColorSchemeColors(ContextCompat.getColor(context, R.color.colorAccent));
-
-        // Save default theme colors
-        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
-        TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
-        backColor = array.getColor(1, Color.WHITE);
-        color = array.getColor(0, Color.BLACK);
-        array.recycle();
+        refreshLayout.setProgressBackgroundColorSchemeColor(backColor);
 
         handler = new Handler();
     }

@@ -77,8 +77,7 @@ public class Api {
         "User-Agent", "OkHttp Bot",
         "Accept", "",
         "Accept-Encoding", "gzip",
-        "Cache-Control", "no-cache",
-        "Accept-Encoding", "gzip, deflate"
+        "Cache-Control", "no-cache"
     );
 
     public static void busDetailsName(String busName, ApiCallback<List<Bus>> callback) {
