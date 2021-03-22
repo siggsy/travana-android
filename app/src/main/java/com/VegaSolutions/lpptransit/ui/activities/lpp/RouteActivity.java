@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -120,7 +119,7 @@ public class RouteActivity extends MapFragmentActivity {
     private int color;
 
     // Bus updater query
-    private ApiCallback<List<BusOnRoute>> busQuery = new ApiCallback<List<BusOnRoute>>() {
+    private final ApiCallback<List<BusOnRoute>> busQuery = new ApiCallback<List<BusOnRoute>>() {
         @Override
         public void onComplete(@Nullable ApiResponse<List<BusOnRoute>> apiResponse, int statusCode, boolean success) {
             runOnUiThread(() -> {
@@ -147,7 +146,7 @@ public class RouteActivity extends MapFragmentActivity {
     };
 
     // Stations on route query
-    private ApiCallback<List<ArrivalOnRoute>> callback = new ApiCallback<List<ArrivalOnRoute>>() {
+    private final ApiCallback<List<ArrivalOnRoute>> callback = new ApiCallback<List<ArrivalOnRoute>>() {
         @Override
         public void onComplete(@Nullable ApiResponse<List<ArrivalOnRoute>> apiResponse, int statusCode, boolean success) {
 
@@ -214,7 +213,7 @@ public class RouteActivity extends MapFragmentActivity {
         }
     };
 
-    private Runnable runnable = new Runnable() {
+    private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             Api.arrivalsOnRoute(tripId, callback);
@@ -475,9 +474,7 @@ public class RouteActivity extends MapFragmentActivity {
 
     class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
-
         List<ArrivalOnRoute> stationsOnRoute = new ArrayList<>();
-        boolean[][] toAnimate;
         int[][] isBus;
 
         private void setStationsOnRoute(List<ArrivalOnRoute> stationsOnRoute) {
@@ -485,7 +482,7 @@ public class RouteActivity extends MapFragmentActivity {
             Map<String, Pair<Integer, Pair<Integer, Integer>>> toAnimateMap = new LinkedHashMap<>();
             for (int i = 0; i < stationsOnRoute.size(); i++) {
                 List<ArrivalOnRoute.Arrival> arrivals = stationsOnRoute.get(i).getArrivals();
-                int size = arrivals.size() <= 2 ? arrivals.size() : 2;
+                int size = Math.min(arrivals.size(), 2);
                 for (int j = 0; j < size; j++) {
                     ArrivalOnRoute.Arrival arrival = arrivals.get(j);
                     if (arrival.getType() != 3) {
@@ -499,7 +496,6 @@ public class RouteActivity extends MapFragmentActivity {
             }
 
             isBus = new int[stationsOnRoute.size()][3];
-            toAnimate = new boolean[stationsOnRoute.size()][2];
             for (Map.Entry<String, Pair<Integer, Pair<Integer, Integer>>> entry : toAnimateMap.entrySet()) {
                 Pair<Integer, Pair<Integer, Integer>> value = entry.getValue();
                 int pos;
@@ -509,16 +505,7 @@ public class RouteActivity extends MapFragmentActivity {
                     else pos = value.first;
 
                 } else pos = value.first;
-                boolean[] tA = toAnimate[pos];
 
-                if (tA == null) {
-                    tA = new boolean[2];
-                    toAnimate[pos] = tA;
-                }
-
-                int a = value.second.first;
-                if (a < 2)
-                    tA[a] = true;
                 if (value.second.second == 2 || value.first == 0) {
                     int b = isBus[value.first][0]++;
                     if (b <= 1)
@@ -627,20 +614,13 @@ public class RouteActivity extends MapFragmentActivity {
                     ImageView rss = v.findViewById(R.id.live_icon);
                     TextView garage = v.findViewById(R.id.garage_text);
 
-                    if (toAnimate[position][i]) {
-                        AnimationDrawable drawable = (AnimationDrawable) ContextCompat.getDrawable(RouteActivity.this, R.drawable.rss_3layer);
-                        rss.setImageDrawable(drawable);
-                        assert drawable != null;
-                        drawable.start();
-                    } else rss.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.ic_rss_feed_24px));
-
                     SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                     // Set preferred time format
-                    arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
+                    arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", arrival.getEta_min()));
                     arrival_time.setTextColor(RouteActivity.this.color);
                     back.getBackground().setTint(backColor);
-                    rss.setVisibility(View.GONE);
+                    rss.setVisibility(View.INVISIBLE);
                     arrival_time.setTypeface(null, Typeface.NORMAL);
 
                     // (0 - predicted, 1 - scheduled, 2 - approaching station (prihod), 3 - detour (obvoz))

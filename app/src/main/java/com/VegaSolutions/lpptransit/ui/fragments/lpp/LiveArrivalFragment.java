@@ -54,6 +54,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class LiveArrivalFragment extends Fragment {
 
     private static final String STATION_ID = "station_id";
+    private static final int UPDATE_PERIOD = 30000;
 
     private String stationId;
     private Context context;
@@ -70,12 +71,13 @@ public class LiveArrivalFragment extends Fragment {
 
     private Handler handler;
 
+
     private final Runnable updater = new Runnable() {
         @Override
         public void run() {
             refreshLayout.setRefreshing(true);
             Api.arrival(stationId, callback);
-            handler.postDelayed(updater, 30000);
+            handler.postDelayed(updater, UPDATE_PERIOD);
         }
     };
     private final ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
@@ -94,7 +96,7 @@ public class LiveArrivalFragment extends Fragment {
                 noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
                 adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
                 handler.removeCallbacks(updater);
-                handler.postDelayed(updater, 30000);
+                handler.postDelayed(updater, UPDATE_PERIOD);
             } else new CustomToast(context).showDefault(statusCode);
         });
 
@@ -240,6 +242,8 @@ public class LiveArrivalFragment extends Fragment {
                 editor.putBoolean(route.arrivalObject.getRoute_id(), !route.favourite);
                 route.favourite = !route.favourite;
                 viewHolder.favourite.setImageDrawable(getResources().getDrawable(route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
+                routes.remove(position);
+                notifyDataSetChanged(); //DOMEN
                 editor.apply();
             });
 
@@ -349,8 +353,8 @@ public class LiveArrivalFragment extends Fragment {
             Collections.sort(arrivals, (o1, o2) -> {
                 String o1S = o1.getRoute_name().replaceAll("[^0-9]", "");
                 String o2S = o2.getRoute_name().replaceAll("[^0-9]", "");
-                int o1V = Integer.valueOf(o1S);
-                int o2V = Integer.valueOf(o2S);
+                int o1V = Integer.parseInt(o1S);
+                int o2V = Integer.parseInt(o2S);
                 if (o1V == o2V) return o1.getRoute_name().compareTo(o2.getRoute_name());
                 return Integer.compare(o1V, o2V);
             });
