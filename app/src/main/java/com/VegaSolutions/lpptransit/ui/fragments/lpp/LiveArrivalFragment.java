@@ -7,8 +7,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -18,22 +24,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
-import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
-import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
@@ -72,7 +70,7 @@ public class LiveArrivalFragment extends Fragment {
 
     private Handler handler;
 
-    private Runnable updater = new Runnable() {
+    private final Runnable updater = new Runnable() {
         @Override
         public void run() {
             refreshLayout.setRefreshing(true);
@@ -80,14 +78,14 @@ public class LiveArrivalFragment extends Fragment {
             handler.postDelayed(updater, 30000);
         }
     };
-    private ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
+    private final ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
 
         // Cancel UI update if fragment is not attached to activity
         if (context == null)
             return;
 
         // Set UI
-        ((Activity)context).runOnUiThread(() -> {
+        ((Activity) context).runOnUiThread(() -> {
             refreshLayout.setRefreshing(false);
             if (success && apiResponse != null) {
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
@@ -224,7 +222,7 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.name.setText(route.name);
             viewHolder.number.setText(route.arrivalObject.getRoute_name());
             viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRoute_name()));
-            viewHolder.favourite.setImageDrawable(context.getDrawable(route.favourite? R.drawable.ic_bookmark_24px : R.drawable.ic_bookmark_border_24px));
+            viewHolder.favourite.setImageDrawable(context.getDrawable(route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
             viewHolder.route.setOnClickListener(v -> {
                 Intent i = new Intent(context, RouteActivity.class);
                 i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
@@ -239,8 +237,8 @@ public class LiveArrivalFragment extends Fragment {
                 SharedPreferences sharedPreferences = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(route.arrivalObject.getRoute_id(), !route.favourite);
-                route.favourite= !route.favourite;
-                viewHolder.favourite.setImageDrawable(getResources().getDrawable(route.favourite? R.drawable.ic_bookmark_24px : R.drawable.ic_bookmark_border_24px));
+                route.favourite = !route.favourite;
+                viewHolder.favourite.setImageDrawable(getResources().getDrawable(route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
                 editor.apply();
             });
 
@@ -258,7 +256,7 @@ public class LiveArrivalFragment extends Fragment {
                 SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                 // Set preferred time format
-                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", String.valueOf(arrival.getEta_min())));
+                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", arrival.getEta_min()));
                 arrival_time.setTextColor(color);
                 back.getBackground().setTint(backColor);
 
