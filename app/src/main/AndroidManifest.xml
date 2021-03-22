@@ -17,8 +17,8 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".ui.activities.WebViewActivity"
-            android:label="@string/title_activity_web_view"
-            android:theme="@style/WhiteTheme.NoActionBar"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/WhiteTheme.NoActionBar" />
         <activity android:name=".ui.activities.DetourActivity" />
         <activity
             android:name=".ui.activities.AboutActivity"
@@ -42,10 +42,6 @@
             android:name=".ui.activities.lpp.DepartureActivity"
             android:screenOrientation="portrait" />
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
         <activity
             android:name=".ui.activities.lpp.RouteActivity"
             android:screenOrientation="portrait" />
@@ -58,6 +54,10 @@
         <activity
             android:name=".ui.activities.lpp.StationActivity"
             android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
         <meta-data
             android:name="preloaded_fonts"

@@ -43,5 +43,8 @@
     <string name="app_version">Verzija 2.0.0</string>
     <string name="relative_time">Relativen (npr. 7 min)</string>
     <string name="absolute_time">Absoluten (npr. 15:30)</string>
+    <string name="select_route">Izberi linijo</string>
+    <string name="about">O aplikaciji</string>
+    <string name="posted_time">Objavljeno • %1$s</string>
 
 </resources>

@@ -49,6 +49,5 @@
     <string name="select_route">Select route</string>
     <string name="posted_time">posted • %1$s</string>
     <string name="about">About</string>
-    <string name="title_activity_web_view">WebViewActivity</string>
 
 </resources>
