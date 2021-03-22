@@ -1,34 +1,14 @@
 <resources>
     <string name="app_name">Travana</string>
-    <string name="title_activity_maps" translatable="false">Map</string>
     <string name="nearby_stations">Nearby Stations</string>
     <string name="routes">Routes</string>
-    <string name="title_activity_main" translatable="false">Map</string>
-    <string name="parking">Parking</string>
-    <string name="todo" translatable="false">TODO</string>
     <string name="into_center">CENTER</string>
-    <string name="sign_in_with_fb">Sign in with Facebook</string>
-    <string name="sign_in_with_google">Sign in with Google</string>
-    <string name="need_help">Need help?</string>
     <string name="contact_us"> Contact us</string>
-    <string name="transport">Transport,</string>
-    <string name="the_way_it_was">the way it was</string>
-    <string name="meant_to_be">meant to be.</string>
-    <string name="developer_help_contact" translatable="false">domenkralj.sahist@gmail.com</string>
     <string name="arrival">arrival</string>
     <string name="detour">detour</string>
     <string name="by_developers">By Domen Kralj, Žiga Leskovec</string>
     <string name="app_slogan_welcome_activity">better public transport.</string>
     <string name="officially">In collaboration with</string>
-
-    <string name="test_text" translatable="false">Zaradi popolne prometne zapore na javni poti JP 752181 (Sp. Pirniče 38 - 44), ima linija 15 od srede, 23. 10. 2019 od izvoza do zaključka gradbenih del »OBVOZ«.\n\nZačasno je ukinjeno postajališče »Zavrh« v obe smeri.</string>
-
-    <string name="you_are_already_logined">You are already logged in.</string>
-    <string name="you_canceled_the_proccess">You canceled the process.</string>
-    <string name="something_went_wrong_try_again">Something went wrong, please try again or contact us.</string>
-    <string name="you_have_successfuly_logged_in">You have successfuly logged in.</string>
-    <string name="facebook_app_id" translatable="false">954691711564227</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb954691711564227</string>
     <string name="stations">Stations</string>
     <string name="garage">garage</string>
     <string name="arrivals">Arrivals</string>
@@ -44,58 +24,30 @@
     <string name="favourite_error">No favourites added yet.</string>
     <string name="location_error">Location not enabled.</string>
     <string name="location_changed">Location changed</string>
-    <string name="update">Update</string>
     <string name="no_arrival_error">No upcoming arrivals.</string>
     <string name="no_departures">No scheduled arrivals for today.</string>
-    <string name="loading_buses">Loading buses</string>
-    <string name="forum" translatable="false">Forum</string>
-    <string name="following">following</string>
-    <string name="follow">follow</string>
-    <string name="all">all</string>
-    <string name="posted_time">posted • %1$s</string>
-    <string name="post_comments">%1$d • comments</string>
-    <string name="comment_replies">%1$d • replies</string>
     <string name="loading">loading</string>
     <string name="opposite_error">Opposite station does not exist.</string>
     <string name="network_error">No internet connection.</string>
     <string name="timed_out_error">Connection timed out.</string>
     <string name="unknown_error">Something went wrong. Please try again. - %1$d</string>
     <string name="refresh">Refresh</string>
-    <string name="create_a_new_post">Create a new post</string>
-    <string name="too_many_tags_error">You have reached tag count limit.</string>
-    <string name="select_route">Select a route</string>
-    <string name="attachments">Attachments</string>
     <string name="connection_refused">Connection refused.</string>
-    <string name="comment_on_the_post">Comment on the post …</string>
-    <string name="sign_in_alert">You must be signed in to perform this action</string>
-    <string name="sign_in_text">Sign in</string>
-    <string name="sign_in_error">Sign in to see followed posts</string>
-    <string name="msg_content_error">Post must contain at least 3 characters.</string>
-    <string name="login_to">Login to</string>
-    <string name="conditions_s1">With loging to this application you agree with </string>
-    <string name="tearms_of_service">Terms of service </string>
-    <string name="privacy_policy">Privacy policy </string>
-    <string name="and">and</string>
-
-    <string name="alert_title">Update</string>
-    <string name="alert_update">There is a new update.</string>
-    <string name="alert_update_urgent">You have an outdated version. Please update the app.</string>
-    <string name="alert_update_button">Update</string>
-    <string name="alert_cancel_button">Cancel</string>
-    <string name="alert_ok_button">Ok</string>
     <string name="departures">TIMETABLE</string>
-    <string name="sign_out">Sign Out</string>
-    <string name="signed_out">Signed Out</string>
-    <string name="not_signed_id">Not Signed In</string>
-    <string name="no_messages">No posts found.</string>
-    <string name="lpp_main_name">Ljubljanski potniški promet</string>
-    <string name="lpp">LPP</string>
+    <string name="lpp_main_name" translatable="false">Ljubljanski potniški promet</string>
+    <string name="lpp" translatable="false">LPP</string>
     <string name="detours">Detours</string>
     <string name="data_is_from">Data about detours are obtained from <b>www.lpp.si/obvozi</b></string>
     <string name="click_for_more">Click for more.</string>
     <string name="error_loading">Error during loading, try again.</string>
     <string name="news">News</string>
-    <string name="lpp_news_webside">https://www.lpp.si/novice-kategorija/aktualno</string>
-
+    <string name="lpp_news_webside" translatable="false">https://www.lpp.si/novice-kategorija/aktualno</string>
+    <string name="app_version">Version 2.0.0</string>
+    <string name="travana_contact_mail" translatable="false">info@travana.si</string>
+    <string name="relative_time">Relative (eg. 7 min)</string>
+    <string name="absolute_time">Absolute (eg. 15:30)</string>
+    <string name="select_route">Select route</string>
+    <string name="posted_time">posted • %1$s</string>
+    <string name="about">About</string>
 
 </resources>

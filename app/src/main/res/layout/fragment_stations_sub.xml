@@ -50,7 +50,8 @@
             android:tint="?android:textColorHint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/textView41"
-            app:layout_constraintStart_toStartOf="@+id/textView41" />
+            app:layout_constraintStart_toStartOf="@+id/textView41"
+            tools:ignore="UseAppTint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -84,7 +85,8 @@
             android:tint="?android:textColorHint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/textView42"
-            app:layout_constraintStart_toStartOf="@+id/textView42" />
+            app:layout_constraintStart_toStartOf="@+id/textView42"
+            tools:ignore="UseAppTint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ProgressBar

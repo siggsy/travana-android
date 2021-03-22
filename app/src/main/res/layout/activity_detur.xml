@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?backgroundViewColor"
-    tools:context=".ui.activities.forum.DetourActivity">
+    tools:context=".ui.activities.DetourActivity">
 
     <RelativeLayout
         android:id="@+id/detour_activity_top"
@@ -19,10 +18,10 @@
             android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
-            android:layout_marginLeft="5dp"
             android:padding="7dp"
             android:src="@drawable/ic_back_arrow"
-            android:tint="?android:textColor" />
+            android:tint="?android:textColor"
+            tools:ignore="UseAppTint" />
 
         <TextView
             android:id="@+id/tv_detours"
@@ -35,7 +34,7 @@
             android:paddingEnd="15dp"
             android:paddingBottom="5dp"
             android:text="@string/detours"
-            android:textSize="30sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
         <View
@@ -44,12 +43,12 @@
             android:layout_height="1dp"
             android:layout_below="@+id/tv_detours"
             android:background="@android:color/black"
-            android:backgroundTint="@color/light_gray_2" />
+            android:backgroundTint="@color/light_gray" />
 
     </RelativeLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swiperefresh"
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/tv_where_is_data_from"
@@ -62,14 +61,13 @@
             tools:listitem="@layout/detours_rv_item" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-
     <View
         android:id="@+id/bottom_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/swiperefresh"
+        android:layout_below="@id/swipe_refresh"
         android:background="@android:color/black"
-        android:backgroundTint="@color/light_gray_2" />
+        android:backgroundTint="@color/light_gray" />
 
     <TextView
         android:id="@+id/tv_where_is_data_from"
@@ -79,11 +77,11 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
-        android:paddingLeft="15dp"
+        android:paddingStart="15dp"
         android:paddingTop="10dp"
-        android:paddingRight="25dp"
+        android:paddingEnd="25dp"
         android:paddingBottom="10dp"
         android:text="@string/data_is_from"
         android:textColor="?android:textColor"
-        android:textSize="16sp" />
+        android:textSize="14sp" />
 </RelativeLayout>

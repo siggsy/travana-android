@@ -10,11 +10,11 @@
         android:id="@+id/search_activity_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="?backgroundViewColor"
+        android:stateListAnimator="@animator/titlebar_elevaton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:stateListAnimator="@animator/titlebar_elevaton"
-        android:background="?backgroundViewColor">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -28,11 +28,12 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:scaleType="centerInside"
+                android:tint="?android:textColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_arrow_back_black_24dp"
-                android:tint="?android:textColor"/>
+                tools:ignore="UseAppTint" />
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_activity_search"

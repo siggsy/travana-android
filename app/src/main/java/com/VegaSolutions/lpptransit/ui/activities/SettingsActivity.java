@@ -7,22 +7,17 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.RadioButton;
-import android.widget.TextView;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 public class SettingsActivity extends AppCompatActivity {
-
 
     public static final int SETTINGS_UPDATE = 0;
 
     ImageView back;
 
     RadioButton buttonWhite, buttonDark, buttonMin, buttonHour;
-    TextView signOut;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +36,6 @@ public class SettingsActivity extends AppCompatActivity {
         buttonMin = findViewById(R.id.radio_minute);
         buttonHour = findViewById(R.id.radio_hour);
 
-        signOut = findViewById(R.id.sign_out_btn);
-
         if (dark_theme) buttonDark.setChecked(true);
         else buttonWhite.setChecked(true);
 
@@ -54,7 +47,6 @@ public class SettingsActivity extends AppCompatActivity {
         buttonDark.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
             if (isChecked) {
-
                 // Set dark theme
                 setResult(SETTINGS_UPDATE);
 
@@ -65,8 +57,6 @@ public class SettingsActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 finish();
-
-
             }
 
         });
@@ -85,8 +75,6 @@ public class SettingsActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 finish();
-
-
             }
 
         });

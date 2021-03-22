@@ -24,17 +24,17 @@
                 android:id="@+id/tab_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/tab_layout_bg"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:background="@drawable/tab_layout_bg"
-                app:tabTextColor="@color/text_hint"
-                app:tabRippleColor="@android:color/transparent"
                 app:tabIndicator="@drawable/tab_indicator"
-                app:tabIndicatorFullWidth="false"
                 app:tabIndicatorColor="@color/colorAccent"
+                app:tabIndicatorFullWidth="false"
+                app:tabRippleColor="@android:color/transparent"
                 app:tabSelectedTextColor="@color/colorAccent"
-                app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance" />
+                app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance"
+                app:tabTextColor="@color/text_hint" />
 
 
             <View
@@ -57,6 +57,5 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
-
 
 </LinearLayout>

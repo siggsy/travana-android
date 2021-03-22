@@ -5,9 +5,9 @@
     android:id="@+id/station_node_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    android:background="?selectableItemBackground">
+    android:focusable="true">
 
     <View
         android:id="@+id/top_node_connection"
@@ -27,13 +27,13 @@
         android:layout_marginStart="64dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Barje"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/station_arrivals"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Barje" />
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/station_arrivals"

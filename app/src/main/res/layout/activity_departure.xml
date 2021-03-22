@@ -35,23 +35,23 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="BEŽIGRAD - GROSUPLJE"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/include"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="BEŽIGRAD - GROSUPLJE" />
 
             <TextView
                 android:id="@+id/departure_station_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Navje"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/departure_route_name"
-                app:layout_constraintTop_toBottomOf="@+id/departure_route_name" />
+                app:layout_constraintTop_toBottomOf="@+id/departure_route_name"
+                tools:text="Navje" />
 
             <TextView
                 android:id="@+id/station_center"
@@ -141,6 +141,7 @@
             android:tint="?android:textColorHint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/textView42"
-            app:layout_constraintStart_toStartOf="@+id/textView42" />
+            app:layout_constraintStart_toStartOf="@+id/textView42"
+            tools:ignore="UseAppTint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
