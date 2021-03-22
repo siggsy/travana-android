@@ -250,7 +250,7 @@ public class LiveArrivalFragment extends Fragment {
                 View v = getLayoutInflater().inflate(R.layout.template_arrival_time, viewHolder.arrivals, false);
                 TextView arrival_time = v.findViewById(R.id.arrival_time_time);
                 TextView arrival_event = v.findViewById(R.id.arrival_time_event);
-                ImageView arrival_event_icon = v.findViewById(R.id.arrival_time_event_rss);
+                View arrival_event_icon = v.findViewById(R.id.arrival_time_event_rss);
                 View back = v.findViewById(R.id.arrival_time_back);
 
                 SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -266,7 +266,7 @@ public class LiveArrivalFragment extends Fragment {
                         arrival_event_icon.setVisibility(View.VISIBLE);
                         break;
                     case 2:
-                        arrival_event.setVisibility(View.GONE);
+                        arrival_event.setVisibility(View.VISIBLE);
                         arrival_event_icon.setVisibility(View.GONE);
                         arrival_time.setText(getString(R.string.arrival).toUpperCase());
                         arrival_time.setTextColor(Color.WHITE);
@@ -284,10 +284,6 @@ public class LiveArrivalFragment extends Fragment {
                         arrival_event_icon.setVisibility(View.GONE);
                 }
 
-                // Ignore "ghost" arrivals
-                if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
-                    viewHolder.arrivals.addView(v);
-
                 // Add "garage" flag
                 if (arrival.getDepot() == 1) {
                     arrival_event.setText(getString(R.string.garage));
@@ -300,8 +296,9 @@ public class LiveArrivalFragment extends Fragment {
                     arrival_event.setVisibility(View.GONE);
                 }
 
-                // Show only one if type is "detour"
-                if (arrival.getType() == 3) break;
+                // Ignore "ghost" arrivals
+                if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                    viewHolder.arrivals.addView(v);
 
             }
 
