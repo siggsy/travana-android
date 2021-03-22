@@ -31,7 +31,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Travana"
+                    android:text="@string/app_name"
                     android:textSize="34sp"
                     android:tint="?android:textColor" />
 
@@ -63,7 +63,7 @@
                         android:id="@+id/detour_icon"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_warning"
+                        android:src="@drawable/ic_round_warning_24"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />
 
@@ -71,7 +71,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_marginStart="20dp"
+                        android:layout_marginStart="15dp"
                         android:layout_toEndOf="@id/detour_icon"
                         android:text="@string/detours"
                         android:textSize="17sp"
@@ -91,8 +91,8 @@
 
                     <ImageView
                         android:id="@+id/news_icon"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_baseline_message_24"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />
@@ -121,8 +121,8 @@
 
                     <ImageView
                         android:id="@+id/settings_icon"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_settings_black_24dp"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />
@@ -151,8 +151,8 @@
 
                     <ImageView
                         android:id="@+id/about_icon"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_baseline_info_24"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />

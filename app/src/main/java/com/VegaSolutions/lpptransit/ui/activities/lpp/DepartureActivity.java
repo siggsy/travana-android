@@ -1,12 +1,5 @@
 package com.VegaSolutions.lpptransit.ui.activities.lpp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,11 +9,18 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
-import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 public class DepartureActivity extends AppCompatActivity {
@@ -94,7 +93,7 @@ public class DepartureActivity extends AppCompatActivity {
         routeNumber.setText(route_number);
         routeNumber.setTextSize(16f);
         stationName.setText(station_name);
-        stationCenter.setVisibility(Integer.valueOf(station_code) % 2 != 0 ? View.VISIBLE : View.GONE);
+        stationCenter.setVisibility(Integer.parseInt(station_code) % 2 != 0 ? View.VISIBLE : View.GONE);
         routeNumberCircle.getBackground().setTint(Colors.getColorFromString(route_number));
 
         adapter = new Adapter();
