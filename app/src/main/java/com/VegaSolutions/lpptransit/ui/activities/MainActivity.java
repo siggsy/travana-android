@@ -241,8 +241,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         }
 
         // Collapse bottom sheet if expanded.
-        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
-            behavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
+            behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
         } else {
             fragments.pop();
 
@@ -329,7 +329,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.bottom_sheet,fragment);
+        transaction.replace(R.id.bottom_sheet, fragment);
         transaction.commit();
         fragments.push(fragment);
 

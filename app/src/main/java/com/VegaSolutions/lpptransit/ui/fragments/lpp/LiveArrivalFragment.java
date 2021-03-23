@@ -9,6 +9,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +55,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class LiveArrivalFragment extends Fragment {
 
     private static final String STATION_ID = "station_id";
-    private static final int UPDATE_PERIOD = 30000;
+    private static final int UPDATE_PERIOD = 5000;
 
     private String stationId;
     private Context context;
@@ -75,7 +76,6 @@ public class LiveArrivalFragment extends Fragment {
     private final Runnable updater = new Runnable() {
         @Override
         public void run() {
-            refreshLayout.setRefreshing(true);
             Api.arrival(stationId, callback);
             handler.postDelayed(updater, UPDATE_PERIOD);
         }
@@ -130,7 +130,7 @@ public class LiveArrivalFragment extends Fragment {
         refreshLayout.setColorSchemeColors(ContextCompat.getColor(context, R.color.colorAccent));
         refreshLayout.setProgressBackgroundColorSchemeColor(backColor);
 
-        handler = new Handler();
+        handler = new Handler(Looper.myLooper());
     }
 
     @Override

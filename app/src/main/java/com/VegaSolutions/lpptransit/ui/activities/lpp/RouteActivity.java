@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
@@ -196,7 +197,7 @@ public class RouteActivity extends MapFragmentActivity {
 
                     // Start bus updater.
                     runOnUiThread(() -> {
-                        handler = new Handler();
+                        handler = new Handler(Looper.myLooper());
                         handler.post(runnable);
                     });
 
