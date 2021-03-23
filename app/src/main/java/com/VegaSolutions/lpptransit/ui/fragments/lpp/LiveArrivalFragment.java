@@ -69,7 +69,6 @@ public class LiveArrivalFragment extends Fragment {
 
     private Handler handler;
 
-
     private final Runnable updater = new Runnable() {
         @Override
         public void run() {
