@@ -5,13 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +12,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
-import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
-import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.DepartureActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
+import com.VegaSolutions.lpptransit.utility.Colors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,10 +141,27 @@ public class RoutesOnStationFragment extends Fragment {
     private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         List<RouteOnStation> routes = new ArrayList<>();
+        List<RouteOnStation> filteredRoutes = new ArrayList<>();    // routes without 'garage' routes
 
         public void setRoutes(List<RouteOnStation> routes) {
             this.routes = routes;
+
+            for (RouteOnStation route : routes) {
+                if (!isRouteInList(filteredRoutes, route.getTrip_id()) && !route.isGarage()) {
+                    filteredRoutes.add(route);
+                }
+            }
+
             notifyDataSetChanged();
+        }
+
+        private boolean isRouteInList(List<RouteOnStation> routes, String trip_id) {
+            for (RouteOnStation route : routes) {
+                if (route.getTrip_id().equals(trip_id)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @NonNull
@@ -157,19 +172,18 @@ public class RoutesOnStationFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return routes.size();
+
+            return filteredRoutes.size();
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-            RouteOnStation route = routes.get(position);
+            RouteOnStation route = filteredRoutes.get(position);
 
             // Set route name and number
 
             String name = route.getRoute_group_name();
-            if (route.isGarage())
-                name += " (" + getString(R.string.garage).toUpperCase() + ")";
             holder.name.setText(name);
             holder.number.setText(route.getRoute_number());
 

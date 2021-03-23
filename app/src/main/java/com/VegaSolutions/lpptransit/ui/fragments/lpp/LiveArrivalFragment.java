@@ -244,6 +244,7 @@ public class LiveArrivalFragment extends Fragment {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(route.arrivalObject.getRoute_id(), !route.favourite);
                 route.favourite = !route.favourite;
+              
                 viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
 
                 // sort routes in the recyclerview and animate them
