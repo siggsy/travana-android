@@ -55,7 +55,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class LiveArrivalFragment extends Fragment {
 
     private static final String STATION_ID = "station_id";
-    private static final int UPDATE_PERIOD = 5000;
+    private static final int UPDATE_PERIOD = 50000;
 
     private String stationId;
     private Context context;
@@ -225,7 +225,7 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.name.setText(route.name);
             viewHolder.number.setText(route.arrivalObject.getRoute_name());
             viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRoute_name()));
-            viewHolder.favourite.setImageDrawable(context.getDrawable(route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
+            viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
             viewHolder.route.setOnClickListener(v -> {
                 Intent i = new Intent(context, RouteActivity.class);
                 i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
@@ -241,9 +241,50 @@ public class LiveArrivalFragment extends Fragment {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(route.arrivalObject.getRoute_id(), !route.favourite);
                 route.favourite = !route.favourite;
-                viewHolder.favourite.setImageDrawable(getResources().getDrawable(route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
-                routes.remove(position);
-                notifyDataSetChanged(); //DOMEN
+                viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
+
+                // sort routes in the recyclerview and animate them
+
+                // find index of clicked route in the routes
+                // NOTE: var position can not be used,because it is not updated when calling function notifyItemMoved()
+                int routeIndex = 0;
+                for (int i = 0; i < routes.size(); i++) {
+                    if (routes.get(i).equals(route)) {
+                        routeIndex = i;
+                    }
+                }
+
+                // calculate new place for clicked route
+                int to = 0;
+                for (int i = 0; i < routes.size(); i++) {
+                    RouteWrapper route2 = routes.get(i);
+                    if (i == routeIndex) continue;
+                    if (route.favourite) {
+                        if (!route2.favourite) {
+                            continue;
+                        }
+                        if (route2.getSortingRouteNumber() < route.getSortingRouteNumber()) {
+                            to++;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        if (route2.favourite) {
+                            to++;
+                            continue;
+                        }
+                        if (route2.getSortingRouteNumber() < route.getSortingRouteNumber()) {
+                            to++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                routes.remove(routeIndex);
+                routes.add(to, route);
+                notifyItemMoved(routeIndex, to);
+
                 editor.apply();
             });
 
@@ -343,6 +384,31 @@ public class LiveArrivalFragment extends Fragment {
         String name;
         ArrivalWrapper.Arrival arrivalObject;
         boolean favourite;
+
+        private String getRouteName() {
+            if (arrivals == null || arrivals.size() == 0) {
+                return "";
+            } else {
+                return arrivals.get(0).getRoute_name();
+            }
+        }
+
+        private int getRouteNumber() {
+            return Integer.parseInt(getRouteName().replaceAll("[^\\d.]", ""));
+        }
+
+        // returns number based on route name
+        // used for sorting routes by name
+        // eg. route 3 -> 30000
+        //     route 3g -> 30103 (30000 + ascii(g))
+        private int getSortingRouteNumber() {
+            int value = getRouteNumber() * 10000;
+            String routeNameLetters = getRouteName().replaceAll("\\d", "");
+            if (routeNameLetters.length() > 0) {
+                value += (char) getRouteName().replaceAll("\\d", "").charAt(0);
+            }
+            return value;
+        }
 
         private static List<RouteWrapper> getFromArrivals(Context context, List<ArrivalWrapper.Arrival> arrivals) {
 
