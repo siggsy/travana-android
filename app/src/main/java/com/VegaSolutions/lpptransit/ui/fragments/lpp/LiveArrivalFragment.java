@@ -52,7 +52,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class LiveArrivalFragment extends Fragment {
 
     private static final String STATION_ID = "station_id";
-    private static final int UPDATE_PERIOD = 50000;
+    private static final int UPDATE_PERIOD = 5000;
 
     private String stationId;
     private Context context;
