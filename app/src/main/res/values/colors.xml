@@ -42,6 +42,7 @@
 
     <!-- dark theme -->
     <color name="color_main_background_dark">#212529</color>
+    <color name="color_main_background_dark_elevated">#313438</color>
     <color name="color_text_dark">#FFFFFF</color>
 
 </resources>
