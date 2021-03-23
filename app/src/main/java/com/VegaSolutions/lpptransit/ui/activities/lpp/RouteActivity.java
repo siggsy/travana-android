@@ -403,7 +403,7 @@ public class RouteActivity extends MapFragmentActivity {
 
     private void setMapPaddingBottom(Float offset) {
         float maxMapPaddingBottom = (float) behavior.getPeekHeight();
-        setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
+        setBottomPadding(Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
     }
 
     @Override
