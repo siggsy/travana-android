@@ -74,6 +74,7 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
 
         // Set location button location callback.
@@ -163,6 +164,18 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;
+    }
+
+    protected void setTopPadding(int top) {
+        if (mMap != null)
+            mMap.setPadding(paddingLeft, top, paddingRight, paddingBottom);
+        paddingTop = top;
+    }
+
+    protected void setBottomPadding(int bottom) {
+        if (mMap != null)
+            mMap.setPadding(paddingLeft, paddingTop, paddingRight, bottom);
+        paddingBottom = bottom;
     }
 
     @Override
