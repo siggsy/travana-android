@@ -47,9 +47,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static android.content.Context.MODE_PRIVATE;
 
 public class LiveArrivalFragment extends Fragment {
@@ -63,9 +60,9 @@ public class LiveArrivalFragment extends Fragment {
 
     private Adapter adapter;
 
-    @BindView(R.id.live_arrival_swipe_refresh) SwipeRefreshLayout refreshLayout;
-    @BindView(R.id.live_arrival_rv) RecyclerView rv;
-    @BindView(R.id.live_arrival_no_arrivals_error) View noArrErr;
+    SwipeRefreshLayout refreshLayout;
+    RecyclerView rv;
+    View noArrErr;
 
     private boolean hour;
     private int color, backColor;
@@ -143,13 +140,20 @@ public class LiveArrivalFragment extends Fragment {
         if (getArguments() != null) {
             stationId = getArguments().getString(STATION_ID);
         }
+
+        refreshLayout = getActivity().findViewById(R.id.live_arrival_swipe_refresh);
+        rv = getActivity().findViewById(R.id.live_arrival_rv);
+        noArrErr = getActivity().findViewById(R.id.live_arrival_no_arrivals_error);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
-        ButterKnife.bind(this, root);
+
+        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
+        rv = root.findViewById(R.id.live_arrival_rv);
+        noArrErr = root.findViewById(R.id.live_arrival_no_arrivals_error);
 
         setupUI();
 
