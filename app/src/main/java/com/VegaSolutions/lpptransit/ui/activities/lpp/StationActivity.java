@@ -184,7 +184,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         mMap.setOnCameraIdleListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
         m.setTag(station);
         m.showInfoWindow();
-        mMap.setOnInfoWindowClickListener(marker -> bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED));
+        mMap.setOnInfoWindowClickListener(marker -> bottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED));
 
         // Focus on station
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(station.getLatLng(), 12.5f));

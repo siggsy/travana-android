@@ -20,6 +20,7 @@
         <item name="colorPrimaryDark">#FFFFFF</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="elevation">2dp</item>
+        <item name="departureHourColor">@color/light_gray</item>
     </style>
 
     <style name="DarkTheme" parent="MyTheme">
@@ -35,5 +36,6 @@
         <item name="android:windowBackground">@color/color_main_background_dark</item>
         <item name="backgroundElevatedColor">@color/color_main_background_dark_elevated</item>
         <item name="android:colorEdgeEffect">@color/divider_dark</item>
+        <item name="departureHourColor">#12FFFFFF</item>
     </style>
 </resources>

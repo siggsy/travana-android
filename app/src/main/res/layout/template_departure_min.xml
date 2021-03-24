@@ -3,8 +3,13 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:background="@drawable/stretched_circle_container"
     android:fontFamily="@font/roboto"
     android:orientation="vertical"
-    android:textSize="18sp">
+    android:paddingStart="4dp"
+    android:paddingTop="2dp"
+    android:paddingEnd="4dp"
+    android:paddingBottom="2dp"
+    android:textSize="14sp">
 
 </TextView>
