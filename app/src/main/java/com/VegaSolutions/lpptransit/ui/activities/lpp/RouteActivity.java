@@ -302,7 +302,10 @@ public class RouteActivity extends MapFragmentActivity {
                     }
 
                     runOnUiThread(() -> {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        AlertDialog.Builder builder = new AlertDialog.Builder( this,
+                                ViewGroupUtils.isDarkTheme(getApplication())
+                                        ? R.style.DarkAlert : R.style.WhiteAlert);
+
                         builder.setTitle(getString(R.string.select_route));
                         builder.setItems(trips, (dialog, which) -> runOnUiThread(() -> {
                             Route route = routes.get(which);
