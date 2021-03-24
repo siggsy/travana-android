@@ -2,7 +2,6 @@ package com.VegaSolutions.lpptransit.ui.custommaps;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -59,7 +58,7 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         }
-        
+
         try {
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
@@ -87,7 +86,6 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
             View v = LayoutInflater.from(context).inflate(R.layout.template_route_number, null);
             TextView textView = v.findViewById(R.id.route_station_number);
             textView.setText(route);
-            textView.setTextColor(Color.WHITE);
             v.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.getColorFromString(route));
             routes.addView(v);
 

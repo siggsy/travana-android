@@ -15,7 +15,7 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 public class CustomClusterRenderer extends DefaultClusterRenderer<StationMarker> {
 
-    private Context context;
+    private final Context context;
 
     public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<StationMarker> clusterManager) {
         super(context, map, clusterManager);
@@ -35,7 +35,7 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<StationMarker>
 
     @Override
     protected void onBeforeClusterItemRendered(StationMarker item, MarkerOptions markerOptions) {
-        super.onBeforeClusterItemRendered(item, markerOptions.icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(context, R.drawable.station_circle))).anchor(0.5f, 0.5f));
+        super.onBeforeClusterItemRendered(item, markerOptions.icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(context, R.drawable.station_circle))).anchor(0.4f, 0.4f));
     }
 
     @Override
