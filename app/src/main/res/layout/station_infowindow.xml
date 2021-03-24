@@ -75,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textAlignment="textEnd"
+                android:textColor="?android:textColor"
                 tools:text="149 m" />
 
         </LinearLayout>
@@ -96,16 +97,16 @@
 
     </LinearLayout>
 
-    <ImageView
+    <View
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_below="@id/inner_card"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="-2dp"
-        android:background="@drawable/ic_triangle"
-        android:rotation="90"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/triangle"
+        android:rotation="180"
         android:scaleType="fitXY"
-        app:tint="@color/colorAccent" />
+        android:translationZ="2dp" />
 
 
 </RelativeLayout>

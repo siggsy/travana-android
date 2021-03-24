@@ -2,7 +2,6 @@ package com.VegaSolutions.lpptransit.ui.custommaps;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -52,14 +51,12 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         root = view.findViewById(R.id.station_nearby_card);
 
         name.setText(station.getName());
-        distance.setText("");
+        distance.setText("123 m");
         center.setVisibility(Integer.parseInt(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
-        center.setTextColor(Color.WHITE);
         fav.setVisibility(f ? View.VISIBLE : View.GONE);
 
         for (String route : station.getRoute_groups_on_station()) {
 
-            Log.e("TAF", route);
             View v = LayoutInflater.from(context).inflate(R.layout.template_route_number, null);
             TextView textView = v.findViewById(R.id.route_station_number);
             textView.setText(route);
