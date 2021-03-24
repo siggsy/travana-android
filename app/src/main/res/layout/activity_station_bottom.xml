@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/maps_location_icon"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="112dp"
+        android:background="@drawable/stretched_circle"
+        android:backgroundTint="?backgroundViewColor"
+        android:clickable="true"
+        android:elevation="6dp"
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/ic_my_location_black_24dp"
+        android:tint="?android:textColor"
+        tools:ignore="UseAppTint" />
+
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@drawable/top_shadow_gradient"
+        app:layout_anchor="@id/rootConstraint" />
+    <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/rootConstraint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:translationZ="6dp"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="100dp"
+        app:layout_behavior="@string/view_pager_bottom_sheet_behavior">
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/station_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:nestedScrollingEnabled="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <FrameLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/backgroundViewColor"
+            android:stateListAnimator="@animator/titlebar_elevaton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/back"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="12dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:backgroundTint="?backgroundViewColor"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_arrow_back_black_24dp"
+                    android:tint="?android:textColor"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="UseAppTint" />
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="50dp"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/stretched_circle"
+                    android:backgroundTint="@color/light_gray_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/station_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Navje"
+                    android:textColor="?android:textColor"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
+                    app:layout_constraintEnd_toStartOf="@+id/station_center"
+                    app:layout_constraintStart_toEndOf="@+id/back"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/station_center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/stretched_circle"
+                    android:backgroundTint="@android:color/holo_orange_light"
+                    android:elevation="2dp"
+                    android:padding="4dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:text="@string/into_center"
+                    android:textColor="?backgroundViewColor"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/station_favourite"
+                    app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
+                    app:layout_constraintVertical_bias="0.6" />
+
+                <ImageButton
+                    android:id="@+id/station_opposite_btn"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:elevation="2dp"
+                    android:src="@drawable/ic_swap_vert_black_24dp"
+                    android:tint="?android:textColor"
+                    app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/station_favourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:elevation="2dp"
+                    android:focusable="true"
+                    android:tint="@color/colorAccent"
+                    app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
+                    app:layout_constraintEnd_toStartOf="@+id/station_opposite_btn"
+                    app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
+                    app:srcCompat="@drawable/ic_favorite_border_black_24dp"
+                    tools:ignore="UseAppTint" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/station_tab_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/tab_layout_bg"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:tabIndicator="@drawable/tab_indicator"
+                    app:tabIndicatorColor="@color/colorAccent"
+                    app:tabIndicatorFullWidth="false"
+                    app:tabRippleColor="@android:color/transparent"
+                    app:tabSelectedTextColor="@color/colorAccent"
+                    app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance"
+                    app:tabTextColor="@color/text_hint" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

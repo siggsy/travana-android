@@ -43,6 +43,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     private ElevationAnimation animation;
 
     private StationsFragmentListener mListener;
+    private FragmentHeaderCallback headerListener = null;
     private OnFragmentCreatedListener createdListener = null;
 
     private ApiCallback<List<Station>> callback = (apiResponse, statusCode, success) -> {
@@ -71,7 +72,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
 
     private void setupUI() {
 
-        animation = new ElevationAnimation(header, 16);
+        animation = new ElevationAnimation(16, header);
 
         adapter = new Adapter(getParentFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
@@ -149,6 +150,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         super.onAttach(context);
         if (context instanceof StationsFragmentListener) {
             mListener = (StationsFragmentListener) context;
+            headerListener = (FragmentHeaderCallback) context;
             this.context = context;
         } else throw new RuntimeException(context.toString() + " must implement StationsFragmentListener");
     }
@@ -168,6 +170,8 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     @Override
     public void onHeaderChanged(boolean selected) {
         animation.elevate(selected);
+        if (headerListener != null)
+            headerListener.onHeaderChanged(selected);
     }
 
     private class Adapter extends FragmentPagerAdapter {
