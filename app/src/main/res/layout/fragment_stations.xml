@@ -11,14 +11,13 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?backgroundViewColor"
-        android:stateListAnimator="@animator/titlebar_elevaton">
+        android:background="?backgroundViewColor" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/header_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?backgroundViewColor">
+            android:background="@color/transparent">
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"

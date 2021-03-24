@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -16,22 +17,27 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
+import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -48,7 +54,7 @@ import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener {
+public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, FragmentHeaderCallback {
 
     private final int locationRequestCode = 1000;
 
@@ -63,7 +69,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     DrawerLayout dl;
     NavigationView nv;
     View bottomSheet;
-    View header;
+    CardView header;
     GoogleMap googleMap;
     View mapFilter;
     View bottom;
@@ -73,6 +79,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     RelativeLayout about_rl;
     int bottomTopMargin = 0;
     int headerTopMargin = 0;
+
+    ElevationAnimation elevationAnimation;
 
     LatLng lastValidMapCenter = ljubljana;
 
@@ -128,6 +136,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         settings_rl = findViewById(R.id.rl_settings);
         about_rl = findViewById(R.id.rl_about);
 
+        elevationAnimation = new ElevationAnimation(16, null, header, mapFilter);
+
         ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
         bottomTopMargin = bottomParams.topMargin;
         ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
@@ -176,6 +186,12 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
+                    header.setElevation(0);
+                } else if (newState == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
+                    mapFilter.setAlpha(0f);
+                    header.setElevation(headerElevation);
+                }
             }
 
             @Override
@@ -349,4 +365,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         }
     }
 
+    @Override
+    public void onHeaderChanged(boolean selected) {
+        elevationAnimation.elevate(selected);
+    }
 }
