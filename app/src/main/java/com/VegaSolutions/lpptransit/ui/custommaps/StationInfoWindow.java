@@ -1,7 +1,11 @@
 package com.VegaSolutions.lpptransit.ui.custommaps;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,6 +16,7 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
+import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -21,6 +26,7 @@ import java.util.Map;
 public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
 
     private final Activity context;
+    private LocationManager locationManager;
 
     public StationInfoWindow(Activity context) {
         this.context = context;
@@ -50,8 +56,29 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         fav = view.findViewById(R.id.route_favourite);
         root = view.findViewById(R.id.station_nearby_card);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        }
+        
+        try {
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                double distanceA = MapUtility.calculationByDistance(location.getLatitude(), location.getLongitude(), station.getLatitude(), station.getLongitude());
+
+                if (distanceA < 0.9) {
+                    distanceA *= 1000;
+                    distance.setText((int) distanceA + " m");
+                } else {
+                    distanceA = (double) Math.round(distanceA * 100d) / 100d;
+                    distance.setText(distanceA + " km");
+                }
+            }
+        } catch (SecurityException e) {
+            distance.setText("");
+        }
+
+
         name.setText(station.getName());
-        distance.setText("123 m");
         center.setVisibility(Integer.parseInt(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
         fav.setVisibility(f ? View.VISIBLE : View.GONE);
 

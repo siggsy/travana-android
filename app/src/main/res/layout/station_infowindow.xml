@@ -108,5 +108,4 @@
         android:scaleType="fitXY"
         android:translationZ="2dp" />
 
-
 </RelativeLayout>
