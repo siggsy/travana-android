@@ -146,10 +146,10 @@ public class DepartureActivity extends AppCompatActivity {
 
         // Calculate for request
         DateTime now = DateTime.now();
-        int next = 28 - now.getHourOfDay();
+        int next = 30 - now.getHourOfDay();
         int prev = now.getHourOfDay() - 6;
 
-        Api.timetable(station_code, 8, 8, (apiResponse, statusCode, success) -> {
+        Api.timetable(station_code, next, prev, (apiResponse, statusCode, success) -> {
             runOnUiThread(() -> {
 
                 // Remove progress bar
