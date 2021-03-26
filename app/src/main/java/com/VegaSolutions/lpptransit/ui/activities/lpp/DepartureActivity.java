@@ -35,9 +35,11 @@ import com.google.android.flexbox.FlexboxLayout;
 
 import org.joda.time.DateTime;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.SimpleTimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -68,6 +70,7 @@ public class DepartureActivity extends AppCompatActivity {
     @BindView(R.id.departure_no_departures_error) View depErr;
     @BindView(R.id.progressBar) ProgressBar progressBar;
     @BindView(R.id.back) View back;
+    @BindView(R.id.timetable_title_tv) TextView title;
 
     private Adapter adapter;
 
@@ -146,8 +149,10 @@ public class DepartureActivity extends AppCompatActivity {
 
         // Calculate for request
         DateTime now = DateTime.now();
-        int next = 30 - now.getHourOfDay();
-        int prev = now.getHourOfDay() - 6;
+        SimpleDateFormat sdf = new SimpleDateFormat("d. M", Locale.getDefault());
+        title.setText(getString(R.string.departures, sdf.format(now.toDate())));
+        int next = 25 - now.getHourOfDay();
+        int prev = now.getHourOfDay();
 
         Api.timetable(station_code, next, prev, (apiResponse, statusCode, success) -> {
             runOnUiThread(() -> {
