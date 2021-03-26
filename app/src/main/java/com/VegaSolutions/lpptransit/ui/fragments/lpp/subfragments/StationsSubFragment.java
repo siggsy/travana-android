@@ -6,12 +6,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +13,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
 import com.VegaSolutions.lpptransit.ui.customviews.NullSafeView;
-import com.VegaSolutions.lpptransit.utility.Colors;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,11 +56,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     private List<Station> stations;
 
     // UI elements
-    private NullSafeView<RecyclerView> list = new NullSafeView<>();
-    private NullSafeView<View> favErr = new NullSafeView<>();
-    private NullSafeView<View> locErr = new NullSafeView<>();
-    private NullSafeView<View> progressBar = new NullSafeView<>();
-    private Adapter adapter = new Adapter();
+    private final NullSafeView<RecyclerView> list = new NullSafeView<>();
+    private final NullSafeView<View> favErr = new NullSafeView<>();
+    private final NullSafeView<View> locErr = new NullSafeView<>();
+    private final NullSafeView<View> progressBar = new NullSafeView<>();
+    private final Adapter adapter = new Adapter();
     private FragmentHeaderCallback callback;
 
     private OnAttachListener onAttachListener = null;
@@ -329,7 +327,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         }
 
         private int where(StationWrapper a, List<StationWrapper> b) {
-
             if (b.isEmpty())
                 return -1;
             for (int i = 0; i < b.size(); i++) {
@@ -337,7 +334,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                     return i;
             }
             return -1;
-
         }
 
         private void refreshStations(List<StationWrapper> stationsNew) {

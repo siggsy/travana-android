@@ -56,11 +56,16 @@ public class MapUtility {
      * @return distance in KM.
      */
     public static double calculationByDistance(LatLng StartP, LatLng EndP) {
+        return calculationByDistance(StartP.latitude, StartP.longitude, EndP.latitude, EndP.longitude);
+    }
+
+    /**
+     * Calculate distance between two LatLng objects
+     *
+     * @return distance in KM.
+     */
+    public static double calculationByDistance(double lat1, double lon1, double lat2, double lon2) {
         int Radius = 6371;
-        double lat1 = StartP.latitude;
-        double lat2 = EndP.latitude;
-        double lon1 = StartP.longitude;
-        double lon2 = EndP.longitude;
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
