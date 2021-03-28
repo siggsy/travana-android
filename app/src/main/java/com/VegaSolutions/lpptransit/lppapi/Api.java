@@ -3,7 +3,6 @@ package com.VegaSolutions.lpptransit.lppapi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.VegaSolutions.lpptransit.BuildConfig;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
@@ -41,7 +40,7 @@ import okhttp3.Response;
 
 public class Api {
 
-    // Documentation: http://194.33.12.32/doc/
+    // Documentation: http://data.lpp.si/doc/
     public static final String DATA_URL = "https://data.lpp.si/api";
     public static final String DETOUR_URL = "https://www.lpp.si";
 
@@ -251,8 +250,6 @@ public class Api {
 
     private static List<DetourInfo> getDetours(String html) {
 
-        Log.i(TAG, html);
-
         List<DetourInfo> list = new ArrayList<>();
 
         Pattern detourPattern = Pattern.compile("<div class=\"content__box--title\"><a href=\"(.*)\">(.*)</a></div>[\\s\\S]*?<div class=\"content__box--date\">(.*)</div>");
@@ -283,11 +280,8 @@ public class Api {
                         ApiResponse<T> data = new Gson().fromJson(r, type);
                         callback.onComplete(data, response.code(), true);
                     } catch (IOException e) {
-
                         e.printStackTrace();
-                        Log.i(TAG, response.request().url().toString());
                         callback.onComplete(null, -4, false);
-
                     }
                 } else {
                     callback.onComplete(null, response.code(), false);

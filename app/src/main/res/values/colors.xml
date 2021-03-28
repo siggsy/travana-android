@@ -39,6 +39,7 @@
     <color name="color_main_shaddow">#242424</color>
 
     <color name="color_black">#000000</color>
+    <color name="white">#FFFFFF</color>
 
     <!-- dark theme -->
     <color name="color_main_background_dark">#212529</color>
