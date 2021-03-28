@@ -3,12 +3,14 @@ package com.VegaSolutions.lpptransit.ui.custommaps;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -22,17 +24,40 @@ import com.google.maps.android.ui.IconGenerator;
 public class CustomClusterRenderer extends DefaultClusterRenderer<StationMarker> {
 
     private final Context context;
-    private final IconGenerator mClusterIconGenerator;
+
+    private final IconGenerator mClusterIconGeneratorBig;
+    private final IconGenerator mClusterIconGeneratorMed;
+    private final IconGenerator mClusterIconGeneratorSml;
+    final Drawable clusterIconBig;
+    final Drawable clusterIconMed;
+    final Drawable clusterIconSml;
 
     public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<StationMarker> clusterManager) {
         super(context, map, clusterManager);
         this.context = context;
-        this.mClusterIconGenerator = new IconGenerator(context);
+        this.mClusterIconGeneratorBig = new IconGenerator(context);
+        this.mClusterIconGeneratorMed = new IconGenerator(context);
+        this.mClusterIconGeneratorSml = new IconGenerator(context);
+        this.clusterIconBig = ContextCompat.getDrawable(context, R.drawable.circle_3);
+        this.clusterIconMed = ContextCompat.getDrawable(context, R.drawable.circle_2);
+        this.clusterIconSml = ContextCompat.getDrawable(context, R.drawable.circle);
+        clusterIconBig.setColorFilter(context.getResources().getColor(R.color.main_blue), PorterDuff.Mode.SRC_ATOP);
+        clusterIconMed.setColorFilter(context.getResources().getColor(R.color.color_main_orange), PorterDuff.Mode.SRC_ATOP);
+        clusterIconSml.setColorFilter(context.getResources().getColor(R.color.main_green), PorterDuff.Mode.SRC_ATOP);
+        setupIconGen(mClusterIconGeneratorBig, clusterIconBig, context);
+        setupIconGen(mClusterIconGeneratorMed, clusterIconMed, context);
+        setupIconGen(mClusterIconGeneratorSml, clusterIconSml, context);
     }
 
-    @Override
-    protected int getColor(int clusterSize) {
-        return Colors.colors.get(clusterSize % 71);
+    private void setupIconGen(IconGenerator generator, Drawable drawable, Context context) {
+        TextView textView = new TextView(context);
+        textView.setTypeface(textView.getTypeface(), Typeface.BOLD);
+        textView.setTextColor(ContextCompat.getColor(context, R.color.white));
+        textView.setId(com.google.maps.android.R.id.amu_text);
+        textView.setGravity(android.view.Gravity.CENTER);
+        textView.setLayoutParams(new FrameLayout.LayoutParams(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+        generator.setContentView(textView);
+        generator.setBackground(drawable);
     }
 
     @Override
@@ -44,20 +69,16 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<StationMarker>
     @Override
     protected void onBeforeClusterRendered(Cluster<StationMarker> cluster, MarkerOptions markerOptions) {
 
-        final Drawable clusterIcon = context.getResources().getDrawable(R.drawable.circle);
-        clusterIcon.setColorFilter(Colors.colors.get(cluster.getSize() % 71), PorterDuff.Mode.SRC_ATOP);
-
-        mClusterIconGenerator.setBackground(clusterIcon);
-
-        //modify padding for one or two digit numbers
-        if (cluster.getSize() < 10) {
-            mClusterIconGenerator.setContentPadding(40, 20, 0, 0);
+        if (cluster.getSize() > 20) {
+            Bitmap icon = mClusterIconGeneratorBig.makeIcon(String.valueOf(cluster.getSize()));
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
+        } else if (cluster.getSize() > 10) {
+            Bitmap icon = mClusterIconGeneratorMed.makeIcon(String.valueOf(cluster.getSize()));
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
         } else {
-            mClusterIconGenerator.setContentPadding(30, 20, 0, 0);
+            Bitmap icon = mClusterIconGeneratorSml.makeIcon(String.valueOf(cluster.getSize()));
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
         }
-
-        Bitmap icon = mClusterIconGenerator.makeIcon(String.valueOf(cluster.getSize()));
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
     }
 
     @Override
