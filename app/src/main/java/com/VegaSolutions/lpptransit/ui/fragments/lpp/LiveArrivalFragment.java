@@ -242,7 +242,7 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.favourite.setOnClickListener(v1 -> {
                 SharedPreferences sharedPreferences = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(route.arrivalObject.getRoute_id(), !route.favourite);
+                editor.putBoolean(route.arrivalObject.getTrip_id(), !route.favourite);
                 route.favourite = !route.favourite;
               
                 viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
@@ -403,13 +403,17 @@ public class LiveArrivalFragment extends Fragment {
 
         // returns number based on route name
         // used for sorting routes by name
-        // eg. route 3 -> 30000
-        //     route 3g -> 30103 (30000 + ascii(g))
+        // eg. route 3 -> 300066 (300000 + ascii(B))
+        //     route 3g -> 30103 (300000 + ascii(g) * 1000 + ascii(B))
+        //ascii(B) - first letter of the destination station
         private int getSortingRouteNumber() {
-            int value = getRouteNumber() * 10000;
+            int value = getRouteNumber() * 1000000;
             String routeNameLetters = getRouteName().replaceAll("\\d", "");
             if (routeNameLetters.length() > 0) {
-                value += (char) getRouteName().replaceAll("\\d", "").charAt(0);
+                value += (char) getRouteName().replaceAll("\\d", "").charAt(0) * 1000;
+            }
+            if (name.length() > 0) {
+                value += (char) name.charAt(0);
             }
             return value;
         }
@@ -433,7 +437,7 @@ public class LiveArrivalFragment extends Fragment {
             int k = 0;
             for (int i = 0; i < arrivals.size(); i++) {
                 ArrivalWrapper.Arrival arrival = arrivals.get(i);
-                Boolean f = fav.get(arrival.getRoute_id());
+                Boolean f = fav.get(arrival.getTrip_id());
                 if (f != null && f) {
                     arrivals.remove(i);
                     arrivals.add(k, arrival);
@@ -446,7 +450,7 @@ public class LiveArrivalFragment extends Fragment {
                 RouteWrapper route = map.get(arrival.getTrip_id());
                 if (route == null) {
                     route = new RouteWrapper();
-                    route.favourite = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE).getBoolean(arrival.getRoute_id(), false);
+                    route.favourite = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE).getBoolean(arrival.getTrip_id(), false);
                     ArrivalWrapper.Arrival.Stations stations = arrival.getStations();
                     route.name = stations != null && stations.getArrival() != null && !stations.getArrival().equals("") ? stations.getArrival() : arrival.getTrip_name();
                     route.arrivalObject = arrival;

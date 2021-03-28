@@ -1,20 +1,10 @@
 package com.VegaSolutions.lpptransit.ui.activities.lpp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -24,6 +14,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
@@ -215,9 +214,9 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
             oppositeBtn.setEnabled(false);
 
             int code;
-            if (Integer.valueOf(station.getRef_id()) % 2 == 0)
-                code = Integer.valueOf(station.getRef_id()) - 1 ;
-            else code = Integer.valueOf(station.getRef_id()) + 1;
+            if (Integer.parseInt(station.getRef_id()) % 2 == 0)
+                code = Integer.parseInt(station.getRef_id()) - 1;
+            else code = Integer.parseInt(station.getRef_id()) + 1;
 
             // Query opposite station details
             Api.stationDetails(String.valueOf(code), true, (apiResponse, statusCode, success) -> runOnUiThread(() -> {
