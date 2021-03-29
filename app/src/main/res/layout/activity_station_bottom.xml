@@ -82,6 +82,7 @@
                     android:scaleType="center"
                     android:src="@drawable/ic_arrow_back_black_24dp"
                     android:tint="?android:textColor"
+                    app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="UseAppTint" />
@@ -102,7 +103,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
                     android:layout_marginEnd="8dp"
                     android:textColor="?android:textColor"
                     android:textSize="24sp"
@@ -110,7 +110,7 @@
                     app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
                     app:layout_constraintEnd_toStartOf="@+id/station_center"
                     app:layout_constraintStart_toEndOf="@+id/back"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/back"
                     tools:text="Navje" />
 
                 <TextView
@@ -137,15 +137,13 @@
                     android:id="@+id/station_opposite_btn"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:elevation="2dp"
                     android:src="@drawable/ic_swap_vert_black_24dp"
                     android:tint="?android:textColor"
-                    app:layout_constraintBottom_toTopOf="@+id/station_tab_layout"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="@+id/station_title" />
 
                 <ImageView
                     android:id="@+id/station_favourite"
