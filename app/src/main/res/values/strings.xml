@@ -42,7 +42,7 @@
     <string name="error_loading">Error during loading, try again.</string>
     <string name="news">News</string>
     <string name="lpp_news_webside" translatable="false">https://www.lpp.si/novice-kategorija/aktualno</string>
-    <string name="app_version">Version 2.0.1</string>
+    <string name="app_version">Version 2.0.2</string>
     <string name="travana_contact_mail" translatable="false">info@travana.si</string>
     <string name="relative_time">Relative (eg. 7 min)</string>
     <string name="absolute_time">Absolute (eg. 15:30)</string>
