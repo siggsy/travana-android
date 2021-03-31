@@ -1,34 +1,40 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.Toast;
-
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
-import com.VegaSolutions.lpptransit.ui.activities.forum.DetourActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
+import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
+import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -36,7 +42,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.navigation.NavigationView;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -46,7 +51,7 @@ import java.util.Stack;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, FragmentHeaderCallback {
 
     private final int locationRequestCode = 1000;
 
@@ -61,8 +66,18 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     DrawerLayout dl;
     NavigationView nv;
     View bottomSheet;
-    View header;
+    CardView header;
     GoogleMap googleMap;
+    View mapFilter;
+    View bottom;
+    RelativeLayout detours_rl;
+    RelativeLayout news_rl;
+    RelativeLayout settings_rl;
+    RelativeLayout about_rl;
+    int bottomTopMargin = 0;
+    int headerTopMargin = 0;
+
+    ElevationAnimation elevationAnimation;
 
     LatLng lastValidMapCenter = ljubljana;
 
@@ -75,6 +90,27 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         setContentView(R.layout.app_nav_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // TODO - remove depricated
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+        } else {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
+            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+            headerParams.setMargins(0, headerTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            bottomParams.setMargins(0, bottomTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            header.setLayoutParams(headerParams);
+            bottom.setLayoutParams(bottomParams);
+            return insets.consumeSystemWindowInsets();
+        });
 
         // Check for permission.
         if (!MapUtility.checkIfAtLeastOnePermissionPermitted(this))
@@ -90,18 +126,45 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         loading = findViewById(R.id.top_message);
         bottomSheet = findViewById(R.id.bottom_sheet);
         header = findViewById(R.id.header);
+        bottom = findViewById(R.id.bottom_main);
+        mapFilter = findViewById(R.id.map_filter);
+        detours_rl = findViewById(R.id.rl_detour);
+        news_rl = findViewById(R.id.rl_news);
+        settings_rl = findViewById(R.id.rl_settings);
+        about_rl = findViewById(R.id.rl_about);
+
+        elevationAnimation = new ElevationAnimation(16, null, header, mapFilter);
+
+        ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+        bottomTopMargin = bottomParams.topMargin;
+        ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
+        headerTopMargin = headerParams.topMargin;
 
         toHide.add(bottomSheet);
         toHide.add(header);
         toHide.add(shadow);
 
+
+        detours_rl.setOnClickListener(view -> {
+            startActivity(new Intent(this, DetourActivity.class));
+        });
+        news_rl.setOnClickListener(view -> {
+            Intent i = new Intent(this, WebViewActivity.class);
+            i.putExtra("LINK", this.getResources().getString(R.string.lpp_news_webside));
+            startActivity(i);
+        });
+        settings_rl.setOnClickListener(view -> {
+            startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+        });
+        about_rl.setOnClickListener(view -> {
+            startActivity(new Intent(this, AboutActivity.class));
+        });
+
         // Setup UI elements.
-        nv.setNavigationItemSelectedListener(this);
 
         search.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
         navBarBtn.setOnClickListener(view -> dl.openDrawer(GravityCompat.START));
 
-        locationIcon.setVisibility(MapUtility.checkIfAtLeastOnePermissionPermitted(this)? View.VISIBLE : View.GONE);
 
         loading.showLoading(true);
         loading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
@@ -114,19 +177,28 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         });
 
         behavior = ViewPagerBottomSheetBehavior.from(bottomSheet);
+        behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
 
+        float headerElevation = 12f;
         behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
+                if (newState == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
+                    header.setElevation(0);
+                } else if (newState == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
+                    mapFilter.setAlpha(0f);
+                    header.setElevation(headerElevation);
+                }
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 switch (behavior.getState()) {
-                    case BottomSheetBehavior.STATE_DRAGGING:
-                    case BottomSheetBehavior.STATE_SETTLING:
+                    case ViewPagerBottomSheetBehavior.STATE_DRAGGING:
+                    case ViewPagerBottomSheetBehavior.STATE_SETTLING:
                         setMapPaddingBottom(slideOffset);
+                        mapFilter.setAlpha(slideOffset);
+                        header.setElevation((1 - slideOffset) * headerElevation);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
                         break;
                 }
@@ -182,8 +254,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         }
 
         // Collapse bottom sheet if expanded.
-        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
-            behavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+        if (behavior.getState() == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
+            behavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
         } else {
             fragments.pop();
 
@@ -242,8 +314,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 loading.showLoading(false);
                 if (mMap != null) {
 
-                    // Clear map and add station markers
-                    // mMap.clear(); // TODO: (fix) Removes current location
                     mMap.setInfoWindowAdapter(new StationInfoWindow(this));
 
                     // Refresh clusters
@@ -272,7 +342,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(R.id.bottom_sheet,fragment);
+        transaction.replace(R.id.bottom_sheet, fragment);
         transaction.commit();
         fragments.push(fragment);
 
@@ -293,27 +363,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-        int id = item.getItemId();
-
-        // Side drawer interaction
-        switch (id) {
-            case R.id.settings:
-                startActivityForResult(new Intent(this, SettingsActivity.class), 0);
-                break;
-            case R.id.news:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(this.getResources().getString(R.string.lpp_news_webside))));
-                break;
-            case R.id.deturs:
-                startActivity(new Intent(this, DetourActivity.class));
-                break;
-            case R.id.about:
-                startActivity(new Intent(this, AboutActivity.class));
-                break;
-        }
-
-        return true;
+    public void onHeaderChanged(boolean selected) {
+        elevationAnimation.elevate(selected);
     }
-
 }

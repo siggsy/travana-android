@@ -11,39 +11,30 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?backgroundViewColor"
-        android:stateListAnimator="@animator/titlebar_elevaton">
+        android:background="?backgroundViewColor" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/header_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?backgroundViewColor">
+            android:background="@color/transparent">
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tab_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/tab_layout_bg"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:tabIndicator="@drawable/tab_indicator"
                 app:tabIndicatorColor="@color/colorAccent"
-                app:tabRippleColor="@color/colorRipple"
-                app:tabTextColor="?android:textColor" />
+                app:tabIndicatorFullWidth="false"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabSelectedTextColor="@color/colorAccent"
+                app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance"
+                app:tabTextColor="@color/text_hint" />
 
-            <TextView
-                android:id="@+id/station_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="4dp"
-                android:text="@string/stations"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@id/tab_layout"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:id="@+id/view"
@@ -65,6 +56,5 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
-
 
 </LinearLayout>

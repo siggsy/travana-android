@@ -1,6 +1,7 @@
 package com.VegaSolutions.lpptransit.ui.custommaps;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -14,12 +15,12 @@ import java.util.List;
 
 class MarkerAnimator {
 
-    private Handler handler;
+    private final Handler handler;
     private Runnable current;
-    private List<Object> animated = new ArrayList<>();
+    private final List<Object> animated = new ArrayList<>();
 
     MarkerAnimator() {
-        handler = new Handler();
+        handler = new Handler(Looper.myLooper());
     }
 
     /**

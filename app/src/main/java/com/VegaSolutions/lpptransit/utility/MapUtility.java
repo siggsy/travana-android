@@ -7,18 +7,12 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Interpolator;
 
 import androidx.core.app.ActivityCompat;
 
-import com.VegaSolutions.lpptransit.ui.custommaps.LatLngInterpolator;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 
 import java.text.DecimalFormat;
 
@@ -26,6 +20,7 @@ public class MapUtility {
 
     /**
      * Convert android drawable to bitmap suitable for google maps
+     *
      * @param drawable drawable to be converted
      * @return bitmap created from drawable
      */
@@ -39,17 +34,38 @@ public class MapUtility {
     }
 
     /**
+     * Convert android drawable to bitmap suitable for google maps
+     *
+     * @param drawable drawable to be converted
+     * @return bitmap created from drawable
+     */
+    public static BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable, int width, int height) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, width, height);
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    /**
      * Calculate distance between two LatLng objects
+     *
      * @param StartP start point
-     * @param EndP end point
+     * @param EndP   end point
      * @return distance in KM.
      */
     public static double calculationByDistance(LatLng StartP, LatLng EndP) {
+        return calculationByDistance(StartP.latitude, StartP.longitude, EndP.latitude, EndP.longitude);
+    }
+
+    /**
+     * Calculate distance between two LatLng objects
+     *
+     * @return distance in KM.
+     */
+    public static double calculationByDistance(double lat1, double lon1, double lat2, double lon2) {
         int Radius = 6371;
-        double lat1 = StartP.latitude;
-        double lat2 = EndP.latitude;
-        double lon1 = StartP.longitude;
-        double lon2 = EndP.longitude;
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
@@ -60,9 +76,9 @@ public class MapUtility {
         double valueResult = Radius * c;
         double km = valueResult / 1;
         DecimalFormat newFormat = new DecimalFormat("####");
-        int kmInDec = Integer.valueOf(newFormat.format(km));
+        int kmInDec = Integer.parseInt(newFormat.format(km));
         double meter = valueResult % 1000;
-        int meterInDec = Integer.valueOf(newFormat.format(meter));
+        int meterInDec = Integer.parseInt(newFormat.format(meter));
 
         return Radius * c;
     }

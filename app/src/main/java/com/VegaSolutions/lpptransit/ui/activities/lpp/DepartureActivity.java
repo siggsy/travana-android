@@ -1,37 +1,47 @@
 package com.VegaSolutions.lpptransit.ui.activities.lpp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.ColorUtils;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
-import com.VegaSolutions.lpptransit.utility.Colors;
+import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
 import org.joda.time.DateTime;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.SimpleTimeZone;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
 
 public class DepartureActivity extends AppCompatActivity {
@@ -59,6 +69,8 @@ public class DepartureActivity extends AppCompatActivity {
     @BindView(R.id.header) FrameLayout header;
     @BindView(R.id.departure_no_departures_error) View depErr;
     @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.back) View back;
+    @BindView(R.id.timetable_title_tv) TextView title;
 
     private Adapter adapter;
 
@@ -66,12 +78,30 @@ public class DepartureActivity extends AppCompatActivity {
     private int textColor;
     private int backGroundColor;
 
+    private ElevationAnimation elevationAnimation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_departure);
         ButterKnife.bind(this);
+
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+        } else {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            ViewGroup.MarginLayoutParams backParams = (ViewGroup.MarginLayoutParams) back.getLayoutParams();
+            backParams.setMargins(0, insets.getSystemWindowInsetTop(), 0, 0);
+            return insets.consumeSystemWindowInsets();
+        });
 
         // Get theme default colors
         int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
@@ -94,11 +124,14 @@ public class DepartureActivity extends AppCompatActivity {
         routeNumber.setText(route_number);
         routeNumber.setTextSize(16f);
         stationName.setText(station_name);
-        stationCenter.setVisibility(Integer.valueOf(station_code) % 2 != 0 ? View.VISIBLE : View.GONE);
+        stationCenter.setVisibility(Integer.parseInt(station_code) % 2 != 0 ? View.VISIBLE : View.GONE);
         routeNumberCircle.getBackground().setTint(Colors.getColorFromString(route_number));
+
+        back.setOnClickListener(v -> super.onBackPressed());
 
         adapter = new Adapter();
 
+        elevationAnimation = new ElevationAnimation(16, header);
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setHasFixedSize(true);
@@ -106,7 +139,7 @@ public class DepartureActivity extends AppCompatActivity {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                header.setSelected(rv.canScrollVertically(-1));
+                elevationAnimation.elevate(rv.canScrollVertically(-1));
             }
         });
 
@@ -116,10 +149,12 @@ public class DepartureActivity extends AppCompatActivity {
 
         // Calculate for request
         DateTime now = DateTime.now();
-        int next = 28 - now.getHourOfDay();
-        int prev = now.getHourOfDay() - 6;
+        SimpleDateFormat sdf = new SimpleDateFormat("d. M", Locale.getDefault());
+        title.setText(getString(R.string.departures, sdf.format(now.toDate())));
+        int next = 25 - now.getHourOfDay();
+        int prev = now.getHourOfDay();
 
-        Api.timetable(Integer.parseInt(station_code), 8, 8, (apiResponse, statusCode, success) -> {
+        Api.timetable(station_code, next, prev, (apiResponse, statusCode, success) -> {
             runOnUiThread(() -> {
 
                 // Remove progress bar
@@ -181,14 +216,13 @@ public class DepartureActivity extends AppCompatActivity {
             // Set minutes in an hour
             for (int min : timetable.getMinutes()) {
                 TextView textView = (TextView) getLayoutInflater().inflate(R.layout.template_departure_min, holder.minutes, false);
-                textView.setText(String.format(Locale.getDefault(), "%02d", min));
-                textView.setTextColor(timetable.isCurrent() ? Color.WHITE : textColor);
+
+                textView.setText(String.format(Locale.getDefault(), "%d:%02d", timetable.getHour(), min));
                 holder.minutes.addView(textView);
             }
 
             if (timetable.isCurrent()) {
-                holder.hour.setTextColor(Color.WHITE);
-                holder.container.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.colorAccent, null));
+                holder.container.getBackground().setTint(ColorUtils.blendARGB(backGroundColor, ViewGroupUtils.isDarkTheme(getApplication()) ? Color.WHITE : Color.GRAY, 0.1f));
             } else {
                 holder.hour.setTextColor(textColor);
                 holder.container.getBackground().setTint(backGroundColor);

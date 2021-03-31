@@ -13,4 +13,6 @@
     <attr name="containerBorderPadding" format="dimension" />
     <attr name="containerBorderPaddingSide" format="dimension" />
     <attr name="elevation" format="dimension" />
+    <attr name="backgroundElevatedColor" format="reference"/>
+    <attr name="departureHourColor" format="color" />
 </resources>

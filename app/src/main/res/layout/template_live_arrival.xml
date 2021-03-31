@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/live_arrival_ll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -43,8 +44,9 @@
             android:paddingStart="4dp"
             android:paddingTop="4dp"
             android:paddingEnd="4dp"
-            android:src="@drawable/ic_bookmark_border_24px"
-            android:tint="?android:textColor" />
+            android:src="@drawable/ic_baseline_push_pin_24"
+            android:tint="?android:textColor"
+            tools:ignore="UseAppTint" />
     </LinearLayout>
 
     <com.google.android.flexbox.FlexboxLayout

@@ -4,17 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
     tools:context=".ui.activities.MainActivity"
     tools:ignore="ContentDescription">
-
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <View
+        android:id="@+id/map_filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?backgroundViewColor" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/header"
@@ -23,12 +27,11 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/stretched_circle"
-        android:backgroundTint="?backgroundViewColor"
         android:clickable="true"
         android:focusable="true"
         app:cardCornerRadius="7dp"
-        app:cardElevation="6dp">
+        app:cardBackgroundColor="?backgroundViewColor"
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -41,9 +44,8 @@
                 android:id="@+id/account"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:background="@drawable/stretched_circle"
-                android:backgroundTint="?backgroundViewColor"
-                android:padding="6dp"
+                android:padding="8dp"
+                android:background="@color/transparent"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_menu_black_24dp"
                 android:tint="?android:textColor"
@@ -56,9 +58,8 @@
                 android:id="@+id/textView43"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_directions_bus_black_24dp"
                 android:drawablePadding="8dp"
-                android:text="LPP"
+                android:text="@string/stations"
                 android:textAlignment="center"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -71,9 +72,8 @@
                 android:id="@+id/search"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:background="@drawable/stretched_circle"
-                android:backgroundTint="?backgroundViewColor"
                 android:scaleType="center"
+                android:background="@color/transparent"
                 android:src="@drawable/ic_search_black_24dp"
                 android:tint="?android:textColor"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -82,48 +82,13 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
-    <ImageView
-        android:id="@+id/maps_location_icon"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="162dp"
-        android:background="@drawable/stretched_circle"
-        android:backgroundTint="?backgroundViewColor"
-        android:clickable="true"
-        android:elevation="6dp"
-        android:focusable="true"
-        android:scaleType="center"
-        android:src="@drawable/ic_my_location_black_24dp"
-        android:tint="?android:textColor" />
-
-    <View
-        android:id="@+id/shadow"
-        android:layout_width="match_parent"
-        android:layout_height="16dp"
-        android:background="@drawable/top_shadow_gradient"
-        android:elevation="6dp"
-        android:translationZ="6dp"
-        app:layout_anchor="@id/bottom_sheet" />
-
-    <FrameLayout
-        android:id="@+id/bottom_sheet"
+    <include
+        android:id="@+id/bottom_main"
+        layout="@layout/activity_main_bottom"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"
-        android:elevation="6dp"
-        android:focusable="true"
-        android:translationZ="6dp"
-        app:behavior_fitToContents="false"
-        app:behavior_hideable="false"
-        app:behavior_peekHeight="150dp"
-        app:layout_behavior="@string/view_pager_bottom_sheet_behavior" />
-
-    <com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage
-        android:id="@+id/top_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="65dp" />
+        android:layout_marginTop="80dp"
+        android:elevation="7dp"
+        android:translationZ="7dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

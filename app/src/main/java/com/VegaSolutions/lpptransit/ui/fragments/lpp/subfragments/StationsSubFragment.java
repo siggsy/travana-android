@@ -6,12 +6,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +13,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
 import com.VegaSolutions.lpptransit.ui.customviews.NullSafeView;
-import com.VegaSolutions.lpptransit.utility.Colors;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,12 +56,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
     private List<Station> stations;
 
     // UI elements
-    private NullSafeView<RecyclerView> list = new NullSafeView<>();
-    private NullSafeView<View> favErr = new NullSafeView<>();
-    private NullSafeView<View> locErr = new NullSafeView<>();
-    private NullSafeView<View> progressBar = new NullSafeView<>();
-    private NullSafeView<FloatingActionButton> locationRefresh = new NullSafeView<>();
-    private Adapter adapter = new Adapter();
+    private final NullSafeView<RecyclerView> list = new NullSafeView<>();
+    private final NullSafeView<View> favErr = new NullSafeView<>();
+    private final NullSafeView<View> locErr = new NullSafeView<>();
+    private final NullSafeView<View> progressBar = new NullSafeView<>();
+    private final Adapter adapter = new Adapter();
     private FragmentHeaderCallback callback;
 
     private OnAttachListener onAttachListener = null;
@@ -110,15 +107,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
             }
         });
 
-        // Setup location refresh button
-        locationRefresh.getView().setVisibility(View.GONE);
-        if (type == TYPE_NEARBY) {
-            locationRefresh.getView().setOnClickListener((v) -> {
-                locErr.getView().setVisibility(View.GONE);
-                progressBar.getView().setVisibility(View.VISIBLE);
-                updateLocationList(locationManager.getLatest());
-            });
-        }
     }
 
     @Override
@@ -162,7 +150,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         locErr.setView(root.findViewById(R.id.stations_sub_list_nearby_error));
         favErr.setView(root.findViewById(R.id.stations_sub_list_favourite_error));
         progressBar.setView(root.findViewById(R.id.stations_sub_progress));
-        locationRefresh.setView(root.findViewById(R.id.location_refresh_fab));
 
         setupUI();
 
@@ -206,12 +193,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
             locErr.addTask(v -> v.setVisibility(View.VISIBLE));
         } else {
 
-            // Sort stations by current location
-            Collections.sort(stations, (o1, o2) -> {
-                double o1D = MapUtility.calculationByDistance(location, o1.getLatLng());
-                double o2D = MapUtility.calculationByDistance(location, o2.getLatLng());
-                return Double.compare(o1D, o2D);
-            });
 
             // Add "favourite" flag and calculate distance
             for (Station station : stations) {
@@ -219,6 +200,9 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 if (f == null) f = false;
                 stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(location, station.getLatLng()) * 1000)));
             }
+
+            // Sort stations by current location
+            Collections.sort(stationWrappersFav, (o1, o2) -> Double.compare(o1.distance, o2.distance));
 
             // Show on recyclerView
             favErr.addTask(v -> v.setVisibility(View.GONE));
@@ -279,7 +263,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                         locationManager.addListener(this);
                     locErr.addTask(v -> v.setVisibility(View.GONE));
                     updateLocationList(locationManager.getLatest());
-                    locationRefresh.addTask(v -> v.setVisibility(View.VISIBLE));
 
                 }
             }
@@ -344,7 +327,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         }
 
         private int where(StationWrapper a, List<StationWrapper> b) {
-
             if (b.isEmpty())
                 return -1;
             for (int i = 0; i < b.size(); i++) {
@@ -352,7 +334,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                     return i;
             }
             return -1;
-
         }
 
         private void refreshStations(List<StationWrapper> stationsNew) {

@@ -3,8 +3,8 @@
 
     <!-- not using these -->
     <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#D81B60</color> <!-- #00574B-->
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimaryDark">#EC407A</color> <!-- #00574B-->
+    <color name="colorAccent">#EC407A</color>
 
     <color name="color_lpp">#1e7b4b</color>
 
@@ -25,7 +25,7 @@
     <color name="color_main_orange">#FFBB33</color>
 
     <color name="event_live">#008577</color>
-    <color name="event_arrival">#D81B60</color>
+    <color name="event_arrival">#EC407A</color>
     <color name="event_detour">#ffff8800</color>
 
     <color name="transparent">#00000000</color>
@@ -38,16 +38,12 @@
     <color name="color_main_gray">#534F4F</color>
     <color name="color_main_shaddow">#242424</color>
 
-    <color name="color_facebook_blue">#3C5A99</color>
-    <color name="color_facebook_button_white">#FCFCFC</color>
-
-    <color name="color_google_button_white">#FFFFFF</color>
-    <color name="color_sign_in_buttons_boders">#707070</color>
     <color name="color_black">#000000</color>
-
+    <color name="white">#FFFFFF</color>
 
     <!-- dark theme -->
     <color name="color_main_background_dark">#212529</color>
+    <color name="color_main_background_dark_elevated">#313438</color>
     <color name="color_text_dark">#FFFFFF</color>
 
 </resources>

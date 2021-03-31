@@ -8,9 +8,9 @@
     android:layout_marginTop="?containerBorderPadding"
     android:layout_marginEnd="?containerBorderPaddingSide"
     android:layout_marginBottom="?containerBorderPadding"
-    android:padding="2dp"
+    android:background="@drawable/stretched_circle_container"
 
-    android:background="@drawable/stretched_circle_container">
+    android:padding="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/arrival_time_back"
@@ -48,7 +48,6 @@
             android:paddingTop="2dp"
             android:paddingEnd="6dp"
             android:paddingBottom="2dp"
-            android:text="v živo"
             android:textAllCaps="true"
             android:textColor="@android:color/white"
             android:textSize="12sp"
@@ -56,20 +55,22 @@
             android:tint="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="@+id/arrival_time_time"
             app:layout_constraintStart_toEndOf="@+id/arrival_time_time"
-            app:layout_constraintTop_toTopOf="@+id/arrival_time_time" />
+            app:layout_constraintTop_toTopOf="@+id/arrival_time_time"
+            tools:text="v živo" />
 
-        6<ImageView
+        <ImageView
             android:id="@+id/arrival_time_event_rss"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_marginStart="4dp"
-            android:src="@drawable/ic_rss_feed_24px"
+            android:src="@drawable/ic_live"
             android:tint="?android:textColor"
             app:layout_constraintBottom_toBottomOf="@+id/arrival_time_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/arrival_time_event"
             app:layout_constraintTop_toTopOf="@+id/arrival_time_time"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            tools:ignore="UseAppTint" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

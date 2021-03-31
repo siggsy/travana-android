@@ -1,13 +1,9 @@
 package com.VegaSolutions.lpptransit.ui.errorhandlers;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -18,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
 
 import com.VegaSolutions.lpptransit.R;
 
@@ -72,7 +70,9 @@ public class TopMessage extends ConstraintLayout {
         loading_text.setTextColor(color);
     }
     public void setProgressBarColor(int color) {
-        progress_bar.getIndeterminateDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+        progress_bar.getIndeterminateDrawable().setColorFilter(
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN));
     }
     public void setErrorMsgBackgroundColor(int color) {
         msg_background.getBackground().setTint(color);
@@ -118,17 +118,15 @@ public class TopMessage extends ConstraintLayout {
 
     private void show(View view, boolean value) {
 
+        ObjectAnimator objectAnimator;
         if (value) {
-            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
-            objectAnimator.setDuration(200);
-            objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.start();
+            objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
         } else {
-            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
-            objectAnimator.setDuration(200);
-            objectAnimator.setInterpolator(new LinearInterpolator());
-            objectAnimator.start();
+            objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
         }
+        objectAnimator.setDuration(200);
+        objectAnimator.setInterpolator(new LinearInterpolator());
+        objectAnimator.start();
     }
 
 }

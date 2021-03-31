@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.activities.lpp.DepartureActivity">
@@ -11,7 +12,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?backgroundViewColor"
-        android:stateListAnimator="@animator/titlebar_elevaton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -35,23 +35,24 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="BEŽIGRAD - GROSUPLJE"
+                android:layout_marginTop="16dp"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/include"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/timetable_title_tv"
+                tools:text="BEŽIGRAD - GROSUPLJE" />
 
             <TextView
                 android:id="@+id/departure_station_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Navje"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/departure_route_name"
-                app:layout_constraintTop_toBottomOf="@+id/departure_route_name" />
+                app:layout_constraintTop_toBottomOf="@+id/departure_route_name"
+                tools:text="Navje" />
 
             <TextView
                 android:id="@+id/station_center"
@@ -73,17 +74,31 @@
                 app:layout_constraintStart_toEndOf="@+id/departure_station_name"
                 app:layout_constraintTop_toTopOf="@+id/departure_station_name" />
 
+
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:backgroundTint="?backgroundViewColor"
+                android:scaleType="center"
+                android:src="@drawable/ic_arrow_back_black_24dp"
+                android:tint="?android:textColor"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseAppTint" />
+
             <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
+                android:id="@+id/timetable_title_tv"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/departures"
-                android:textSize="12sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/station_center"
-                app:layout_constraintStart_toEndOf="@+id/station_center"
-                app:layout_constraintTop_toTopOf="@+id/station_center" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/back"
+                app:layout_constraintTop_toTopOf="@+id/back" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
@@ -141,6 +156,7 @@
             android:tint="?android:textColorHint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/textView42"
-            app:layout_constraintStart_toStartOf="@+id/textView42" />
+            app:layout_constraintStart_toStartOf="@+id/textView42"
+            tools:ignore="UseAppTint" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
