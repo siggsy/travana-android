@@ -1,5 +1,6 @@
 package com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,17 +15,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.ui.activities.SearchActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
 import com.VegaSolutions.lpptransit.ui.customviews.NullSafeView;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
+import com.VegaSolutions.lpptransit.utility.Constants;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.flexbox.FlexboxLayout;
@@ -151,6 +155,18 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         favErr.setView(root.findViewById(R.id.stations_sub_list_favourite_error));
         progressBar.setView(root.findViewById(R.id.stations_sub_progress));
 
+        TextView enableLocation = root.findViewById(R.id.tv_enable_location);
+        enableLocation.setOnClickListener(view -> {
+            // Check for permission.
+            if (!MapUtility.checkIfAtLeastOnePermissionPermitted(getContext()))
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, Constants.LOCATION_REQUEST_CODE);
+        });
+        TextView addFavorites = root.findViewById(R.id.tv_add_favorites);
+        addFavorites.setOnClickListener(view -> {
+            Intent i = new Intent(getActivity(), SearchActivity.class);
+            startActivity(i);
+        });
+
         setupUI();
 
         return root;
@@ -172,12 +188,11 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
         if (stationWrappersFav.size() == 0) {
             locErr.addTask(v -> v.setVisibility(View.GONE));
             favErr.addTask(v -> v.setVisibility(View.VISIBLE));
-            adapter.setStations(stationWrappersFav);
         } else {
             favErr.addTask(v -> v.setVisibility(View.GONE));
             locErr.addTask(v -> v.setVisibility(View.GONE));
-            adapter.setStations(stationWrappersFav);
         }
+        adapter.setStations(stationWrappersFav);
 
     }
 

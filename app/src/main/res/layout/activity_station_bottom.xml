@@ -158,7 +158,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/station_opposite_btn"
                     app:layout_constraintEnd_toStartOf="@+id/station_opposite_btn"
                     app:layout_constraintTop_toTopOf="@+id/station_opposite_btn"
-                    app:srcCompat="@drawable/ic_favorite_border_black_24dp"
+                    app:srcCompat="@drawable/ic_heart_border"
                     tools:ignore="UseAppTint" />
 
                 <com.google.android.material.tabs.TabLayout

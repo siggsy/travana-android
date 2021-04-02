@@ -202,7 +202,7 @@ public class SearchActivity extends AppCompatActivity {
                 viewHolder.image.setVisibility(View.VISIBLE);
                 viewHolder.circle.setVisibility(View.GONE);
                 viewHolder.center.setVisibility(Integer.parseInt(stationItem.station.getRef_id()) % 2 != 0 ? View.VISIBLE : View.GONE);
-                viewHolder.image.setImageResource((R.drawable.ic_location_on_black_24dp));
+                viewHolder.image.setImageResource((R.drawable.ic_location_pin));
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent i = new Intent(SearchActivity.this, StationActivity.class);
                     i.putExtra("station", stationItem.station);

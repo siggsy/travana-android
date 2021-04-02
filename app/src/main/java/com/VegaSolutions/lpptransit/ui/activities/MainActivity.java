@@ -36,6 +36,7 @@ import com.VegaSolutions.lpptransit.ui.custommaps.StationMarker;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
+import com.VegaSolutions.lpptransit.utility.Constants;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -52,8 +53,6 @@ import java.util.Stack;
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
 public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, FragmentHeaderCallback {
-
-    private final int locationRequestCode = 1000;
 
     // Fragment navigation stack
     Stack<Fragment> fragments = new Stack<>();
@@ -91,7 +90,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // TODO - remove depricated
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -114,7 +112,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         // Check for permission.
         if (!MapUtility.checkIfAtLeastOnePermissionPermitted(this))
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, locationRequestCode);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, Constants.LOCATION_REQUEST_CODE);
 
         // Find all UI elements.
         dl = findViewById(R.id.nav_layout);
@@ -351,14 +349,23 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == locationRequestCode) {
+        if (requestCode == Constants.LOCATION_REQUEST_CODE) {
             // If request is cancelled, the result arrays are empty.
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                boolean showRationale = shouldShowRequestPermissionRationale(permissions[0]);
+                if (!showRationale) {
+                    Toast.makeText(this, getResources().getString(R.string.please_enable_location_permission_in_the_settings), Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (mMap != null) {
                     onMapReady(mMap);
                     switchFragment(new StationsFragment());
                 }
-            } else Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(this, getResources().getString(R.string.permission_denied), Toast.LENGTH_SHORT).show();//TODO - TRANSLATION
         }
     }
 

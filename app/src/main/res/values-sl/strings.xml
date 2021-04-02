@@ -46,5 +46,9 @@
     <string name="select_route">Izberi linijo</string>
     <string name="about">O aplikaciji</string>
     <string name="posted_time">Objavljeno • %1$s</string>
+    <string name="enable_location">Omogoči lokacijo.</string>
+    <string name="please_enable_location_permission_in_the_settings">Prosim omogoči lokacijo v nastavitvah telefona.</string>
+    <string name="permission_denied">Dovoljenje zavrjeno.</string>
+    <string name="add_favorites">Dodaj priljubljene</string>
 
 </resources>

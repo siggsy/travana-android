@@ -46,7 +46,7 @@
                 android:layout_weight="0"
                 android:background="@android:color/transparent"
                 android:elevation="2dp"
-                android:src="@drawable/ic_favorite_black_24dp"
+                android:src="@drawable/ic_heart_fill"
                 android:tint="@color/colorAccent"
                 tools:ignore="UseAppTint" />
 

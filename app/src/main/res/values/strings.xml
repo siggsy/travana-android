@@ -49,5 +49,9 @@
     <string name="select_route">Select route</string>
     <string name="posted_time">posted • %1$s</string>
     <string name="about">About</string>
+    <string name="enable_location">Enable location</string>
+    <string name="please_enable_location_permission_in_the_settings">Please enable location permission in the settings.</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="add_favorites">Add favorites</string>
 
 </resources>
