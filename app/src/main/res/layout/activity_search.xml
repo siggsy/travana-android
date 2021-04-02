@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,17 +8,16 @@
 
     <FrameLayout
         android:id="@+id/search_activity_header"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?backgroundViewColor"
-        android:stateListAnimator="@animator/titlebar_elevaton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:stateListAnimator="@animator/titlebar_elevaton">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/search_activity_back"
@@ -29,51 +28,81 @@
                 android:focusable="true"
                 android:scaleType="centerInside"
                 android:tint="?android:textColor"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_arrow_back"
                 tools:ignore="UseAppTint" />
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_activity_search"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:background="?backgroundViewColor"
                 app:iconifiedByDefault="false"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/search_activity_back"
-                app:layout_constraintTop_toTopOf="parent"
                 app:queryBackground="@null"
                 app:queryHint='"Bavarski dvor", "19B",  "dolgi most"'
                 app:searchHintIcon="@null"
                 app:searchIcon="@null">
 
             </androidx.appcompat.widget.SearchView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_activity_rv"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="?backgroundViewColor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_activity_header"
-        app:layout_constraintVertical_bias="1.0" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/search_activity_header"
+        android:background="?backgroundViewColor" />
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:indeterminateTint="?android:textColor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_activity_header" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_centerInParent="true"
+        android:indeterminateTint="?android:textColor" />
+
+    <LinearLayout
+        android:id="@+id/ll_error_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_error"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_wifi"
+                android:tint="?android:textColor"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/tv_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:textColor"
+                android:background="?android:attr/selectableItemBackground"
+                tools:text="No internet connection" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_try_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:text="@string/try_again" />
+
+    </LinearLayout>
+</RelativeLayout>

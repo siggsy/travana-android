@@ -53,5 +53,7 @@
     <string name="please_enable_location_permission_in_the_settings">Please enable location permission in the settings.</string>
     <string name="permission_denied">Permission denied</string>
     <string name="add_favorites">Add favorites</string>
+    <string name="try_again">Try again</string>
+    <string name="no_internet_connection">No internet connection</string>
 
 </resources>

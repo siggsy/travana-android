@@ -68,6 +68,7 @@ public class Api {
     public static final String DETOURS = "/javni-prevoz/obvozi/";
 
     public static final String TAG = "Api";
+
     private static final OkHttpClient httpClient = new OkHttpClient.Builder()
             .addInterceptor(new GzipInterceptor())
             .build();

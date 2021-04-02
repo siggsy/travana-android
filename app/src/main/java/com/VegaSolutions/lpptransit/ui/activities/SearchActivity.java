@@ -18,18 +18,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
-import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.utility.Colors;
+import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
+import com.VegaSolutions.lpptransit.utility.ScreenState;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.VegaSolutions.lpptransit.utility.ScreenState.DONE;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.ERROR;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.LOADING;
 
 public class SearchActivity extends AppCompatActivity {
 
@@ -42,12 +48,120 @@ public class SearchActivity extends AppCompatActivity {
     FrameLayout header;
     ProgressBar progressBar;
 
+    LinearLayout errorContainer;
+    TextView errorText;
+    ImageView errorImageView;
+    TextView tryAgainText;
+
     // Search objects
     SearchAdapter adapter;
     String filter = "";
     final List<SearchItem> items = Collections.synchronizedList(new ArrayList<>());
 
-    void setupUI() {
+    private TravanaApp app;
+    private NetworkConnectivityManager networkConnectivityManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+        setContentView(R.layout.activity_search);
+
+        app = TravanaApp.getInstance();
+        networkConnectivityManager = app.getNetworkConnectivityManager();
+
+        initializeElements();
+        setupUi(ERROR);
+
+        retrieveStationsAndRoutes();
+        /*
+        // Query stations and then routes.
+        Api.stationDetails(true, (apiResponse, statusCode, success) -> {
+            if (success) {
+
+                // Add stations
+                for (Station station : apiResponse.getData())
+                    items.add(new StationItem(station));
+
+                // Query active routes
+                Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
+                    if (success1) {
+                        for (Route route : apiResponse1.getData())
+                            items.add(new RouteItem(route));
+                        runOnUiThread(() -> applyFilter(filter));
+                    }
+                    else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
+                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
+                });
+            }
+            else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
+
+        });*/
+    }
+
+    void retrieveStationsAndRoutes() {
+        if (!networkConnectivityManager.isConnectionAvailable()) {
+            setupUi(ERROR);
+            setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_wifi);
+            return;
+        }
+        setupUi(LOADING);
+        Api.stationDetails(true, (apiResponse, statusCode, success) -> {
+            if (success) {
+                // Add stations
+                for (Station station : apiResponse.getData())
+                    items.add(new StationItem(station));
+
+                // Query active routes
+                Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
+                    if (success1) {
+                        for (Route route : apiResponse1.getData())
+                            items.add(new RouteItem(route));
+                        runOnUiThread(() -> applyFilter(filter));
+                        setupUi(DONE);
+                    } else {
+                        setupUi(ERROR);
+                        setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
+                    }
+                });
+            } else {
+                setupUi(ERROR);
+                setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
+            }
+        });
+    }
+
+    void setErrorUi(String errorName, int errorIconCode) {
+        errorText.setText(errorName);
+        errorImageView.setImageResource(errorIconCode);
+    }
+
+    void setupUi(ScreenState screenState) {
+        runOnUiThread(() -> {
+            switch (screenState) {
+                case DONE: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.searchList.setVisibility(View.VISIBLE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case LOADING: {
+                    this.progressBar.setVisibility(View.VISIBLE);
+                    this.searchList.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case ERROR: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.searchList.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        });
+    }
+
+    void initializeElements() {
 
         // Find all UI elements
         searchList = findViewById(R.id.search_activity_rv);
@@ -55,11 +169,19 @@ public class SearchActivity extends AppCompatActivity {
         back = findViewById(R.id.search_activity_back);
         header = findViewById(R.id.search_activity_header);
         progressBar = findViewById(R.id.progressBar);
+        errorText = findViewById(R.id.tv_error);
+        errorImageView = findViewById(R.id.iv_error);
+        tryAgainText = findViewById(R.id.tv_try_again);
+        errorContainer = findViewById(R.id.ll_error_container);
 
-        // Setup UI
-        adapter = new SearchAdapter();
+        ImageView searchClose = searchView.findViewById(R.id.search_close_btn);
+        searchClose.setColorFilter(ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK, android.graphics.PorterDuff.Mode.SRC_IN);
+
+        back.setOnClickListener(view -> finish());
+        tryAgainText.setOnClickListener(view -> retrieveStationsAndRoutes());
 
         // RV
+        adapter = new SearchAdapter();
         searchList.setAdapter(adapter);
         searchList.setLayoutManager(new LinearLayoutManager(this));
         searchList.setHasFixedSize(false);
@@ -87,11 +209,6 @@ public class SearchActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-        ImageView searchClose = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
-        searchClose.setColorFilter(ViewGroupUtils.isDarkTheme(this)? Color.WHITE : Color.BLACK, android.graphics.PorterDuff.Mode.SRC_IN);
-
-        back.setOnClickListener(view -> finish());
 
     }
 
@@ -137,41 +254,6 @@ public class SearchActivity extends AppCompatActivity {
         this.runOnUiThread(() -> adapter.notifyDataSetChanged());
 
     }
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
-        setContentView(R.layout.activity_search);
-
-        setupUI();
-
-        // Query stations and then routes.
-        Api.stationDetails(true, (apiResponse, statusCode, success) -> {
-            if (success) {
-
-                // Add stations
-                for (Station station : apiResponse.getData())
-                    items.add(new StationItem(station));
-
-                // Query active routes
-                Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
-                    if (success1) {
-                        for (Route route : apiResponse1.getData())
-                            items.add(new RouteItem(route));
-                        runOnUiThread(() -> applyFilter(filter));
-                    }
-                    else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
-                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-                });
-            }
-            else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
-
-        });
-
-    }
-
 
     class SearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

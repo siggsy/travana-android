@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
@@ -38,6 +39,7 @@ import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.StationsFragment;
 import com.VegaSolutions.lpptransit.utility.Constants;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
+import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -80,7 +82,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
     LatLng lastValidMapCenter = ljubljana;
 
+    private TravanaApp app;
     private ClusterManager<StationMarker> clusterManager;
+    private NetworkConnectivityManager networkConnectivityManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +94,9 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         setContentView(R.layout.app_nav_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        app = TravanaApp.getInstance();
+        networkConnectivityManager = app.getNetworkConnectivityManager();
 
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

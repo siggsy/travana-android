@@ -47,9 +47,7 @@ public class DetourActivity extends AppCompatActivity {
         });
 
         refreshLayout.setOnRefreshListener(
-                () -> {
-                    loadDetours();
-                }
+                this::loadDetours
         );
 
         whereIsDataFromTextView.setOnClickListener(view -> {
