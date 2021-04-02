@@ -37,17 +37,9 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <View
-            android:id="@+id/top_line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/tv_detours"
-            android:background="@android:color/black"
-            android:backgroundTint="@color/light_gray" />
 
     </RelativeLayout>
-
-
+    
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_detours"
         android:layout_width="match_parent"
@@ -117,12 +109,6 @@
         android:visibility="gone"
         android:text="@string/there_are_currently_no_detours" />
 
-    <View
-        android:id="@+id/bottom_line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/black"
-        android:backgroundTint="@color/light_gray" />
 
     <TextView
         android:id="@+id/tv_where_is_data_from"

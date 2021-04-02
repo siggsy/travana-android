@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.TravanaApp;
@@ -27,15 +29,16 @@ import static com.VegaSolutions.lpptransit.utility.ScreenState.LOADING;
 
 public class WebViewActivity extends AppCompatActivity {
 
-    ImageView iv_back;
+    ImageView ivBack;
     WebView webView;
-    TextView tv_link;
-    ProgressBar pbar;
+    TextView tvLink;
+    ProgressBar pBar;
     LinearLayout errorContainer;
     TextView errorText;
     ImageView errorImageView;
     TextView tryAgainText;
 
+    private String link;
     private TravanaApp app;
     private NetworkConnectivityManager networkConnectivityManager;
 
@@ -49,9 +52,12 @@ public class WebViewActivity extends AppCompatActivity {
         app = TravanaApp.getInstance();
         networkConnectivityManager = app.getNetworkConnectivityManager();
 
-        String link = getIntent().getStringExtra(Constants.LINK_KEY);
+        link = getIntent().getStringExtra(Constants.LINK_KEY);
         loadPage(link);
 
+        if (ViewGroupUtils.isDarkTheme(this) && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+            WebSettingsCompat.setForceDark(webView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
+        }
     }
 
     void setErrorUi(String errorName, int errorIconCode) {
@@ -65,19 +71,19 @@ public class WebViewActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             switch (screenState) {
                 case DONE: {
-                    this.pbar.setVisibility(View.GONE);
+                    this.pBar.setVisibility(View.GONE);
                     this.webView.setVisibility(View.VISIBLE);
                     this.errorContainer.setVisibility(View.GONE);
                     break;
                 }
                 case LOADING: {
-                    this.pbar.setVisibility(View.VISIBLE);
+                    this.pBar.setVisibility(View.VISIBLE);
                     this.webView.setVisibility(View.GONE);
                     this.errorContainer.setVisibility(View.GONE);
                     break;
                 }
                 case ERROR: {
-                    this.pbar.setVisibility(View.GONE);
+                    this.pBar.setVisibility(View.GONE);
                     this.webView.setVisibility(View.GONE);
                     this.errorContainer.setVisibility(View.VISIBLE);
                     break;
@@ -87,7 +93,7 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
     void loadPage(String link) {
-        tv_link.setText(link);
+        tvLink.setText(link);
 
         if (!networkConnectivityManager.isConnectionAvailable()) {
             setupUi(ERROR);
@@ -98,17 +104,21 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
     void initElements() {
-        iv_back = findViewById(R.id.iv_back);
+        ivBack = findViewById(R.id.iv_back);
         webView = findViewById(R.id.webview);
-        tv_link = findViewById(R.id.tv_link);
-        pbar = findViewById(R.id.p_bar);
+        tvLink = findViewById(R.id.tv_link);
+        pBar = findViewById(R.id.progress_bar);
         errorText = findViewById(R.id.tv_error);
         errorImageView = findViewById(R.id.iv_error);
         tryAgainText = findViewById(R.id.tv_try_again);
         errorContainer = findViewById(R.id.ll_error_container);
 
-        iv_back.setOnClickListener(view -> {
+        ivBack.setOnClickListener(view -> {
             finish();
+        });
+
+        tryAgainText.setOnClickListener(view -> {
+            loadPage(link);
         });
 
         webView.setWebViewClient(new WebViewClient() {
