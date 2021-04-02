@@ -37,15 +37,14 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-
     </RelativeLayout>
-    
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_detours"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/detour_activity_top"
         android:layout_above="@+id/tv_where_is_data_from"
+        android:layout_below="@id/detour_activity_top"
         tools:listitem="@layout/detours_rv_item" />
 
     <ProgressBar
@@ -94,9 +93,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:text="@string/try_again"
             android:textColor="@color/colorAccent"
-            android:textStyle="bold"
-            android:text="@string/try_again" />
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -104,10 +103,10 @@
         android:id="@+id/tv_no_detours"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="?android:textColor"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-        android:text="@string/there_are_currently_no_detours" />
+        android:text="@string/there_are_currently_no_detours"
+        android:textColor="?android:textColor"
+        android:visibility="gone" />
 
 
     <TextView
