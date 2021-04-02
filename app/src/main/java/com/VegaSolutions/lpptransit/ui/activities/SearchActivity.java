@@ -1,15 +1,8 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -17,7 +10,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.lppapi.Api;
@@ -25,12 +23,11 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
-import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -204,7 +201,7 @@ public class SearchActivity extends AppCompatActivity {
                 viewHolder.name.setText(stationItem.station.getName());
                 viewHolder.image.setVisibility(View.VISIBLE);
                 viewHolder.circle.setVisibility(View.GONE);
-                viewHolder.center.setVisibility(Integer.valueOf(stationItem.station.getRef_id()) % 2 != 0 ? View.VISIBLE : View.GONE);
+                viewHolder.center.setVisibility(Integer.parseInt(stationItem.station.getRef_id()) % 2 != 0 ? View.VISIBLE : View.GONE);
                 viewHolder.image.setImageResource((R.drawable.ic_location_on_black_24dp));
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent i = new Intent(SearchActivity.this, StationActivity.class);

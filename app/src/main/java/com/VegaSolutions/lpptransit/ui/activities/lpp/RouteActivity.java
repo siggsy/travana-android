@@ -179,7 +179,7 @@ public class RouteActivity extends MapFragmentActivity {
                         RouteActivity.this.runOnUiThread(() -> {
                             Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
                             marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
-                            if (Integer.valueOf(stationId) == stationOnRoute.getCode_id()) {
+                            if (Integer.parseInt(stationId) == stationOnRoute.getCode_id()) {
                                 marker.showInfoWindow();
                             }
                         });
@@ -470,8 +470,6 @@ public class RouteActivity extends MapFragmentActivity {
             }
         }));
 
-
-
         // Query stations on route and display them on the map.
         Api.arrivalsOnRoute(tripId, callback);
 
@@ -615,7 +613,6 @@ public class RouteActivity extends MapFragmentActivity {
                     // Inflate view
                     View v = getLayoutInflater().inflate(R.layout.template_live_arrival_special, holder.liveArrivals, false);
                     TextView arrival_time = v.findViewById(R.id.arrival_time_time);
-                    View back = v.findViewById(R.id.arrival_time_back);
                     ImageView rss = v.findViewById(R.id.live_icon);
                     TextView garage = v.findViewById(R.id.garage_text);
 
@@ -624,7 +621,6 @@ public class RouteActivity extends MapFragmentActivity {
                     // Set preferred time format
                     arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", arrival.getEta_min()));
                     arrival_time.setTextColor(RouteActivity.this.color);
-                    back.getBackground().setTint(backColor);
                     rss.setVisibility(View.INVISIBLE);
                     arrival_time.setTypeface(null, Typeface.NORMAL);
 
@@ -660,8 +656,6 @@ public class RouteActivity extends MapFragmentActivity {
             else {
                 View v = getLayoutInflater().inflate(R.layout.template_live_arrival_special, holder.liveArrivals, false);
                 TextView arrival_time = v.findViewById(R.id.arrival_time_time);
-                View back = v.findViewById(R.id.arrival_time_back);
-                back.getBackground().setTint(backColor);
 
                 arrival_time.setText("/");
                 holder.liveArrivals.addView(v);
