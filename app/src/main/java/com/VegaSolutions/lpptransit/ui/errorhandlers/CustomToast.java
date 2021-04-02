@@ -78,7 +78,7 @@ public class CustomToast {
                 setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
                 break;
             case -1:
-                setText(context.getString(R.string.network_error));
+                setText(context.getString(R.string.no_internet_connection));
                 setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi));
                 break;
             default:

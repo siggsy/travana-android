@@ -47,25 +47,80 @@
 
     </RelativeLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh"
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_detours"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/tv_where_is_data_from"
-        android:layout_below="@+id/detour_activity_top">
+        android:layout_below="@id/detour_activity_top"
+        android:layout_above="@+id/tv_where_is_data_from"
+        tools:listitem="@layout/detours_rv_item" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_detours"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/detours_rv_item" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="?android:textColor" />
+
+    <LinearLayout
+        android:id="@+id/ll_error_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_error"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_wifi"
+                android:tint="?android:textColor"
+                tools:ignore="UseAppTint" />
+
+            <TextView
+                android:id="@+id/tv_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:textColor"
+                tools:text="No internet connection" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_try_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:text="@string/try_again" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_no_detours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:textColor"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:text="@string/there_are_currently_no_detours" />
 
     <View
         android:id="@+id/bottom_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/swipe_refresh"
         android:background="@android:color/black"
         android:backgroundTint="@color/light_gray" />
 

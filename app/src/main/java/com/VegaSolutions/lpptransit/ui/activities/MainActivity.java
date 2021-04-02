@@ -71,10 +71,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     GoogleMap googleMap;
     View mapFilter;
     View bottom;
-    RelativeLayout detours_rl;
-    RelativeLayout news_rl;
-    RelativeLayout settings_rl;
-    RelativeLayout about_rl;
+    RelativeLayout detoursRl;
+    RelativeLayout newsRl;
+    RelativeLayout settingsRl;
+    RelativeLayout aboutRl;
     int bottomTopMargin = 0;
     int headerTopMargin = 0;
 
@@ -134,10 +134,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         header = findViewById(R.id.header);
         bottom = findViewById(R.id.bottom_main);
         mapFilter = findViewById(R.id.map_filter);
-        detours_rl = findViewById(R.id.rl_detour);
-        news_rl = findViewById(R.id.rl_news);
-        settings_rl = findViewById(R.id.rl_settings);
-        about_rl = findViewById(R.id.rl_about);
+        detoursRl = findViewById(R.id.rl_detour);
+        newsRl = findViewById(R.id.rl_news);
+        settingsRl = findViewById(R.id.rl_settings);
+        aboutRl = findViewById(R.id.rl_about);
 
         elevationAnimation = new ElevationAnimation(16, null, header, mapFilter);
 
@@ -151,18 +151,18 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         toHide.add(shadow);
 
 
-        detours_rl.setOnClickListener(view -> {
+        detoursRl.setOnClickListener(view -> {
             startActivity(new Intent(this, DetourActivity.class));
         });
-        news_rl.setOnClickListener(view -> {
+        newsRl.setOnClickListener(view -> {
             Intent i = new Intent(this, WebViewActivity.class);
-            i.putExtra("LINK", this.getResources().getString(R.string.lpp_news_webside));
+            i.putExtra(Constants.LINK_KEY, this.getResources().getString(R.string.lpp_news_webside));
             startActivity(i);
         });
-        settings_rl.setOnClickListener(view -> {
+        settingsRl.setOnClickListener(view -> {
             startActivityForResult(new Intent(this, SettingsActivity.class), 0);
         });
-        about_rl.setOnClickListener(view -> {
+        aboutRl.setOnClickListener(view -> {
             startActivity(new Intent(this, AboutActivity.class));
         });
 

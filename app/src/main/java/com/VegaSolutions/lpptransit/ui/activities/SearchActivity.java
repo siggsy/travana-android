@@ -70,33 +70,10 @@ public class SearchActivity extends AppCompatActivity {
         app = TravanaApp.getInstance();
         networkConnectivityManager = app.getNetworkConnectivityManager();
 
-        initializeElements();
+        initElements();
         setupUi(ERROR);
 
         retrieveStationsAndRoutes();
-        /*
-        // Query stations and then routes.
-        Api.stationDetails(true, (apiResponse, statusCode, success) -> {
-            if (success) {
-
-                // Add stations
-                for (Station station : apiResponse.getData())
-                    items.add(new StationItem(station));
-
-                // Query active routes
-                Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
-                    if (success1) {
-                        for (Route route : apiResponse1.getData())
-                            items.add(new RouteItem(route));
-                        runOnUiThread(() -> applyFilter(filter));
-                    }
-                    else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
-                    runOnUiThread(() -> progressBar.setVisibility(View.GONE));
-                });
-            }
-            else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
-
-        });*/
     }
 
     void retrieveStationsAndRoutes() {
@@ -106,6 +83,8 @@ public class SearchActivity extends AppCompatActivity {
             return;
         }
         setupUi(LOADING);
+
+        // TODO - stations should be safed to TravanaApp refence, so therefore no need for loading the same thing 2 times.
         Api.stationDetails(true, (apiResponse, statusCode, success) -> {
             if (success) {
                 // Add stations
@@ -161,7 +140,7 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    void initializeElements() {
+    void initElements() {
 
         // Find all UI elements
         searchList = findViewById(R.id.search_activity_rv);

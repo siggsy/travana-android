@@ -329,8 +329,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 }
             }
 
-
-
             for (int i = 0; i < stations.size(); i++) {
                 if (where(stations.get(i), stationsNew) == -1) {
                     stations.remove(i);
@@ -430,7 +428,6 @@ public class StationsSubFragment extends Fragment implements MyLocationManager.M
                 v.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.getColorFromString(route));
                 viewHolder.routes.addView(v);
             }
-
 
         }
 
