@@ -26,7 +26,7 @@
         android:layout_weight="0"
         android:tint="?android:textColor"
         android:visibility="gone"
-        app:srcCompat="@drawable/ic_directions_bus_black_24dp" />
+        app:srcCompat="@drawable/ic_directions_bus" />
 
     <TextView
         android:id="@+id/search_item_name"

@@ -232,11 +232,11 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
                     CustomToast toast = new CustomToast(StationActivity.this);
                     if (statusCode == 500) {
                         toast
-                            .setBackgroundColor(ContextCompat.getColor(StationActivity.this, R.color.colorAccent))
-                            .setTextColor(Color.WHITE)
-                            .setIconColor(Color.WHITE)
-                            .setText(getString(R.string.opposite_error))
-                            .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap_vert_black_24dp))
+                                .setBackgroundColor(ContextCompat.getColor(StationActivity.this, R.color.colorAccent))
+                                .setTextColor(Color.WHITE)
+                                .setIconColor(Color.WHITE)
+                                .setText(getString(R.string.opposite_error))
+                                .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap))
                             .show(Toast.LENGTH_SHORT);
                     }
                     else toast.showDefault(statusCode);

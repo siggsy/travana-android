@@ -259,7 +259,7 @@ public class RouteActivity extends MapFragmentActivity {
         generator.setBackground(null);
         generator.setContentView(v);
         busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(
-                Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.ic_water_drop_svgrepo_com_1)), 80, 80)).flat(true);
+                Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.ic_water_drop)), 80, 80)).flat(true);
         stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true);
 
         // Setup views.
@@ -601,7 +601,7 @@ public class RouteActivity extends MapFragmentActivity {
                 } else holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position][1] == 1 ? R.drawable.bus_icon_2_offline : R.drawable.bus_icon_2));
                 holder.node.setColorFilter(null);
             } else {
-                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle_node));
+                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle));
             }
 
             List<ArrivalOnRoute.Arrival> arrivals = station.getArrivals();

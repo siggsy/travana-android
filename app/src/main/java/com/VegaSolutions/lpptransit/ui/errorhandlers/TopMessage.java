@@ -104,13 +104,13 @@ public class TopMessage extends ConstraintLayout {
     public void showMsgDefault(Context context, int statusCode) {
         switch (statusCode) {
             case -2:
-                showMsg(context.getString(R.string.timed_out_error), ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                showMsg(context.getString(R.string.timed_out_error), ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
                 break;
             case -1:
-                showMsg(context.getString(R.string.network_error), ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px));
+                showMsg(context.getString(R.string.network_error), ContextCompat.getDrawable(context, R.drawable.ic_wifi));
                 break;
             default:
-                showMsg(context.getString(R.string.unknown_error, statusCode), ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                showMsg(context.getString(R.string.unknown_error, statusCode), ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
                 break;
         }
     }

@@ -11,20 +11,22 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="162dp"
-        android:background="@drawable/stretched_circle"
+        android:background="@drawable/circle"
         android:backgroundTint="?backgroundViewColor"
         android:clickable="true"
         android:elevation="6dp"
         android:focusable="true"
         android:scaleType="center"
-        android:src="@drawable/ic_my_location_black_24dp"
+        android:src="@drawable/ic_my_location"
         android:tint="?android:textColor"
         tools:ignore="UseAppTint" />
+
     <com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage
         android:id="@+id/top_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="65dp" />
+        android:layout_marginTop="65dp"
+        android:elevation="5dp" />
     <View
         android:id="@+id/shadow"
         android:layout_width="match_parent"

@@ -18,7 +18,7 @@
         android:elevation="6dp"
         android:focusable="true"
         android:scaleType="center"
-        android:src="@drawable/ic_my_location_black_24dp"
+        android:src="@drawable/ic_my_location"
         android:tint="?android:textColor"
         tools:ignore="UseAppTint" />
 
@@ -66,7 +66,7 @@
                     android:layout_marginBottom="12dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:scaleType="center"
-                    android:src="@drawable/ic_arrow_back_black_24dp"
+                    android:src="@drawable/ic_arrow_back"
                     android:tint="?android:textColor"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -123,7 +123,7 @@
                     android:layout_marginBottom="12dp"
                     android:background="?selectableItemBackgroundBorderless"
                     android:elevation="2dp"
-                    android:src="@drawable/ic_swap_vert_black_24dp"
+                    android:src="@drawable/ic_swap"
                     android:tint="?android:textColor"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

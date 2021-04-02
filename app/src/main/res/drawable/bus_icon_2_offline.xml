@@ -7,7 +7,6 @@
             android:toDegrees="180"
             android:pivotX="50%"
             android:pivotY="50%"
-            android:drawable="@drawable/ic_water_drop_svgrepo_com_1_offline">
-        </rotate>
+            android:drawable="@drawable/ic_water_drop_offline"></rotate>
     </item>
 </layer-list>

@@ -63,7 +63,7 @@
                         android:id="@+id/detour_icon"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_round_warning_24"
+                        android:src="@drawable/ic_round_warning"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />
 
@@ -93,7 +93,7 @@
                         android:id="@+id/news_icon"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_baseline_message_24"
+                        android:src="@drawable/ic_baseline_message"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />
 
@@ -123,7 +123,7 @@
                         android:id="@+id/settings_icon"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_settings_black_24dp"
+                        android:src="@drawable/ic_settings"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />
 
@@ -153,7 +153,7 @@
                         android:id="@+id/about_icon"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:src="@drawable/ic_baseline_info_24"
+                        android:src="@drawable/ic_baseline_info"
                         android:tint="?android:textColor"
                         tools:ignore="UseAppTint" />
 

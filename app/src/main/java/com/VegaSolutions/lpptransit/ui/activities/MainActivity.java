@@ -365,7 +365,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                     switchFragment(new StationsFragment());
                 }
             } else
-                Toast.makeText(this, getResources().getString(R.string.permission_denied), Toast.LENGTH_SHORT).show();//TODO - TRANSLATION
+                Toast.makeText(this, getResources().getString(R.string.permission_denied), Toast.LENGTH_SHORT).show();
         }
     }
 

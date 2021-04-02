@@ -45,7 +45,7 @@
             android:padding="8dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:src="@drawable/ic_departure_board_24px"
+            android:src="@drawable/ic_departure_board"
             android:tint="?android:textColor" />
 
         <ImageView
@@ -62,7 +62,7 @@
             android:padding="8dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:src="@drawable/ic_map_black_24dp"
+            android:src="@drawable/ic_map"
             android:tint="?android:textColor" />
 
     </LinearLayout>

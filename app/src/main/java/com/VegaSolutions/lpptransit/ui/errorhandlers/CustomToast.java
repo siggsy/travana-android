@@ -16,15 +16,15 @@ import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 public class CustomToast {
 
-    private Context context;
+    private final Context context;
 
-    private View v;
-    private TextView textView;
-    private ImageView imageView;
+    private final View v;
+    private final TextView textView;
+    private final ImageView imageView;
 
     public CustomToast(Context context) {
         this.context = context;
-        v = ((Activity)context).getLayoutInflater().inflate(R.layout.template_custom_toast, null);
+        v = ((Activity) context).getLayoutInflater().inflate(R.layout.template_custom_toast, null);
         textView = v.findViewById(R.id.custom_toast_text);
         imageView = v.findViewById(R.id.custom_toast_icon);
     }
@@ -71,19 +71,19 @@ public class CustomToast {
         switch (statusCode) {
             case -3:
                 setText(context.getString(R.string.connection_refused));
-                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
                 break;
             case -2:
                 setText(context.getString(R.string.timed_out_error));
-                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
                 break;
             case -1:
                 setText(context.getString(R.string.network_error));
-                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi_off_24px));
+                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_wifi));
                 break;
             default:
                 setText(context.getString(R.string.unknown_error, statusCode));
-                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+                setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
                 break;
 
         }
@@ -95,7 +95,7 @@ public class CustomToast {
         setTextColor(Color.WHITE);
         setIconColor(Color.WHITE);
         setText(error);
-        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline_black_24dp));
+        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
         show(Toast.LENGTH_SHORT);
     }
 
@@ -104,7 +104,7 @@ public class CustomToast {
         setIconColor(Color.WHITE);
         setTextColor(Color.WHITE);
         setText("");
-        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_check_black_24dp));
+        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_check));
         show(Toast.LENGTH_SHORT);
     }
 
@@ -114,7 +114,7 @@ public class CustomToast {
         setTextColor(isDark ? Color.WHITE : Color.BLACK);
         setIconColor(isDark ? Color.WHITE : Color.BLACK);
         setText(message);
-        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_info_outline_black_24dp));
+        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_info_outline));
         show(Toast.LENGTH_SHORT);
     }
 
