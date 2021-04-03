@@ -1,36 +1,49 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.gson.annotations.SerializedName;
+
 public class RouteOnStation {
 
-    private String trip_id;
-    private String route_id;
-    private String route_number;
-    private String route_name;
-    private String route_group_name;
-    private boolean is_garage;
+    @SerializedName("trip_id")
+    private String tripId;
+
+    @SerializedName("route_id")
+    private String routeId;
+
+    @SerializedName("route_number")
+    private String routeNumber;
+
+    @SerializedName("route_name")
+    private String routeName;
+
+    @SerializedName("route_group_name")
+    private String routeGroupName;
+
+    @SerializedName("is_garage")
+    private boolean isGarage;
 
 
-    public String getTrip_id() {
-        return trip_id;
+    public String getTripId() {
+        return tripId;
     }
 
-    public String getRoute_id() {
-        return route_id;
+    public String getRouteId() {
+        return routeId;
     }
 
-    public String getRoute_number() {
-        return route_number;
+    public String getRouteNumber() {
+        return routeNumber;
     }
 
-    public String getRoute_name() {
-        return route_name;
+    public String getRouteName() {
+        return routeName;
     }
 
-    public String getRoute_group_name() {
-        return route_group_name;
+    public String getRouteGroupName() {
+        return routeGroupName;
     }
 
     public boolean isGarage() {
-        return is_garage;
+        return isGarage;
     }
 }

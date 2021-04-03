@@ -1,26 +1,33 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class TimetableWrapper {
 
     private Station station;
-    private List<RouteGroup> route_groups;
+
+    @SerializedName("route_groups")
+    private List<RouteGroup> routeGroups;
 
     public Station getStation() {
         return station;
     }
 
-    public List<RouteGroup> getRoute_groups() {
-        return route_groups;
+    public List<RouteGroup> getRouteGroups() {
+        return routeGroups;
     }
 
     public class Station {
-        private String ref_id;
+
+        @SerializedName("ref_id")
+        private String refId;
+
         private String name;
 
-        public String getRef_id() {
-            return ref_id;
+        public String getRefId() {
+            return refId;
         }
 
         public String getName() {
@@ -29,11 +36,14 @@ public class TimetableWrapper {
     }
 
     public class RouteGroup {
-        private String route_group_number;
+
+        @SerializedName("route_group_number")
+        private String routeGroupNumber;
+
         private List<Route> routes;
 
-        public String getRoute_group_number() {
-            return route_group_number;
+        public String getRouteGroupNumber() {
+            return routeGroupNumber;
         }
 
         public List<Route> getRoutes() {
@@ -41,13 +51,22 @@ public class TimetableWrapper {
         }
 
         public class Route {
+
             private List<Timetable> timetable;
             private List<Station> stations;
             private String name;
-            private String parent_name;
-            private String group_name;
-            private String route_number_suffix;
-            private String route_number_prefix;
+
+            @SerializedName("parent_name")
+            private String parentName;
+
+            @SerializedName("group_name")
+            private String groupName;
+
+            @SerializedName("route_number_suffix")
+            private String routeNumberSuffix;
+
+            @SerializedName("route_number_prefix")
+            private String routeNumberPrefix;
 
             public List<Timetable> getTimetable() {
                 return timetable;
@@ -61,26 +80,28 @@ public class TimetableWrapper {
                 return name;
             }
 
-            public String getParent_name() {
-                return parent_name;
+            public String getParentName() {
+                return parentName;
             }
 
-            public String getGroup_name() {
-                return group_name;
+            public String getGroupName() {
+                return groupName;
             }
 
-            public String getRoute_number_suffix() {
-                return route_number_suffix;
+            public String getRouteNumberSuffix() {
+                return routeNumberSuffix;
             }
 
-            public String getRoute_number_prefix() {
-                return route_number_prefix;
+            public String getRouteNumberPrefix() {
+                return routeNumberPrefix;
             }
 
             public class Timetable {
                 private int hour;
                 private int[] minutes;
-                private boolean is_current;
+
+                @SerializedName("is_current")
+                private boolean isCurrent;
 
                 public int getHour() {
                     return hour;
@@ -91,25 +112,30 @@ public class TimetableWrapper {
                 }
 
                 public boolean isCurrent() {
-                    return is_current;
+                    return isCurrent;
                 }
             }
 
             public class Station {
-                private String ref_id;
-                private String name;
-                private int order_no;
 
-                public String getRef_id() {
-                    return ref_id;
+                @SerializedName("ref_id")
+                private String refId;
+
+                private String name;
+
+                @SerializedName("order_no")
+                private int orderNo;
+
+                public String getRefId() {
+                    return refId;
                 }
 
                 public String getName() {
                     return name;
                 }
 
-                public int getOrder_no() {
-                    return order_no;
+                public int getOrderNo() {
+                    return orderNo;
                 }
             }
         }

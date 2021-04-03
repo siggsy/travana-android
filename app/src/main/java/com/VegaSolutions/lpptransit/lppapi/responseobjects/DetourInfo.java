@@ -5,27 +5,27 @@ public class DetourInfo {
     private String title;
     private String date;
 
-    private String more_data_url;
+    private String moreDataUrl;
     private String content;
-    private String photo_url;
+    private String photoUrl;
 
     public DetourInfo(String title, String date) {
         this.title = title;
         this.date = date;
     }
 
-    public DetourInfo(String title, String date, String more_data_url) {
+    public DetourInfo(String title, String date, String moreDataUrl) {
         this.title = title;
         this.date = date;
-        this.more_data_url = more_data_url;
+        this.moreDataUrl = moreDataUrl;
     }
 
-    public DetourInfo(String title, String date, String more_data_url, String content, String photo_url) {
+    public DetourInfo(String title, String date, String moreDataUrl, String content, String photoUrl) {
         this.title = title;
         this.date = date;
-        this.more_data_url = more_data_url;
+        this.moreDataUrl = moreDataUrl;
         this.content = content;
-        this.photo_url = photo_url;
+        this.photoUrl = photoUrl;
     }
 
     @Override
@@ -33,8 +33,9 @@ public class DetourInfo {
         return "DetourInfo{" +
                 "title='" + title + '\'' +
                 ", date='" + date + '\'' +
-                ", more_data_url='" + more_data_url + '\'' +
-                ", photo_url='" + photo_url + '\'' +
+                ", moreDataUrl='" + moreDataUrl + '\'' +
+                ", content='" + content + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
                 '}';
     }
 
@@ -54,20 +55,20 @@ public class DetourInfo {
         this.date = date;
     }
 
-    public String getMore_data_url() {
-        return more_data_url;
+    public String getMoreDataUrl() {
+        return moreDataUrl;
     }
 
-    public void setMore_data_url(String more_data_url) {
-        this.more_data_url = more_data_url;
+    public void setMoreDataUrl(String moreDataUrl) {
+        this.moreDataUrl = moreDataUrl;
     }
 
-    public String getPhoto_url() {
-        return photo_url;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setPhoto_url(String photo_url) {
-        this.photo_url = photo_url;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     public String getContent() {

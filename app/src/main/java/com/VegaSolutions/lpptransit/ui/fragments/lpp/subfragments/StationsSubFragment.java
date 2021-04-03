@@ -194,6 +194,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         }
 
         setupUi(mainActivity.screenState);
+
         if (mainActivity.screenState == ScreenState.ERROR) {
             switch (mainActivity.errorCode) {
                 case NetworkConnectivityManager.NO_INTERNET_CONNECTION: {
@@ -244,7 +245,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         Map<String, Boolean> favourites = LppHelper.getFavouriteStations(context);
         ArrayList<StationWrapper> stationWrappersFav = new ArrayList<>();
         for (Station station : stations) {
-            Boolean f = favourites.get(station.getRef_id());
+            Boolean f = favourites.get(station.getRefId());
             if (f == null) f = false;
             if (f) stationWrappersFav.add(new StationWrapper(station, true));
         }
@@ -275,7 +276,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
 
             // Add "favourite" flag and calculate distance
             for (Station station : stations) {
-                Boolean f = favourites.get(station.getRef_id());
+                Boolean f = favourites.get(station.getRefId());
                 if (f == null) f = false;
                 stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(location, station.getLatLng()) * 1000)));
             }
@@ -474,7 +475,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
 
             // Set all route circles
             viewHolder.routes.removeAllViews();
-            for (String route : station.station.getRoute_groups_on_station()) {
+            for (String route : station.station.getRouteGroupsOnStation()) {
                 View v = getLayoutInflater().inflate(R.layout.template_route_number, viewHolder.routes, false);
                 ((TextView) v.findViewById(R.id.route_station_number)).setText(route);
 

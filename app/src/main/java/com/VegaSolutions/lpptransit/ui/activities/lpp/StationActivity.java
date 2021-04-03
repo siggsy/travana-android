@@ -100,7 +100,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
         // Get Intent data
         station = getIntent().getParcelableExtra(STATION);
-        favourite = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE).getBoolean(station.getRef_id(), false);
+        favourite = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE).getBoolean(station.getRefId(), false);
 
         setupStationDetails();
         saveRecentSearchedStation();
@@ -135,7 +135,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
     }
 
     private void saveRecentSearchedStation() {
-        Api.addSavedSearchedItemsIds(station.getRef_id(), this);
+        Api.addSavedSearchedItemsIds(station.getRefId(), this);
     }
 
     @Override
@@ -206,10 +206,10 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
             oppositeBtn.setEnabled(false);
 
             int code;
-            if (Integer.parseInt(station.getRef_id()) % 2 == 0) {
-                code = Integer.parseInt(station.getRef_id()) - 1;
+            if (Integer.parseInt(station.getRefId()) % 2 == 0) {
+                code = Integer.parseInt(station.getRefId()) - 1;
             } else {
-                code = Integer.parseInt(station.getRef_id()) + 1;
+                code = Integer.parseInt(station.getRefId()) + 1;
             }
 
             Station oppositeStation = getOppositeStation(code);
@@ -258,7 +258,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         fav.setOnClickListener(v1 -> {
             SharedPreferences sharedPreferences = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(station.getRef_id(), !favourite);
+            editor.putBoolean(station.getRefId(), !favourite);
             favourite = !favourite;
             fav.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
             editor.apply();
@@ -272,7 +272,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         }
 
         for (Station station : app.getStations()) {
-            if (station.getRef_id().equals(stationCode + "")) {
+            if (station.getRefId().equals(stationCode + "")) {
                 return station;
             }
         }
@@ -305,9 +305,9 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
             switch (position) {
                 case 0:
-                    return LiveArrivalFragment.newInstance(station.getRef_id());
+                    return LiveArrivalFragment.newInstance(station.getRefId());
                 case 1:
-                    return RoutesOnStationFragment.newInstance(station.getRef_id(), station.getName());
+                    return RoutesOnStationFragment.newInstance(station.getRefId(), station.getName());
                 default:
                     return null;
             }

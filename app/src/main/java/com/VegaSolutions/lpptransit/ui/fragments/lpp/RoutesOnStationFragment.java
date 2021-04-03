@@ -210,7 +210,7 @@ public class RoutesOnStationFragment extends Fragment {
             this.routes = routes;
 
             for (RouteOnStation route : routes) {
-                if (!isRouteInList(filteredRoutes, route.getTrip_id()) && !route.isGarage()) {
+                if (!isRouteInList(filteredRoutes, route.getTripId()) && !route.isGarage()) {
                     filteredRoutes.add(route);
                 }
             }
@@ -220,7 +220,7 @@ public class RoutesOnStationFragment extends Fragment {
 
         private boolean isRouteInList(List<RouteOnStation> routes, String trip_id) {
             for (RouteOnStation route : routes) {
-                if (route.getTrip_id().equals(trip_id)) {
+                if (route.getTripId().equals(trip_id)) {
                     return true;
                 }
             }
@@ -246,18 +246,18 @@ public class RoutesOnStationFragment extends Fragment {
 
             // Set route name and number
 
-            String name = route.getRoute_group_name();
+            String name = route.getRouteGroupName();
             holder.name.setText(name);
-            holder.number.setText(route.getRoute_number());
+            holder.number.setText(route.getRouteNumber());
 
             // Set route color
-            holder.circle.getBackground().setTint(Colors.getColorFromString(route.getRoute_number()));
+            holder.circle.getBackground().setTint(Colors.getColorFromString(route.getRouteNumber()));
 
             // Start DepartureActivity on click
             holder.departure.setOnClickListener(v -> {
                 Intent intent = new Intent(context, DepartureActivity.class);
-                intent.putExtra(DepartureActivity.ROUTE_NAME, route.getRoute_group_name());
-                intent.putExtra(DepartureActivity.ROUTE_NUMBER, route.getRoute_number());
+                intent.putExtra(DepartureActivity.ROUTE_NAME, route.getRouteGroupName());
+                intent.putExtra(DepartureActivity.ROUTE_NUMBER, route.getRouteNumber());
                 intent.putExtra(DepartureActivity.STATION_NAME, stationName);
                 intent.putExtra(DepartureActivity.STATION_CODE, stationId);
                 intent.putExtra(DepartureActivity.ROUTE_GARAGE, route.isGarage());
@@ -267,10 +267,10 @@ public class RoutesOnStationFragment extends Fragment {
             // Start RouteActivity on click
             holder.map.setOnClickListener(v -> {
                 Intent intent = new Intent(context, RouteActivity.class);
-                intent.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_group_name());
-                intent.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
-                intent.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
-                intent.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
+                intent.putExtra(RouteActivity.ROUTE_NAME, route.getRouteGroupName());
+                intent.putExtra(RouteActivity.ROUTE_NUMBER, route.getRouteNumber());
+                intent.putExtra(RouteActivity.ROUTE_ID, route.getRouteId());
+                intent.putExtra(RouteActivity.TRIP_ID, route.getTripId());
                 intent.putExtra(RouteActivity.STATION_ID, stationId);
                 startActivity(intent);
             });

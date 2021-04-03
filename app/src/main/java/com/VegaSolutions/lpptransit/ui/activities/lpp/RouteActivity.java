@@ -131,7 +131,7 @@ public class RouteActivity extends MapFragmentActivity {
 
                     // Filter by trip ID.
                     for (BusOnRoute busOnRoute : apiResponse.getData())
-                        if (busOnRoute.getTrip_id().equals(tripId))
+                        if (busOnRoute.getTripId().equals(tripId))
                             buses.add(busOnRoute);
 
                     // Update markers and queue another update.
@@ -156,12 +156,12 @@ public class RouteActivity extends MapFragmentActivity {
                 List<ArrivalOnRoute> stationsOnRoute = apiResponse.getData();
 
                 // Sort stations.
-                Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
+                Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrderNo(), o2.getOrderNo()));
                 for (ArrivalOnRoute station : stationsOnRoute) {
                     Collections.sort(station.getArrivals(), (o1, o2) -> {
                         if (o1.getType() == 2) return -1;
                         else if (o2.getType() == 2) return 1;
-                        else return Integer.compare(o1.getEta_min(), o2.getEta_min());
+                        else return Integer.compare(o1.getEtaMin(), o2.getEtaMin());
                     });
                 }
                 adapter.setStationsOnRoute(stationsOnRoute);
@@ -298,7 +298,7 @@ public class RouteActivity extends MapFragmentActivity {
                     String[] trips = new String[routes.size()];
                     for (int i = 0, routesSize = routes.size(); i < routesSize; i++) {
                         Route route = routes.get(i);
-                        trips[i] = route.getRoute_name();
+                        trips[i] = route.getRouteName();
                     }
 
                     runOnUiThread(() -> {
@@ -310,10 +310,10 @@ public class RouteActivity extends MapFragmentActivity {
                         builder.setItems(trips, (dialog, which) -> runOnUiThread(() -> {
                             Route route = routes.get(which);
                             Intent i = new Intent(this, RouteActivity.class);
-                            i.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_name());
-                            i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
-                            i.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
-                            i.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
+                            i.putExtra(RouteActivity.ROUTE_NAME, route.getRouteName());
+                            i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRouteNumber());
+                            i.putExtra(RouteActivity.ROUTE_ID, route.getRouteId());
+                            i.putExtra(RouteActivity.TRIP_ID, route.getTripId());
                             i.putExtra(RouteActivity.STATION_ID, stationId);
                             startActivity(i);
                             finish();
@@ -327,13 +327,13 @@ public class RouteActivity extends MapFragmentActivity {
 
                 } else {
                     // Auto-swap if there are only 2 trips
-                    Route route = routes.get(routes.get(0).getTrip_id().equals(tripId) ? 1 : 0);
+                    Route route = routes.get(routes.get(0).getTripId().equals(tripId) ? 1 : 0);
                     runOnUiThread(() -> {
                         Intent i = new Intent(this, RouteActivity.class);
-                        i.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_name());
-                        i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
-                        i.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
-                        i.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
+                        i.putExtra(RouteActivity.ROUTE_NAME, route.getRouteName());
+                        i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRouteNumber());
+                        i.putExtra(RouteActivity.ROUTE_ID, route.getRouteId());
+                        i.putExtra(RouteActivity.TRIP_ID, route.getTripId());
                         i.putExtra(RouteActivity.STATION_ID, stationId);
                         startActivity(i);
                         finish();
@@ -489,10 +489,10 @@ public class RouteActivity extends MapFragmentActivity {
                 for (int j = 0; j < size; j++) {
                     ArrivalOnRoute.Arrival arrival = arrivals.get(j);
                     if (arrival.getType() != 3) {
-                        if (!(arrival.getEta_min() > 10 && arrival.getType() == 1)) {
-                            Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
+                        if (!(arrival.getEtaMin() > 10 && arrival.getType() == 1)) {
+                            Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicleId());
                             if (arrivalsToAnimate == null)
-                                toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));
+                                toAnimateMap.put(arrival.getVehicleId(), new Pair<>(i, new Pair<>(j, arrival.getType())));
                         }
                     }
                 }
@@ -548,7 +548,7 @@ public class RouteActivity extends MapFragmentActivity {
             holder.name.setText(station.getName());
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.node.getLayoutParams();
 
-            if (Integer.parseInt(stationId) == station.getStation_code()) {
+            if (Integer.parseInt(stationId) == station.getStationCode()) {
                 holder.name.setTypeface(null, Typeface.BOLD);
                 holder.name.setTextSize(20f);
                 params.height = 56;
@@ -580,7 +580,7 @@ public class RouteActivity extends MapFragmentActivity {
             if (isBus[position][0] > 0) {
 
                 // Set bold and bigger text for previous activity station
-                if (Integer.parseInt(stationId) == station.getStation_code()) {
+                if (Integer.parseInt(stationId) == station.getStationCode()) {
                     params.height = 94;
                     params.width = 94;
                 } else {
@@ -619,7 +619,7 @@ public class RouteActivity extends MapFragmentActivity {
                     SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                     // Set preferred time format
-                    arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", arrival.getEta_min()));
+                    arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEtaMin()).toDate()) : String.format("%s min", arrival.getEtaMin()));
                     arrival_time.setTextColor(RouteActivity.this.color);
                     rss.setVisibility(View.INVISIBLE);
                     arrival_time.setTypeface(null, Typeface.NORMAL);
@@ -646,7 +646,7 @@ public class RouteActivity extends MapFragmentActivity {
 
 
                     // Ignore "ghost" arrivals
-                    if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                    if (!arrival.getVehicleId().equals("22222222-2222-2222-2222-222222222222"))
                         holder.liveArrivals.addView(v);
 
                     // Show only one if type is "detour"

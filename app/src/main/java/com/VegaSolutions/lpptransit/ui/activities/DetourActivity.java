@@ -186,7 +186,7 @@ public class DetourActivity extends AppCompatActivity {
             holder.rl.setOnClickListener(view -> {
 
                 Intent i = new Intent(getApplicationContext(), WebViewActivity.class);
-                String url = "https://www.lpp.si" + list.get(position).getMore_data_url();
+                String url = "https://www.lpp.si" + list.get(position).getMoreDataUrl();
                 i.putExtra(Constants.LINK_KEY, url);
                 startActivity(i);
 

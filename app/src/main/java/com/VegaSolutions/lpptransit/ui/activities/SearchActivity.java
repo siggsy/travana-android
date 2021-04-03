@@ -204,12 +204,12 @@ public class SearchActivity extends AppCompatActivity {
                 for (SearchItem item : this.items) {
                     if (item.getType() == SearchItem.STATION) {
                         StationItem stationItem = (StationItem) item;
-                        if (stationItem.getStation().getRef_id().equals(searchItemId)) {
+                        if (stationItem.getStation().getRefId().equals(searchItemId)) {
                             filteredItems.add(item);
                         }
                     } else {
                         RouteItem routeItem = (RouteItem) item;
-                        if (routeItem.getRoute().getTrip_id().equals(searchItemId)) {
+                        if (routeItem.getRoute().getTripId().equals(searchItemId)) {
                             filteredItems.add(item);
                         }
                     }
@@ -262,7 +262,7 @@ public class SearchActivity extends AppCompatActivity {
                 viewHolder.name.setText(stationItem.station.getName());
                 viewHolder.image.setVisibility(View.VISIBLE);
                 viewHolder.circle.setVisibility(View.GONE);
-                viewHolder.center.setVisibility(Integer.parseInt(stationItem.station.getRef_id()) % 2 != 0 ? View.VISIBLE : View.GONE);
+                viewHolder.center.setVisibility(Integer.parseInt(stationItem.station.getRefId()) % 2 != 0 ? View.VISIBLE : View.GONE);
                 viewHolder.image.setImageResource((R.drawable.ic_location_pin));
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent i = new Intent(SearchActivity.this, StationActivity.class);
@@ -278,15 +278,15 @@ public class SearchActivity extends AppCompatActivity {
                 viewHolder.image.setVisibility(View.GONE);
                 viewHolder.circle.setVisibility(View.VISIBLE);
                 viewHolder.center.setVisibility(View.GONE);
-                viewHolder.number.setText(routeItem.route.getRoute_number());
-                viewHolder.circle.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.getColorFromString(routeItem.route.getRoute_number()));
-                viewHolder.name.setText(routeItem.route.getRoute_name());
+                viewHolder.number.setText(routeItem.route.getRouteNumber());
+                viewHolder.circle.findViewById(R.id.route_station_circle).getBackground().setTint(Colors.getColorFromString(routeItem.route.getRouteNumber()));
+                viewHolder.name.setText(routeItem.route.getRouteName());
                 viewHolder.ll.setOnClickListener(v -> {
                     Intent intent = new Intent(SearchActivity.this, RouteActivity.class);
-                    intent.putExtra(RouteActivity.ROUTE_NUMBER, routeItem.route.getRoute_number());
-                    intent.putExtra(RouteActivity.ROUTE_NAME, routeItem.route.getRoute_name());
-                    intent.putExtra(RouteActivity.ROUTE_ID, routeItem.route.getRoute_id());
-                    intent.putExtra(RouteActivity.TRIP_ID, routeItem.route.getTrip_id());
+                    intent.putExtra(RouteActivity.ROUTE_NUMBER, routeItem.route.getRouteNumber());
+                    intent.putExtra(RouteActivity.ROUTE_NAME, routeItem.route.getRouteName());
+                    intent.putExtra(RouteActivity.ROUTE_ID, routeItem.route.getRouteId());
+                    intent.putExtra(RouteActivity.TRIP_ID, routeItem.route.getTripId());
                     startActivity(intent);
                 });
 
@@ -356,7 +356,7 @@ public class SearchActivity extends AppCompatActivity {
 
         RouteItem(Route route) {
             this.route = route;
-            searchText = route.getRoute_number() + " " + route.getRoute_name();
+            searchText = route.getRouteNumber() + " " + route.getRouteName();
         }
 
         @Override

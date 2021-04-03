@@ -136,8 +136,8 @@ public class DepartureActivity extends AppCompatActivity {
 
                 TimetableWrapper timetableWrapper = apiResponse.getData();
                 // Search for the right timetable
-                for (TimetableWrapper.RouteGroup.Route route : timetableWrapper.getRoute_groups().get(0).getRoutes()) {
-                    if (route.getParent_name().equals(routeName)) {
+                for (TimetableWrapper.RouteGroup.Route route : timetableWrapper.getRouteGroups().get(0).getRoutes()) {
+                    if (route.getParentName().equals(routeName)) {
                         runOnUiThread(() -> {
                             adapter.setTimetables(route.getTimetable());
                             // Notify user if empty

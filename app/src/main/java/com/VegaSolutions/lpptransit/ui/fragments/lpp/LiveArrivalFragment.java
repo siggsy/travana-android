@@ -225,15 +225,15 @@ public class LiveArrivalFragment extends Fragment {
 
             // Update ViewHolder.
             viewHolder.name.setText(route.name);
-            viewHolder.number.setText(route.arrivalObject.getRoute_name());
-            viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRoute_name()));
+            viewHolder.number.setText(route.arrivalObject.getRouteName());
+            viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRouteName()));
             viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin : R.drawable.ic_outline_push_pin));
             viewHolder.route.setOnClickListener(v -> {
                 Intent i = new Intent(context, RouteActivity.class);
-                i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
-                i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRoute_name());
-                i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRoute_id());
-                i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTrip_id());
+                i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTripName());
+                i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRouteName());
+                i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRouteId());
+                i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTripId());
                 i.putExtra(RouteActivity.STATION_ID, stationId);
                 startActivity(i);
             });
@@ -241,7 +241,7 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.favourite.setOnClickListener(v1 -> {
                 SharedPreferences sharedPreferences = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(route.arrivalObject.getTrip_id(), !route.favourite);
+                editor.putBoolean(route.arrivalObject.getTripId(), !route.favourite);
                 route.favourite = !route.favourite;
 
                 viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin : R.drawable.ic_outline_push_pin));
@@ -305,7 +305,7 @@ public class LiveArrivalFragment extends Fragment {
                 SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                 // Set preferred time format
-                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", arrival.getEta_min()));
+                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEtaMin()).toDate()) : String.format("%s min", arrival.getEtaMin()));
                 arrival_time.setTextColor(color);
                 back.getBackground().setTint(backColor);
 
@@ -344,7 +344,7 @@ public class LiveArrivalFragment extends Fragment {
                 }
 
                 // Ignore "ghost" arrivals
-                if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                if (!arrival.getVehicleId().equals("22222222-2222-2222-2222-222222222222"))
                     viewHolder.arrivals.addView(v);
 
             }
@@ -390,7 +390,7 @@ public class LiveArrivalFragment extends Fragment {
             if (arrivals == null || arrivals.size() == 0) {
                 return "";
             } else {
-                return arrivals.get(0).getRoute_name();
+                return arrivals.get(0).getRouteName();
             }
         }
 
@@ -410,7 +410,7 @@ public class LiveArrivalFragment extends Fragment {
                 value += (char) getRouteName().replaceAll("\\d", "").charAt(0) * 1000;
             }
             if (name.length() > 0) {
-                value += (char) name.charAt(0);
+                value += name.charAt(0);
             }
             return value;
         }
@@ -422,11 +422,11 @@ public class LiveArrivalFragment extends Fragment {
 
             // Sort by route number
             Collections.sort(arrivals, (o1, o2) -> {
-                String o1S = o1.getRoute_name().replaceAll("[^0-9]", "");
-                String o2S = o2.getRoute_name().replaceAll("[^0-9]", "");
+                String o1S = o1.getRouteName().replaceAll("[^0-9]", "");
+                String o2S = o2.getRouteName().replaceAll("[^0-9]", "");
                 int o1V = Integer.parseInt(o1S);
                 int o2V = Integer.parseInt(o2S);
-                if (o1V == o2V) return o1.getRoute_name().compareTo(o2.getRoute_name());
+                if (o1V == o2V) return o1.getRouteName().compareTo(o2.getRouteName());
                 return Integer.compare(o1V, o2V);
             });
 
@@ -434,7 +434,7 @@ public class LiveArrivalFragment extends Fragment {
             int k = 0;
             for (int i = 0; i < arrivals.size(); i++) {
                 ArrivalWrapper.Arrival arrival = arrivals.get(i);
-                Boolean f = fav.get(arrival.getTrip_id());
+                Boolean f = fav.get(arrival.getTripId());
                 if (f != null && f) {
                     arrivals.remove(i);
                     arrivals.add(k, arrival);
@@ -444,14 +444,14 @@ public class LiveArrivalFragment extends Fragment {
 
             Map<String, RouteWrapper> map = new LinkedHashMap<>();
             for (ArrivalWrapper.Arrival arrival : arrivals) {
-                RouteWrapper route = map.get(arrival.getTrip_id());
+                RouteWrapper route = map.get(arrival.getTripId());
                 if (route == null) {
                     route = new RouteWrapper();
-                    route.favourite = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE).getBoolean(arrival.getTrip_id(), false);
+                    route.favourite = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE).getBoolean(arrival.getTripId(), false);
                     ArrivalWrapper.Arrival.Stations stations = arrival.getStations();
-                    route.name = stations != null && stations.getArrival() != null && !stations.getArrival().equals("") ? stations.getArrival() : arrival.getTrip_name();
+                    route.name = stations != null && stations.getArrival() != null && !stations.getArrival().equals("") ? stations.getArrival() : arrival.getTripName();
                     route.arrivalObject = arrival;
-                    map.put(arrival.getTrip_id(), route);
+                    map.put(arrival.getTripId(), route);
                 }
                 route.arrivals.add(arrival);
             }
