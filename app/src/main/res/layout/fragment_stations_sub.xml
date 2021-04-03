@@ -12,7 +12,7 @@
         android:background="?backgroundViewColor"
         android:nestedScrollingEnabled="true"
         tools:context=".ui.fragments.lpp.subfragments.StationsSubFragment"
-        tools:listitem="@layout/template_station_nearby" />
+        tools:listitem="@layout/template_station" />
 
     <LinearLayout
         android:id="@+id/stations_sub_list_favourite_error"

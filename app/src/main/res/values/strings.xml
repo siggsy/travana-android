@@ -30,7 +30,6 @@
     <string name="opposite_error">Opposite station does not exist.</string>
     <string name="timed_out_error">Connection timed out.</string>
     <string name="unknown_error">Something went wrong. Please try again. - %1$d</string>
-    <string name="refresh">Refresh</string>
     <string name="connection_refused">Connection refused.</string>
     <string name="departures">Timetable %s</string>
     <string name="lpp_main_name" translatable="false">Ljubljanski potniški promet</string>

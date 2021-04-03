@@ -111,7 +111,7 @@
                 android:padding="6dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/refresh"
+                android:text="@string/try_again"
                 android:textAllCaps="false" />
         </LinearLayout>
 

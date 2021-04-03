@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -287,7 +286,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 setUpMainActivityUi(ScreenState.ERROR);
                 errorCode = NetworkConnectivityManager.ERROR_DURING_LOADING;
             }
-            Log.e(TAG, "UPDATIG SUBFRAGMENTS WITH" + screenState);
             stationsFragment.setSubstationsFragments();
         });
     }
@@ -417,8 +415,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 if (mMap != null) {
                     onMapReady(mMap);
                 }
-            } else
-                Toast.makeText(this, getResources().getString(R.string.permission_denied), Toast.LENGTH_SHORT).show();
+                stationsFragment.setSubstationsFragments();         // reload list of nearby stations when users enables location in the app
+            }
         }
     }
 

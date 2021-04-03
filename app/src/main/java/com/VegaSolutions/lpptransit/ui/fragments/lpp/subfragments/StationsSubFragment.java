@@ -50,8 +50,6 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     public static final int TYPE_NEARBY = 1;
     public static final int TYPE_FAVOURITE = 2;
 
-    public boolean isError = false;
-
     // Fragment parameters
     private int type;
 
@@ -102,15 +100,6 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
 
         callback.onHeaderChanged(list.getView().canScrollVertically(-1));
         updateStations();
-        /*
-        if (stations != null) {
-            if (type == TYPE_FAVOURITE) { adapter.notifyDataSetChanged(); setFavouriteStations(stations); }
-            else if (locationManager != null) updateLocationList(locationManager.getLatest());
-        }
-        if (type == TYPE_NEARBY && locationManager != null && !locationManager.isMainProviderEnabled()) {
-            if (stations != null)
-                locationManager.addListener(this);
-        }*/
     }
 
 
@@ -200,6 +189,10 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     }
 
     public void updateStations() {
+        if (mainActivity.screenState == null) {
+            return;
+        }
+
         setupUi(mainActivity.screenState);
         if (mainActivity.screenState == ScreenState.ERROR) {
             switch (mainActivity.errorCode) {
@@ -263,6 +256,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
             noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
         }
         adapter.setStations(stationWrappersFav);
+        list.getView().scrollToPosition(0);
 
     }
 
@@ -450,7 +444,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(getLayoutInflater().inflate(R.layout.template_station_nearby, parent, false));
+            return new ViewHolder(getLayoutInflater().inflate(R.layout.template_station, parent, false));
         }
 
         @Override
