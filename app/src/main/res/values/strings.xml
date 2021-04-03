@@ -54,5 +54,6 @@
     <string name="try_again">Try again</string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="there_are_currently_no_detours">There are currently no detours.</string>
+    <string name="error_updating_arrivals">Error updating live arrivals.</string>
 
 </resources>

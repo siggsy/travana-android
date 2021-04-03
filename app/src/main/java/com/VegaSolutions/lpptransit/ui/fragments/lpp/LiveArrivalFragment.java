@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,17 +23,17 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
-import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
+import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
+import com.VegaSolutions.lpptransit.utility.ScreenState;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -47,8 +48,13 @@ import java.util.Locale;
 import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.DONE;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.ERROR;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.LOADING;
 
 public class LiveArrivalFragment extends Fragment {
+
+    public static final String TAG = "LiveArrivalFragment";
 
     private static final String STATION_ID = "station_id";
     private static final int UPDATE_PERIOD = 5000;
@@ -59,9 +65,19 @@ public class LiveArrivalFragment extends Fragment {
 
     private Adapter adapter;
 
-    SwipeRefreshLayout refreshLayout;
     RecyclerView rv;
-    View noArrErr;
+    LinearLayout noArrivalsContainer;
+    ProgressBar progressBar;
+    LinearLayout errorContainer;
+    TextView errorText;
+    ImageView errorImageView;
+    TextView tryAgainText;
+
+    private TravanaApp app;
+    private NetworkConnectivityManager networkConnectivityManager;
+
+    private boolean isFirstCallRetrieveLiveArrivals = true;
+    private int numberOfCallsFailedInRow = 0;
 
     private boolean hour;
     private int color, backColor;
@@ -71,38 +87,127 @@ public class LiveArrivalFragment extends Fragment {
     private final Runnable updater = new Runnable() {
         @Override
         public void run() {
-            Api.arrival(stationId, callback);
+            retrieveLiveArrivals();
             handler.postDelayed(updater, UPDATE_PERIOD);
         }
     };
-    private final ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
 
-        // Cancel UI update if fragment is not attached to activity
-        if (context == null)
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
+        hour = sharedPreferences.getBoolean("hour", false);
+
+        if (getArguments() != null) {
+            stationId = getArguments().getString(STATION_ID);
+        }
+
+        app = TravanaApp.getInstance();
+        networkConnectivityManager = app.getNetworkConnectivityManager();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
+        initElements(root);
+
+        return root;
+
+    }
+
+    private void retrieveLiveArrivals() {
+
+        if (!networkConnectivityManager.isConnectionAvailable()) {
+            if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
+                setupUi(ERROR);
+                setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_wifi);
+            } else {
+                numberOfCallsFailedInRow++;
+            }
             return;
+        }
+        if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
+            setupUi(LOADING);
+        }
 
-        // Set UI
-        ((Activity) context).runOnUiThread(() -> {
-            refreshLayout.setRefreshing(false);
-            if (success && apiResponse != null) {
+        Api.arrival(stationId, (apiResponse, statusCode, success) -> {
+
+            if (context == null) {
+                return;
+            }
+
+            if (success) {
+                numberOfCallsFailedInRow = 0;
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
-
-                // Check if arrival list is not empty and refresh rv adapter
-                noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
-                adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
+                ((Activity) context).runOnUiThread(() -> {
+                    noArrivalsContainer.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
+                    adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
+                });
                 handler.removeCallbacks(updater);
                 handler.postDelayed(updater, UPDATE_PERIOD);
-            } else new CustomToast(context).showDefault(statusCode);
+                setupUi(DONE);
+            } else {
+                numberOfCallsFailedInRow++;
+                if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
+                    setupUi(ERROR);
+                    setErrorUi(this.getResources().getString(R.string.error_updating_arrivals), R.drawable.ic_error_outline);
+                }
+            }
+
+        });
+        isFirstCallRetrieveLiveArrivals = false;
+    }
+
+    void setErrorUi(String errorName, int errorIconCode) {
+        ((Activity) context).runOnUiThread(() -> {
+            errorText.setText(errorName);
+            errorImageView.setImageResource(errorIconCode);
+        });
+    }
+
+    void setupUi(ScreenState screenState) {
+        ((Activity) context).runOnUiThread(() -> {
+            switch (screenState) {
+                case DONE: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.rv.setVisibility(View.VISIBLE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case LOADING: {
+                    this.progressBar.setVisibility(View.VISIBLE);
+                    this.rv.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case ERROR: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.rv.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        });
+    }
+
+    private void initElements(View root) {
+        rv = root.findViewById(R.id.live_arrival_rv);
+        noArrivalsContainer = root.findViewById(R.id.live_arrival_no_arrivals_error);
+        progressBar = root.findViewById(R.id.progress_bar);
+        errorText = root.findViewById(R.id.tv_error);
+        errorImageView = root.findViewById(R.id.iv_error);
+        tryAgainText = root.findViewById(R.id.tv_try_again);
+        errorContainer = root.findViewById(R.id.ll_error_container);
+        rv = root.findViewById(R.id.live_arrival_rv);
+        noArrivalsContainer = root.findViewById(R.id.live_arrival_no_arrivals_error);
+
+        tryAgainText.setOnClickListener(v -> {
+            retrieveLiveArrivals();
         });
 
-    };
-
-
-
-    private void setupUI() {
-
         // Save default theme colors
-        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundElevatedColor };
+        int[] attribute = new int[]{android.R.attr.textColor, R.attr.backgroundElevatedColor};
         TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
         backColor = array.getColor(1, Color.WHITE);
         color = array.getColor(0, Color.BLACK);
@@ -120,43 +225,7 @@ public class LiveArrivalFragment extends Fragment {
             }
         });
 
-        refreshLayout.setRefreshing(true);
-        refreshLayout.setOnRefreshListener(() -> Api.arrival(stationId, callback));
-        refreshLayout.setColorSchemeColors(ContextCompat.getColor(context, R.color.colorAccent));
-        refreshLayout.setProgressBackgroundColorSchemeColor(backColor);
-
         handler = new Handler(Looper.myLooper());
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
-        hour = sharedPreferences.getBoolean("hour", false);
-
-        if (getArguments() != null) {
-            stationId = getArguments().getString(STATION_ID);
-        }
-
-        refreshLayout = getActivity().findViewById(R.id.live_arrival_swipe_refresh);
-        rv = getActivity().findViewById(R.id.live_arrival_rv);
-        noArrErr = getActivity().findViewById(R.id.live_arrival_no_arrivals_error);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
-
-        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
-        rv = root.findViewById(R.id.live_arrival_rv);
-        noArrErr = root.findViewById(R.id.live_arrival_no_arrivals_error);
-
-        setupUI();
-
-        return root;
-
     }
 
     public static LiveArrivalFragment newInstance(String stationId) {
@@ -186,8 +255,7 @@ public class LiveArrivalFragment extends Fragment {
     public void onResume() {
         super.onResume();
         onHeaderChanged(rv.canScrollVertically(-1));
-        refreshLayout.setRefreshing(true);
-        Api.arrival(stationId, callback);
+        retrieveLiveArrivals();
     }
 
     @Override
@@ -407,7 +475,7 @@ public class LiveArrivalFragment extends Fragment {
             int value = getRouteNumber() * 1000000;
             String routeNameLetters = getRouteName().replaceAll("\\d", "");
             if (routeNameLetters.length() > 0) {
-                value += (char) getRouteName().replaceAll("\\d", "").charAt(0) * 1000;
+                value += getRouteName().replaceAll("\\d", "").charAt(0) * 1000;
             }
             if (name.length() > 0) {
                 value += name.charAt(0);

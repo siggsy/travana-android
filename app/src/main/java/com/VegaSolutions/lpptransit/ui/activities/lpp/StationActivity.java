@@ -253,7 +253,6 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         center.setVisibility(station.isCenter() ? View.VISIBLE : View.GONE);
 
         // Favourite button toggle
-        // fav.setImageDrawable(getDrawable(favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
         fav.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
         fav.setOnClickListener(v1 -> {
             SharedPreferences sharedPreferences = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE);
