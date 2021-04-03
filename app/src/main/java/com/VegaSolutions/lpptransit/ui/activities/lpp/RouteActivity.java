@@ -109,7 +109,7 @@ public class RouteActivity extends MapFragmentActivity {
     private ViewPagerBottomSheetBehavior behavior;
 
     // Google maps parameters
-    private final int UPDATE_TIME = 10000;
+    private final int UPDATE_TIME = 5000;
     private Handler handler;
     private BusMarkerManager busManager;
     private MarkerOptions busOptions;
@@ -223,24 +223,8 @@ public class RouteActivity extends MapFragmentActivity {
     };
 
     private void setupUI() {
-        // TODO remove depricated
-        Window window = getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
-        } else {
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }
-        window.setStatusBarColor(Color.TRANSPARENT);
 
-        bottom = findViewById(R.id.bottom_route);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
-            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
-            bottomParams.setMargins(0, insets.getSystemWindowInsetTop(), 0, 0);
-            bottom.setLayoutParams(bottomParams);
-            return insets.consumeSystemWindowInsets();
-        });
+        setScreenSettings();
 
         // Header elevation animation
         elevationAnimation = new ElevationAnimation(16, header, mapFilter);
@@ -343,6 +327,26 @@ public class RouteActivity extends MapFragmentActivity {
             } else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
         }));
 
+    }
+
+    private void setScreenSettings() {
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+        } else {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        bottom = findViewById(R.id.bottom_route);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+            bottomParams.setMargins(0, insets.getSystemWindowInsetTop(), 0, 0);
+            bottom.setLayoutParams(bottomParams);
+            return insets.consumeSystemWindowInsets();
+        });
     }
 
     @Override

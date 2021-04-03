@@ -58,6 +58,7 @@ public class LiveArrivalFragment extends Fragment {
 
     private static final String STATION_ID = "station_id";
     private static final int UPDATE_PERIOD = 5000;
+    private static final int MAX_FAILED_CALLS_IN_ROW = 4;
 
     private String stationId;
     private Context context;
@@ -122,7 +123,7 @@ public class LiveArrivalFragment extends Fragment {
         handler.postDelayed(updater, UPDATE_PERIOD);
 
         if (!networkConnectivityManager.isConnectionAvailable()) {
-            if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
+            if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= MAX_FAILED_CALLS_IN_ROW) {
                 setupUi(ERROR);
                 setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_wifi);
             } else {
@@ -131,7 +132,7 @@ public class LiveArrivalFragment extends Fragment {
             isFirstCallRetrieveLiveArrivals = false;
             return;
         }
-        if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
+        if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= MAX_FAILED_CALLS_IN_ROW) {
             setupUi(LOADING);
         }
 
