@@ -68,13 +68,6 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         removeFragments();
     }
 
-    public static StationsFragment newInstance() {
-        StationsFragment fragment = new StationsFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     private void initElements(View root) {
 
         // Find all UI elements

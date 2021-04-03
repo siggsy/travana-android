@@ -181,6 +181,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         behavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
                 if (newState == ViewPagerBottomSheetBehavior.STATE_EXPANDED) {
                     header.setElevation(0);
                 } else if (newState == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {

@@ -94,7 +94,8 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
 
         }
 
-        mMap.setOnMapClickListener(latLng -> setHide(!hidden));
+        // remove this option.
+        //mMap.setOnMapClickListener(latLng -> setHide(!hidden));
 
 
     }
