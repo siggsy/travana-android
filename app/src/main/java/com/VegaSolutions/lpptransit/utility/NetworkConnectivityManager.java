@@ -13,6 +13,10 @@ import java.util.ArrayList;
 
 public class NetworkConnectivityManager {
 
+    public static final int NO_INTERNET_CONNECTION = -1;
+    public static final int ERROR_DURING_LOADING = -2;
+    public static final int NO_ERROR = 0;
+
     private final Context context;
     private boolean isConnectionAvailable = false;
     private final ArrayList<ConnectivityManager.NetworkCallback> callbacks = new ArrayList<>();

@@ -4,22 +4,17 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
-import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.ui.custommaps.LocationMarkerManager;
-import com.VegaSolutions.lpptransit.ui.custommaps.MyLocationManager;
+import com.VegaSolutions.lpptransit.ui.custommaps.TravanaLocationManager;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,12 +26,12 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MapFragmentActivity extends FragmentActivity implements OnMapReadyCallback, MyLocationManager.MyLocationListener {
+public abstract class MapFragmentActivity extends FragmentActivity implements OnMapReadyCallback, TravanaLocationManager.TravanaLocationListener {
 
     protected GoogleMap mMap;
 
     protected LatLng ljubljana = new LatLng(46.056319, 14.505381);
-    protected MyLocationManager locationManager;
+    protected TravanaLocationManager locationManager;
     protected LocationMarkerManager markerManager;
 
     protected ImageView locationIcon;
@@ -81,7 +76,7 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         if (MapUtility.checkIfAtLeastOnePermissionPermitted(this)) {
 
             // Setup location objects
-            locationManager = new MyLocationManager(this);
+            locationManager = new TravanaLocationManager(this);
             markerManager = new LocationMarkerManager(this, mMap,
                     locationManager.getLatest(),
                     MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_live)),

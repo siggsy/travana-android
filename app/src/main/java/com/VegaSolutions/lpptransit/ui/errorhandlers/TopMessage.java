@@ -104,7 +104,7 @@ public class TopMessage extends ConstraintLayout {
     public void showMsgDefault(Context context, int statusCode) {
         switch (statusCode) {
             case -2:
-                showMsg(context.getString(R.string.timed_out_error), ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
+                showMsg(context.getString(R.string.error_loading), ContextCompat.getDrawable(context, R.drawable.ic_error_outline));
                 break;
             case -1:
                 showMsg(context.getString(R.string.no_internet_connection), ContextCompat.getDrawable(context, R.drawable.ic_wifi));

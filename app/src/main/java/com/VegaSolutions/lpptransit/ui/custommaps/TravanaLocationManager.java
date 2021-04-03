@@ -15,21 +15,20 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class MyLocationManager {
+public class TravanaLocationManager {
 
-    private static final String TAG = MyLocationManager.class.getSimpleName();
+    private static final String TAG = TravanaLocationManager.class.getSimpleName();
 
-    private Context context;
+    private final Context context;
 
     private LocationManager locationManager;
     private boolean gps, network = false;
     private static boolean live;
 
     private static LatLng latest;
-    private static List<MyLocationListener> listeners = new ArrayList<>();
-    private LocationListener mainListener = new LocationListener() {
+    private static final List<TravanaLocationListener> listeners = new ArrayList<>();
+    private final LocationListener mainListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
 
@@ -41,7 +40,7 @@ public class MyLocationManager {
             live = true;
 
             // Notify all listeners
-            for (MyLocationListener listener : listeners)
+            for (TravanaLocationListener listener : listeners)
                 listener.onLocationChanged(location);
 
             // Save the latest
@@ -55,7 +54,7 @@ public class MyLocationManager {
             Log.i(TAG, "Provider enabled: " + provider);
 
             // Notify listeners if at least one is enabled
-            for (MyLocationListener listener : listeners)
+            for (TravanaLocationListener listener : listeners)
                 listener.onProviderAvailabilityChanged(true);
 
             if (provider.equals(LocationManager.GPS_PROVIDER))
@@ -77,7 +76,7 @@ public class MyLocationManager {
 
            // Notify listeners if both providers are disabled
            if (!gps  && !network)
-               for (MyLocationListener listener : listeners)
+               for (TravanaLocationListener listener : listeners)
                    listener.onProviderAvailabilityChanged(false);
 
         }
@@ -87,11 +86,11 @@ public class MyLocationManager {
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     };
 
-    public MyLocationManager(Context context) {
+    public TravanaLocationManager(Context context) {
         this.context = context;
     }
 
-    public boolean addListener(MyLocationListener locationListener) {
+    public boolean addListener(TravanaLocationListener locationListener) {
 
         // Enable main listener if this is the first one
         if (listeners.size() == 0) {
@@ -104,7 +103,7 @@ public class MyLocationManager {
         return true;
     }
 
-    public void removeListener(MyLocationListener locationListener) {
+    public void removeListener(TravanaLocationListener locationListener) {
         listeners.remove(locationListener);
 
         // Disable main listener if list is empty and save latest location
@@ -188,8 +187,9 @@ public class MyLocationManager {
 
     }
 
-    public interface MyLocationListener {
+    public interface TravanaLocationListener {
         void onLocationChanged(Location location);
+
         void onProviderAvailabilityChanged(boolean value);
     }
 

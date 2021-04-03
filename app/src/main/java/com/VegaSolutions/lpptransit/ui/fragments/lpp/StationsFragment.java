@@ -1,31 +1,27 @@
 package com.VegaSolutions.lpptransit.ui.fragments.lpp;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments.StationsSubFragment;
+import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
@@ -46,22 +42,31 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
     private FragmentHeaderCallback headerListener = null;
     private OnFragmentCreatedListener createdListener = null;
 
-    private ApiCallback<List<Station>> callback = (apiResponse, statusCode, success) -> {
+    private TravanaApp app;
+    private NetworkConnectivityManager networkConnectivityManager;
 
-            if (context == null)
-                return;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_stations, container, false);
 
-            if (success)
-                mListener.onStationsUpdated(apiResponse.getData(), true, statusCode);
-            else mListener.onStationsUpdated(null, false, statusCode);
-            if (adapter.registeredFragments.size() == 2) {
-                if (success)
-                    for (int i = 0; i < adapter.registeredFragments.size(); i++)
-                        adapter.registeredFragments.get(i).setStations(apiResponse.getData(), statusCode, true);
-            } else if (success) createdListener = fragment -> fragment.setStations(apiResponse.getData(), statusCode, true);
+        app = TravanaApp.getInstance();
+        networkConnectivityManager = app.getNetworkConnectivityManager();
 
-    };
+        initElements(root);
 
+        return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        removeFragments();
+    }
 
     public static StationsFragment newInstance() {
         StationsFragment fragment = new StationsFragment();
@@ -70,7 +75,12 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         return fragment;
     }
 
-    private void setupUI() {
+    private void initElements(View root) {
+
+        // Find all UI elements
+        viewPager = root.findViewById(R.id.station_view_pager);
+        header = root.findViewById(R.id.header);
+        tabLayout = root.findViewById(R.id.tab_layout);
 
         animation = new ElevationAnimation(16, header);
 
@@ -101,49 +111,33 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
      * Remove previous or cached fragments to avoid any unwanted results
      */
     private void removeFragments() {
-
         FragmentManager fm = getParentFragmentManager();
 
-        for (Fragment fragment : fm.getFragments())
+        for (Fragment fragment : fm.getFragments()) {
             if (fragment instanceof StationsSubFragment) {
                 try {
                     fm.beginTransaction().remove(fragment).commit();
                 } catch (IllegalStateException e) {
                     return;
                 }
-
             }
-
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
         }
-        removeFragments();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_stations, container, false);
+    public void setSubstationsFragments() {
+        if (adapter == null || adapter.registeredFragments == null) {
+            return;
+        }
 
-        // Find all UI elements
-        viewPager = root.findViewById(R.id.station_view_pager);
-        header = root.findViewById(R.id.header);
-        tabLayout = root.findViewById(R.id.tab_layout);
-
-        setupUI();
-
-        Api.stationDetails(false, callback);
-
-        return root;
+        if (adapter.registeredFragments.size() == 2) {
+            if (adapter.registeredFragments.get(0) != null) {
+                adapter.registeredFragments.get(0).updateStations();
+            }
+            if (adapter.registeredFragments.get(1) != null) {
+                adapter.registeredFragments.get(1).updateStations();
+            }
+        }
     }
-
-    public void refresh() {
-        Api.stationDetails(false, callback);
-    }
-
 
     @Override
     public void onAttach(@NonNull Context context) {
