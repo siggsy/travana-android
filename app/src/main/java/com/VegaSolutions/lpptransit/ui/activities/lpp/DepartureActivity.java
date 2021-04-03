@@ -1,6 +1,5 @@
 package com.VegaSolutions.lpptransit.ui.activities.lpp;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.ColorUtils;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -210,7 +209,7 @@ public class DepartureActivity extends AppCompatActivity {
 
         back.setOnClickListener(v -> super.onBackPressed());
 
-        tryAgainText.setOnClickListener(view -> {
+        tryAgainText.setOnClickListener(v -> {
             retrieveDepartures();
         });
 
@@ -267,7 +266,7 @@ public class DepartureActivity extends AppCompatActivity {
             }
 
             if (timetable.isCurrent()) {
-                holder.container.getBackground().setTint(ColorUtils.blendARGB(backGroundColor, ViewGroupUtils.isDarkTheme(getApplication()) ? Color.WHITE : Color.GRAY, 0.1f));
+                holder.container.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), ViewGroupUtils.isDarkTheme(getApplicationContext()) ? R.color.departure_active_dark : R.color.departure_active_white));
             } else {
                 holder.container.setBackgroundColor(backGroundColor);
             }
