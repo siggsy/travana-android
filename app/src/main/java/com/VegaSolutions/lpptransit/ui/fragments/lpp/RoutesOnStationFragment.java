@@ -1,7 +1,6 @@
 package com.VegaSolutions.lpptransit.ui.fragments.lpp;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,16 +19,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.DepartureActivity;
 import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
-import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
+import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
+import com.VegaSolutions.lpptransit.utility.ScreenState;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.VegaSolutions.lpptransit.utility.ScreenState.DONE;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.ERROR;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.LOADING;
 
 public class RoutesOnStationFragment extends Fragment {
 
@@ -45,9 +50,17 @@ public class RoutesOnStationFragment extends Fragment {
     private FragmentHeaderCallback headerCallback;
 
     // Activity UI elements
-    private RecyclerView rv;
-    private ProgressBar progressBar;
-    private Adapter adapter;
+    RecyclerView rv;
+    Adapter adapter;
+
+    ProgressBar progressBar;
+    LinearLayout errorContainer;
+    TextView errorText;
+    ImageView errorImageView;
+    TextView tryAgainText;
+
+    private TravanaApp app;
+    private NetworkConnectivityManager networkConnectivityManager;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -91,17 +104,83 @@ public class RoutesOnStationFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         View root = inflater.inflate(R.layout.fragment_routes_on_station, container, false);
+        initElements(root);
 
-        adapter = new Adapter();
+        app = TravanaApp.getInstance();
+        networkConnectivityManager = app.getNetworkConnectivityManager();
 
-        // Find UI elements by id
+        retrieveRoutes();
+
+        return root;
+    }
+
+    private void retrieveRoutes() {
+
+        if (!networkConnectivityManager.isConnectionAvailable()) {
+            setupUi(ERROR);
+            setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_wifi);
+            return;
+        }
+        setupUi(LOADING);
+
+        // Query all routes on station
+        Api.routesOnStation(stationId, (apiResponse, statusCode, success) -> {
+            if (success) {
+                getActivity().runOnUiThread(() -> {
+                    adapter.setRoutes(apiResponse.getData());
+                });
+                setupUi(DONE);
+            } else {
+                setupUi(ERROR);
+                setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
+            }
+        });
+
+    }
+
+    void setErrorUi(String errorName, int errorIconCode) {
+        getActivity().runOnUiThread(() -> {
+            errorText.setText(errorName);
+            errorImageView.setImageResource(errorIconCode);
+        });
+    }
+
+    void setupUi(ScreenState screenState) {
+        getActivity().runOnUiThread(() -> {
+            switch (screenState) {
+                case DONE: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.rv.setVisibility(View.VISIBLE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case LOADING: {
+                    this.progressBar.setVisibility(View.VISIBLE);
+                    this.rv.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case ERROR: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.rv.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        });
+    }
+
+    private void initElements(View root) {
         rv = root.findViewById(R.id.routes_on_station_rv);
         progressBar = root.findViewById(R.id.progressBar);
-
+        errorText = root.findViewById(R.id.tv_error);
+        errorImageView = root.findViewById(R.id.iv_error);
+        tryAgainText = root.findViewById(R.id.tv_try_again);
+        errorContainer = root.findViewById(R.id.ll_error_container);
 
         // Setup UI
+        adapter = new Adapter();
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(context));
         rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -112,25 +191,9 @@ public class RoutesOnStationFragment extends Fragment {
             }
         });
 
-        // Query all routes on station
-        Api.routesOnStation(stationId, (apiResponse, statusCode, success) -> {
-
-            // Cancel UI update if fragment not attached
-            if (context == null)
-                return;
-
-            // Update UI
-            ((Activity)context).runOnUiThread(() -> {
-                progressBar.setVisibility(View.GONE);
-
-                if (success) adapter.setRoutes(apiResponse.getData());
-                else new CustomToast(context).showDefault(statusCode);
-
-            });
-
+        tryAgainText.setOnClickListener(v -> {
+            retrieveRoutes();
         });
-
-        return root;
     }
 
     private void onHeaderChanged(boolean value) {

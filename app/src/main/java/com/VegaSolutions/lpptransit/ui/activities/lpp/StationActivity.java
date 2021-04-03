@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -25,6 +27,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.MapFragmentActivity;
@@ -43,7 +46,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.tabs.TabLayout;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
@@ -78,6 +80,8 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
     ElevationAnimation animation;
 
+    private TravanaApp app;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +93,21 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
         View root = findViewById(R.id.rootConstraint);
 
+        app = TravanaApp.getInstance();
+
+        setScreenSettings();
+        initElements(root);
+
+        // Get Intent data
+        station = getIntent().getParcelableExtra(STATION);
+        favourite = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE).getBoolean(station.getRef_id(), false);
+
+        setupStationDetails();
+        saveRecentSearchedStation();
+
+    }
+
+    private void setScreenSettings() {
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -105,58 +124,6 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
             bottom.setLayoutParams(bottomParams);
             return insets.consumeSystemWindowInsets();
         });
-
-        // Get bottom sheet behaviour for controlling expanding and collapsing
-        bottomSheetBehavior = ViewPagerBottomSheetBehavior.from(root);
-        bottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-
-        bottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                switch (bottomSheetBehavior.getState()) {
-                    case ViewPagerBottomSheetBehavior.STATE_DRAGGING:
-                    case ViewPagerBottomSheetBehavior.STATE_SETTLING:
-                        setMapPaddingBottom(slideOffset);
-                        mapFilter.setAlpha(slideOffset);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
-                        break;
-                }
-            }
-        });
-
-
-        // Assign all UI elements
-        name = findViewById(R.id.station_title);
-        header = findViewById(R.id.header);
-        center = findViewById(R.id.station_center);
-        oppositeBtn = findViewById(R.id.station_opposite_btn);
-        fav = findViewById(R.id.station_favourite);
-        viewPager = findViewById(R.id.station_pager);
-        tabLayout = findViewById(R.id.station_tab_layout);
-        back = findViewById(R.id.back);
-        locationIcon = findViewById(R.id.maps_location_icon);
-        shadow = findViewById(R.id.shadow);
-        bottom = findViewById(R.id.bottom_station);
-        mapFilter = findViewById(R.id.map_filter);
-
-        ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
-        bottomTopMargin = bottomParams.topMargin;
-
-        toHide.add(root);
-        toHide.add(shadow);
-
-        // Get Intent data
-        station = getIntent().getParcelableExtra(STATION);
-        favourite = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE).getBoolean(station.getRef_id(), false);
-
-        setupUI();
-        saveRecentSearchedStation();
-
     }
 
     private void setMapPaddingBottom(Float offset) {
@@ -190,59 +157,83 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
     }
 
-    public void setupUI() {
+    private void initElements(View root) {
+        // Get bottom sheet behaviour for controlling expanding and collapsing
+        bottomSheetBehavior = ViewPagerBottomSheetBehavior.from(root);
+        bottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
 
-        animation = new ElevationAnimation(16, header, mapFilter);
+        bottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
 
-        // Set header
-        name.setText(station.getName());
-        center.setVisibility(station.isCenter() ? View.VISIBLE : View.GONE);
+            }
 
-        // Favourite button toggle
-        fav.setImageDrawable(getDrawable(favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
-        fav.setOnClickListener(v1 -> {
-            SharedPreferences sharedPreferences = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(station.getRef_id(), !favourite);
-            favourite = !favourite;
-            fav.setImageDrawable(getResources().getDrawable(favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
-            editor.apply();
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                switch (bottomSheetBehavior.getState()) {
+                    case ViewPagerBottomSheetBehavior.STATE_DRAGGING:
+                    case ViewPagerBottomSheetBehavior.STATE_SETTLING:
+                        setMapPaddingBottom(slideOffset);
+                        mapFilter.setAlpha(slideOffset);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
+                        break;
+                }
+            }
         });
+
+        // Assign all UI elements
+        name = findViewById(R.id.station_title);
+        header = findViewById(R.id.header);
+        center = findViewById(R.id.station_center);
+        oppositeBtn = findViewById(R.id.station_opposite_btn);
+        fav = findViewById(R.id.station_favourite);
+        viewPager = findViewById(R.id.station_pager);
+        tabLayout = findViewById(R.id.station_tab_layout);
+        back = findViewById(R.id.back);
+        locationIcon = findViewById(R.id.maps_location_icon);
+        shadow = findViewById(R.id.shadow);
+        bottom = findViewById(R.id.bottom_station);
+        mapFilter = findViewById(R.id.map_filter);
+
+        ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+        bottomTopMargin = bottomParams.topMargin;
+
+        toHide.add(root);
+        toHide.add(shadow);
 
         // Set opposite station button listener
         oppositeBtn.setOnClickListener(view -> {
             oppositeBtn.setEnabled(false);
 
             int code;
-            if (Integer.parseInt(station.getRef_id()) % 2 == 0)
+            if (Integer.parseInt(station.getRef_id()) % 2 == 0) {
                 code = Integer.parseInt(station.getRef_id()) - 1;
-            else code = Integer.parseInt(station.getRef_id()) + 1;
+            } else {
+                code = Integer.parseInt(station.getRef_id()) + 1;
+            }
 
-            // Query opposite station details
-            Api.stationDetails(String.valueOf(code), true, (apiResponse, statusCode, success) -> runOnUiThread(() -> {
-                if (success) {
-                    // Start opposite route StationActivity and finish current
-                    Intent intent = getIntent();
-                    Station station = apiResponse.getData();
-                    intent.putExtra("station", station);
-                    finish();
-                    startActivity(intent);
-                } else {
-                    // On error
-                    CustomToast toast = new CustomToast(StationActivity.this);
-                    if (statusCode == 500) {
-                        toast
-                                .setBackgroundColor(ContextCompat.getColor(StationActivity.this, R.color.colorAccent))
-                                .setTextColor(Color.WHITE)
-                                .setIconColor(Color.WHITE)
-                                .setText(getString(R.string.opposite_error))
-                                .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap))
-                            .show(Toast.LENGTH_SHORT);
-                    }
-                    else toast.showDefault(statusCode);
-                }
-                oppositeBtn.setEnabled(true);
-            }));
+            Station oppositeStation = getOppositeStation(code);
+            if (oppositeStation != null) {
+                // Start opposite route StationActivity and finish current
+                Intent intent = getIntent();
+                intent.putExtra("station", oppositeStation);
+                finish();
+                startActivity(intent);
+            } else {
+                CustomToast toast = new CustomToast(StationActivity.this);
+                toast.setBackgroundColor(ContextCompat.getColor(StationActivity.this, R.color.colorAccent))
+                        .setTextColor(Color.WHITE)
+                        .setIconColor(Color.WHITE)
+                        .setText(getString(R.string.opposite_error))
+                        .setIcon(ContextCompat.getDrawable(StationActivity.this, R.drawable.ic_swap))
+                        .show(Toast.LENGTH_SHORT);
+
+                // enable button when current toast disappear
+                final Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(() -> {
+                    oppositeBtn.setEnabled(true);
+                }, 2000);
+            }
         });
 
         // Setup viewpager
@@ -251,7 +242,41 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         tabLayout.setupWithViewPager(viewPager);
 
         back.setOnClickListener(v -> super.onBackPressed());
+    }
 
+    private void setupStationDetails() {
+
+        animation = new ElevationAnimation(16, header, mapFilter);
+
+        // Set header
+        name.setText(station.getName());
+        center.setVisibility(station.isCenter() ? View.VISIBLE : View.GONE);
+
+        // Favourite button toggle
+        // fav.setImageDrawable(getDrawable(favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
+        fav.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
+        fav.setOnClickListener(v1 -> {
+            SharedPreferences sharedPreferences = getSharedPreferences(LppHelper.STATION_FAVOURITES, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(station.getRef_id(), !favourite);
+            favourite = !favourite;
+            fav.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), favourite ? R.drawable.ic_heart_fill : R.drawable.ic_heart_border));
+            editor.apply();
+        });
+
+    }
+
+    private Station getOppositeStation(int stationCode) {
+        if (!app.areStationsLoaded()) {
+            return null;
+        }
+
+        for (Station station : app.getStations()) {
+            if (station.getRef_id().equals(stationCode + "")) {
+                return station;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -261,9 +286,11 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
     @Override
     public void onBackPressed() {
-        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED)
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        else super.onBackPressed();
+        if (bottomSheetBehavior.getState() == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
+            bottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     class Adapter extends FragmentPagerAdapter {
@@ -304,7 +331,5 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
                     return "";
             }
         }
-
     }
-
 }

@@ -139,11 +139,10 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         ValueAnimator animator;
         if (value) {
             animator = ValueAnimator.ofInt(0, paddingBottom);
-            animator.setDuration(200);
         } else {
             animator = ValueAnimator.ofInt(paddingBottom, 0);
-            animator.setDuration(200);
         }
+        animator.setDuration(200);
 
         animator.addUpdateListener(animation -> {
             int value1 = (int) animation.getAnimatedValue();
@@ -160,12 +159,6 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;
-    }
-
-    protected void setTopPadding(int top) {
-        if (mMap != null)
-            mMap.setPadding(paddingLeft, top, paddingRight, paddingBottom);
-        paddingTop = top;
     }
 
     protected void setBottomPadding(int bottom) {

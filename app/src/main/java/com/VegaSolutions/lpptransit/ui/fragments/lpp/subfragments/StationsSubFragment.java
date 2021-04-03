@@ -189,7 +189,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     }
 
     public void updateStations() {
-        if (mainActivity.screenState == null) {
+        if (mainActivity == null) {
             return;
         }
 
