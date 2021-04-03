@@ -118,6 +118,9 @@ public class LiveArrivalFragment extends Fragment {
 
     private void retrieveLiveArrivals() {
 
+        handler.removeCallbacks(updater);
+        handler.postDelayed(updater, UPDATE_PERIOD);
+
         if (!networkConnectivityManager.isConnectionAvailable()) {
             if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
                 setupUi(ERROR);
@@ -125,6 +128,7 @@ public class LiveArrivalFragment extends Fragment {
             } else {
                 numberOfCallsFailedInRow++;
             }
+            isFirstCallRetrieveLiveArrivals = false;
             return;
         }
         if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
@@ -144,8 +148,6 @@ public class LiveArrivalFragment extends Fragment {
                     noArrivalsContainer.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
                     adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
                 });
-                handler.removeCallbacks(updater);
-                handler.postDelayed(updater, UPDATE_PERIOD);
                 setupUi(DONE);
             } else {
                 numberOfCallsFailedInRow++;
