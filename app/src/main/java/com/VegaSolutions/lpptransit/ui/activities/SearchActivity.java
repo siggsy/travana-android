@@ -84,25 +84,36 @@ public class SearchActivity extends AppCompatActivity {
         }
         setupUi(LOADING);
 
-        // TODO - stations should be safed to TravanaApp refence, so therefore no need for loading the same thing 2 times.
-        Api.stationDetails(true, (apiResponse, statusCode, success) -> {
-            if (success) {
-                // Add stations
-                for (Station station : apiResponse.getData())
-                    items.add(new StationItem(station));
 
-                // Query active routes
-                Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
-                    if (success1) {
-                        for (Route route : apiResponse1.getData())
-                            items.add(new RouteItem(route));
-                        runOnUiThread(() -> applyFilter(filter));
-                        setupUi(DONE);
-                    } else {
-                        setupUi(ERROR);
-                        setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
-                    }
-                });
+        // if in app there are valid stations data use them, otherwise retrieve new stations data
+        if (app.areStationsLoaded()) {
+            for (Station station : app.getStations())
+                items.add(new StationItem(station));
+
+            loadRoutes();
+        } else {
+            Api.stationDetails(true, (apiResponse, statusCode, success) -> {
+                if (success) {
+                    // Add stations
+                    for (Station station : apiResponse.getData())
+                        items.add(new StationItem(station));
+
+                    loadRoutes();
+                } else {
+                    setupUi(ERROR);
+                    setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
+                }
+            });
+        }
+    }
+
+    void loadRoutes() {
+        Api.activeRoutes((apiResponse1, statusCode1, success1) -> {
+            if (success1) {
+                for (Route route : apiResponse1.getData())
+                    items.add(new RouteItem(route));
+                runOnUiThread(() -> applyFilter(filter));
+                setupUi(DONE);
             } else {
                 setupUi(ERROR);
                 setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
