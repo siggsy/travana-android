@@ -117,7 +117,7 @@ public class RouteActivity extends MapFragmentActivity {
     private ViewPagerBottomSheetBehavior behavior;
 
     // Google maps parameters
-    private final int UPDATE_TIME = 5000;
+    private final int UPDATE_TIME = 10000;
     private Handler handler;
     private BusMarkerManager busManager;
     private MarkerOptions busOptions;
@@ -140,7 +140,6 @@ public class RouteActivity extends MapFragmentActivity {
     private final Runnable arrivalsUpdaterRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.e(TAG, "Updating arrivals");
             updateArrivals();
             handler.postDelayed(this, UPDATE_TIME);
         }
@@ -149,7 +148,6 @@ public class RouteActivity extends MapFragmentActivity {
     private final Runnable busesUpdaterRunnable = new Runnable() {
         @Override
         public void run() {
-            Log.e(TAG, "Updating buses");
             updateBuses();
             handler.postDelayed(this, UPDATE_TIME);
         }
@@ -197,7 +195,6 @@ public class RouteActivity extends MapFragmentActivity {
                     }
                 }
                 runOnUiThread(() -> {
-                    Log.e(TAG, "BUSSS TIME " + buses.size());
                     Log.e(TAG, buses + "");
 
                     // Update markers and queue another update.

@@ -57,8 +57,8 @@ public class LiveArrivalFragment extends Fragment {
     public static final String TAG = "LiveArrivalFragment";
 
     private static final String STATION_ID = "station_id";
-    private static final int UPDATE_PERIOD = 5000;
-    private static final int MAX_FAILED_CALLS_IN_ROW = 4;
+    private static final int UPDATE_PERIOD = 10000;
+    private static final int MAX_FAILED_CALLS_IN_ROW = 3;
 
     private String stationId;
     private Context context;
