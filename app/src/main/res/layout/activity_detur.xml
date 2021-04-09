@@ -34,8 +34,7 @@
             android:paddingEnd="15dp"
             android:paddingBottom="5dp"
             android:text="@string/detours"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textSize="24sp" />
 
     </RelativeLayout>
 
