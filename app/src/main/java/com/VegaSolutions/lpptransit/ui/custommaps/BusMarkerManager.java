@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class BusMarkerManager {
 
-    private final Map<String, Marker> busMap;
+    private Map<String, Marker> busMap;
     private final GoogleMap map;
     private final MarkerOptions options;
     private final MarkerAnimator animator;
@@ -50,8 +50,8 @@ public class BusMarkerManager {
         // Remove all buses not on the list.
         for (Map.Entry<String, Marker> entry : busMap.entrySet()) {
             entry.getValue().remove();
-
         }
+        busMap = new HashMap<>();
     }
 
     public void updateAll(List<Bus> buses) {

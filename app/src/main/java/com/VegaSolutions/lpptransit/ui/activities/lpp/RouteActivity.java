@@ -197,7 +197,9 @@ public class RouteActivity extends MapFragmentActivity {
                     }
                 }
                 runOnUiThread(() -> {
-                    routeLoading.showLoading(false);
+                    Log.e(TAG, "BUSSS TIME " + buses.size());
+                    Log.e(TAG, buses + "");
+
                     // Update markers and queue another update.
                     busManager.update(buses);
                 });

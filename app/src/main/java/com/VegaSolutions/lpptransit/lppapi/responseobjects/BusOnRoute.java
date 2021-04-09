@@ -94,4 +94,22 @@ public class BusOnRoute {
         return new LatLng(latitude, longitude);
     }
 
+    @Override
+    public String toString() {
+        return "BusOnRoute{" +
+                "routeNumber='" + routeNumber + '\'' +
+                ", routeId='" + routeId + '\'' +
+                ", tripId='" + tripId + '\'' +
+                ", routeName='" + routeName + '\'' +
+                ", destination='" + destination + '\'' +
+                ", busUnitId='" + busUnitId + '\'' +
+                ", busName='" + busName + '\'' +
+                ", busTimestamp='" + busTimestamp + '\'' +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", altitude=" + altitude +
+                ", groundSpeed=" + groundSpeed +
+                ", cardinalDirection=" + cardinalDirection +
+                '}';
+    }
 }
