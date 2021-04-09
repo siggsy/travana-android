@@ -28,8 +28,9 @@ public class BusMarkerManager {
 
         // Remove all buses not on the list.
         for (Map.Entry<String, Marker> entry : busMap.entrySet()) {
-            if (!contains(busesOnRoute, entry.getKey()))
+            if (!contains(busesOnRoute, entry.getKey())) {
                 entry.getValue().remove();
+            }
         }
 
         // Add or update bus markers.
@@ -43,6 +44,14 @@ public class BusMarkerManager {
             }
         }
 
+    }
+
+    public void removeAllBuses() {
+        // Remove all buses not on the list.
+        for (Map.Entry<String, Marker> entry : busMap.entrySet()) {
+            entry.getValue().remove();
+
+        }
     }
 
     public void updateAll(List<Bus> buses) {

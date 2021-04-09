@@ -77,6 +77,8 @@ public class LiveArrivalFragment extends Fragment {
     private TravanaApp app;
     private NetworkConnectivityManager networkConnectivityManager;
 
+    private ScreenState screenState = LOADING;
+
     private boolean isFirstCallRetrieveLiveArrivals = true;
     private int numberOfCallsFailedInRow = 0;
 
@@ -125,14 +127,14 @@ public class LiveArrivalFragment extends Fragment {
         if (!networkConnectivityManager.isConnectionAvailable()) {
             if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= MAX_FAILED_CALLS_IN_ROW) {
                 setupUi(ERROR);
-                setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_wifi);
+                setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_no_wifi);
             } else {
                 numberOfCallsFailedInRow++;
             }
             isFirstCallRetrieveLiveArrivals = false;
             return;
         }
-        if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= MAX_FAILED_CALLS_IN_ROW) {
+        if (isFirstCallRetrieveLiveArrivals || screenState == ERROR) {
             setupUi(LOADING);
         }
 
@@ -170,6 +172,7 @@ public class LiveArrivalFragment extends Fragment {
     }
 
     void setupUi(ScreenState screenState) {
+        this.screenState = screenState;
         ((Activity) context).runOnUiThread(() -> {
             switch (screenState) {
                 case DONE: {
@@ -181,12 +184,14 @@ public class LiveArrivalFragment extends Fragment {
                 case LOADING: {
                     this.progressBar.setVisibility(View.VISIBLE);
                     this.rv.setVisibility(View.GONE);
+                    this.noArrivalsContainer.setVisibility(View.GONE);
                     this.errorContainer.setVisibility(View.GONE);
                     break;
                 }
                 case ERROR: {
                     this.progressBar.setVisibility(View.GONE);
                     this.rv.setVisibility(View.GONE);
+                    this.noArrivalsContainer.setVisibility(View.GONE);
                     this.errorContainer.setVisibility(View.VISIBLE);
                     break;
                 }

@@ -119,7 +119,7 @@ public class RoutesOnStationFragment extends Fragment {
 
         if (!networkConnectivityManager.isConnectionAvailable()) {
             setupUi(ERROR);
-            setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_wifi);
+            setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_no_wifi);
             return;
         }
         setupUi(LOADING);

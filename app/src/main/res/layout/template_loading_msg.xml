@@ -78,7 +78,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:tint="?android:textColor"
-                app:srcCompat="@drawable/ic_wifi"
+                app:srcCompat="@drawable/ic_no_wifi"
                 tools:ignore="UseAppTint" />
 
             <TextView

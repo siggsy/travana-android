@@ -198,7 +198,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         if (mainActivity.screenState == ScreenState.ERROR) {
             switch (mainActivity.errorCode) {
                 case NetworkConnectivityManager.NO_INTERNET_CONNECTION: {
-                    setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_wifi);
+                    setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_no_wifi);
                     break;
                 }
                 case NetworkConnectivityManager.ERROR_DURING_LOADING: {
