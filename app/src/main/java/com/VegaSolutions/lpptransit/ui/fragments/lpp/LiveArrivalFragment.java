@@ -156,7 +156,7 @@ public class LiveArrivalFragment extends Fragment {
                 numberOfCallsFailedInRow++;
                 if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
                     setupUi(ERROR);
-                    setErrorUi(this.getResources().getString(R.string.error_updating_arrivals), R.drawable.ic_error_outline);
+                    setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
                 }
             }
 
