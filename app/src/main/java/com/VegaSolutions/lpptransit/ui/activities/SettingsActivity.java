@@ -1,12 +1,12 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -23,9 +23,9 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
-        boolean dark_theme = ViewGroupUtils.isDarkTheme(this);
+        boolean darkTheme = ViewGroupUtils.isDarkTheme(this);
         boolean hour = sharedPreferences.getBoolean("hour", false);
-        setTheme(dark_theme ? R.style.DarkTheme : R.style.WhiteTheme);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
         setContentView(R.layout.activity_settings);
 
         back = findViewById(R.id.back);
@@ -36,7 +36,7 @@ public class SettingsActivity extends AppCompatActivity {
         buttonMin = findViewById(R.id.radio_minute);
         buttonHour = findViewById(R.id.radio_hour);
 
-        if (dark_theme) buttonDark.setChecked(true);
+        if (darkTheme) buttonDark.setChecked(true);
         else buttonWhite.setChecked(true);
 
         if (hour) buttonHour.setChecked(true);

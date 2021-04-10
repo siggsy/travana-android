@@ -18,6 +18,7 @@
             android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
+            android:background="?selectableItemBackgroundBorderless"
             android:padding="7dp"
             android:src="@drawable/ic_back_arrow"
             android:tint="?android:textColor"
