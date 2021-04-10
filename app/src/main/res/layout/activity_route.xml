@@ -10,7 +10,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.activities.lpp.RouteActivity" />
+        tools:context=".ui.activities.RouteActivity" />
 
     <View
         android:id="@+id/map_filter"

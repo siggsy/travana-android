@@ -40,11 +40,11 @@
             android:name=".ui.activities.SettingsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activities.lpp.DepartureActivity"
+            android:name=".ui.activities.DepartureActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.activities.lpp.RouteActivity"
+            android:name=".ui.activities.RouteActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.MainActivity"
@@ -53,7 +53,7 @@
             android:name=".ui.activities.SearchActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activities.lpp.StationActivity"
+            android:name=".ui.activities.StationActivity"
             android:screenOrientation="portrait" />
 
         <meta-data

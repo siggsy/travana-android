@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities.lpp;
+package com.VegaSolutions.lpptransit.ui.activities;
 
 import android.os.Bundle;
 import android.view.View;

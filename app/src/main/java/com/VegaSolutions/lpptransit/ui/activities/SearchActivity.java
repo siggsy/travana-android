@@ -22,8 +22,6 @@ import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
 import com.VegaSolutions.lpptransit.utility.ScreenState;

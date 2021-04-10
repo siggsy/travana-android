@@ -24,7 +24,7 @@ import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.MainActivity;
 import com.VegaSolutions.lpptransit.ui.activities.SearchActivity;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
+import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
 import com.VegaSolutions.lpptransit.ui.custommaps.TravanaLocationManager;
 import com.VegaSolutions.lpptransit.ui.customviews.NullSafeView;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;

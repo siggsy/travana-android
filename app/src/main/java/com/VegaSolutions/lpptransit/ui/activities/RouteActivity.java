@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities.lpp;
+package com.VegaSolutions.lpptransit.ui.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,7 +38,6 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
-import com.VegaSolutions.lpptransit.ui.activities.MapFragmentActivity;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
@@ -553,15 +552,6 @@ public class RouteActivity extends MapFragmentActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        updateBuses();
-        updateArrivals();
-        startBusesUpdater();
-        startArrivalsUpdater();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         startArrivalsUpdater();
@@ -618,6 +608,10 @@ public class RouteActivity extends MapFragmentActivity {
                 });
             }
         }));
+        updateBuses();
+        updateArrivals();
+        startBusesUpdater();
+        startArrivalsUpdater();
     }
 
     class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {

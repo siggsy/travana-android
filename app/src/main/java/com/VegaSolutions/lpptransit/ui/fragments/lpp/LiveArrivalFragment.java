@@ -28,7 +28,7 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
+import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.LppHelper;

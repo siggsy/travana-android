@@ -29,7 +29,6 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.StationActivity;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.custommaps.CustomClusterRenderer;
 import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
