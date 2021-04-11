@@ -93,6 +93,7 @@ public class SearchActivity extends AppCompatActivity {
             Api.stationDetails(true, (apiResponse, statusCode, success) -> {
                 if (success) {
                     // Add stations
+                    app.setStations((ArrayList) apiResponse.getData());
                     for (Station station : apiResponse.getData())
                         items.add(new StationItem(station));
 
