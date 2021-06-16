@@ -1,29 +1,39 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class DepartureWrapper {
 
-    private String station_code;
-    private String station_name;
-    private String route_destination;
-    private String route_full_name;
+    @SerializedName("station_code")
+    private String stationCode;
+
+    @SerializedName("station_name")
+    private String stationName;
+
+    @SerializedName("route_destination")
+    private String routeDestination;
+
+    @SerializedName("route_full_name")
+    private String routeFullName;
+
     private List<Departure> departures;
 
-    public String getStation_code() {
-        return station_code;
+    public String getStationCode() {
+        return stationCode;
     }
 
-    public String getStation_name() {
-        return station_name;
+    public String getStationName() {
+        return stationName;
     }
 
-    public String getRoute_destination() {
-        return route_destination;
+    public String getRouteDestination() {
+        return routeDestination;
     }
 
-    public String getRoute_full_name() {
-        return route_full_name;
+    public String getRouteFullName() {
+        return routeFullName;
     }
 
     public List<Departure> getDepartures() {
@@ -31,15 +41,19 @@ public class DepartureWrapper {
     }
 
     public class Departure {
-        private int arrival_hour;
-        private int arrival_minute;
 
-        public int getArrival_hour() {
-            return arrival_hour;
+        @SerializedName("arrival_hour")
+        private int arrivalHour;
+
+        @SerializedName("arrival_minute")
+        private int arrivalMinute;
+
+        public int getArrivalHour() {
+            return arrivalHour;
         }
 
-        public int getArrival_minute() {
-            return arrival_minute;
+        public int getArrivalMinute() {
+            return arrivalMinute;
         }
     }
 

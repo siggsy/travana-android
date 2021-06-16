@@ -1,53 +1,73 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 
 public class BusOnRoute {
 
-    private String route_number;
-    private String route_id;
-    private String trip_id;
-    private String route_name;
+    @SerializedName("route_number")
+    private String routeNumber;
+
+    @SerializedName("route_id")
+    private String routeId;
+
+    @SerializedName("trip_id")
+    private String tripId;
+
+    @SerializedName("route_name")
+    private String routeName;
+
     private String destination;
-    private String bus_unit_id;
-    private String bus_name;
-    private String bus_timestamp;
+
+    @SerializedName("bus_unit_id")
+    private String busUnitId;
+
+    @SerializedName("bus_name")
+    private String busName;
+
+    @SerializedName("bus_timestamp")
+    private String busTimestamp;
+
     private double longitude;
     private double latitude;
     private int altitude;
-    private float ground_speed;
-    private float cardinal_direction;
 
-    public String getRoute_number() {
-        return route_number;
+    @SerializedName("ground_speed")
+    private float groundSpeed;
+
+    @SerializedName("cardinal_direction")
+    private float cardinalDirection;
+
+    public String getRouteNumber() {
+        return routeNumber;
     }
 
-    public String getRoute_id() {
-        return route_id;
+    public String getRouteId() {
+        return routeId;
     }
 
-    public String getTrip_id() {
-        return trip_id;
+    public String getTripId() {
+        return tripId;
     }
 
-    public String getRoute_name() {
-        return route_name;
+    public String getRouteName() {
+        return routeName;
     }
 
     public String getDestination() {
         return destination;
     }
 
-    public String getBus_unit_id() {
-        return bus_unit_id;
+    public String getBusUnitId() {
+        return busUnitId;
     }
 
-    public String getBus_name() {
-        return bus_name;
+    public String getBusName() {
+        return busName;
     }
 
-    public String getBus_timestamp() {
-        return bus_timestamp;
+    public String getBusTimestamp() {
+        return busTimestamp;
     }
 
     public double getLongitude() {
@@ -62,16 +82,34 @@ public class BusOnRoute {
         return altitude;
     }
 
-    public float getGround_speed() {
-        return ground_speed;
+    public float getGroundSpeed() {
+        return groundSpeed;
     }
 
-    public float getCardinal_direction() {
-        return cardinal_direction;
+    public float getCardinalDirection() {
+        return cardinalDirection;
     }
 
     public LatLng getLatLng() {
         return new LatLng(latitude, longitude);
     }
 
+    @Override
+    public String toString() {
+        return "BusOnRoute{" +
+                "routeNumber='" + routeNumber + '\'' +
+                ", routeId='" + routeId + '\'' +
+                ", tripId='" + tripId + '\'' +
+                ", routeName='" + routeName + '\'' +
+                ", destination='" + destination + '\'' +
+                ", busUnitId='" + busUnitId + '\'' +
+                ", busName='" + busName + '\'' +
+                ", busTimestamp='" + busTimestamp + '\'' +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", altitude=" + altitude +
+                ", groundSpeed=" + groundSpeed +
+                ", cardinalDirection=" + cardinalDirection +
+                '}';
+    }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/route_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -39,14 +40,15 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:layout_weight="0"
-            android:background="@drawable/stretched_circle_container"
+            android:background="?selectableItemBackgroundBorderless"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:padding="8dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:src="@drawable/ic_departure_board_24px"
-            android:tint="?android:textColor" />
+            android:src="@drawable/ic_departure_board"
+            android:tint="?android:textColor"
+            tools:ignore="UseAppTint" />
 
         <ImageView
             android:id="@+id/route_map_btn"
@@ -56,14 +58,15 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:layout_weight="0"
-            android:background="@drawable/stretched_circle_container"
+            android:background="?selectableItemBackgroundBorderless"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:padding="8dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:src="@drawable/ic_map_black_24dp"
-            android:tint="?android:textColor" />
+            android:src="@drawable/ic_map"
+            android:tint="?android:textColor"
+            tools:ignore="UseAppTint" />
 
     </LinearLayout>
 

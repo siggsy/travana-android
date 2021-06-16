@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/departure_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -26,29 +27,27 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="?containerBorderPaddingSide"
-                android:layout_marginTop="?containerBorderPadding"
-                android:layout_marginEnd="?containerBorderPaddingSide"
-                android:layout_marginBottom="?containerBorderPadding"
-                android:background="@drawable/stretched_circle_container"
+            <RelativeLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginVertical="?containerBorderPadding"
+                android:layout_marginHorizontal="?containerBorderPaddingSide"
+                android:background="@drawable/circle"
+                android:backgroundTint="?departureHourColor"
                 android:padding="2dp">
 
                 <TextView
                     android:id="@+id/departure_hour_hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/circle"
-                    android:backgroundTint="?departureHourColor"
-                    android:gravity="center"
+                    android:textColor="?android:textColor"
+                    android:layout_centerInParent="true"
                     android:padding="4dp"
-                    android:text="15"
                     android:textAlignment="center"
                     android:textAllCaps="false"
-                    android:textSize="18sp" />
-            </FrameLayout>
+                    android:textSize="18sp"
+                    tools:text="15" />
+            </RelativeLayout>
 
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/departure_hour_minutes"
@@ -70,4 +69,4 @@
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</RelativeLayout>

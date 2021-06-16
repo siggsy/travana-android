@@ -1,4 +1,4 @@
-package com.VegaSolutions.lpptransit.ui.activities.lpp;
+package com.VegaSolutions.lpptransit.ui.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +17,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -30,20 +32,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
-import com.VegaSolutions.lpptransit.ui.activities.MapFragmentActivity;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
 import com.VegaSolutions.lpptransit.ui.custommaps.BusMarkerManager;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.TopMessage;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
+import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
+import com.VegaSolutions.lpptransit.utility.ScreenState;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -70,11 +72,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class RouteActivity extends MapFragmentActivity {
 
+    public static final String TAG = "RouteActivity";
+    private static final int MAX_FAILED_CALLS_IN_ROW = 2;
 
     public static final String ROUTE_NAME = "route_name";
     public static final String ROUTE_NUMBER = "route_number";
@@ -90,16 +92,21 @@ public class RouteActivity extends MapFragmentActivity {
     private String stationId;
 
     // Activity UI elements
-    @BindView(R.id.back) ImageView backBtn;
-    @BindView(R.id.route_station_number) TextView number;
-    @BindView(R.id.route_name) TextView name;
-    @BindView(R.id.route_circle) View circle;
-    @BindView(R.id.loading_msg) TopMessage routeLoading;
-    @BindView(R.id.station_list) RecyclerView recyclerView;
-    @BindView(R.id.header) View header;
-    @BindView(R.id.bottom_sheet) View bottomSheet;
-    @BindView(R.id.route_opposite_btn) ImageButton opposite;
-    @BindView(R.id.shadow) View shadow;
+    ImageView backBtn;
+    TextView number;
+    TextView name;
+    View circle;
+    TopMessage routeLoading;
+    RecyclerView recyclerView;
+    View header;
+    View bottomSheet;
+    ImageButton opposite;
+    View shadow;
+    ProgressBar progressBar;
+    LinearLayout errorContainer;
+    TextView errorText;
+    ImageView errorImageView;
+    TextView tryAgainText;
 
     View bottom;
     View mapFilter;
@@ -120,54 +127,130 @@ public class RouteActivity extends MapFragmentActivity {
     private int backColor;
     private int color;
 
-    // Bus updater query
-    private final ApiCallback<List<BusOnRoute>> busQuery = new ApiCallback<List<BusOnRoute>>() {
+    private boolean isRouteDrawn = false;
+    private boolean isFirstCallingUpdateBuses = true;
+    private int failedCallingUpdateBusesInRow = 0;
+    private boolean isFirstCallingUpdateArrivals = true;
+    private int failedCallingUpdateArrivalsInRow = 0;
+
+    private TravanaApp app;
+    private NetworkConnectivityManager networkConnectivityManager;
+
+    private final Runnable arrivalsUpdaterRunnable = new Runnable() {
         @Override
-        public void onComplete(@Nullable ApiResponse<List<BusOnRoute>> apiResponse, int statusCode, boolean success) {
-            runOnUiThread(() -> {
-                if (success) {
-                    List<BusOnRoute> buses = new ArrayList<>();
-                    routeLoading.showLoading(false);
-
-                    // Filter by trip ID.
-                    for (BusOnRoute busOnRoute : apiResponse.getData())
-                        if (busOnRoute.getTrip_id().equals(tripId))
-                            buses.add(busOnRoute);
-
-                    // Update markers and queue another update.
-                    busManager.update(buses);
-
-
-                } else {
-                    // Remove update queue and show error message
-                    handler.removeCallbacks(runnable);
-                    routeLoading.showMsgDefault(RouteActivity.this, statusCode);
-                }
-            });
+        public void run() {
+            updateArrivals();
+            handler.postDelayed(this, UPDATE_TIME);
         }
     };
 
-    // Stations on route query
-    private final ApiCallback<List<ArrivalOnRoute>> callback = new ApiCallback<List<ArrivalOnRoute>>() {
+    private final Runnable busesUpdaterRunnable = new Runnable() {
         @Override
-        public void onComplete(@Nullable ApiResponse<List<ArrivalOnRoute>> apiResponse, int statusCode, boolean success) {
+        public void run() {
+            updateBuses();
+            handler.postDelayed(this, UPDATE_TIME);
+        }
+    };
+
+    private void startArrivalsUpdater() {
+        handler.postDelayed(arrivalsUpdaterRunnable, UPDATE_TIME);
+    }
+
+    private void stopArrivalsUpdater() {
+        handler.removeCallbacks(arrivalsUpdaterRunnable);
+    }
+
+    private void startBusesUpdater() {
+        handler.postDelayed(busesUpdaterRunnable, UPDATE_TIME);
+    }
+
+    private void stopBusesUpdater() {
+        handler.removeCallbacks(busesUpdaterRunnable);
+    }
+
+    private void updateBuses() {
+        if (!networkConnectivityManager.isConnectionAvailable()) {
+            if (isFirstCallingUpdateBuses || failedCallingUpdateBusesInRow >= MAX_FAILED_CALLS_IN_ROW) {
+                setupUi(ScreenState.ERROR);
+                busManager.removeAllBuses();
+                setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_no_wifi, NetworkConnectivityManager.NO_INTERNET_CONNECTION);
+            }
+            isFirstCallingUpdateBuses = false;
+            failedCallingUpdateBusesInRow++;
+            return;
+        }
+        if (isFirstCallingUpdateBuses || failedCallingUpdateBusesInRow >= MAX_FAILED_CALLS_IN_ROW) {
+            setupUi(ScreenState.LOADING);
+        }
+        Api.busesOnRoute(routeNumber, (apiResponse, statusCode, success) -> {
 
             if (success) {
+                failedCallingUpdateBusesInRow = 0;
+                List<BusOnRoute> buses = new ArrayList<>();
+                // Filter by trip ID.
+                for (BusOnRoute busOnRoute : apiResponse.getData()) {
+                    if (busOnRoute.getTripId().equals(tripId)) {
+                        buses.add(busOnRoute);
+                    }
+                }
+                runOnUiThread(() -> {
+                    Log.e(TAG, buses + "");
+
+                    // Update markers and queue another update.
+                    busManager.update(buses);
+                });
+                setupUi(ScreenState.DONE);
+            } else {
+                if (isFirstCallingUpdateBuses || failedCallingUpdateBusesInRow >= MAX_FAILED_CALLS_IN_ROW) {
+                    runOnUiThread(() -> {
+                        // Remove update queue and show error message
+                        busManager.removeAllBuses();
+                        setupUi(ScreenState.ERROR);
+                        setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline, NetworkConnectivityManager.ERROR_DURING_LOADING);
+                    });
+                }
+                failedCallingUpdateBusesInRow++;
+            }
+        });
+        isFirstCallingUpdateBuses = false;
+    }
+
+    private void updateArrivals() {
+
+        if (!networkConnectivityManager.isConnectionAvailable()) {
+            if (isFirstCallingUpdateArrivals || failedCallingUpdateArrivalsInRow >= MAX_FAILED_CALLS_IN_ROW) {
+                setupUi(ScreenState.ERROR);
+                setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_no_wifi, NetworkConnectivityManager.NO_INTERNET_CONNECTION);
+            }
+            isFirstCallingUpdateArrivals = false;
+            failedCallingUpdateArrivalsInRow++;
+            return;
+        }
+        if (isFirstCallingUpdateArrivals || failedCallingUpdateArrivalsInRow >= MAX_FAILED_CALLS_IN_ROW) {
+            setupUi(ScreenState.LOADING);
+        }
+        Api.arrivalsOnRoute(tripId, (apiResponse, statusCode, success) -> {
+
+            if (success) {
+                failedCallingUpdateArrivalsInRow = 0;
+
                 List<ArrivalOnRoute> stationsOnRoute = apiResponse.getData();
 
                 // Sort stations.
-                Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrder_no(), o2.getOrder_no()));
+                Collections.sort(stationsOnRoute, (o1, o2) -> Integer.compare(o1.getOrderNo(), o2.getOrderNo()));
                 for (ArrivalOnRoute station : stationsOnRoute) {
                     Collections.sort(station.getArrivals(), (o1, o2) -> {
                         if (o1.getType() == 2) return -1;
                         else if (o2.getType() == 2) return 1;
-                        else return Integer.compare(o1.getEta_min(), o2.getEta_min());
+                        else return Integer.compare(o1.getEtaMin(), o2.getEtaMin());
                     });
                 }
                 adapter.setStationsOnRoute(stationsOnRoute);
                 RouteActivity.this.runOnUiThread(() -> adapter.notifyDataSetChanged());
 
-                if (handler == null) {
+                // Draw stations - called just once
+                if (!isRouteDrawn) {
+
                     List<LatLng> latLngs = new ArrayList<>();
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
@@ -179,194 +262,41 @@ public class RouteActivity extends MapFragmentActivity {
                         RouteActivity.this.runOnUiThread(() -> {
                             Marker marker = mMap.addMarker(stationOptions.position(latLng).title(stationOnRoute.getName()));
                             marker.setTag(String.valueOf(stationOnRoute.getCode_id()));
-                            if (Integer.valueOf(stationId) == stationOnRoute.getCode_id()) {
+                            if (Integer.parseInt(stationId) == stationOnRoute.getCode_id()) {
                                 marker.showInfoWindow();
                             }
                         });
                     }
 
                     // Connect stations with polyline and move the camera.
-                    RouteActivity.this.runOnUiThread(() -> {
+                    runOnUiThread(() -> {
                         if (!stationsOnRoute.isEmpty()) {
                             LatLngBounds bounds = builder.build();
 
                             mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(Colors.getColorFromString(routeNumber))); // ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK
                             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
 
-                        } else mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
-                    });
-
-                    // Start bus updater.
-                    runOnUiThread(() -> {
-                        handler = new Handler(Looper.myLooper());
-                        handler.post(runnable);
-                    });
-
-                } else {
-                    Api.busesOnRoute(routeNumber, busQuery);
-                    handler.postDelayed(runnable, UPDATE_TIME);
-                }
-
-            } else {
-                if (handler != null)
-                    handler.removeCallbacks(runnable);
-                RouteActivity.this.runOnUiThread(() -> routeLoading.showMsgDefault(RouteActivity.this, statusCode));
-            }
-        }
-    };
-
-    private final Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            Api.arrivalsOnRoute(tripId, callback);
-        }
-    };
-
-    private void setupUI() {
-        // TODO remove depricated
-        Window window = getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
-        } else {
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }
-        window.setStatusBarColor(Color.TRANSPARENT);
-
-        bottom = findViewById(R.id.bottom_route);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
-            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
-            bottomParams.setMargins(0, insets.getSystemWindowInsetTop(), 0, 0);
-            bottom.setLayoutParams(bottomParams);
-            return insets.consumeSystemWindowInsets();
-        });
-
-        // Header elevation animation
-        elevationAnimation = new ElevationAnimation(16, header, mapFilter);
-
-        // Get drawable resource for markers.
-        int color = Colors.getColorFromString(routeNumber);
-
-        // Set bus and station marker style
-        View v = getLayoutInflater().inflate(R.layout.station_node_maps, null);
-
-        v.findViewById(R.id.stroke).getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN));
-        v.findViewById(R.id.solid).getBackground().setColorFilter(
-                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                        ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background), BlendModeCompat.SRC_IN));
-        IconGenerator generator = new IconGenerator(this);
-        generator.setBackground(null);
-        generator.setContentView(v);
-        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(
-                Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.ic_water_drop_svgrepo_com_1)), 80, 80)).flat(true);
-        stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true);
-
-        // Setup views.
-        backBtn.setOnClickListener(vi -> super.onBackPressed());
-        number.setText(routeNumber);
-        number.setTextSize(14f);
-        circle.getBackground().setTint(Colors.getColorFromString(routeNumber));
-        routeLoading.showLoading(true);
-        routeLoading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
-        routeLoading.setErrorMsgColor(Color.WHITE);
-        routeLoading.setErrorIconColor(Color.WHITE);
-        routeLoading.setRefreshClickEvent(vi -> {
-            routeLoading.showLoading(true);
-            Api.arrivalsOnRoute(tripId, callback);
-        });
-        name.setText(routeName);
-        name.setSelected(true);
-
-        adapter = new Adapter();
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                elevationAnimation.elevate(recyclerView.canScrollVertically(-1));
-            }
-        });
-
-        opposite.setOnClickListener(vi -> Api.routes(routeId, (apiResponse, statusCode, success) -> {
-            if (success) {
-                List<Route> routes = apiResponse.getData();
-
-                // Show list of all trips
-                if (routes.size() > 2) {
-                    String[] trips = new String[routes.size()];
-                    for (int i = 0, routesSize = routes.size(); i < routesSize; i++) {
-                        Route route = routes.get(i);
-                        trips[i] = route.getRoute_name();
-                    }
-
-                    runOnUiThread(() -> {
-                        AlertDialog.Builder builder = new AlertDialog.Builder( this,
-                                ViewGroupUtils.isDarkTheme(getApplication())
-                                        ? R.style.DarkAlert : R.style.WhiteAlert);
-
-                        builder.setTitle(getString(R.string.select_route));
-                        builder.setItems(trips, (dialog, which) -> runOnUiThread(() -> {
-                            Route route = routes.get(which);
-                            Intent i = new Intent(this, RouteActivity.class);
-                            i.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_name());
-                            i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
-                            i.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
-                            i.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
-                            i.putExtra(RouteActivity.STATION_ID, stationId);
-                            startActivity(i);
-                            finish();
-                        }));
-
-                        if(!isFinishing()) {
-                            AlertDialog alertDialog = builder.create();
-                            alertDialog.show();
+                        } else {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
                         }
                     });
-
-                } else {
-                    // Auto-swap if there are only 2 trips
-                    Route route = routes.get(routes.get(0).getTrip_id().equals(tripId) ? 1 : 0);
-                    runOnUiThread(() -> {
-                        Intent i = new Intent(this, RouteActivity.class);
-                        i.putExtra(RouteActivity.ROUTE_NAME, route.getRoute_name());
-                        i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRoute_number());
-                        i.putExtra(RouteActivity.ROUTE_ID, route.getRoute_id());
-                        i.putExtra(RouteActivity.TRIP_ID, route.getTrip_id());
-                        i.putExtra(RouteActivity.STATION_ID, stationId);
-                        startActivity(i);
-                        finish();
-                    });
+                    isRouteDrawn = true;
                 }
-
-            } else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
-        }));
-
+                setupUi(ScreenState.DONE);
+            } else {
+                if (isFirstCallingUpdateArrivals || failedCallingUpdateArrivalsInRow >= MAX_FAILED_CALLS_IN_ROW) {
+                    setupUi(ScreenState.ERROR);
+                    setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline, NetworkConnectivityManager.ERROR_DURING_LOADING);
+                }
+                failedCallingUpdateArrivalsInRow++;
+            }
+        });
+        isFirstCallingUpdateArrivals = false;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
-        setContentView(R.layout.activity_route);
-        ButterKnife.bind(this);
+    private void setElements() {
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
-        hour = sharedPreferences.getBoolean("hour", false);
-
-        // Get activity parameters
-        routeName = getIntent().getStringExtra(ROUTE_NAME);
-        routeNumber = getIntent().getStringExtra(ROUTE_NUMBER);
-        routeId = getIntent().getStringExtra(ROUTE_ID);
-        tripId = getIntent().getStringExtra(TRIP_ID);
-        stationId = getIntent().getStringExtra(STATION_ID);
-        if (stationId == null) stationId = "0";
-
-        Api.addSavedSearchedItemsIds(tripId, this);
+        setScreenSettings();
 
         locationIcon = findViewById(R.id.maps_location_icon);
 
@@ -395,13 +325,224 @@ public class RouteActivity extends MapFragmentActivity {
             }
         });
 
-        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundViewColor };
+        int[] attribute = new int[]{android.R.attr.textColor, R.attr.backgroundViewColor};
         TypedArray array = obtainStyledAttributes(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
         backColor = array.getColor(1, Color.WHITE);
         color = ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK;
         array.recycle();
 
-        setupUI();
+        // Header elevation animation
+        elevationAnimation = new ElevationAnimation(16, header, mapFilter);
+
+        // Get drawable resource for markers.
+        int color = Colors.getColorFromString(routeNumber);
+
+        // Set bus and station marker style
+        View v = getLayoutInflater().inflate(R.layout.station_node_maps, null);
+
+        v.findViewById(R.id.stroke).getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN));
+        v.findViewById(R.id.solid).getBackground().setColorFilter(
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background), BlendModeCompat.SRC_IN));
+        IconGenerator generator = new IconGenerator(this);
+        generator.setBackground(null);
+        generator.setContentView(v);
+        busOptions = new MarkerOptions().anchor(0.5f, 0.5f).zIndex(1f).icon(MapUtility.getMarkerIconFromDrawable(
+                Objects.requireNonNull(ContextCompat.getDrawable(this, R.drawable.ic_water_drop)), 80, 80)).flat(true);
+        stationOptions = new MarkerOptions().anchor(0.5f, 0.5f).icon(BitmapDescriptorFactory.fromBitmap(generator.makeIcon())).flat(true);
+
+        // Setup views.
+        backBtn.setOnClickListener(vi -> super.onBackPressed());
+        number.setText(routeNumber);
+        number.setTextSize(14f);
+        circle.getBackground().setTint(Colors.getColorFromString(routeNumber));
+        routeLoading.showLoading(true);
+        routeLoading.setErrorMsgBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+        routeLoading.setErrorMsgColor(Color.WHITE);
+        routeLoading.setErrorIconColor(Color.WHITE);
+        routeLoading.setRefreshClickEvent(vi -> {
+            updateBuses();
+            updateArrivals();
+        });
+        tryAgainText.setOnClickListener(view -> {
+            updateBuses();
+            updateArrivals();
+        });
+
+        name.setText(routeName);
+        name.setSelected(true);
+
+        adapter = new Adapter();
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                elevationAnimation.elevate(recyclerView.canScrollVertically(-1));
+            }
+        });
+
+        opposite.setOnClickListener(vi -> Api.routes(routeId, (apiResponse, statusCode, success) -> {
+            if (success) {
+                List<Route> routes = apiResponse.getData();
+
+                // Show list of all trips
+                if (routes.size() > 2) {
+                    String[] trips = new String[routes.size()];
+                    for (int i = 0, routesSize = routes.size(); i < routesSize; i++) {
+                        Route route = routes.get(i);
+                        trips[i] = route.getRouteName();
+                    }
+
+                    runOnUiThread(() -> {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this,
+                                ViewGroupUtils.isDarkTheme(getApplication())
+                                        ? R.style.DarkAlert : R.style.WhiteAlert);
+
+                        builder.setTitle(getString(R.string.select_route));
+                        builder.setItems(trips, (dialog, which) -> runOnUiThread(() -> {
+                            Route route = routes.get(which);
+                            Intent i = new Intent(this, RouteActivity.class);
+                            i.putExtra(RouteActivity.ROUTE_NAME, route.getRouteName());
+                            i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRouteNumber());
+                            i.putExtra(RouteActivity.ROUTE_ID, route.getRouteId());
+                            i.putExtra(RouteActivity.TRIP_ID, route.getTripId());
+                            i.putExtra(RouteActivity.STATION_ID, stationId);
+                            startActivity(i);
+                            finish();
+                        }));
+
+                        if (!isFinishing()) {
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+                        }
+                    });
+
+                } else {
+                    // Auto-swap if there are only 2 trips
+                    Route route = routes.get(routes.get(0).getTripId().equals(tripId) ? 1 : 0);
+                    runOnUiThread(() -> {
+                        Intent i = new Intent(this, RouteActivity.class);
+                        i.putExtra(RouteActivity.ROUTE_NAME, route.getRouteName());
+                        i.putExtra(RouteActivity.ROUTE_NUMBER, route.getRouteNumber());
+                        i.putExtra(RouteActivity.ROUTE_ID, route.getRouteId());
+                        i.putExtra(RouteActivity.TRIP_ID, route.getTripId());
+                        i.putExtra(RouteActivity.STATION_ID, stationId);
+                        startActivity(i);
+                        finish();
+                    });
+                }
+
+            } else runOnUiThread(() -> new CustomToast(this).showDefault(statusCode));
+        }));
+
+    }
+
+    private void setScreenSettings() {
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+        } else {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        bottom = findViewById(R.id.bottom_route);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+            bottomParams.setMargins(0, insets.getSystemWindowInsetTop(), 0, 0);
+            bottom.setLayoutParams(bottomParams);
+            return insets.consumeSystemWindowInsets();
+        });
+    }
+
+    private void initElements() {
+        progressBar = findViewById(R.id.progress_bar);
+        errorText = findViewById(R.id.tv_error);
+        errorImageView = findViewById(R.id.iv_error);
+        tryAgainText = findViewById(R.id.tv_try_again);
+        errorContainer = findViewById(R.id.ll_error_container);
+        backBtn = findViewById(R.id.back);
+        number = findViewById(R.id.route_station_number);
+        name = findViewById(R.id.route_name);
+        circle = findViewById(R.id.route_circle);
+        routeLoading = findViewById(R.id.loading_msg);
+        recyclerView = findViewById(R.id.station_list);
+        header = findViewById(R.id.header);
+        bottomSheet = findViewById(R.id.bottom_sheet);
+        opposite = findViewById(R.id.route_opposite_btn);
+        shadow = findViewById(R.id.shadow);
+    }
+
+    private void setErrorUi(String errorName, int errorIconCode, int errorCode) {
+        runOnUiThread(() -> {
+            errorText.setText(errorName);
+            errorImageView.setImageResource(errorIconCode);
+            this.routeLoading.showMsgDefault(getApplicationContext(), errorCode);
+        });
+    }
+
+    private void setupUi(ScreenState screenState) {
+        runOnUiThread(() -> {
+            switch (screenState) {
+                case DONE: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.recyclerView.setVisibility(View.VISIBLE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    this.routeLoading.showLoading(false);
+
+                    break;
+                }
+                case LOADING: {
+                    this.progressBar.setVisibility(View.VISIBLE);
+                    this.recyclerView.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    this.routeLoading.showLoading(true);
+                    break;
+                }
+                case ERROR: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.recyclerView.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.VISIBLE);
+                    this.routeLoading.showLoading(false);
+                    break;
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+        setContentView(R.layout.activity_route);
+        initElements();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        app = TravanaApp.getInstance();
+        networkConnectivityManager = app.getNetworkConnectivityManager();
+
+        handler = new Handler(Looper.myLooper());
+
+        SharedPreferences sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE);
+        hour = sharedPreferences.getBoolean("hour", false);
+
+        // Get activity parameters
+        routeName = getIntent().getStringExtra(ROUTE_NAME);
+        routeNumber = getIntent().getStringExtra(ROUTE_NUMBER);
+        routeId = getIntent().getStringExtra(ROUTE_ID);
+        tripId = getIntent().getStringExtra(TRIP_ID);
+        stationId = getIntent().getStringExtra(STATION_ID);
+        if (stationId == null) stationId = "0";
+
+        Api.addSavedSearchedItemsIds(tripId, this);
+
+        setElements();
 
     }
 
@@ -411,19 +552,17 @@ public class RouteActivity extends MapFragmentActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        // Resume bus updates
-        if (handler != null)
-            handler.post(runnable);
+    protected void onPause() {
+        super.onPause();
+        startArrivalsUpdater();
+        startBusesUpdater();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        // Pause bus updates
-        if (handler != null)
-            handler.removeCallbacks(runnable);
+    protected void onDestroy() {
+        super.onDestroy();
+        stopArrivalsUpdater();
+        stopBusesUpdater();
     }
 
     @Override
@@ -469,12 +608,10 @@ public class RouteActivity extends MapFragmentActivity {
                 });
             }
         }));
-
-
-
-        // Query stations on route and display them on the map.
-        Api.arrivalsOnRoute(tripId, callback);
-
+        updateBuses();
+        updateArrivals();
+        startBusesUpdater();
+        startArrivalsUpdater();
     }
 
     class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
@@ -491,10 +628,10 @@ public class RouteActivity extends MapFragmentActivity {
                 for (int j = 0; j < size; j++) {
                     ArrivalOnRoute.Arrival arrival = arrivals.get(j);
                     if (arrival.getType() != 3) {
-                        if (!(arrival.getEta_min() > 10 && arrival.getType() == 1)) {
-                            Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicle_id());
+                        if (!(arrival.getEtaMin() > 10 && arrival.getType() == 1)) {
+                            Pair<Integer, Pair<Integer, Integer>> arrivalsToAnimate = toAnimateMap.get(arrival.getVehicleId());
                             if (arrivalsToAnimate == null)
-                                toAnimateMap.put(arrival.getVehicle_id(), new Pair<>(i, new Pair<>(j, arrival.getType())));
+                                toAnimateMap.put(arrival.getVehicleId(), new Pair<>(i, new Pair<>(j, arrival.getType())));
                         }
                     }
                 }
@@ -515,8 +652,7 @@ public class RouteActivity extends MapFragmentActivity {
                     int b = isBus[value.first][0]++;
                     if (b <= 1)
                         isBus[value.first][b + 1] = value.second.second;
-                }
-                else {
+                } else {
                     int b = isBus[value.first - 1][0]++;
                     if (b <= 1)
                         isBus[value.first - 1][b + 1] = value.second.second;
@@ -550,7 +686,7 @@ public class RouteActivity extends MapFragmentActivity {
             holder.name.setText(station.getName());
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) holder.node.getLayoutParams();
 
-            if (Integer.parseInt(stationId) == station.getStation_code()) {
+            if (Integer.parseInt(stationId) == station.getStationCode()) {
                 holder.name.setTypeface(null, Typeface.BOLD);
                 holder.name.setTextSize(20f);
                 params.height = 56;
@@ -574,7 +710,8 @@ public class RouteActivity extends MapFragmentActivity {
                     Intent i = new Intent(RouteActivity.this, StationActivity.class);
                     i.putExtra(StationActivity.STATION, apiResponse.getData());
                     startActivity(i);
-                } else runOnUiThread(() -> new CustomToast(RouteActivity.this).showDefault(statusCode));
+                } else
+                    runOnUiThread(() -> new CustomToast(RouteActivity.this).showDefault(statusCode));
             }));
 
             holder.liveArrivals.removeAllViews();
@@ -582,7 +719,7 @@ public class RouteActivity extends MapFragmentActivity {
             if (isBus[position][0] > 0) {
 
                 // Set bold and bigger text for previous activity station
-                if (Integer.parseInt(stationId) == station.getStation_code()) {
+                if (Integer.parseInt(stationId) == station.getStationCode()) {
                     params.height = 94;
                     params.width = 94;
                 } else {
@@ -594,16 +731,19 @@ public class RouteActivity extends MapFragmentActivity {
                     if (isBus[position][1] == 1) {
                         if (isBus[position][2] == 1)
                             holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3_offline3));
-                        else holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3_offline1));
+                        else
+                            holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3_offline1));
                     } else {
                         if (isBus[position][2] == 1)
                             holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3_offline2));
-                        else holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3));
+                        else
+                            holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.bus_icon_3));
                     }
-                } else holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position][1] == 1 ? R.drawable.bus_icon_2_offline : R.drawable.bus_icon_2));
+                } else
+                    holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, isBus[position][1] == 1 ? R.drawable.bus_icon_2_offline : R.drawable.bus_icon_2));
                 holder.node.setColorFilter(null);
             } else {
-                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle_node));
+                holder.node.setImageDrawable(ContextCompat.getDrawable(RouteActivity.this, R.drawable.station_circle));
             }
 
             List<ArrivalOnRoute.Arrival> arrivals = station.getArrivals();
@@ -615,16 +755,14 @@ public class RouteActivity extends MapFragmentActivity {
                     // Inflate view
                     View v = getLayoutInflater().inflate(R.layout.template_live_arrival_special, holder.liveArrivals, false);
                     TextView arrival_time = v.findViewById(R.id.arrival_time_time);
-                    View back = v.findViewById(R.id.arrival_time_back);
                     ImageView rss = v.findViewById(R.id.live_icon);
                     TextView garage = v.findViewById(R.id.garage_text);
 
                     SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                     // Set preferred time format
-                    arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", arrival.getEta_min()));
+                    arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEtaMin()).toDate()) : String.format("%s min", arrival.getEtaMin()));
                     arrival_time.setTextColor(RouteActivity.this.color);
-                    back.getBackground().setTint(backColor);
                     rss.setVisibility(View.INVISIBLE);
                     arrival_time.setTypeface(null, Typeface.NORMAL);
 
@@ -650,7 +788,7 @@ public class RouteActivity extends MapFragmentActivity {
 
 
                     // Ignore "ghost" arrivals
-                    if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                    if (!arrival.getVehicleId().equals("22222222-2222-2222-2222-222222222222"))
                         holder.liveArrivals.addView(v);
 
                     // Show only one if type is "detour"
@@ -660,8 +798,6 @@ public class RouteActivity extends MapFragmentActivity {
             else {
                 View v = getLayoutInflater().inflate(R.layout.template_live_arrival_special, holder.liveArrivals, false);
                 TextView arrival_time = v.findViewById(R.id.arrival_time_time);
-                View back = v.findViewById(R.id.arrival_time_back);
-                back.getBackground().setTint(backColor);
 
                 arrival_time.setText("/");
                 holder.liveArrivals.addView(v);

@@ -2,28 +2,35 @@ package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
 public class Station implements Parcelable {
 
-    private String name;
-    private int int_id;
-    private double latitude;
-    private double longitude;
-    private String ref_id;
-    private List<String> route_groups_on_station;
+    private final String name;
+
+    @SerializedName("int_id")
+    private final int intId;
+
+    private final double latitude;
+    private final double longitude;
+
+    @SerializedName("ref_id")
+    private final String refId;
+
+    @SerializedName("route_groups_on_station")
+    private final List<String> routeGroupsOnStation;
 
     protected Station(Parcel in) {
         name = in.readString();
-        int_id = in.readInt();
+        intId = in.readInt();
         latitude = in.readDouble();
         longitude = in.readDouble();
-        ref_id = in.readString();
-        route_groups_on_station = in.createStringArrayList();
+        refId = in.readString();
+        routeGroupsOnStation = in.createStringArrayList();
     }
 
     public static final Creator<Station> CREATOR = new Creator<Station>() {
@@ -42,8 +49,8 @@ public class Station implements Parcelable {
         return name;
     }
 
-    public int getInt_id() {
-        return int_id;
+    public int getIntId() {
+        return intId;
     }
 
     public double getLatitude() {
@@ -54,18 +61,20 @@ public class Station implements Parcelable {
         return longitude;
     }
 
-    public String getRef_id() {
-        return ref_id;
+    public String getRefId() {
+        return refId;
     }
 
-    public List<String> getRoute_groups_on_station() {
-        return route_groups_on_station;
+    public List<String> getRouteGroupsOnStation() {
+        return routeGroupsOnStation;
     }
 
-    public LatLng getLatLng() { return new LatLng(latitude, longitude); }
+    public LatLng getLatLng() {
+        return new LatLng(latitude, longitude);
+    }
 
     public boolean isCenter() {
-        return Integer.valueOf(ref_id) % 2 != 0;
+        return Integer.valueOf(refId) % 2 != 0;
     }
 
     @Override
@@ -76,11 +85,11 @@ public class Station implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        dest.writeInt(int_id);
+        dest.writeInt(intId);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
-        dest.writeString(ref_id);
-        dest.writeStringList(route_groups_on_station);
+        dest.writeString(refId);
+        dest.writeStringList(routeGroupsOnStation);
 
     }
 
@@ -88,11 +97,11 @@ public class Station implements Parcelable {
     public String toString() {
         return "Station{" +
                 "name='" + name + '\'' +
-                ", int_id=" + int_id +
+                ", int_id=" + intId +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
-                ", ref_id='" + ref_id + '\'' +
-                ", route_groups_on_station=" + route_groups_on_station +
+                ", ref_id='" + refId + '\'' +
+                ", route_groups_on_station=" + routeGroupsOnStation +
                 '}';
     }
 }

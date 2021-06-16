@@ -15,7 +15,7 @@
     <color name="gray">#66000000</color>
     <color name="light_gray">#11000000</color>
     <color name="light_gray_2">#C0C0C0</color>
-    <color name="divider_dark">#50666666</color>
+    <color name="divider_dark">#30666666</color>
     <color name="text_hint">#888888</color>
 
     <color name="main_green">#75E645</color>
@@ -24,7 +24,6 @@
     <color name="main_yellow">#F7FF00</color>
     <color name="color_main_orange">#FFBB33</color>
 
-    <color name="event_live">#008577</color>
     <color name="event_arrival">#EC407A</color>
     <color name="event_detour">#ffff8800</color>
 
@@ -40,10 +39,12 @@
 
     <color name="color_black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="departure_active_white">#F3F3F3</color>
 
     <!-- dark theme -->
     <color name="color_main_background_dark">#212529</color>
     <color name="color_main_background_dark_elevated">#313438</color>
     <color name="color_text_dark">#FFFFFF</color>
+    <color name="departure_active_dark">#373A3E</color>
 
 </resources>

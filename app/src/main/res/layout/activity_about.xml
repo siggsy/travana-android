@@ -7,6 +7,39 @@
     tools:context="com.VegaSolutions.lpptransit.ui.activities.AboutActivity">
 
     <RelativeLayout
+        android:id="@+id/about_activity_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="7dp">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:padding="7dp"
+            android:src="@drawable/ic_back_arrow"
+            android:tint="?android:textColor"
+            tools:ignore="UseAppTint" />
+
+        <TextView
+            android:id="@+id/tv_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@+id/iv_back"
+            android:paddingStart="15dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="5dp"
+            android:text="@string/about"
+            android:textSize="24sp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/logo_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,6 +64,7 @@
                 android:textSize="45sp" />
 
             <TextView
+                android:id="@+id/tv_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-5dp"

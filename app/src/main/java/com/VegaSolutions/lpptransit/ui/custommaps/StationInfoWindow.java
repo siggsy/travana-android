@@ -45,7 +45,7 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
         RelativeLayout root;
 
         Map<String, Boolean> favourites = LppHelper.getFavouriteStations(context);
-        Boolean f = favourites.get(station.getRef_id());
+        Boolean f = favourites.get(station.getRefId());
         if (f == null) f = false;
 
         name = view.findViewById(R.id.station_nearby_name);
@@ -78,10 +78,10 @@ public class StationInfoWindow implements GoogleMap.InfoWindowAdapter {
 
 
         name.setText(station.getName());
-        center.setVisibility(Integer.parseInt(station.getRef_id()) % 2 == 0 ? View.GONE : View.VISIBLE);
+        center.setVisibility(Integer.parseInt(station.getRefId()) % 2 == 0 ? View.GONE : View.VISIBLE);
         fav.setVisibility(f ? View.VISIBLE : View.GONE);
 
-        for (String route : station.getRoute_groups_on_station()) {
+        for (String route : station.getRouteGroupsOnStation()) {
 
             View v = LayoutInflater.from(context).inflate(R.layout.template_route_number, null);
             TextView textView = v.findViewById(R.id.route_station_number);

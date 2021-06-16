@@ -28,17 +28,15 @@
     <string name="no_departures">Za danes ni napovedanih prihodov.</string>
     <string name="loading">nalaganje</string>
     <string name="opposite_error">Nasprotna postaja ne obstaja.</string>
-    <string name="network_error">Brez internetne povezave.</string>
     <string name="timed_out_error">Povezava je potekla.</string>
     <string name="unknown_error">Nekaj je šlo narobe. Prosimo poizkusite še enkrat. - %1$d</string>
-    <string name="refresh">Osveži</string>
     <string name="officially">V sodelovanju z</string>
     <string name="connection_refused">Povezava zavrnjena.</string>
     <string name="departures">Vozni red %s</string>
     <string name="detours">Obvozi</string>
     <string name="data_is_from">Podatki o obvozih so pridobljeni iz <b>www.lpp.si/obvozi</b>.</string>
     <string name="click_for_more">Klikni za več.</string>
-    <string name="error_loading">Napaka pri nalganju, poizkusi še enkrat.</string>
+    <string name="error_loading">Napaka pri nalganju</string>
     <string name="news">Novice</string>
     <string name="app_version">Verzija 2.0.2</string>
     <string name="relative_time">Relativen (npr. 7 min)</string>
@@ -46,5 +44,12 @@
     <string name="select_route">Izberi linijo</string>
     <string name="about">O aplikaciji</string>
     <string name="posted_time">Objavljeno • %1$s</string>
+    <string name="enable_location">Omogoči lokacijo.</string>
+    <string name="please_enable_location_permission_in_the_settings">Prosim omogoči lokacijo v nastavitvah telefona.</string>
+    <string name="permission_denied">Dovoljenje zavrjeno.</string>
+    <string name="add_favorites">Dodaj priljubljene</string>
+    <string name="try_again">Osveži</string>
+    <string name="no_internet_connection">Ni internetne povezave</string>
+    <string name="there_are_currently_no_detours">Trenutno ni obvozov.</string>
 
 </resources>

@@ -15,25 +15,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.ApiCallback;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
-import com.VegaSolutions.lpptransit.ui.activities.lpp.RouteActivity;
-import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
+import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
+import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
+import com.VegaSolutions.lpptransit.utility.ScreenState;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.flexbox.FlexboxLayout;
 
@@ -48,11 +48,17 @@ import java.util.Locale;
 import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.DONE;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.ERROR;
+import static com.VegaSolutions.lpptransit.utility.ScreenState.LOADING;
 
 public class LiveArrivalFragment extends Fragment {
 
+    public static final String TAG = "LiveArrivalFragment";
+
     private static final String STATION_ID = "station_id";
-    private static final int UPDATE_PERIOD = 5000;
+    private static final int UPDATE_PERIOD = 10000;
+    private static final int MAX_FAILED_CALLS_IN_ROW = 3;
 
     private String stationId;
     private Context context;
@@ -60,9 +66,21 @@ public class LiveArrivalFragment extends Fragment {
 
     private Adapter adapter;
 
-    SwipeRefreshLayout refreshLayout;
     RecyclerView rv;
-    View noArrErr;
+    LinearLayout noArrivalsContainer;
+    ProgressBar progressBar;
+    LinearLayout errorContainer;
+    TextView errorText;
+    ImageView errorImageView;
+    TextView tryAgainText;
+
+    private TravanaApp app;
+    private NetworkConnectivityManager networkConnectivityManager;
+
+    private ScreenState screenState = LOADING;
+
+    private boolean isFirstCallRetrieveLiveArrivals = true;
+    private int numberOfCallsFailedInRow = 0;
 
     private boolean hour;
     private int color, backColor;
@@ -72,38 +90,132 @@ public class LiveArrivalFragment extends Fragment {
     private final Runnable updater = new Runnable() {
         @Override
         public void run() {
-            Api.arrival(stationId, callback);
+            retrieveLiveArrivals();
             handler.postDelayed(updater, UPDATE_PERIOD);
         }
     };
-    private final ApiCallback<ArrivalWrapper> callback = (apiResponse, statusCode, success) -> {
 
-        // Cancel UI update if fragment is not attached to activity
-        if (context == null)
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
+        hour = sharedPreferences.getBoolean("hour", false);
+
+        if (getArguments() != null) {
+            stationId = getArguments().getString(STATION_ID);
+        }
+
+        app = TravanaApp.getInstance();
+        networkConnectivityManager = app.getNetworkConnectivityManager();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
+        initElements(root);
+
+        return root;
+
+    }
+
+    private void retrieveLiveArrivals() {
+
+        handler.removeCallbacks(updater);
+        handler.postDelayed(updater, UPDATE_PERIOD);
+
+        if (!networkConnectivityManager.isConnectionAvailable()) {
+            if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= MAX_FAILED_CALLS_IN_ROW) {
+                setupUi(ERROR);
+                setErrorUi(this.getResources().getString(R.string.no_internet_connection), R.drawable.ic_no_wifi);
+            } else {
+                numberOfCallsFailedInRow++;
+            }
+            isFirstCallRetrieveLiveArrivals = false;
             return;
+        }
+        if (isFirstCallRetrieveLiveArrivals || screenState == ERROR) {
+            setupUi(LOADING);
+        }
 
-        // Set UI
-        ((Activity) context).runOnUiThread(() -> {
-            refreshLayout.setRefreshing(false);
-            if (success && apiResponse != null) {
+        Api.arrival(stationId, (apiResponse, statusCode, success) -> {
+
+            if (context == null) {
+                return;
+            }
+
+            if (success) {
+                numberOfCallsFailedInRow = 0;
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
+                ((Activity) context).runOnUiThread(() -> {
+                    noArrivalsContainer.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
+                    adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
+                });
+                setupUi(DONE);
+            } else {
+                numberOfCallsFailedInRow++;
+                if (isFirstCallRetrieveLiveArrivals || numberOfCallsFailedInRow >= 5) {
+                    setupUi(ERROR);
+                    setErrorUi(this.getResources().getString(R.string.error_loading), R.drawable.ic_error_outline);
+                }
+            }
 
-                // Check if arrival list is not empty and refresh rv adapter
-                noArrErr.setVisibility(arrivalWrapper.getArrivals().isEmpty() ? View.VISIBLE : View.GONE);
-                adapter.setArrivals(RouteWrapper.getFromArrivals(context, arrivalWrapper.getArrivals()));
-                handler.removeCallbacks(updater);
-                handler.postDelayed(updater, UPDATE_PERIOD);
-            } else new CustomToast(context).showDefault(statusCode);
+        });
+        isFirstCallRetrieveLiveArrivals = false;
+    }
+
+    void setErrorUi(String errorName, int errorIconCode) {
+        ((Activity) context).runOnUiThread(() -> {
+            errorText.setText(errorName);
+            errorImageView.setImageResource(errorIconCode);
+        });
+    }
+
+    void setupUi(ScreenState screenState) {
+        this.screenState = screenState;
+        ((Activity) context).runOnUiThread(() -> {
+            switch (screenState) {
+                case DONE: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.rv.setVisibility(View.VISIBLE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case LOADING: {
+                    this.progressBar.setVisibility(View.VISIBLE);
+                    this.rv.setVisibility(View.GONE);
+                    this.noArrivalsContainer.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.GONE);
+                    break;
+                }
+                case ERROR: {
+                    this.progressBar.setVisibility(View.GONE);
+                    this.rv.setVisibility(View.GONE);
+                    this.noArrivalsContainer.setVisibility(View.GONE);
+                    this.errorContainer.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        });
+    }
+
+    private void initElements(View root) {
+        rv = root.findViewById(R.id.live_arrival_rv);
+        noArrivalsContainer = root.findViewById(R.id.live_arrival_no_arrivals_error);
+        progressBar = root.findViewById(R.id.progress_bar);
+        errorText = root.findViewById(R.id.tv_error);
+        errorImageView = root.findViewById(R.id.iv_error);
+        tryAgainText = root.findViewById(R.id.tv_try_again);
+        errorContainer = root.findViewById(R.id.ll_error_container);
+        rv = root.findViewById(R.id.live_arrival_rv);
+        noArrivalsContainer = root.findViewById(R.id.live_arrival_no_arrivals_error);
+
+        tryAgainText.setOnClickListener(v -> {
+            retrieveLiveArrivals();
         });
 
-    };
-
-
-
-    private void setupUI() {
-
         // Save default theme colors
-        int[] attribute = new int[] { android.R.attr.textColor, R.attr.backgroundElevatedColor };
+        int[] attribute = new int[]{android.R.attr.textColor, R.attr.backgroundElevatedColor};
         TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
         backColor = array.getColor(1, Color.WHITE);
         color = array.getColor(0, Color.BLACK);
@@ -121,43 +233,7 @@ public class LiveArrivalFragment extends Fragment {
             }
         });
 
-        refreshLayout.setRefreshing(true);
-        refreshLayout.setOnRefreshListener(() -> Api.arrival(stationId, callback));
-        refreshLayout.setColorSchemeColors(ContextCompat.getColor(context, R.color.colorAccent));
-        refreshLayout.setProgressBackgroundColorSchemeColor(backColor);
-
         handler = new Handler(Looper.myLooper());
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", MODE_PRIVATE);
-        hour = sharedPreferences.getBoolean("hour", false);
-
-        if (getArguments() != null) {
-            stationId = getArguments().getString(STATION_ID);
-        }
-
-        refreshLayout = getActivity().findViewById(R.id.live_arrival_swipe_refresh);
-        rv = getActivity().findViewById(R.id.live_arrival_rv);
-        noArrErr = getActivity().findViewById(R.id.live_arrival_no_arrivals_error);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View root = inflater.inflate(R.layout.fragment_live_arrival, container, false);
-
-        refreshLayout = root.findViewById(R.id.live_arrival_swipe_refresh);
-        rv = root.findViewById(R.id.live_arrival_rv);
-        noArrErr = root.findViewById(R.id.live_arrival_no_arrivals_error);
-
-        setupUI();
-
-        return root;
-
     }
 
     public static LiveArrivalFragment newInstance(String stationId) {
@@ -187,8 +263,7 @@ public class LiveArrivalFragment extends Fragment {
     public void onResume() {
         super.onResume();
         onHeaderChanged(rv.canScrollVertically(-1));
-        refreshLayout.setRefreshing(true);
-        Api.arrival(stationId, callback);
+        retrieveLiveArrivals();
     }
 
     @Override
@@ -226,15 +301,15 @@ public class LiveArrivalFragment extends Fragment {
 
             // Update ViewHolder.
             viewHolder.name.setText(route.name);
-            viewHolder.number.setText(route.arrivalObject.getRoute_name());
-            viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRoute_name()));
-            viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
+            viewHolder.number.setText(route.arrivalObject.getRouteName());
+            viewHolder.circle.getBackground().setTint(Colors.getColorFromString(route.arrivalObject.getRouteName()));
+            viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin : R.drawable.ic_outline_push_pin));
             viewHolder.route.setOnClickListener(v -> {
                 Intent i = new Intent(context, RouteActivity.class);
-                i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTrip_name());
-                i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRoute_name());
-                i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRoute_id());
-                i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTrip_id());
+                i.putExtra(RouteActivity.ROUTE_NAME, route.arrivalObject.getTripName());
+                i.putExtra(RouteActivity.ROUTE_NUMBER, route.arrivalObject.getRouteName());
+                i.putExtra(RouteActivity.ROUTE_ID, route.arrivalObject.getRouteId());
+                i.putExtra(RouteActivity.TRIP_ID, route.arrivalObject.getTripId());
                 i.putExtra(RouteActivity.STATION_ID, stationId);
                 startActivity(i);
             });
@@ -242,10 +317,10 @@ public class LiveArrivalFragment extends Fragment {
             viewHolder.favourite.setOnClickListener(v1 -> {
                 SharedPreferences sharedPreferences = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(route.arrivalObject.getTrip_id(), !route.favourite);
+                editor.putBoolean(route.arrivalObject.getTripId(), !route.favourite);
                 route.favourite = !route.favourite;
-              
-                viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin_24 : R.drawable.ic_outline_push_pin_24));
+
+                viewHolder.favourite.setImageDrawable(ContextCompat.getDrawable(getContext(), route.favourite ? R.drawable.ic_baseline_push_pin : R.drawable.ic_outline_push_pin));
 
                 // sort routes in the recyclerview and animate them
 
@@ -306,7 +381,7 @@ public class LiveArrivalFragment extends Fragment {
                 SimpleDateFormat formatter = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
                 // Set preferred time format
-                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEta_min()).toDate()) : String.format("%s min", arrival.getEta_min()));
+                arrival_time.setText(hour ? formatter.format(DateTime.now().plusMinutes(arrival.getEtaMin()).toDate()) : String.format("%s min", arrival.getEtaMin()));
                 arrival_time.setTextColor(color);
                 back.getBackground().setTint(backColor);
 
@@ -320,14 +395,12 @@ public class LiveArrivalFragment extends Fragment {
                         arrival_event_icon.setVisibility(View.GONE);
                         arrival_time.setText(getString(R.string.arrival).toUpperCase());
                         arrival_time.setTextColor(Color.WHITE);
-                        back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_arrival, null));
                         break;
                     case 3:
                         arrival_event.setVisibility(View.GONE);
                         arrival_event_icon.setVisibility(View.GONE);
                         arrival_time.setText(getString(R.string.detour).toUpperCase());
                         arrival_time.setTextColor(Color.WHITE);
-                        back.getBackground().setTint(ResourcesCompat.getColor(getResources(), R.color.event_detour, null));
                         break;
                     default:
                         arrival_event.setVisibility(View.GONE);
@@ -347,7 +420,7 @@ public class LiveArrivalFragment extends Fragment {
                 }
 
                 // Ignore "ghost" arrivals
-                if (!arrival.getVehicle_id().equals("22222222-2222-2222-2222-222222222222"))
+                if (!arrival.getVehicleId().equals("22222222-2222-2222-2222-222222222222"))
                     viewHolder.arrivals.addView(v);
 
             }
@@ -393,7 +466,7 @@ public class LiveArrivalFragment extends Fragment {
             if (arrivals == null || arrivals.size() == 0) {
                 return "";
             } else {
-                return arrivals.get(0).getRoute_name();
+                return arrivals.get(0).getRouteName();
             }
         }
 
@@ -410,10 +483,10 @@ public class LiveArrivalFragment extends Fragment {
             int value = getRouteNumber() * 1000000;
             String routeNameLetters = getRouteName().replaceAll("\\d", "");
             if (routeNameLetters.length() > 0) {
-                value += (char) getRouteName().replaceAll("\\d", "").charAt(0) * 1000;
+                value += getRouteName().replaceAll("\\d", "").charAt(0) * 1000;
             }
             if (name.length() > 0) {
-                value += (char) name.charAt(0);
+                value += name.charAt(0);
             }
             return value;
         }
@@ -425,11 +498,11 @@ public class LiveArrivalFragment extends Fragment {
 
             // Sort by route number
             Collections.sort(arrivals, (o1, o2) -> {
-                String o1S = o1.getRoute_name().replaceAll("[^0-9]", "");
-                String o2S = o2.getRoute_name().replaceAll("[^0-9]", "");
+                String o1S = o1.getRouteName().replaceAll("[^0-9]", "");
+                String o2S = o2.getRouteName().replaceAll("[^0-9]", "");
                 int o1V = Integer.parseInt(o1S);
                 int o2V = Integer.parseInt(o2S);
-                if (o1V == o2V) return o1.getRoute_name().compareTo(o2.getRoute_name());
+                if (o1V == o2V) return o1.getRouteName().compareTo(o2.getRouteName());
                 return Integer.compare(o1V, o2V);
             });
 
@@ -437,7 +510,7 @@ public class LiveArrivalFragment extends Fragment {
             int k = 0;
             for (int i = 0; i < arrivals.size(); i++) {
                 ArrivalWrapper.Arrival arrival = arrivals.get(i);
-                Boolean f = fav.get(arrival.getTrip_id());
+                Boolean f = fav.get(arrival.getTripId());
                 if (f != null && f) {
                     arrivals.remove(i);
                     arrivals.add(k, arrival);
@@ -447,14 +520,14 @@ public class LiveArrivalFragment extends Fragment {
 
             Map<String, RouteWrapper> map = new LinkedHashMap<>();
             for (ArrivalWrapper.Arrival arrival : arrivals) {
-                RouteWrapper route = map.get(arrival.getTrip_id());
+                RouteWrapper route = map.get(arrival.getTripId());
                 if (route == null) {
                     route = new RouteWrapper();
-                    route.favourite = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE).getBoolean(arrival.getTrip_id(), false);
+                    route.favourite = context.getSharedPreferences(LppHelper.ROUTE_FAVOURITES, MODE_PRIVATE).getBoolean(arrival.getTripId(), false);
                     ArrivalWrapper.Arrival.Stations stations = arrival.getStations();
-                    route.name = stations != null && stations.getArrival() != null && !stations.getArrival().equals("") ? stations.getArrival() : arrival.getTrip_name();
+                    route.name = stations != null && stations.getArrival() != null && !stations.getArrival().equals("") ? stations.getArrival() : arrival.getTripName();
                     route.arrivalObject = arrival;
-                    map.put(arrival.getTrip_id(), route);
+                    map.put(arrival.getTripId(), route);
                 }
                 route.arrivals.add(arrival);
             }

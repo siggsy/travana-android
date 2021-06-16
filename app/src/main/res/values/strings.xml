@@ -28,10 +28,8 @@
     <string name="no_departures">No scheduled arrivals for today.</string>
     <string name="loading">loading</string>
     <string name="opposite_error">Opposite station does not exist.</string>
-    <string name="network_error">No internet connection.</string>
     <string name="timed_out_error">Connection timed out.</string>
     <string name="unknown_error">Something went wrong. Please try again. - %1$d</string>
-    <string name="refresh">Refresh</string>
     <string name="connection_refused">Connection refused.</string>
     <string name="departures">Timetable %s</string>
     <string name="lpp_main_name" translatable="false">Ljubljanski potniški promet</string>
@@ -39,7 +37,7 @@
     <string name="detours">Detours</string>
     <string name="data_is_from">Data about detours are obtained from <b>www.lpp.si/obvozi</b></string>
     <string name="click_for_more">Click for more.</string>
-    <string name="error_loading">Error during loading, try again.</string>
+    <string name="error_loading">Error during loading.</string>
     <string name="news">News</string>
     <string name="lpp_news_webside" translatable="false">https://www.lpp.si/novice-kategorija/aktualno</string>
     <string name="app_version">Version 2.0.2</string>
@@ -49,5 +47,13 @@
     <string name="select_route">Select route</string>
     <string name="posted_time">posted • %1$s</string>
     <string name="about">About</string>
+    <string name="enable_location">Enable location</string>
+    <string name="please_enable_location_permission_in_the_settings">Please enable location permission in the settings.</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="add_favorites">Add favorites</string>
+    <string name="try_again">Try again</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="there_are_currently_no_detours">There are currently no detours.</string>
+    <string name="version">Version</string>
 
 </resources>

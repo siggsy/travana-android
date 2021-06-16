@@ -1,51 +1,64 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Route {
 
-    private String trip_id;
-    private String route_id;
-    private String route_number;
-    private String route_name;
-    private String short_route_name;
-    private String trip_int_id;
+    @SerializedName("trip_id")
+    private String tripId;
 
-    public String getTrip_id() {
-        return trip_id;
+    @SerializedName("route_id")
+    private String routeId;
+
+    @SerializedName("route_number")
+    private String routeNumber;
+
+    @SerializedName("route_name")
+    private String routeName;
+
+    @SerializedName("short_route_name")
+    private String shortRouteName;
+
+    @SerializedName("trip_int_id")
+    private String tripIntId;
+
+    public String getTripId() {
+        return tripId;
     }
 
-    public String getRoute_id() {
-        return route_id;
+    public String getRouteId() {
+        return routeId;
     }
 
-    public String getRoute_number() {
-        return route_number;
+    public String getRouteNumber() {
+        return routeNumber;
     }
 
-    public String getRoute_name() {
-        return route_name;
+    public String getRouteName() {
+        return routeName;
     }
 
-    public String getRoute_short_name() {
-        return short_route_name;
+    public String getRouteShortName() {
+        return shortRouteName;
     }
 
-    public String getShort_route_name() {
-        return short_route_name;
+    public String getShortRouteName() {
+        return shortRouteName;
     }
 
-    public String getTrip_int_id() {
-        return trip_int_id;
+    public String getTripIntId() {
+        return tripIntId;
     }
 
     @Override
     public String toString() {
         return "Route{" +
-                "trip_id='" + trip_id + '\'' +
-                ", route_id='" + route_id + '\'' +
-                ", route_number='" + route_number + '\'' +
-                ", route_name='" + route_name + '\'' +
-                ", short_route_name='" + short_route_name + '\'' +
-                ", trip_int_id='" + trip_int_id + '\'' +
+                "tripId='" + tripId + '\'' +
+                ", routeId='" + routeId + '\'' +
+                ", routeNumber='" + routeNumber + '\'' +
+                ", routeName='" + routeName + '\'' +
+                ", shortRouteName='" + shortRouteName + '\'' +
+                ", tripIntId='" + tripIntId + '\'' +
                 '}';
     }
 }

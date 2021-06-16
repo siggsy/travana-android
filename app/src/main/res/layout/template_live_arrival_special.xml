@@ -12,7 +12,7 @@
         android:id="@+id/arrival_time_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/stretched_circle"
+        android:background="@color/transparent"
         android:orientation="vertical"
         android:padding="2dp"
         android:paddingStart="6dp"

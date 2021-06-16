@@ -78,7 +78,7 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:tint="?android:textColor"
-                app:srcCompat="@drawable/ic_wifi_off_24px"
+                app:srcCompat="@drawable/ic_no_wifi"
                 tools:ignore="UseAppTint" />
 
             <TextView
@@ -111,7 +111,7 @@
                 android:padding="6dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/refresh"
+                android:text="@string/try_again"
                 android:textAllCaps="false" />
         </LinearLayout>
 

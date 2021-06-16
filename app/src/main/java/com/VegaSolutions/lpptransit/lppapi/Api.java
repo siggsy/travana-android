@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,7 +69,11 @@ public class Api {
     public static final String DETOURS = "/javni-prevoz/obvozi/";
 
     public static final String TAG = "Api";
+
     private static final OkHttpClient httpClient = new OkHttpClient.Builder()
+            .connectTimeout(7, TimeUnit.SECONDS)
+            .writeTimeout(7, TimeUnit.SECONDS)
+            .readTimeout(7, TimeUnit.SECONDS)
             .addInterceptor(new GzipInterceptor())
             .build();
     private static final Headers headers = Headers.of(

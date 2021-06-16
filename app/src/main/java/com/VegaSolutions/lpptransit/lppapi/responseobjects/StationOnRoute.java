@@ -1,26 +1,34 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 
 public class StationOnRoute {
 
     private String name;
-    private int station_code;
-    private int order_no;
+
+    @SerializedName("station_code")
+    private int stationCode;
+
+    @SerializedName("order_no")
+    private int orderNo;
+
     private double latitude;
     private double longitude;
-    private int station_int_id;
+
+    @SerializedName("station_int_id")
+    private int stationIntId;
 
     public String getName() {
         return name;
     }
 
     public int getCode_id() {
-        return station_code;
+        return stationCode;
     }
 
-    public int getOrder_no() {
-        return order_no;
+    public int getOrderNo() {
+        return orderNo;
     }
 
     public double getLatitude() {
@@ -35,11 +43,11 @@ public class StationOnRoute {
         return new LatLng(latitude, longitude);
     }
 
-    public int getStation_code() {
-        return station_code;
+    public int getStationCode() {
+        return stationCode;
     }
 
-    public int getStation_int_id() {
-        return station_int_id;
+    public int getStationIntId() {
+        return stationIntId;
     }
 }

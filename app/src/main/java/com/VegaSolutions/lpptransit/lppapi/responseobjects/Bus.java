@@ -1,28 +1,43 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 
 public class Bus {
 
-    private String bus_unit_id;
+    @SerializedName("bus_unit_id")
+    private String busUnitId;
+
     private String name;
     private String vin;
     private String timestamp;
 
-    private double coordinate_x;
-    private double coordinate_y;
-    private double coordinate_z;
+    @SerializedName("coordinate_x")
+    private double coordinateX;
 
-    private float cardinal_direction;
-    private float ground_speed;
-    private boolean ignition_value;
-    private boolean engine_value;
+    @SerializedName("coordinate_y")
+    private double coordinateY;
 
-    private String driver_id;
+    @SerializedName("coordinate_z")
+    private double coordinateZ;
+
+    @SerializedName("cardinal_direction")
+    private float cardinalDirection;
+
+    @SerializedName("ground_speed")
+    private float groundSpeed;
+
+    @SerializedName("ignition_value")
+    private boolean ignitionValue;
+
+    @SerializedName("engine_value")
+    private boolean engineValue;
+
+    private String driverId;
     private int odo;
 
-    public String getBus_unit_id() {
-        return bus_unit_id;
+    public String getBusUnitId() {
+        return busUnitId;
     }
 
     public String getName() {
@@ -37,36 +52,36 @@ public class Bus {
         return timestamp;
     }
 
-    public double getCoordinate_x() {
-        return coordinate_x;
+    public double getCoordinateX() {
+        return coordinateX;
     }
 
-    public double getCoordinate_y() {
-        return coordinate_y;
+    public double getCoordinateY() {
+        return coordinateY;
     }
 
-    public double getCoordinate_z() {
-        return coordinate_z;
+    public double getCoordinateZ() {
+        return coordinateZ;
     }
 
-    public float getCardinal_direction() {
-        return cardinal_direction;
+    public float getCardinalDirection() {
+        return cardinalDirection;
     }
 
-    public float getGround_speed() {
-        return ground_speed;
+    public float getGroundSpeed() {
+        return groundSpeed;
     }
 
-    public boolean isIgnition_value() {
-        return ignition_value;
+    public boolean isIgnitionValue() {
+        return ignitionValue;
     }
 
-    public boolean isEngine_value() {
-        return engine_value;
+    public boolean isEngineValue() {
+        return engineValue;
     }
 
-    public String getDriver_id() {
-        return driver_id;
+    public String getDriverId() {
+        return driverId;
     }
 
     public int getOdo() {
@@ -74,6 +89,6 @@ public class Bus {
     }
 
     public LatLng getLatLng() {
-        return new LatLng(coordinate_y, coordinate_x);
+        return new LatLng(coordinateY, coordinateX);
     }
 }
