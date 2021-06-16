@@ -38,5 +38,7 @@
         <item name="android:colorEdgeEffect">@color/divider_dark</item>
         <item name="departureHourColor">#12FFFFFF</item>
         <item name="android:navigationBarColor">@color/color_main_background_dark</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
+
 </resources>

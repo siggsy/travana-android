@@ -1,8 +1,12 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -80,6 +85,8 @@ public class DepartureActivity extends AppCompatActivity {
     ImageView errorImageView;
     TextView tryAgainText;
 
+    int backTopMargin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +97,8 @@ public class DepartureActivity extends AppCompatActivity {
 
         app = TravanaApp.getInstance();
         networkConnectivityManager = app.getNetworkConnectivityManager();
+
+        setScreenSettings();
 
         // Get activity parameters
         stationCode = getIntent().getStringExtra(STATION_CODE);
@@ -112,6 +121,33 @@ public class DepartureActivity extends AppCompatActivity {
         titleText.setText(getString(R.string.departures, sdf.format(now.toDate())));
 
         retrieveDepartures();
+    }
+
+    private void setScreenSettings() {
+        Window window = getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | (ViewGroupUtils.isDarkTheme(this) ?
+                        0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR));
+            } else {
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | (ViewGroupUtils.isDarkTheme(this) ?
+                        0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+            }
+        } else {
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+        window.setStatusBarColor(Color.TRANSPARENT);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) back.getLayoutParams();
+            headerParams.setMargins(0, backTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            back.setLayoutParams(headerParams);
+            return insets.consumeSystemWindowInsets();
+        });
     }
 
     private void retrieveDepartures() {
@@ -208,6 +244,8 @@ public class DepartureActivity extends AppCompatActivity {
         errorContainer = findViewById(R.id.ll_error_container);
 
         back.setOnClickListener(v -> super.onBackPressed());
+        ViewGroup.MarginLayoutParams backParams = (ViewGroup.MarginLayoutParams) back.getLayoutParams();
+        backTopMargin = backParams.topMargin;
 
         tryAgainText.setOnClickListener(v -> {
             retrieveDepartures();

@@ -395,12 +395,14 @@ public class LiveArrivalFragment extends Fragment {
                         arrival_event_icon.setVisibility(View.GONE);
                         arrival_time.setText(getString(R.string.arrival).toUpperCase());
                         arrival_time.setTextColor(Color.WHITE);
+                        back.getBackground().setTint(ContextCompat.getColor(context, R.color.colorAccent));
                         break;
                     case 3:
                         arrival_event.setVisibility(View.GONE);
                         arrival_event_icon.setVisibility(View.GONE);
                         arrival_time.setText(getString(R.string.detour).toUpperCase());
                         arrival_time.setTextColor(Color.WHITE);
+                        back.getBackground().setTint(ContextCompat.getColor(context, R.color.event_detour));
                         break;
                     default:
                         arrival_event.setVisibility(View.GONE);

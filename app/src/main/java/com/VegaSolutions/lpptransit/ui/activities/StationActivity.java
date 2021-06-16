@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
@@ -31,25 +32,16 @@ import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.animations.ElevationAnimation;
-import com.VegaSolutions.lpptransit.ui.custommaps.StationInfoWindow;
 import com.VegaSolutions.lpptransit.ui.errorhandlers.CustomToast;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.LiveArrivalFragment;
 import com.VegaSolutions.lpptransit.ui.fragments.lpp.RoutesOnStationFragment;
 import com.VegaSolutions.lpptransit.utility.LppHelper;
-import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.tabs.TabLayout;
 
-import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
-
-public class StationActivity extends MapFragmentActivity implements FragmentHeaderCallback {
+public class StationActivity extends AppCompatActivity implements FragmentHeaderCallback {
 
     public static final String TAG = "StationActivity";
     public static final String STATION = "station";
@@ -61,15 +53,12 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
     ImageView fav, back;
     ViewPager viewPager;
     TabLayout tabLayout;
-    ViewPagerBottomSheetBehavior bottomSheetBehavior;
 
-    LatLng lastValidMapCenter;
+    int headerTopMargin = 0;
 
-    View bottom;
-    int bottomTopMargin = 0;
-
-    View mapFilter;
     View shadow;
+    View root;
+    View headerContainer;
 
     Adapter adapter;
 
@@ -88,9 +77,8 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         setContentView(R.layout.activity_station);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
 
-        View root = findViewById(R.id.rootConstraint);
+        root = findViewById(R.id.root);
 
         app = TravanaApp.getInstance();
 
@@ -111,74 +99,33 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | (ViewGroupUtils.isDarkTheme(this) ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | (ViewGroupUtils.isDarkTheme(this) ?
+                        0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR));
+            } else {
+                window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | (ViewGroupUtils.isDarkTheme(this) ?
+                        0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+            }
         } else {
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
         window.setStatusBarColor(Color.TRANSPARENT);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
-            ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
-            bottomParams.setMargins(0, bottomTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
-            bottom.setLayoutParams(bottomParams);
+            ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) headerContainer.getLayoutParams();
+            headerParams.setMargins(0, headerTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            headerContainer.setLayoutParams(headerParams);
             return insets.consumeSystemWindowInsets();
         });
-    }
-
-    private void setMapPaddingBottom(Float offset) {
-        float maxMapPaddingBottom = (float) bottomSheetBehavior.getPeekHeight();
-
-        if (mMap != null) {
-            setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
-        }
     }
 
     private void saveRecentSearchedStation() {
         Api.addSavedSearchedItemsIds(station.getRefId(), this);
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        super.onMapReady(googleMap);
-
-        // Setup Google maps UI
-        setPadding(0,0,0, bottomSheetBehavior.getPeekHeight());
-
-        mMap.setInfoWindowAdapter(new StationInfoWindow(this));
-        Marker m = mMap.addMarker(new MarkerOptions().position(station.getLatLng()).icon(MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.station_circle))).anchor(0.5f, 0.5f));
-        mMap.setOnCameraIdleListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
-        m.setTag(station);
-        m.showInfoWindow();
-        mMap.setOnInfoWindowClickListener(marker -> bottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED));
-
-        // Focus on station
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(station.getLatLng(), 12.5f));
-
-    }
-
     private void initElements(View root) {
-        // Get bottom sheet behaviour for controlling expanding and collapsing
-        bottomSheetBehavior = ViewPagerBottomSheetBehavior.from(root);
-        bottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-
-        bottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                switch (bottomSheetBehavior.getState()) {
-                    case ViewPagerBottomSheetBehavior.STATE_DRAGGING:
-                    case ViewPagerBottomSheetBehavior.STATE_SETTLING:
-                        setMapPaddingBottom(slideOffset);
-                        mapFilter.setAlpha(slideOffset);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(lastValidMapCenter));
-                        break;
-                }
-            }
-        });
 
         // Assign all UI elements
         name = findViewById(R.id.station_title);
@@ -189,16 +136,11 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
         viewPager = findViewById(R.id.station_pager);
         tabLayout = findViewById(R.id.station_tab_layout);
         back = findViewById(R.id.back);
-        locationIcon = findViewById(R.id.maps_location_icon);
         shadow = findViewById(R.id.shadow);
-        bottom = findViewById(R.id.bottom_station);
-        mapFilter = findViewById(R.id.map_filter);
+        headerContainer = findViewById(R.id.headerContainer);
 
-        ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
-        bottomTopMargin = bottomParams.topMargin;
-
-        toHide.add(root);
-        toHide.add(shadow);
+        ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) headerContainer.getLayoutParams();
+        headerTopMargin = headerParams.topMargin;
 
         // Set opposite station button listener
         oppositeBtn.setOnClickListener(view -> {
@@ -245,7 +187,7 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
 
     private void setupStationDetails() {
 
-        animation = new ElevationAnimation(16, header, mapFilter);
+        animation = new ElevationAnimation(16, header);
 
         // Set header
         name.setText(station.getName());
@@ -280,15 +222,6 @@ public class StationActivity extends MapFragmentActivity implements FragmentHead
     @Override
     public void onHeaderChanged(boolean selected) {
         animation.elevate(selected);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (bottomSheetBehavior.getState() == ViewPagerBottomSheetBehavior.STATE_COLLAPSED) {
-            bottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     class Adapter extends FragmentPagerAdapter {
