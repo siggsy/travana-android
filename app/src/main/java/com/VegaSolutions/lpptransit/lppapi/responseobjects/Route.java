@@ -1,6 +1,20 @@
 package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
+import android.graphics.Color;
+import android.util.Log;
+
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+import com.google.maps.android.data.Geometry;
+import com.google.maps.android.data.geojson.GeoJsonFeature;
+import com.google.maps.android.data.geojson.GeoJsonGeometryCollection;
+import com.google.maps.android.data.geojson.GeoJsonLineString;
+import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
 
 public class Route {
 
@@ -21,6 +35,9 @@ public class Route {
 
     @SerializedName("trip_int_id")
     private String tripIntId;
+
+    @SerializedName("geojson_shape")
+    private JsonObject geoJSON;
 
     public String getTripId() {
         return tripId;
@@ -48,6 +65,15 @@ public class Route {
 
     public String getTripIntId() {
         return tripIntId;
+    }
+
+    public JSONObject getGeoJSON() {
+        try {
+            return new JSONObject(geoJSON.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

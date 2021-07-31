@@ -58,9 +58,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.maps.android.PolyUtil;
+import com.google.maps.android.data.geojson.GeoJsonFeature;
+import com.google.maps.android.data.geojson.GeoJsonLayer;
+import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
 import com.google.maps.android.ui.IconGenerator;
 
 import org.joda.time.DateTime;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -269,18 +274,38 @@ public class RouteActivity extends MapFragmentActivity {
                     }
 
                     // Connect stations with polyline and move the camera.
-                    runOnUiThread(() -> {
-                        if (!stationsOnRoute.isEmpty()) {
-                            LatLngBounds bounds = builder.build();
+                    Api.routes(routeId, true, (routeShapeResponse, shapeStatusCode, shapeSuccess) -> {
+                        runOnUiThread(() -> {
+                            if (shapeSuccess && routeShapeResponse != null) {
+                                Route route = null;
+                                for (Route r : routeShapeResponse.getData()) {
+                                    if (r.getTripId().equals(tripId)) {
+                                        route = r;
+                                    }
+                                }
+                                if (route != null) {
+                                    Log.e(TAG, route.getGeoJSON().toString());
+                                    GeoJsonLayer layer = new GeoJsonLayer(mMap, route.getGeoJSON());
+                                    GeoJsonLineStringStyle style = new GeoJsonLineStringStyle();
+                                    style.setColor(Colors.getColorFromString(routeNumber));
+                                    for (GeoJsonFeature feature : layer.getFeatures()) {
+                                        feature.setLineStringStyle(style);
+                                    }
+                                    layer.addLayerToMap();
+                                    LatLngBounds bounds = builder.build();
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
+                                }
+                            } else if (!stationsOnRoute.isEmpty()) {
+                                LatLngBounds bounds = builder.build();
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
+                                mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(Colors.getColorFromString(routeNumber)));
+                            } else {
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
+                            }
 
-                            mMap.addPolyline(new PolylineOptions().addAll(latLngs).width(14f).color(Colors.getColorFromString(routeNumber))); // ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
-
-                        } else {
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ljubljana, 11.5f));
-                        }
+                            isRouteDrawn = true;
+                        });
                     });
-                    isRouteDrawn = true;
                 }
                 setupUi(ScreenState.DONE);
             } else {

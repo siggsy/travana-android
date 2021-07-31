@@ -3,6 +3,7 @@ package com.VegaSolutions.lpptransit.lppapi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.VegaSolutions.lpptransit.BuildConfig;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
@@ -112,6 +113,12 @@ public class Api {
     public static void routes(String routeId, ApiCallback<List<Route>> callback) {
         request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
                 "route-id", routeId);
+    }
+
+    public static void routes(String routeId, boolean shape, ApiCallback<List<Route>> callback) {
+        request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
+                "route-id", routeId,
+                "shape", shape ? "1" : "0");
     }
 
     public static void stationsOnRoute(String tripId, ApiCallback<List<StationOnRoute>> callback) {
@@ -284,8 +291,14 @@ public class Api {
                         String r = response.body().string();
                         ApiResponse<T> data = new Gson().fromJson(r, type);
                         callback.onComplete(data, response.code(), true);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
+                        try {
+                            Log.e(TAG, response.body().string());
+                        } catch (Exception ea) {
+                            e.printStackTrace();
+                        }
+
                         callback.onComplete(null, -4, false);
                     }
                 } else {
