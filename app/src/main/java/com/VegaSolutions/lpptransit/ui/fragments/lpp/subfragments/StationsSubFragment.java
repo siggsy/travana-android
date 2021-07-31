@@ -1,6 +1,7 @@
 package com.VegaSolutions.lpptransit.ui.fragments.lpp.subfragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -145,14 +146,18 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     }
 
     void setErrorUi(String errorName, int errorIconCode) {
-        getActivity().runOnUiThread(() -> {
+        Activity activity = getActivity();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
             errorText.setText(errorName);
             errorImageView.setImageResource(errorIconCode);
         });
     }
 
     public void setupUi(ScreenState screenState) {
-        getActivity().runOnUiThread(() -> {
+        Activity activity = getActivity();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
             switch (screenState) {
                 case DONE: {
                     this.progressBar.addTask(view -> {
@@ -214,7 +219,9 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     public void setStations() {
 
         // Update UI
-        getActivity().runOnUiThread(() -> {
+        Activity activity = getActivity();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
             // Show favourite stations
             if (type == TYPE_FAVOURITE) {
                 setFavouriteStations(app.getStations());
@@ -295,7 +302,9 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     }
 
     private void updateLocationList(LatLng location) {
-        getActivity().runOnUiThread(() -> {
+        Activity activity = getActivity();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
             if (location != null) {
                 this.location = location;
                 setNearbyStations(app.getStations());

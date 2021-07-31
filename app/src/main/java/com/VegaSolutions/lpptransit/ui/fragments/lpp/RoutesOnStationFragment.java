@@ -1,6 +1,7 @@
 package com.VegaSolutions.lpptransit.ui.fragments.lpp;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -126,10 +127,10 @@ public class RoutesOnStationFragment extends Fragment {
 
         // Query all routes on station
         Api.routesOnStation(stationId, (apiResponse, statusCode, success) -> {
+            Activity activity = getActivity();
+            if (activity == null) return;
             if (success) {
-                getActivity().runOnUiThread(() -> {
-                    adapter.setRoutes(apiResponse.getData());
-                });
+                activity.runOnUiThread(() -> adapter.setRoutes(apiResponse.getData()));
                 setupUi(DONE);
             } else {
                 setupUi(ERROR);
@@ -140,14 +141,18 @@ public class RoutesOnStationFragment extends Fragment {
     }
 
     void setErrorUi(String errorName, int errorIconCode) {
-        getActivity().runOnUiThread(() -> {
+        Activity activity = getActivity();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
             errorText.setText(errorName);
             errorImageView.setImageResource(errorIconCode);
         });
     }
 
     void setupUi(ScreenState screenState) {
-        getActivity().runOnUiThread(() -> {
+        Activity activity = getActivity();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
             switch (screenState) {
                 case DONE: {
                     this.progressBar.setVisibility(View.GONE);
@@ -245,7 +250,6 @@ public class RoutesOnStationFragment extends Fragment {
             RouteOnStation route = filteredRoutes.get(position);
 
             // Set route name and number
-
             String name = route.getRouteGroupName();
             holder.name.setText(name);
             holder.number.setText(route.getRouteNumber());
