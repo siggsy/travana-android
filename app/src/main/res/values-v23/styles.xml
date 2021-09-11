@@ -23,6 +23,7 @@
         <item name="departureHourColor">@color/light_gray</item>
         <item name="android:navigationBarColor">@color/color_main_background</item>
         <item name="android:windowBackground">@color/color_main_background</item>
+        <item name="android:editTextColor">@color/color_text</item>
     </style>
 
 </resources>
