@@ -51,5 +51,5 @@
     <string name="try_again">Osveži</string>
     <string name="no_internet_connection">Ni internetne povezave</string>
     <string name="there_are_currently_no_detours">Trenutno ni obvozov.</string>
-
+    <string name="follow_system_theme">Sledi sistemski temi</string>
 </resources>

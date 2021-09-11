@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -19,6 +20,7 @@ import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -26,7 +28,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MapFragmentActivity extends FragmentActivity implements OnMapReadyCallback, TravanaLocationManager.TravanaLocationListener {
+public abstract class MapFragmentActivity extends AppCompatActivity implements OnMapReadyCallback, TravanaLocationManager.TravanaLocationListener {
 
     protected GoogleMap mMap;
 
@@ -70,7 +72,9 @@ public abstract class MapFragmentActivity extends FragmentActivity implements On
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setRotateGesturesEnabled(false);
-        mMap.setMapStyle(new MapStyleOptions(ViewGroupUtils.isDarkTheme(this) ? getString(R.string.dark_2) : getString(R.string.white)));
+        if (ViewGroupUtils.isDarkTheme(this)) {
+            mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark)));
+        }
 
         // Set location button location callback.
         if (MapUtility.checkIfAtLeastOnePermissionPermitted(this)) {

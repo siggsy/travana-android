@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.BlendModeColorFilterCompat;
@@ -350,11 +351,8 @@ public class RouteActivity extends MapFragmentActivity {
             }
         });
 
-        int[] attribute = new int[]{android.R.attr.textColor, R.attr.backgroundViewColor};
-        TypedArray array = obtainStyledAttributes(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
-        backColor = array.getColor(1, Color.WHITE);
+        backColor = ContextCompat.getColor(this, R.color.color_main_background);
         color = ViewGroupUtils.isDarkTheme(this) ? Color.WHITE : Color.BLACK;
-        array.recycle();
 
         // Header elevation animation
         elevationAnimation = new ElevationAnimation(16, header, mapFilter);
@@ -368,7 +366,7 @@ public class RouteActivity extends MapFragmentActivity {
         v.findViewById(R.id.stroke).getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN));
         v.findViewById(R.id.solid).getBackground().setColorFilter(
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                        ContextCompat.getColor(this, ViewGroupUtils.isDarkTheme(this) ? R.color.color_main_background_dark : R.color.color_main_background), BlendModeCompat.SRC_IN));
+                        ContextCompat.getColor(this, R.color.color_main_background), BlendModeCompat.SRC_IN));
         IconGenerator generator = new IconGenerator(this);
         generator.setBackground(null);
         generator.setContentView(v);
@@ -550,7 +548,7 @@ public class RouteActivity extends MapFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+
         setContentView(R.layout.activity_route);
         initElements();
 

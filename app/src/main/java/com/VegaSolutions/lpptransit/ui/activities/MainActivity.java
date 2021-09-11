@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -53,7 +54,7 @@ import java.util.List;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, FragmentHeaderCallback {
+public class  MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, FragmentHeaderCallback {
 
     public static final String TAG = "MainActivity";
 
@@ -92,7 +93,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+
         setContentView(R.layout.app_nav_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);

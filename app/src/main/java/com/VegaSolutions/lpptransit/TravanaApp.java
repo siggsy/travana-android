@@ -1,9 +1,13 @@
 package com.VegaSolutions.lpptransit;
 
 import android.app.Application;
+import android.content.res.Resources;
+
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
+import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
 import java.util.ArrayList;
 
@@ -22,6 +26,12 @@ public class TravanaApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        AppCompatDelegate.setDefaultNightMode(ViewGroupUtils
+                .Theme.valueOf(
+                        getSharedPreferences("settings", MODE_PRIVATE)
+                                .getString("app_theme", "NO")
+                ).value);
+
         instance = this;
         networkConnectivityManager = new NetworkConnectivityManager(this);
     }

@@ -2,11 +2,14 @@ package com.VegaSolutions.lpptransit.ui.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -17,7 +20,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     ImageView back;
 
-    RadioButton buttonWhite, buttonDark, buttonMin, buttonHour;
+    RadioButton buttonWhite, buttonDark, buttonAuto, buttonMin, buttonHour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences("settings", MODE_PRIVATE);
         boolean darkTheme = ViewGroupUtils.isDarkTheme(this);
         boolean hour = sharedPreferences.getBoolean("hour", false);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+
         setContentView(R.layout.activity_settings);
 
         back = findViewById(R.id.back);
@@ -33,30 +36,29 @@ public class SettingsActivity extends AppCompatActivity {
 
         buttonDark = findViewById(R.id.radio_dark);
         buttonWhite = findViewById(R.id.radio_white);
+        buttonAuto = findViewById(R.id.radio_auto);
         buttonMin = findViewById(R.id.radio_minute);
         buttonHour = findViewById(R.id.radio_hour);
 
-        if (darkTheme) buttonDark.setChecked(true);
-        else buttonWhite.setChecked(true);
+        String appTheme = sharedPreferences.getString("app_theme", ViewGroupUtils.Theme.NO.name());
+
+        switch (ViewGroupUtils.Theme.valueOf(appTheme)) {
+            case NO: buttonWhite.setChecked(true); break;
+            case YES: buttonDark.setChecked(true); break;
+            case AUTO: buttonAuto.setChecked(true); break;
+        }
 
         if (hour) buttonHour.setChecked(true);
         else buttonMin.setChecked(true);
-
-        setResult(1);
 
         buttonDark.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
             if (isChecked) {
                 // Set dark theme
-                setResult(SETTINGS_UPDATE);
-
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("app_theme", true);
+                editor.putString("app_theme", ViewGroupUtils.Theme.YES.name());
                 editor.apply();
-
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                finish();
             }
 
         });
@@ -66,19 +68,23 @@ public class SettingsActivity extends AppCompatActivity {
             if (isChecked) {
 
                 // Set white theme
-                setResult(SETTINGS_UPDATE);
-
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("app_theme", false);
+                editor.putString("app_theme", ViewGroupUtils.Theme.NO.name());
                 editor.apply();
-
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-                finish();
             }
 
         });
 
+        buttonAuto.setVisibility(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? View.VISIBLE : View.GONE);
+        buttonAuto.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("app_theme", ViewGroupUtils.Theme.AUTO.name());
+                editor.apply();
+            }
+        });
 
         buttonMin.setOnCheckedChangeListener((buttonView, isChecked) -> {
 

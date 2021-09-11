@@ -18,27 +18,11 @@
         <item name="android:textColorHint">@color/text_hint</item>
         <item name="dividerColor">@color/light_gray</item>
         <item name="colorPrimaryDark">#FFFFFF</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">@bool/isLightTheme</item>
         <item name="elevation">2dp</item>
         <item name="departureHourColor">@color/light_gray</item>
-    </style>
-
-    <style name="DarkTheme" parent="MyTheme">
-        <item name="backgroundViewColor">@color/color_main_background_dark</item>
-        <item name="android:textColor">@color/color_text_dark</item>
-        <item name="containerBackground">@drawable/stretched_circle</item>
-        <item name="containerBorderColor">@color/light_gray_2</item>
-        <item name="android:editTextColor">@android:color/white</item>
-        <item name="android:textColorHint">#ffA2A2A2</item>
-        <item name="dividerColor">@color/divider_dark</item>
-        <item name="colorPrimaryDark">@color/color_main_background_dark</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowBackground">@color/color_main_background_dark</item>
-        <item name="backgroundElevatedColor">@color/color_main_background_dark_elevated</item>
-        <item name="android:colorEdgeEffect">@color/divider_dark</item>
-        <item name="departureHourColor">#12FFFFFF</item>
-        <item name="android:navigationBarColor">@color/color_main_background_dark</item>
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarColor">@color/color_main_background</item>
+        <item name="android:windowBackground">@color/color_main_background</item>
     </style>
 
 </resources>

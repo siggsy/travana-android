@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -23,7 +24,7 @@ public class AboutActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+
         setContentView(R.layout.activity_about);
         tvMail = findViewById(R.id.mail_tv);
         ivBack = findViewById(R.id.iv_back);

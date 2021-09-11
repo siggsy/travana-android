@@ -32,6 +32,7 @@
 
     <!-- default 'white' theme -->
     <color name="color_main_background">#FFFFFFFF</color>
+    <color name="color_main_background_elevated">#FFFFFFFF</color>
     <color name="color_text">#000000</color>
 
     <color name="color_main_gray">#534F4F</color>
@@ -39,12 +40,7 @@
 
     <color name="color_black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="departure_active_white">#F3F3F3</color>
-
-    <!-- dark theme -->
-    <color name="color_main_background_dark">#212529</color>
-    <color name="color_main_background_dark_elevated">#313438</color>
-    <color name="color_text_dark">#FFFFFF</color>
-    <color name="departure_active_dark">#373A3E</color>
+    <color name="departure_active">#F3F3F3</color>
+    <bool name="isLightTheme">true</bool>
 
 </resources>

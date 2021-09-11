@@ -86,6 +86,14 @@
             android:buttonTint="?android:textColor"
             android:text="@string/dark_theme"
             android:textColor="?android:textColor" />
+
+        <RadioButton
+                android:id="@+id/radio_auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="?android:textColor"
+                android:text="@string/follow_system_theme"
+                android:textColor="?android:textColor" />
     </RadioGroup>
 
     <RadioGroup

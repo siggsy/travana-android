@@ -215,11 +215,8 @@ public class LiveArrivalFragment extends Fragment {
         });
 
         // Save default theme colors
-        int[] attribute = new int[]{android.R.attr.textColor, R.attr.backgroundElevatedColor};
-        TypedArray array = context.obtainStyledAttributes(ViewGroupUtils.isDarkTheme(context) ? R.style.DarkTheme : R.style.WhiteTheme, attribute);
-        backColor = array.getColor(1, Color.WHITE);
-        color = array.getColor(0, Color.BLACK);
-        array.recycle();
+        backColor = ContextCompat.getColor(context, R.color.color_main_background_elevated);
+        color = ContextCompat.getColor(context, R.color.color_text);
 
         adapter = new Adapter();
         rv.setLayoutManager(new LinearLayoutManager(context));

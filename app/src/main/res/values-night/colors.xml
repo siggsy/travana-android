@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- dark theme -->
+    <color name="color_main_background">#212529</color>
+    <color name="color_main_background_elevated">#313438</color>
+    <color name="color_text">#FFFFFF</color>
+    <color name="departure_active">#373A3E</color>
+    <bool name="isLightTheme">false</bool>
+</resources>

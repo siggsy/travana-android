@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -91,7 +92,7 @@ public class DepartureActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(ViewGroupUtils.isDarkTheme(this) ? R.style.DarkTheme : R.style.WhiteTheme);
+
         setContentView(R.layout.activity_departure);
         initElements();
 
@@ -304,7 +305,7 @@ public class DepartureActivity extends AppCompatActivity {
             }
 
             if (timetable.isCurrent()) {
-                holder.container.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), ViewGroupUtils.isDarkTheme(getApplicationContext()) ? R.color.departure_active_dark : R.color.departure_active_white));
+                holder.container.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.departure_active));
             } else {
                 holder.container.setBackgroundColor(backGroundColor);
             }
