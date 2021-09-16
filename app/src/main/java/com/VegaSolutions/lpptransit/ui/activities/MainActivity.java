@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -54,7 +53,7 @@ import java.util.List;
 
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 
-public class  MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, FragmentHeaderCallback {
+public class MainActivity extends MapFragmentActivity implements StationsFragment.StationsFragmentListener, FragmentHeaderCallback {
 
     public static final String TAG = "MainActivity";
 
@@ -300,22 +299,17 @@ public class  MainActivity extends MapFragmentActivity implements StationsFragme
     }
 
     private void setUpStationMarkers() {
-        Log.e(TAG, "Setting markers 1.2");
-        Log.e(TAG, "Setting markers mMap is null " + (mMap == null));
-        Log.e(TAG, "Setting markers googleMaps is null " + (this.googleMap == null));
         if (mMap != null) {
             mMap.setInfoWindowAdapter(new StationInfoWindow(this));
-
-            Log.e(TAG, "Setting markers 2");
 
             // Refresh clusters
             if (clusterManager != null) {
                 clusterManager.clearItems();
-                for (Station station : app.getStations())
+                for (Station station : app.getStations()) {
                     clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station));
+                }
                 clusterManager.cluster();
 
-                Log.e(TAG, "Setting markers 3");
             }
         }
     }
@@ -326,13 +320,6 @@ public class  MainActivity extends MapFragmentActivity implements StationsFragme
         if (googleMap != null) {
             setPadding(0, 0, 0, Math.round(offset * maxMapPaddingBottom) + (int) maxMapPaddingBottom);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.e(TAG, "Setting markers 1");
-        setUpStationMarkers();
     }
 
     @Override
