@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +21,7 @@ import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.SearchTryItem;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.utility.Colors;
 import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
@@ -208,10 +208,13 @@ public class SearchActivity extends AppCompatActivity {
 
         if(text.isEmpty()) {
             //Load saved items
-            List<String> searchItemsIds = Api.getSavedSearchItemsIds(this);
+            List<SearchTryItem> searchItemsList = Api.getSavedSearchItemsIds(this);
 
-            for (int i = searchItemsIds.size() - 1; i >= 0; i--) {
-                String searchItemId = searchItemsIds.get(i);
+            Collections.sort(searchItemsList,
+                    (o1, o2) -> o1.getDate().compareTo(o2.getDate()));
+
+            for (int i = searchItemsList.size() - 1; i >= 0; i--) {
+                String searchItemId = searchItemsList.get(i).getSearchItemId();
                 for (SearchItem item : this.items) {
                     if (item.getType() == SearchItem.STATION) {
                         StationItem stationItem = (StationItem) item;

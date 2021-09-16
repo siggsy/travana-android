@@ -15,6 +15,7 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.DepartureWrapper;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.DetourInfo;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.SearchTryItem;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.StationOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper;
@@ -26,9 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,6 +70,10 @@ public class Api {
 
     public static final String TAG = "Api";
 
+    // Everytime the architecture of saving searched items is changed, change the version
+    // otherwise -> crashing when app will be updated, but old data saved
+    public static final String SEARCH_SAVED_ITEMS_KEY = "searched_saved_items_v2";
+
     private static final OkHttpClient httpClient = new OkHttpClient.Builder()
             .connectTimeout(7, TimeUnit.SECONDS)
             .writeTimeout(7, TimeUnit.SECONDS)
@@ -78,8 +81,8 @@ public class Api {
             .addInterceptor(new GzipInterceptor())
             .build();
     private static final Headers headers = Headers.of(
-        "apikey", BuildConfig.LPP_API_KEY,
-        "User-Agent", "OkHttp Bot",
+            "apikey", BuildConfig.LPP_API_KEY,
+            "User-Agent", "OkHttp Bot",
         "Accept", "",
         "Accept-Encoding", "gzip",
         "Cache-Control", "no-cache"
@@ -222,42 +225,45 @@ public class Api {
         });
     }
 
-    public static List<String> getSavedSearchItemsIds(Activity activity) {
+    public static List<SearchTryItem> getSavedSearchItemsIds(Activity activity) {
         SharedPreferences sharedPref = activity.getSharedPreferences("app", Context.MODE_PRIVATE);
-        Set<String> searchItems = sharedPref.getStringSet("saved_search_items", null);
+        String searchItemsString = sharedPref.getString(SEARCH_SAVED_ITEMS_KEY, null);
 
-        if (searchItems == null) {
+        if (searchItemsString == null) {
             return new ArrayList<>();
         }
 
-        return new ArrayList<>(searchItems);
+        Type listType = new TypeToken<ArrayList<SearchTryItem>>() {
+        }.getType();
+        List<SearchTryItem> searchItemsArrayList = new Gson().fromJson(searchItemsString, listType);
+
+        return searchItemsArrayList;
     }
 
+
     public static void addSavedSearchedItemsIds(String id, Activity activity) {
+        List<SearchTryItem> searchItemsArrayList = getSavedSearchItemsIds(activity);
 
-        SharedPreferences sharedPref = activity.getSharedPreferences("app", Context.MODE_PRIVATE);
-        Set<String> searchItems = sharedPref.getStringSet("saved_search_items", null);
-
-        if (searchItems == null) {
-            searchItems = new HashSet<>();
+        // remove old searches
+        for (int i = searchItemsArrayList.size() - 1; i >= 0; --i) {
+            if (searchItemsArrayList.get(i).getSearchItemId().equals(id)) {
+                searchItemsArrayList.remove(i);
+            }
         }
+        searchItemsArrayList.add(new SearchTryItem(id));
 
-        ArrayList<String> searchItemsArrayList = new ArrayList<>(searchItems);
-
-        //Add item to the end if it was recently added
-        searchItemsArrayList.add(id);
-
+        // clear the oldest search history
         if (searchItemsArrayList.size() > 20) {
             searchItemsArrayList.remove(0);
         }
 
-        searchItems.clear();
-        searchItems.addAll(searchItemsArrayList);
-
+        SharedPreferences sharedPref = activity.getSharedPreferences("app", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.clear();
-        editor.putStringSet("saved_search_items", searchItems);
+        String searchItemsString = new Gson().toJson(searchItemsArrayList);
+        editor.putString(SEARCH_SAVED_ITEMS_KEY, searchItemsString);
         editor.apply();
+
     }
 
     private static List<DetourInfo> getDetours(String html) {
@@ -274,7 +280,6 @@ public class Api {
         }
 
         return list;
-
     }
 
     private static <T> Callback jsonCallback(ApiCallback<T> callback, Type type) {
