@@ -40,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
         buttonMin = findViewById(R.id.radio_minute);
         buttonHour = findViewById(R.id.radio_hour);
 
-        String appTheme = sharedPreferences.getString("app_theme", ViewGroupUtils.Theme.NO.name());
+        String appTheme = sharedPreferences.getString("application_theme", ViewGroupUtils.Theme.NO.name());
 
         switch (ViewGroupUtils.Theme.valueOf(appTheme)) {
             case NO: buttonWhite.setChecked(true); break;
@@ -57,7 +57,7 @@ public class SettingsActivity extends AppCompatActivity {
                 // Set dark theme
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("app_theme", ViewGroupUtils.Theme.YES.name());
+                editor.putString("application_theme", ViewGroupUtils.Theme.YES.name());
                 editor.apply();
             }
 
@@ -70,7 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
                 // Set white theme
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("app_theme", ViewGroupUtils.Theme.NO.name());
+                editor.putString("application_theme", ViewGroupUtils.Theme.NO.name());
                 editor.apply();
             }
 
@@ -81,7 +81,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("app_theme", ViewGroupUtils.Theme.AUTO.name());
+                editor.putString("application_theme", ViewGroupUtils.Theme.AUTO.name());
                 editor.apply();
             }
         });
