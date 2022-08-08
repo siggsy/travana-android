@@ -19,9 +19,9 @@ features.
 
 Since Travana was developed in 2019, a rewrite is planned with a fresh, new and thought-out
 UI/UX that tries to bring information to users more clearly and consistently. It is still 
-in early stage of development where only the UI/UX mockups exist. Technology/framework that will be
-used still is not decided yet with discussions regarding whether this should be 2 separate native apps
-(Android and IOS) or an app build with a multi-platform framework.
+in early stage of development where only [UI/UX mockups](https://www.figma.com/file/CtFOYrD9k2uA9KR8hT7q3l/Travana---UI-%C2%B7-UX?node-id=748%3A3087) exist. Technology/framework that will be
+used is not yet decided with discussions regarding whether if this project should be split into 
+2 separate native apps (Android and IOS) or an app build with a multi-platform framework.
 
 ## Contributions
 
