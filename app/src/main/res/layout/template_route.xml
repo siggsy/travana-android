@@ -83,6 +83,6 @@
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="?dividerColor" />
+        android:background="?attr/dividerColorCustom" />
 
 </LinearLayout>

@@ -66,6 +66,6 @@
         android:layout_below="@id/tv_click_more"
         android:layout_marginTop="20dp"
         android:background="@android:color/black"
-        android:backgroundTint="?dividerColor" />
+        android:backgroundTint="?attr/dividerColorCustom" />
 
 </RelativeLayout>

@@ -8,7 +8,7 @@
             android:pivotY="87%">
             <shape android:shape="rectangle">
                 <stroke
-                    android:color="?dividerColor"
+                    android:color="?attr/dividerColorCustom"
                     android:width="2dp" />
                 <solid android:color="?backgroundViewColor" />
             </shape>

@@ -16,7 +16,7 @@
         <item name="containerBorderPadding">0dp</item>
         <item name="containerBorderPaddingSide">0dp</item>
         <item name="android:textColorHint">@color/text_hint</item>
-        <item name="dividerColor">@color/light_gray</item>
+        <item name="dividerColorCustom">@color/light_gray</item>
         <item name="colorPrimaryDark">#FFFFFF</item>
         <item name="android:windowLightStatusBar">@bool/isLightTheme</item>
         <item name="elevation">2dp</item>

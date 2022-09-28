@@ -4,7 +4,7 @@
 
     <stroke
         android:width="2dp"
-        android:color="?dividerColor" />
+        android:color="?attr/dividerColorCustom" />
     <padding
         android:left="0dp"
         android:top="0dp"
