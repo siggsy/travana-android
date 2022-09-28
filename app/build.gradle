@@ -1,5 +1,8 @@
-apply plugin: 'com.android.application'
-apply plugin: 'com.jakewharton.butterknife'
+plugins {
+    id 'com.android.application'
+    id 'com.jakewharton.butterknife'
+    id 'kotlin-android'
+}
 
 android {
     compileSdkVersion 33
@@ -25,10 +28,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
+//    compileOptions {
+//        sourceCompatibility = 1.8
+//        targetCompatibility = 1.8
+//    }
     namespace 'com.VegaSolutions.lpptransit'
 
     buildTypes.each {
@@ -63,6 +66,10 @@ dependencies {
 
     implementation 'com.jakewharton:butterknife:10.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
+
+    // Kotlin
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 apply plugin: 'com.google.gms.google-services'

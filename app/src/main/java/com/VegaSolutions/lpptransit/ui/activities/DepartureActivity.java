@@ -1,11 +1,13 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -18,7 +20,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -124,6 +128,7 @@ public class DepartureActivity extends AppCompatActivity {
         retrieveDepartures();
     }
 
+    @SuppressLint("WrongConstant")
     private void setScreenSettings() {
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -144,10 +149,11 @@ public class DepartureActivity extends AppCompatActivity {
         window.setStatusBarColor(Color.TRANSPARENT);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+            Insets systemInsets = insets.getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars());
             ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) back.getLayoutParams();
-            headerParams.setMargins(0, backTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            headerParams.setMargins(0, backTopMargin + systemInsets.top, 0, 0);
             back.setLayoutParams(headerParams);
-            return insets.consumeSystemWindowInsets();
+            return WindowInsetsCompat.CONSUMED;
         });
     }
 
