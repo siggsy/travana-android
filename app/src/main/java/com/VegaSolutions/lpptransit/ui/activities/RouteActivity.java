@@ -193,18 +193,16 @@ public class RouteActivity extends MapFragmentActivity {
             if (success) {
                 failedCallingUpdateBusesInRow = 0;
                 List<BusOnRoute> buses = new ArrayList<>();
+
                 // Filter by trip ID.
                 for (BusOnRoute busOnRoute : apiResponse.getData()) {
                     if (busOnRoute.getTripId().equals(tripId)) {
                         buses.add(busOnRoute);
                     }
                 }
-                runOnUiThread(() -> {
-                    Log.e(TAG, buses + "");
 
-                    // Update markers and queue another update.
-                    busManager.update(buses);
-                });
+                // Update markers and queue another update.
+                runOnUiThread(() -> busManager.update(buses));
                 setupUi(ScreenState.DONE);
             } else {
                 if (isFirstCallingUpdateBuses || failedCallingUpdateBusesInRow >= MAX_FAILED_CALLS_IN_ROW) {
@@ -255,7 +253,7 @@ public class RouteActivity extends MapFragmentActivity {
                 RouteActivity.this.runOnUiThread(() -> adapter.notifyDataSetChanged());
 
                 // Draw stations - called just once
-                if (!isRouteDrawn) {
+                if (!isRouteDrawn && !stationsOnRoute.isEmpty()) {
 
                     List<LatLng> latLngs = new ArrayList<>();
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -362,11 +360,24 @@ public class RouteActivity extends MapFragmentActivity {
 
         // Set bus and station marker style
         View v = getLayoutInflater().inflate(R.layout.station_node_maps, null);
+        v.findViewById(R.id.stroke)
+                .getBackground()
+                .setColorFilter(
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        color,
+                        BlendModeCompat.SRC_IN
+                    )
+                );
 
-        v.findViewById(R.id.stroke).getBackground().setColorFilter(BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN));
-        v.findViewById(R.id.solid).getBackground().setColorFilter(
-                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                        ContextCompat.getColor(this, R.color.color_main_background), BlendModeCompat.SRC_IN));
+        v.findViewById(R.id.solid)
+                .getBackground()
+                .setColorFilter(
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        ContextCompat.getColor(this, R.color.color_main_background),
+                        BlendModeCompat.SRC_IN
+                    )
+                );
+
         IconGenerator generator = new IconGenerator(this);
         generator.setBackground(null);
         generator.setContentView(v);

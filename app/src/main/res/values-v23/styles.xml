@@ -21,6 +21,7 @@
         <item name="android:windowLightStatusBar">@bool/isLightTheme</item>
         <item name="elevation">2dp</item>
         <item name="departureHourColor">@color/light_gray</item>
+        <item name="departureActive">@color/departure_active</item>
         <item name="android:navigationBarColor">@color/color_main_background</item>
         <item name="android:windowBackground">@color/color_main_background</item>
         <item name="android:editTextColor">@color/color_text</item>

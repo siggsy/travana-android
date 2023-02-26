@@ -1,72 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/departure_root"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="2dp"
-    app:cardBackgroundColor="?backgroundViewColor"
-    app:cardCornerRadius="0dp"
-    app:cardElevation="0dp">
+    android:id="@+id/departure_root"
+    android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/departure_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_margin="?containerBorderMargin"
+        android:layout_marginStart="16dp"
+        android:elevation="?elevation"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
 
-        <LinearLayout
-            android:id="@+id/departure_container"
+        <RelativeLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginVertical="?containerBorderPadding"
+            android:layout_marginHorizontal="?containerBorderPaddingSide"
+            android:background="@drawable/circle"
+            android:backgroundTint="?departureHourColor"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/departure_hour_hour"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:textColor"
+                android:layout_centerInParent="true"
+                android:padding="4dp"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                tools:text="15" />
+        </RelativeLayout>
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/departure_hour_minutes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="?containerBorderMargin"
-            android:layout_marginStart="16dp"
-            android:elevation="?elevation"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
-
-            <RelativeLayout
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginVertical="?containerBorderPadding"
-                android:layout_marginHorizontal="?containerBorderPaddingSide"
-                android:background="@drawable/circle"
-                android:backgroundTint="?departureHourColor"
-                android:padding="2dp">
-
-                <TextView
-                    android:id="@+id/departure_hour_hour"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?android:textColor"
-                    android:layout_centerInParent="true"
-                    android:padding="4dp"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    tools:text="15" />
-            </RelativeLayout>
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/departure_hour_minutes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="8dp"
-                app:alignItems="flex_start"
-                app:flexWrap="wrap" />
-
-        </LinearLayout>
-
-        <View
-            android:id="@+id/view2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:alpha="0"
-            android:background="?attr/dividerColorCustom" />
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
+            app:alignItems="flex_start"
+            app:flexWrap="wrap" />
 
     </LinearLayout>
 
-</RelativeLayout>
+    <View
+        android:id="@+id/view2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:alpha="0"
+        android:background="?attr/dividerColorCustom" />
+
+</LinearLayout>

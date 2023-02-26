@@ -1,9 +1,12 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -16,10 +19,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -91,7 +97,7 @@ public class DepartureActivity extends AppCompatActivity {
     TextView tryAgainText;
 
     int backTopMargin;
-
+    @ColorInt int highlightColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +130,10 @@ public class DepartureActivity extends AppCompatActivity {
         now = DateTime.now();
         SimpleDateFormat sdf = new SimpleDateFormat("d. M", Locale.getDefault());
         titleText.setText(getString(R.string.departures, sdf.format(now.toDate())));
+
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.departureActive, typedValue, true);
+        highlightColor = typedValue.data;
 
         retrieveDepartures();
     }
@@ -311,7 +321,8 @@ public class DepartureActivity extends AppCompatActivity {
             }
 
             if (timetable.isCurrent()) {
-                holder.container.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.departure_active));
+                Log.i("COlor test", "Color color: " + highlightColor);
+                holder.container.setBackgroundColor(highlightColor);
             } else {
                 holder.container.setBackgroundColor(backGroundColor);
             }
@@ -327,7 +338,7 @@ public class DepartureActivity extends AppCompatActivity {
 
             TextView hour;
             FlexboxLayout minutes;
-            RelativeLayout container;
+            LinearLayout container;
 
             private ViewHolder(@NonNull View itemView) {
                 super(itemView);

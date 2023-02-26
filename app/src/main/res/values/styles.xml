@@ -27,6 +27,7 @@
         <item name="elevation">2dp</item>
         <item name="backgroundElevatedColor">@color/color_main_background_elevated</item>
         <item name="departureHourColor">@color/light_gray</item>
+        <item name="departureActive">@color/departure_active</item>
         <item name="android:editTextColor">@color/color_text</item>
     </style>
 

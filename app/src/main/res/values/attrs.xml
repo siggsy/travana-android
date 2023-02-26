@@ -15,4 +15,5 @@
     <attr name="elevation" format="dimension" />
     <attr name="backgroundElevatedColor" format="reference"/>
     <attr name="departureHourColor" format="color" />
+    <attr name="departureActive" format="color" />
 </resources>
