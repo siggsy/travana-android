@@ -10,21 +10,20 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import com.VegaSolutions.lpptransit.R;
-import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
-
-import butterknife.BindViews;
-import butterknife.ButterKnife;
 
 public class LauncherActivity extends AppCompatActivity {
-
-    @BindViews({R.id.v1, R.id.v2, R.id.v3, R.id.v4}) View[] v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_launcher);
-        ButterKnife.bind(this);
+
+        View[] v = new View[4];
+        v[0] = findViewById(R.id.v1);
+        v[1] = findViewById(R.id.v2);
+        v[2] = findViewById(R.id.v3);
+        v[3] = findViewById(R.id.v4);
 
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.popout_fast);
         animation.setStartOffset(0);
