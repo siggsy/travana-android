@@ -40,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
         buttonMin = findViewById(R.id.radio_minute);
         buttonHour = findViewById(R.id.radio_hour);
 
-        String appTheme = sharedPreferences.getString("application_theme", ViewGroupUtils.Theme.NO.name());
+        String appTheme = sharedPreferences.getString("application_theme", ViewGroupUtils.Theme.AUTO.name());
 
         switch (ViewGroupUtils.Theme.valueOf(appTheme)) {
             case NO: buttonWhite.setChecked(true); break;
