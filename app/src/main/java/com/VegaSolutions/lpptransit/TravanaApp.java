@@ -29,7 +29,7 @@ public class TravanaApp extends Application {
         AppCompatDelegate.setDefaultNightMode(ViewGroupUtils
                 .Theme.valueOf(
                         getSharedPreferences("settings", MODE_PRIVATE)
-                                .getString("application_theme", "NO")
+                                .getString("application_theme", "AUTO")
                 ).value);
 
         instance = this;
