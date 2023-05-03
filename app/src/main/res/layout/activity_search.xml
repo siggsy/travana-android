@@ -66,6 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_margin="32dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:visibility="gone">
@@ -89,8 +90,8 @@
                 android:id="@+id/tv_error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:textColor"
                 android:background="?android:attr/selectableItemBackground"
+                android:textColor="?android:textColor"
                 tools:text="No internet connection" />
 
         </LinearLayout>
@@ -100,9 +101,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:text="@string/try_again"
             android:textColor="@color/colorAccent"
-            android:textStyle="bold"
-            android:text="@string/try_again" />
+            android:textStyle="bold" />
 
     </LinearLayout>
 </RelativeLayout>

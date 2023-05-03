@@ -90,7 +90,8 @@ public class LiveArrivalFragment extends Fragment {
     private final Runnable updater = new Runnable() {
         @Override
         public void run() {
-            retrieveLiveArrivals();
+            if (screenState != ERROR)
+                retrieveLiveArrivals();
             handler.postDelayed(updater, UPDATE_PERIOD);
         }
     };
@@ -144,7 +145,7 @@ public class LiveArrivalFragment extends Fragment {
                 return;
             }
 
-            if (success) {
+            if (false && success) {
                 numberOfCallsFailedInRow = 0;
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
                 ((Activity) context).runOnUiThread(() -> {

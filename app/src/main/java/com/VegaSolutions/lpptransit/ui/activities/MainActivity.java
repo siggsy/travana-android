@@ -66,6 +66,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     ViewPagerBottomSheetBehavior behavior;
     DrawerLayout dl;
     NavigationView nv;
+    RelativeLayout nvRl;
     View bottomSheet;
     CardView header;
     GoogleMap googleMap;
@@ -77,6 +78,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     RelativeLayout aboutRl;
     int bottomTopMargin = 0;
     int headerTopMargin = 0;
+    int nvTopMargin = 0;
 
     ElevationAnimation elevationAnimation;
 
@@ -125,6 +127,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         // Find all UI elements.
         dl = findViewById(R.id.nav_layout);
         nv = findViewById(R.id.nv);
+        nvRl = findViewById(R.id.nv_rl);
         search = findViewById(R.id.search);
         navBarBtn = findViewById(R.id.account);
         locationIcon = findViewById(R.id.maps_location_icon);
@@ -145,6 +148,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         bottomTopMargin = bottomParams.topMargin;
         ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
         headerTopMargin = headerParams.topMargin;
+        ViewGroup.MarginLayoutParams dlParams = (ViewGroup.MarginLayoutParams) nvRl.getLayoutParams();
+        nvTopMargin = dlParams.topMargin;
 
         toHide.add(bottomSheet);
         toHide.add(header);
@@ -256,10 +261,13 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
             ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
             ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
+            ViewGroup.MarginLayoutParams nvParams = (ViewGroup.MarginLayoutParams) nvRl.getLayoutParams();
             headerParams.setMargins(0, headerTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
             bottomParams.setMargins(0, bottomTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+            nvParams.setMargins(0, nvTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
             header.setLayoutParams(headerParams);
             bottom.setLayoutParams(bottomParams);
+            nvRl.setLayoutParams(nvParams);
             return insets.consumeSystemWindowInsets();
         });
     }

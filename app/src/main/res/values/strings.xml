@@ -37,7 +37,7 @@
     <string name="detours">Detours</string>
     <string name="data_is_from">Data about detours are obtained from <b>www.lpp.si/obvozi</b></string>
     <string name="click_for_more">Click for more.</string>
-    <string name="error_loading">Error during loading.</string>
+    <string name="error_loading">Error while trying to connect to LPP server. Try again later.</string>
     <string name="news">News</string>
     <string name="lpp_news_webside" translatable="false">https://www.lpp.si/novice-kategorija/aktualno</string>
     <string name="app_version">Version 2.0.2</string>

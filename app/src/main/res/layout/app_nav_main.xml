@@ -16,6 +16,7 @@
         android:background="?backgroundViewColor">
 
         <RelativeLayout
+            android:id="@+id/nv_rl"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -24,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -36,8 +37,10 @@
                     android:tint="?android:textColor" />
 
                 <ImageView
-                    android:layout_width="65dp"
-                    android:layout_height="65dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
                     android:src="@drawable/ic_logo_svg_transparent" />
             </LinearLayout>
 
