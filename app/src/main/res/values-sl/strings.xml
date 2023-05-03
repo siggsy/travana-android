@@ -36,7 +36,7 @@
     <string name="detours">Obvozi</string>
     <string name="data_is_from">Podatki o obvozih so pridobljeni iz <b>www.lpp.si/obvozi</b>.</string>
     <string name="click_for_more">Klikni za več.</string>
-    <string name="error_loading">Napaka pri nalganju</string>
+    <string name="error_loading">Napaka pri vzpostavljanju povezave z LPP strežnikom. Poskusite ponovno kasneje.</string>
     <string name="news">Novice</string>
     <string name="app_version">Verzija 2.0.2</string>
     <string name="relative_time">Relativen (npr. 7 min)</string>
