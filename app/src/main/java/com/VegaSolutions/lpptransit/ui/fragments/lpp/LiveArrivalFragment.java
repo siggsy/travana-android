@@ -145,7 +145,7 @@ public class LiveArrivalFragment extends Fragment {
                 return;
             }
 
-            if (false && success) {
+            if (success) {
                 numberOfCallsFailedInRow = 0;
                 ArrivalWrapper arrivalWrapper = apiResponse.getData();
                 ((Activity) context).runOnUiThread(() -> {
