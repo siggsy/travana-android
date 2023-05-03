@@ -30,7 +30,7 @@ public class AboutActivity extends AppCompatActivity {
 
         tvMail.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                    "mailto", "info@travana.si", null));
+                    "mailto", "travana@siggsy.xyz", null));
             startActivity(intent);
         });
 
