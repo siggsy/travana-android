@@ -82,8 +82,7 @@ public class Api {
             .build();
     private static final Headers headers = Headers.of(
             "apikey", BuildConfig.LPP_API_KEY,
-            "User-Agent", "OkHttp Bot",
-        "Accept", "",
+        "Accept", "Travana",
         "Accept-Encoding", "gzip",
         "Cache-Control", "no-cache"
     );
