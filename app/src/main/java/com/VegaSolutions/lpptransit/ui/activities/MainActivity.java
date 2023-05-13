@@ -19,8 +19,10 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -258,17 +260,21 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         }
         window.setStatusBarColor(Color.TRANSPARENT);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (i, insetsCompat) -> {
+            Insets insets = insetsCompat.getInsets(WindowInsetsCompat.Type.systemBars());
+
             ViewGroup.MarginLayoutParams headerParams = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
             ViewGroup.MarginLayoutParams bottomParams = (ViewGroup.MarginLayoutParams) bottom.getLayoutParams();
             ViewGroup.MarginLayoutParams nvParams = (ViewGroup.MarginLayoutParams) nvRl.getLayoutParams();
-            headerParams.setMargins(0, headerTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
-            bottomParams.setMargins(0, bottomTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
-            nvParams.setMargins(0, nvTopMargin + insets.getSystemWindowInsetTop(), 0, 0);
+
+            headerParams.setMargins(0, headerTopMargin + insets.top, 0, 0);
+            bottomParams.setMargins(0, bottomTopMargin + insets.top, 0, 0);
+            nvParams.setMargins(0, nvTopMargin + insets.top, 0, 0);
+
             header.setLayoutParams(headerParams);
             bottom.setLayoutParams(bottomParams);
             nvRl.setLayoutParams(nvParams);
-            return insets.consumeSystemWindowInsets();
+            return WindowInsetsCompat.CONSUMED;
         });
     }
 
