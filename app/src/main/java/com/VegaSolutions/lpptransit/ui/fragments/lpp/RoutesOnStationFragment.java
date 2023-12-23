@@ -16,12 +16,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.Api;
+import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation;
 import com.VegaSolutions.lpptransit.ui.activities.DepartureActivity;
 import com.VegaSolutions.lpptransit.ui.activities.RouteActivity;
@@ -129,8 +132,14 @@ public class RoutesOnStationFragment extends Fragment {
         Api.routesOnStation(stationId, (apiResponse, statusCode, success) -> {
             Activity activity = getActivity();
             if (activity == null) return;
-            if (success) {
-                activity.runOnUiThread(() -> adapter.setRoutes(apiResponse.getData()));
+
+            if (success && apiResponse != null) {
+                List<RouteOnStation> routes = apiResponse.getData();
+                List<RouteOnStation> filtered = new ArrayList<>();
+                for (RouteOnStation route : routes) {
+                    if (!route.isGarage()) filtered.add(route);
+                }
+                activity.runOnUiThread(() -> adapter.submitList(filtered));
                 setupUi(DONE);
             } else {
                 setupUi(ERROR);
@@ -206,30 +215,22 @@ public class RoutesOnStationFragment extends Fragment {
             headerCallback.onHeaderChanged(value);
     }
 
-    private class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
-
-        List<RouteOnStation> routes = new ArrayList<>();
-        List<RouteOnStation> filteredRoutes = new ArrayList<>();    // routes without 'garage' routes
-
-        public void setRoutes(List<RouteOnStation> routes) {
-            this.routes = routes;
-
-            for (RouteOnStation route : routes) {
-                if (!isRouteInList(filteredRoutes, route.getTripId()) && !route.isGarage()) {
-                    filteredRoutes.add(route);
-                }
-            }
-
-            notifyDataSetChanged();
+    private static final DiffUtil.ItemCallback<RouteOnStation> DIFF_PROVIDER = new DiffUtil.ItemCallback<RouteOnStation>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull RouteOnStation oldItem, @NonNull RouteOnStation newItem) {
+            return oldItem.getTripId().equals(newItem.getTripId());
         }
 
-        private boolean isRouteInList(List<RouteOnStation> routes, String trip_id) {
-            for (RouteOnStation route : routes) {
-                if (route.getTripId().equals(trip_id)) {
-                    return true;
-                }
-            }
-            return false;
+        @Override
+        public boolean areContentsTheSame(@NonNull RouteOnStation oldItem, @NonNull RouteOnStation newItem) {
+            return true;
+        }
+    };
+
+    private class Adapter extends ListAdapter<RouteOnStation, Adapter.ViewHolder> {
+
+        private Adapter() {
+            super(DIFF_PROVIDER);
         }
 
         @NonNull
@@ -239,15 +240,9 @@ public class RoutesOnStationFragment extends Fragment {
         }
 
         @Override
-        public int getItemCount() {
-
-            return filteredRoutes.size();
-        }
-
-        @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-            RouteOnStation route = filteredRoutes.get(position);
+            RouteOnStation route = getItem(position);
 
             // Set route name and number
             String name = route.getRouteGroupName();
