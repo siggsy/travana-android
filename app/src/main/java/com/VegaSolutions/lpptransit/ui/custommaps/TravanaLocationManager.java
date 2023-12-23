@@ -10,11 +10,15 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TravanaLocationManager {
 
@@ -24,61 +28,62 @@ public class TravanaLocationManager {
 
     private LocationManager locationManager;
     private boolean gps, network = false;
-    private static boolean live;
+    private boolean live = false;
 
-    private static LatLng latest;
-    private static final List<TravanaLocationListener> listeners = new ArrayList<>();
+    private LatLng latest = null;
+    private final Set<TravanaLocationListener> listeners = new HashSet<>();
     private final LocationListener mainListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
+            synchronized (this) {
+                Log.i(TAG, "location updated: " + location.toString());
 
-            Log.i(TAG, "location updated: " + location.toString());
+                if (location.getAccuracy() > 500)
+                    return;
 
-            if (location.getAccuracy() > 500)
-                return;
+                live = true;
 
-            live = true;
+                // Notify all listeners
+                for (TravanaLocationListener listener : listeners)
+                    listener.onLocationChanged(location);
 
-            // Notify all listeners
-            for (TravanaLocationListener listener : listeners)
-                listener.onLocationChanged(location);
-
-            // Save the latest
-            latest = new LatLng(location.getLatitude(), location.getLongitude());
-
+                // Save the latest
+                latest = new LatLng(location.getLatitude(), location.getLongitude());
+            }
         }
 
         @Override
-        public void onProviderEnabled(String provider) {
+        public void onProviderEnabled(@NonNull String provider) {
+            synchronized (this) {
+                Log.i(TAG, "Provider enabled: " + provider);
 
-            Log.i(TAG, "Provider enabled: " + provider);
+                // Notify listeners if at least one is enabled
+                for (TravanaLocationListener listener : listeners)
+                    listener.onProviderAvailabilityChanged(true);
 
-            // Notify listeners if at least one is enabled
-            for (TravanaLocationListener listener : listeners)
-                listener.onProviderAvailabilityChanged(true);
-
-            if (provider.equals(LocationManager.GPS_PROVIDER))
-                gps = true;
-            else if (provider.equals(LocationManager.NETWORK_PROVIDER))
-                network = true;
-
+                if (provider.equals(LocationManager.GPS_PROVIDER))
+                    gps = true;
+                else if (provider.equals(LocationManager.NETWORK_PROVIDER))
+                    network = true;
+            }
         }
 
         @Override
         public void onProviderDisabled(String provider) {
+            synchronized (this) {
+                Log.i(TAG, "Provider disabled: " + provider);
 
-            Log.i(TAG, "Provider disabled: " + provider);
+                if (provider.equals(LocationManager.GPS_PROVIDER))
+                    gps = false;
+                else if (provider.equals(LocationManager.NETWORK_PROVIDER))
+                    network = false;
 
-           if (provider.equals(LocationManager.GPS_PROVIDER))
-               gps = false;
-           else if (provider.equals(LocationManager.NETWORK_PROVIDER))
-               network = false;
+                // Notify listeners if both providers are disabled
+                if (!gps  && !network)
+                    for (TravanaLocationListener listener : listeners)
+                        listener.onProviderAvailabilityChanged(false);
 
-           // Notify listeners if both providers are disabled
-           if (!gps  && !network)
-               for (TravanaLocationListener listener : listeners)
-                   listener.onProviderAvailabilityChanged(false);
-
+            }
         }
 
         // Redundant (Deprecated on API 29)
@@ -90,7 +95,7 @@ public class TravanaLocationManager {
         this.context = context;
     }
 
-    public boolean addListener(TravanaLocationListener locationListener) {
+    public synchronized boolean addListener(TravanaLocationListener locationListener) {
 
         // Enable main listener if this is the first one
         if (listeners.size() == 0) {
@@ -103,7 +108,7 @@ public class TravanaLocationManager {
         return true;
     }
 
-    public void removeListener(TravanaLocationListener locationListener) {
+    public synchronized void removeListener(TravanaLocationListener locationListener) {
         listeners.remove(locationListener);
 
         // Disable main listener if list is empty and save latest location
@@ -113,16 +118,21 @@ public class TravanaLocationManager {
         }
     }
 
-    public boolean isMainProviderEnabled() {
+    public synchronized boolean isMainProviderEnabled() {
         return !listeners.isEmpty();
     }
 
-    public boolean isLive() {
+    public synchronized boolean isLive() {
         return live;
     }
 
-    private LatLng getLatestFromPreferences() {
+    public synchronized LatLng getLatest() {
+        if (latest == null)
+            return getLatestFromPreferences();
+        else return latest;
+    }
 
+    private LatLng getLatestFromPreferences() {
         SharedPreferences preferences = context.getSharedPreferences("Latest_location", Context.MODE_PRIVATE);
         float lat = preferences.getFloat("lat", -91);
         float lng = preferences.getFloat("lng", -181);
@@ -130,23 +140,14 @@ public class TravanaLocationManager {
         if (lat == -91 || lng == -181)
             return null;
         else return new LatLng(lat, lng);
-
     }
 
     private void saveLatest() {
-
         if (latest == null)
             return;
 
         SharedPreferences preferences = context.getSharedPreferences("Latest_location", Context.MODE_PRIVATE);
         preferences.edit().putFloat("lat", (float) latest.latitude).putFloat("lng", (float) latest.longitude).apply();
-
-    }
-
-    public LatLng getLatest() {
-        if (latest == null)
-            return getLatestFromPreferences();
-        else return latest;
     }
 
     /**

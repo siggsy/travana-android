@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.VegaSolutions.lpptransit.R;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.ui.custommaps.LocationMarkerManager;
 import com.VegaSolutions.lpptransit.ui.custommaps.TravanaLocationManager;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
@@ -80,7 +81,7 @@ public abstract class MapFragmentActivity extends AppCompatActivity implements O
         if (MapUtility.checkIfAtLeastOnePermissionPermitted(this)) {
 
             // Setup location objects
-            locationManager = new TravanaLocationManager(this);
+            locationManager = TravanaApp.getInstance().getLocationManager();
             markerManager = new LocationMarkerManager(this, mMap,
                     locationManager.getLatest(),
                     MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_live)),
