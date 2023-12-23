@@ -103,9 +103,9 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:elevation="2dp"
                 android:src="@drawable/ic_swap"
-                android:tint="?android:textColor"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/station_title" />
+                app:layout_constraintTop_toTopOf="@+id/station_title"
+                app:tint="?android:textColor" />
 
             <ImageView
                 android:id="@+id/station_favourite"

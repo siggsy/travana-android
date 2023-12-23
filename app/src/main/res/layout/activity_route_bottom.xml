@@ -124,10 +124,10 @@
                     android:background="?selectableItemBackgroundBorderless"
                     android:elevation="2dp"
                     android:src="@drawable/ic_swap"
-                    android:tint="?android:textColor"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="?android:textColor" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
