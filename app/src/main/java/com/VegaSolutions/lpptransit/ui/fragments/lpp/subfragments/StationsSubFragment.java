@@ -103,7 +103,6 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         super.onResume();
 
         callback.onHeaderChanged(list.getView().canScrollVertically(-1));
-        Log.i("DEBUGGING State", mainActivity.screenState.toString());
         updateStations();
     }
 
@@ -161,7 +160,6 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     public void setupUi(ScreenState screenState) {
         Activity activity = getActivity();
         if (activity == null) return;
-        Log.i("DEBUGGING State", "State: " + screenState + ", type: " + type);
         activity.runOnUiThread(() -> {
             switch (screenState) {
                 case DONE: {
@@ -292,6 +290,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
             noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
             noLocationEnabledView.addTask(v -> v.setVisibility(View.VISIBLE));
         } else {
+            setupUi(ScreenState.LOADING);
             app.getThreadPool().execute(() -> {
                 // Add "favourite" flag and calculate distance
                 for (Station station : stations) {
@@ -308,7 +307,6 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
                     noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
                     noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
                 });
-                setupUi(ScreenState.LOADING);
                 adapter.submitList(stationWrappersFav.subList(0, 30), () -> { setupUi(ScreenState.DONE); });
             });
         }
