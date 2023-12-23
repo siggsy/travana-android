@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.VegaSolutions.lpptransit.R;
@@ -100,6 +103,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         super.onResume();
 
         callback.onHeaderChanged(list.getView().canScrollVertically(-1));
+        Log.i("DEBUGGING State", mainActivity.screenState.toString());
         updateStations();
     }
 
@@ -157,6 +161,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     public void setupUi(ScreenState screenState) {
         Activity activity = getActivity();
         if (activity == null) return;
+        Log.i("DEBUGGING State", "State: " + screenState + ", type: " + type);
         activity.runOnUiThread(() -> {
             switch (screenState) {
                 case DONE: {
@@ -198,8 +203,12 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
             return;
         }
 
-        setupUi(mainActivity.screenState);
+        if (mainActivity.screenState == ScreenState.DONE && type == TYPE_NEARBY) {
+            setStations();
+            return;
+        }
 
+        setupUi(mainActivity.screenState);
         if (mainActivity.screenState == ScreenState.ERROR) {
             switch (mainActivity.errorCode) {
                 case NetworkConnectivityManager.NO_INTERNET_CONNECTION: {
@@ -221,11 +230,14 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         // Update UI
         Activity activity = getActivity();
         if (activity == null) return;
+
         activity.runOnUiThread(() -> {
             // Show favourite stations
             if (type == TYPE_FAVOURITE) {
                 setFavouriteStations(app.getStations());
-            } // Show nearby stations
+            }
+
+            // Show nearby stations
             else if (type == TYPE_NEARBY) {
                 // Check permissions
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -244,6 +256,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
                 updateLocationList(locationManager.getLatest());
             }
         });
+
     }
 
 
@@ -263,7 +276,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         } else {
             noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
         }
-        adapter.setStations(stationWrappersFav);
+        adapter.submitList(stationWrappersFav);
         list.getView().scrollToPosition(0);
 
     }
@@ -275,28 +288,29 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
 
         // Check for location availability
         if (location == null) {
-            adapter.setStations(new ArrayList<>());
+            adapter.submitList(new ArrayList<>());
             noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
             noLocationEnabledView.addTask(v -> v.setVisibility(View.VISIBLE));
         } else {
+            app.getThreadPool().execute(() -> {
+                // Add "favourite" flag and calculate distance
+                for (Station station : stations) {
+                    Boolean f = favourites.get(station.getRefId());
+                    if (f == null) f = false;
+                    stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(location, station.getLatLng()) * 1000)));
+                }
 
+                // Sort stations by current location
+                Collections.sort(stationWrappersFav, (o1, o2) -> Double.compare(o1.distance, o2.distance));
 
-            // Add "favourite" flag and calculate distance
-            for (Station station : stations) {
-                Boolean f = favourites.get(station.getRefId());
-                if (f == null) f = false;
-                stationWrappersFav.add(new StationWrapper(station, f, (int) Math.round(MapUtility.calculationByDistance(location, station.getLatLng()) * 1000)));
-            }
-
-            // Sort stations by current location
-            Collections.sort(stationWrappersFav, (o1, o2) -> Double.compare(o1.distance, o2.distance));
-
-            // Show on recyclerView
-            noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
-            noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
-            adapter.setStations(stationWrappersFav.subList(0, 30));
-            adapter.refreshStations(stationWrappersFav.subList(0, 30));
-
+                // Show on recyclerView
+                mainActivity.runOnUiThread(() -> {
+                    noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
+                    noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
+                });
+                setupUi(ScreenState.LOADING);
+                adapter.submitList(stationWrappersFav.subList(0, 30), () -> { setupUi(ScreenState.DONE); });
+            });
         }
 
     }
@@ -306,6 +320,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         if (activity == null) return;
         activity.runOnUiThread(() -> {
             if (location != null) {
+                if (location.equals(this.location)) return;
                 this.location = location;
                 setNearbyStations(app.getStations());
                 noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
@@ -357,7 +372,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
 
     @Override
     public void onLocationChanged(Location location) {
-        // Nothing
+        updateLocationList(MapUtility.getLatLngFromLocation(location));
     }
 
     @Override
@@ -365,90 +380,22 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         // Nothing
     }
 
-    public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final DiffUtil.ItemCallback<StationWrapper> DIFF_CALLBACK = new DiffUtil.ItemCallback<StationWrapper>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull StationWrapper oldItem, @NonNull StationWrapper newItem) {
+            return oldItem.station.getRefId().equals(newItem.station.getRefId());
+        }
 
-        public List<StationWrapper> stations;
+        @Override
+        public boolean areContentsTheSame(@NonNull StationWrapper oldItem, @NonNull StationWrapper newItem) {
+            return oldItem.distance == newItem.distance;
+        }
+    };
+
+    public class Adapter extends ListAdapter<StationWrapper, RecyclerView.ViewHolder> {
 
         private Adapter() {
-            stations = new ArrayList<>();
-        }
-
-        private void setStations(List<StationWrapper> stationsNew) {
-
-            // Check for new elements
-            for (int i = 0; i < stationsNew.size(); i++) {
-                StationWrapper newStation = stationsNew.get(i);
-                int j = where(newStation, stations);
-                if (j == -1) {
-                    // Add if not inserted
-                    stations.add(i, newStation);
-                    notifyItemInserted(i);
-                } else {
-                    StationWrapper oldStation = stations.get(j);
-                    if (newStation.distance != oldStation.distance || newStation.favourite != oldStation.favourite) {
-                        stations.remove(i);
-                        stations.add(i, newStation);
-                        notifyItemChanged(i);
-                    }
-                }
-            }
-
-            for (int i = 0; i < stations.size(); i++) {
-                if (where(stations.get(i), stationsNew) == -1) {
-                    stations.remove(i);
-                    notifyItemRemoved(i);
-                    i--;
-                }
-            }
-
-        }
-
-        private int where(StationWrapper a, List<StationWrapper> b) {
-            if (b.isEmpty())
-                return -1;
-            for (int i = 0; i < b.size(); i++) {
-                if (a.station.equals(b.get(i).station))
-                    return i;
-            }
-            return -1;
-        }
-
-        private void refreshStations(List<StationWrapper> stationsNew) {
-
-            // Check for new elements
-            for (int i = 0; i < stationsNew.size(); i++) {
-                int j = where(stationsNew.get(i), stations);
-
-                if (j != -1) {
-                    // Move if already in
-                    if (i != j) {
-                        stations.remove(j);
-                        stations.add(i, stationsNew.get(i));
-                        notifyItemMoved(j, i);
-                    }
-                } else {
-                    // Insert if not
-                    stations.add(i, stationsNew.get(i));
-                    notifyItemInserted(i);
-                }
-            }
-
-            for (int i = 0; i < stations.size(); i++) {
-                if (where(stations.get(i), stationsNew) == -1) {
-                    stations.remove(i);
-                    notifyItemRemoved(i);
-                    i--;
-                }
-            }
-            list.getView().scrollToPosition(0);
-        }
-
-        public ArrayList<Station> getStations() {
-            // Convert array
-            ArrayList<Station> stations = new ArrayList<>();
-            for (StationWrapper stationWrapper : this.stations)
-                stations.add(stationWrapper.station);
-            return stations;
+            super(DIFF_CALLBACK);
         }
 
         @NonNull
@@ -460,7 +407,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-            StationWrapper station = stations.get(position);
+            StationWrapper station = getItem(position);
             ViewHolder viewHolder = (ViewHolder) holder;
 
             // Set distance
@@ -493,11 +440,6 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
                 viewHolder.routes.addView(v);
             }
 
-        }
-
-        @Override
-        public int getItemCount() {
-            return stations.size();
         }
 
         private class ViewHolder extends RecyclerView.ViewHolder {

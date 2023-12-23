@@ -1,11 +1,14 @@
 package com.VegaSolutions.lpptransit.ui.activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -109,12 +112,12 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         setStationsFragment();
 
         // Check for permission.
-        if (!MapUtility.checkIfAtLeastOnePermissionPermitted(this)) {
+        SharedPreferences sp = getSharedPreferences("one_time_dialogs", Context.MODE_PRIVATE);
+        boolean askedBefore = sp.getBoolean("location_permission", false);
+        if (!MapUtility.checkIfAtLeastOnePermissionPermitted(this) && !askedBefore) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, Constants.LOCATION_REQUEST_CODE);
+            sp.edit().putBoolean("location_permission", true).apply();
         }
-
-        retrieveStations();
-
     }
 
     private void setStationsFragment() {
@@ -289,8 +292,10 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         // return if stations are already loaded
         if (app.areStationsLoaded()) {
-            screenState = ScreenState.DONE;
+            setUpMainActivityUi(ScreenState.DONE);
+            stationsFragment.setSubstationsFragments();
             errorCode = NetworkConnectivityManager.NO_ERROR;
+            setUpStationMarkers();
             return;
         }
         setUpMainActivityUi(ScreenState.LOADING);
@@ -299,9 +304,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         Api.stationDetails(false, (apiResponse, statusCode, success) -> {
             if (success) {
                 app.setStations((ArrayList<Station>) apiResponse.getData());
-                runOnUiThread(() -> {
-                    setUpStationMarkers();
-                });
+                runOnUiThread(this::setUpStationMarkers);
                 setUpMainActivityUi(ScreenState.DONE);
                 errorCode = NetworkConnectivityManager.NO_ERROR;
             } else {
@@ -318,6 +321,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
             // Refresh clusters
             if (clusterManager != null) {
+                Log.i(TAG, "Clearing cluster");
                 clusterManager.clearItems();
                 for (Station station : app.getStations()) {
                     clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station));
@@ -358,7 +362,8 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
         });
 
         mMap.setOnCameraMoveListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
-
+        retrieveStations();
+        Log.i(TAG, "Map ready!!");
     }
 
     @Override

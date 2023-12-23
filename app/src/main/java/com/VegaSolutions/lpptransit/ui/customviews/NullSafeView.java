@@ -8,7 +8,7 @@ import java.util.List;
 public class NullSafeView<T extends View> {
 
     private T view;
-    private List<OnViewAssignedListener> listeners = new ArrayList<>();
+    private final List<OnViewAssignedListener> listeners = new ArrayList<>();
 
 
     public synchronized void addTask(OnViewAssignedListener listener) {
@@ -26,13 +26,11 @@ public class NullSafeView<T extends View> {
     }
 
     private synchronized void onAssigned() {
-
         if (view != null) {
             for (OnViewAssignedListener listener : listeners)
                 listener.onAssigned(view);
             listeners.clear();
         }
-
     }
 
     public interface OnViewAssignedListener {

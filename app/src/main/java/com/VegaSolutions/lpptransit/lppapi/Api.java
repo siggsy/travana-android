@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.VegaSolutions.lpptransit.BuildConfig;
+import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper;
@@ -24,14 +25,18 @@ import com.google.gson.reflect.TypeToken;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
@@ -74,83 +79,93 @@ public class Api {
     // otherwise -> crashing when app will be updated, but old data saved
     public static final String SEARCH_SAVED_ITEMS_KEY = "searched_saved_items_v2";
 
-    private static final OkHttpClient httpClient = new OkHttpClient.Builder()
-            .connectTimeout(7, TimeUnit.SECONDS)
-            .writeTimeout(7, TimeUnit.SECONDS)
-            .readTimeout(7, TimeUnit.SECONDS)
-            .addInterceptor(new GzipInterceptor())
-            .build();
+    private final OkHttpClient httpClient;
     private static final Headers headers = Headers.of(
-        "apikey", BuildConfig.LPP_API_KEY,
-        "Accept", "Travana",
-        "Accept-Encoding", "gzip",
-        "Cache-Control", "no-cache"
+            "apikey", BuildConfig.LPP_API_KEY,
+            "Accept", "Travana",
+            "Accept-Encoding", "gzip",
+            "Cache-Control", "no-cache"
     );
 
+    public Api(Context context) {
+        long cacheSize = 50L * 1024L * 1024L; // 50 MiB
+        httpClient = new OkHttpClient.Builder()
+                .connectTimeout(7, TimeUnit.SECONDS)
+                .writeTimeout(7, TimeUnit.SECONDS)
+                .readTimeout(7, TimeUnit.SECONDS)
+                .addInterceptor(new GzipInterceptor())
+                .cache(new Cache(new File(context.getCacheDir(), "response.cache"), cacheSize))
+                .build();
+    }
+
+    public static Api getInstance() {
+        return TravanaApp.getInstance().getApi();
+    }
+
     public static void busDetailsName(String busName, ApiCallback<List<Bus>> callback) {
-        request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()),
+        getInstance().request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()),
                 "bus-name", busName
         );
     }
     public static void busDetailsVin(String busVin, ApiCallback<Bus> callback) {
-        request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<Bus>>(){}.getType()),
+        getInstance().request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<Bus>>(){}.getType()),
                 "bus-vin", busVin);
     }
     public static void busDetailsAll(ApiCallback<List<Bus>> callback) {
-        request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()));
+        getInstance().request(DATA_URL + BUS_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<List<Bus>>>(){}.getType()));
     }
     public static void busesOnRoute(String routeGroupNumber, ApiCallback<List<BusOnRoute>> callback) {
-        request(DATA_URL + BUSES_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<BusOnRoute>>>(){}.getType()),
+        getInstance().request(DATA_URL + BUSES_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<BusOnRoute>>>(){}.getType()),
                 "route-group-number", routeGroupNumber);
     }
 
     public static void activeRoutes(ApiCallback<List<Route>> callback) {
-        request(DATA_URL + ACTIVE_ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
+        getInstance().request(DATA_URL + ACTIVE_ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
     }
 
     public static void routes(ApiCallback<List<Route>> callback) {
-        request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
+        getInstance().request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()));
     }
 
     public static void routes(String routeId, ApiCallback<List<Route>> callback) {
-        request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
+        getInstance().request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
                 "route-id", routeId);
     }
 
     public static void routes(String routeId, boolean shape, ApiCallback<List<Route>> callback) {
-        request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
+        getInstance().request(DATA_URL + ROUTES, jsonCallback(callback, new TypeToken<ApiResponse<List<Route>>>(){}.getType()),
                 "route-id", routeId,
                 "shape", shape ? "1" : "0");
     }
 
     public static void stationsOnRoute(String tripId, ApiCallback<List<StationOnRoute>> callback) {
-        request(DATA_URL + STATIONS_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<StationOnRoute>>>(){}.getType()),
+        getInstance().request(DATA_URL + STATIONS_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<StationOnRoute>>>(){}.getType()),
                 "trip-id", tripId);
     }
 
     public static void arrivalsOnRoute(String tripId, ApiCallback<List<ArrivalOnRoute>> callback) {
-        request(DATA_URL + ARRIVALS_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<ArrivalOnRoute>>>(){}.getType()),
+        getInstance().request(DATA_URL + ARRIVALS_ON_ROUTE, jsonCallback(callback, new TypeToken<ApiResponse<List<ArrivalOnRoute>>>(){}.getType()),
                 "trip-id", tripId);
     }
 
     public static void arrival(String stationCode, ApiCallback<ArrivalWrapper> callback) {
-        request(DATA_URL + ARRIVAL, jsonCallback(callback, new TypeToken<ApiResponse<ArrivalWrapper>>(){}.getType()),
+        getInstance().request(DATA_URL + ARRIVAL, jsonCallback(callback, new TypeToken<ApiResponse<ArrivalWrapper>>(){}.getType()),
                 "station-code", stationCode);
     }
 
     public static void routesOnStation(String stationCode, ApiCallback<List<RouteOnStation>> callback) {
-        request(DATA_URL + ROUTES_ON_STATION, jsonCallback(callback, new TypeToken<ApiResponse<List<RouteOnStation>>>(){}.getType()),
+        getInstance().request(DATA_URL + ROUTES_ON_STATION, jsonCallback(callback, new TypeToken<ApiResponse<List<RouteOnStation>>>(){}.getType()),
                 "station-code", stationCode);
     }
 
     public static void stationDetails(String stationCode, boolean showSubroutes, ApiCallback<Station> callback) {
-        request(DATA_URL + STATION_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<Station>>(){}.getType()),
+        getInstance().request(DATA_URL + STATION_DETAILS, jsonCallback(callback, new TypeToken<ApiResponse<Station>>(){}.getType()),
                 "station-code", stationCode,
                 "show-subroutes", showSubroutes ? "1" : "0");
     }
 
     public static void stationDetails(boolean showSubroutes, ApiCallback<List<Station>> callback) {
-        request(
+        getInstance().request(
                 DATA_URL + STATION_DETAILS,
                 jsonCallback(callback, new TypeToken<ApiResponse<List<Station>>>(){}.getType()),
                 "show-subroutes", showSubroutes ? "1" : "0"
@@ -188,11 +203,11 @@ public class Api {
             index++;
         }
 
-        request(DATA_URL + TIMETABLE, jsonCallback(callback, new TypeToken<ApiResponse<TimetableWrapper>>(){}.getType()), finalParams);
+        getInstance().request(DATA_URL + TIMETABLE, jsonCallback(callback, new TypeToken<ApiResponse<TimetableWrapper>>(){}.getType()), finalParams);
     }
 
     public static void routeDepartures(String tripId, String routeId, ApiCallback<DepartureWrapper> callback) {
-        request(
+        getInstance().request(
                 DATA_URL + ROUTE_DEPARTURES,
                 jsonCallback(callback, new TypeToken<ApiResponse<DepartureWrapper>>(){}.getType()),
                 "trip-id", tripId,
@@ -201,7 +216,7 @@ public class Api {
     }
 
     public static void getDetours(ApiCallback<List<DetourInfo>> callback) {
-        request(DETOUR_URL + DETOURS, new Callback() {
+        getInstance().request(DETOUR_URL + DETOURS, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 callback.onComplete(null, -1, false);
@@ -312,10 +327,11 @@ public class Api {
         };
     }
 
-    private static void request(String url, Callback callback, String... params) {
+    private void request(String url, Callback callback, String... params) {
         String paramString = getParamString(params);
         Request request = new Request.Builder()
                 .url(url + paramString)
+                .cacheControl(new CacheControl.Builder().maxAge(1, TimeUnit.MINUTES).build())
                 .headers(headers)
                 .build();
 

@@ -136,7 +136,7 @@
                 app:tabIndicatorFullWidth="false"
                 app:tabRippleColor="@android:color/transparent"
                 app:tabSelectedTextColor="@color/colorAccent"
-                app:tabTextAppearance="@style/AppTheme.Tabs.TextAppearance"
+                app:tabTextAppearance="@style/TabTextAppearance"
                 app:tabTextColor="@color/text_hint" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
