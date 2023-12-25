@@ -39,7 +39,7 @@
     <string name="click_for_more">Click for more.</string>
     <string name="error_loading">Error while trying to connect to LPP server. Try again later.</string>
     <string name="news">News</string>
-    <string name="lpp_news_webside" translatable="false">https://www.lpp.si/novice-kategorija/aktualno</string>
+    <string name="lpp_news_webside" translatable="false">https://www.lpp.si/aktualno</string>
     <string name="app_version">Version 2.0.2</string>
     <string name="travana_contact_mail" translatable="false">travana@siggsy.xyz</string>
     <string name="relative_time">Relative (eg. 7 min)</string>
