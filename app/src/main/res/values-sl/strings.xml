@@ -32,7 +32,7 @@
     <string name="unknown_error">Nekaj je šlo narobe. Prosimo poizkusite še enkrat. - %1$d</string>
     <string name="officially">V sodelovanju z</string>
     <string name="connection_refused">Povezava zavrnjena.</string>
-    <string name="departures">Vozni red %s</string>
+    <string name="departures">Vozni red</string>
     <string name="detours">Obvozi</string>
     <string name="data_is_from">Podatki o obvozih so pridobljeni iz <b>www.lpp.si/obvozi</b>.</string>
     <string name="click_for_more">Klikni za več.</string>

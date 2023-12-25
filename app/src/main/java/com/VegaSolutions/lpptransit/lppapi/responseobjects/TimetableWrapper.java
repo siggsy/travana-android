@@ -2,6 +2,8 @@ package com.VegaSolutions.lpptransit.lppapi.responseobjects;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class TimetableWrapper {
@@ -68,6 +70,9 @@ public class TimetableWrapper {
             @SerializedName("route_number_prefix")
             private String routeNumberPrefix;
 
+            @SerializedName("is_garage")
+            private boolean isGarage;
+
             public List<Timetable> getTimetable() {
                 return timetable;
             }
@@ -96,23 +101,31 @@ public class TimetableWrapper {
                 return routeNumberPrefix;
             }
 
-            public class Timetable {
-                private int hour;
-                private int[] minutes;
+            public boolean isGarage() {
+                return isGarage;
+            }
 
+            public class Timetable {
+                @SerializedName("hour")
+                private int hour;
+                @SerializedName("minutes")
+                private int[] minutes;
+                @SerializedName("timestamp")
+                private String timestamp;
                 @SerializedName("is_current")
                 private boolean isCurrent;
 
                 public int getHour() {
                     return hour;
                 }
-
                 public int[] getMinutes() {
                     return minutes;
                 }
-
                 public boolean isCurrent() {
                     return isCurrent;
+                }
+                public String getTimestamp() {
+                    return timestamp;
                 }
             }
 

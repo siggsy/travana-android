@@ -31,7 +31,7 @@
     <string name="timed_out_error">Connection timed out.</string>
     <string name="unknown_error">Something went wrong. Please try again. - %1$d</string>
     <string name="connection_refused">Connection refused.</string>
-    <string name="departures">Timetable %s</string>
+    <string name="departures">Timetable</string>
     <string name="lpp_main_name" translatable="false">Ljubljanski potniški promet</string>
     <string name="lpp" translatable="false">LPP</string>
     <string name="detours">Detours</string>

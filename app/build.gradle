@@ -6,6 +6,10 @@ plugins {
 
 android {
 
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+    }
+
     defaultConfig {
         compileSdk 34
         applicationId "com.VegaSolutions.lpptransit"
@@ -58,6 +62,7 @@ dependencies {
 
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation group: 'joda-time', name: 'joda-time', version: '2.10.5'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 
     // Kotlin
     implementation 'androidx.core:core-ktx:1.12.0'
