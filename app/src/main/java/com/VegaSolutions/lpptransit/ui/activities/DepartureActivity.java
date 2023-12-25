@@ -186,12 +186,14 @@ public class DepartureActivity extends AppCompatActivity {
                 TimetableWrapper timetableWrapper = apiResponse.getData();
 
                 // Search for the right timetable
-                ArrayList<Timetable> normal = new ArrayList<>();
-                ArrayList<Timetable> garage = new ArrayList<>();
                 for (Route route : timetableWrapper.getRouteGroups().get(0).getRoutes()) {
                     if (route.getParentName().equals(routeName) && route.isGarage() == routeGarage) {
                         if (route.getTimetable().isEmpty()) {
-                            setupUi(DONE);
+                            runOnUiThread(() -> {
+                                setupUi(DONE);
+                                Log.i(TAG, "Empty timetable");
+                                llNoDepartures.setVisibility(View.VISIBLE);
+                            });
                             return;
                         }
                         DateTimeFormatter dtf= DateTimeFormatter.ISO_DATE_TIME;
@@ -219,6 +221,11 @@ public class DepartureActivity extends AppCompatActivity {
                         });
                         return;
                     }
+                    runOnUiThread(() -> {
+                        setupUi(DONE);
+                        Log.i(TAG, "Empty timetable");
+                        llNoDepartures.setVisibility(View.VISIBLE);
+                    });
                 }
             }
 
