@@ -331,7 +331,6 @@ public class Api {
         String paramString = getParamString(params);
         Request request = new Request.Builder()
                 .url(url + paramString)
-                .cacheControl(new CacheControl.Builder().maxAge(1, TimeUnit.MINUTES).build())
                 .headers(headers)
                 .build();
 
