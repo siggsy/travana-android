@@ -321,7 +321,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
             // Refresh clusters
             if (clusterManager != null) {
-                Log.i(TAG, "Clearing cluster");
                 clusterManager.clearItems();
                 for (Station station : app.getStations()) {
                     clusterManager.addItem(new StationMarker(station.getLatitude(), station.getLongitude(), station));
@@ -363,7 +362,6 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
 
         mMap.setOnCameraMoveListener(() -> lastValidMapCenter = mMap.getCameraPosition().target);
         retrieveStations();
-        Log.i(TAG, "Map ready!!");
     }
 
     @Override
