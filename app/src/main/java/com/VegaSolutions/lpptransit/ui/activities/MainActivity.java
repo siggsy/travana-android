@@ -340,7 +340,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         super.onMapReady(googleMap);
 
         // Setup google maps UI.

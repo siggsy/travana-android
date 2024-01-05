@@ -247,9 +247,8 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
 
                 // Setup location for updates
                 locationManager = TravanaApp.getInstance().getLocationManager();
-                if (!locationManager.isMainProviderEnabled()) {
-                    locationManager.addListener(this);
-                }
+                locationManager.removeListener(this);
+                locationManager.addListener(this);
                 noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
                 updateLocationList(locationManager.getLatest());
             }

@@ -15,9 +15,7 @@ import androidx.annotation.NonNull;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class TravanaLocationManager {
@@ -31,6 +29,8 @@ public class TravanaLocationManager {
     private boolean live = false;
 
     private LatLng latest = null;
+    private long lastUpdate = 0;
+
     private final Set<TravanaLocationListener> listeners = new HashSet<>();
     private final LocationListener mainListener = new LocationListener() {
         @Override
@@ -38,9 +38,23 @@ public class TravanaLocationManager {
             synchronized (this) {
                 Log.i(TAG, "location updated: " + location.toString());
 
-                if (location.getAccuracy() > 500)
+                if (location.getAccuracy() > 100) {
+                    if (System.currentTimeMillis() - lastUpdate > 1000L * 60L * 2L)  { // 2 min
+                        live = false;
+                        for (TravanaLocationListener listener : listeners) {
+                            listener.onProviderAvailabilityChanged(false);
+                        }
+                    }
                     return;
+                }
+                lastUpdate = System.currentTimeMillis();
 
+                // Notify first live location
+                if (!live) {
+                    for (TravanaLocationListener listener : listeners) {
+                        listener.onProviderAvailabilityChanged(true);
+                    }
+                }
                 live = true;
 
                 // Notify all listeners
@@ -56,11 +70,6 @@ public class TravanaLocationManager {
         public void onProviderEnabled(@NonNull String provider) {
             synchronized (this) {
                 Log.i(TAG, "Provider enabled: " + provider);
-
-                // Notify listeners if at least one is enabled
-                for (TravanaLocationListener listener : listeners)
-                    listener.onProviderAvailabilityChanged(true);
-
                 if (provider.equals(LocationManager.GPS_PROVIDER))
                     gps = true;
                 else if (provider.equals(LocationManager.NETWORK_PROVIDER))
@@ -77,12 +86,6 @@ public class TravanaLocationManager {
                     gps = false;
                 else if (provider.equals(LocationManager.NETWORK_PROVIDER))
                     network = false;
-
-                // Notify listeners if both providers are disabled
-                if (!gps  && !network)
-                    for (TravanaLocationListener listener : listeners)
-                        listener.onProviderAvailabilityChanged(false);
-
             }
         }
 
@@ -116,10 +119,6 @@ public class TravanaLocationManager {
             enableMainProvider(false);
             saveLatest();
         }
-    }
-
-    public synchronized boolean isMainProviderEnabled() {
-        return !listeners.isEmpty();
     }
 
     public synchronized boolean isLive() {
@@ -159,6 +158,9 @@ public class TravanaLocationManager {
     private boolean enableMainProvider(boolean value) {
 
         if (value) {
+            // Avoid repeated requests for location updates
+            if (network || gps)
+                return true;
 
             long minTime = 2000;
             float minDist = 50;
@@ -182,6 +184,8 @@ public class TravanaLocationManager {
             return gps || network;
 
         } else {
+            network = false;
+            gps = false;
             locationManager.removeUpdates(mainListener);
             return true;
         }

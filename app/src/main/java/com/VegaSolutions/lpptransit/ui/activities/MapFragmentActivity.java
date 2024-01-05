@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -62,17 +63,18 @@ public abstract class MapFragmentActivity extends AppCompatActivity implements O
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
         toHide.add(locationIcon);
+
+        // Disable buildings
+        mMap.setBuildingsEnabled(false);
 
         // Setup generic UI
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
-        mMap.getUiSettings().setRotateGesturesEnabled(false);
         if (ViewGroupUtils.isDarkTheme(this)) {
             mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark)));
         }

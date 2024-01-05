@@ -618,7 +618,7 @@ public class RouteActivity extends MapFragmentActivity {
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         super.onMapReady(googleMap);
 
         // Setup Google maps UI
