@@ -250,7 +250,8 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
                 locationManager.removeListener(this);
                 locationManager.addListener(this);
                 noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
-                updateLocationList(locationManager.getLatest());
+                if (locationManager.isLive())
+                    updateLocationList(locationManager.getLatest());
             }
         });
 
@@ -289,7 +290,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
             noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
             noLocationEnabledView.addTask(v -> v.setVisibility(View.VISIBLE));
         } else {
-            setupUi(ScreenState.LOADING);
+//            setupUi(ScreenState.LOADING);
             app.getThreadPool().execute(() -> {
                 // Add "favourite" flag and calculate distance
                 for (Station station : stations) {
