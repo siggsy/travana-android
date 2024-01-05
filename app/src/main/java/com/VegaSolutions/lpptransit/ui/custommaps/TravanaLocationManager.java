@@ -134,10 +134,10 @@ public class TravanaLocationManager {
 
     private LatLng getLatestFromPreferences() {
         SharedPreferences preferences = context.getSharedPreferences("Latest_location", Context.MODE_PRIVATE);
-        float lat = preferences.getFloat("lat", -91);
-        float lng = preferences.getFloat("lng", -181);
+        float lat = preferences.getFloat("lat", Float.NaN);
+        float lng = preferences.getFloat("lng", Float.NaN);
 
-        if (lat == -91 || lng == -181)
+        if (Float.isNaN(lat) || Float.isNaN(lng))
             return null;
         else return new LatLng(lat, lng);
     }
