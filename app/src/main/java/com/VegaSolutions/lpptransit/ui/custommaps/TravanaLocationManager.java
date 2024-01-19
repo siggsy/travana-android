@@ -38,7 +38,7 @@ public class TravanaLocationManager {
             synchronized (this) {
                 Log.i(TAG, "location updated: " + location.toString());
 
-                if (location.getAccuracy() > 100) {
+                if (location.getAccuracy() > 250) {
                     if (System.currentTimeMillis() - lastUpdate > 1000L * 60L * 2L)  { // 2 min
                         live = false;
                         for (TravanaLocationListener listener : listeners) {
