@@ -29,7 +29,6 @@ public class TravanaLocationManager {
     private boolean live = false;
 
     private LatLng latest = null;
-    private long lastUpdate = 0;
 
     private final Set<TravanaLocationListener> listeners = new HashSet<>();
     private final LocationListener mainListener = new LocationListener() {
@@ -39,15 +38,8 @@ public class TravanaLocationManager {
                 Log.i(TAG, "location updated: " + location.toString());
 
                 if (location.getAccuracy() > 250) {
-                    if (System.currentTimeMillis() - lastUpdate > 1000L * 60L * 2L)  { // 2 min
-                        live = false;
-                        for (TravanaLocationListener listener : listeners) {
-                            listener.onProviderAvailabilityChanged(false);
-                        }
-                    }
                     return;
                 }
-                lastUpdate = System.currentTimeMillis();
 
                 // Notify first live location
                 if (!live) {
@@ -178,7 +170,7 @@ public class TravanaLocationManager {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDist, mainListener);
                 gps = true;
             // Enable network provider as fallback but not alongside
-            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && (permission == 1 || permission == 3)) {
+            } if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && (permission == 1 || permission == 3)) {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, minDist, mainListener);
                 network = true;
             }
