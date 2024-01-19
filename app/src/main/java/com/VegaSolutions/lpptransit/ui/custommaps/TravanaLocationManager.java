@@ -163,7 +163,7 @@ public class TravanaLocationManager {
                 return true;
 
             long minTime = 2000;
-            float minDist = 50;
+            float minDist = 20;
 
             // Get service if null
             if (locationManager == null)
@@ -177,7 +177,8 @@ public class TravanaLocationManager {
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && (permission == 2 || permission == 3)) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDist, mainListener);
                 gps = true;
-            } if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && (permission == 1 || permission == 3)) {
+            // Enable network provider as fallback but not alongside
+            } else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && (permission == 1 || permission == 3)) {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime, minDist, mainListener);
                 network = true;
             }
