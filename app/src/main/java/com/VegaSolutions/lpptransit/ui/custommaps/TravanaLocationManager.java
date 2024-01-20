@@ -179,7 +179,8 @@ public class TravanaLocationManager {
         } else {
             network = false;
             gps = false;
-            locationManager.removeUpdates(mainListener);
+            if (locationManager != null)
+                locationManager.removeUpdates(mainListener);
             return true;
         }
 

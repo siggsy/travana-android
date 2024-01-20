@@ -73,13 +73,6 @@ public class MapUtility {
                 * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
                 * Math.sin(dLon / 2);
         double c = 2 * Math.asin(Math.sqrt(a));
-        double valueResult = Radius * c;
-        double km = valueResult / 1;
-        DecimalFormat newFormat = new DecimalFormat("####");
-        int kmInDec = Integer.parseInt(newFormat.format(km));
-        double meter = valueResult % 1000;
-        int meterInDec = Integer.parseInt(newFormat.format(meter));
-
         return Radius * c;
     }
 
@@ -98,6 +91,16 @@ public class MapUtility {
                 || ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    public static final int FINE_LOCATION = 0b10;
+    public static final int COARSE_LOCATION = 0b01;
+
+    public static boolean hasPermission(int permission, int ... required) {
+        int mask = 0;
+        for (int r : required)
+            mask |= r;
+        return (permission & mask) != 0;
+    }
+
     /**
      * Get int representing location permission level
      * @param context with which to check the permission
@@ -105,11 +108,11 @@ public class MapUtility {
      */
     public static int getGrantedLocationPermission(Context context) {
         if (checkLocationPermission(context))
-            return 3;
+            return FINE_LOCATION | COARSE_LOCATION;
         else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            return 2;
+            return FINE_LOCATION;
         else if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            return 1;
+            return COARSE_LOCATION;
         else return 0;
     }
 

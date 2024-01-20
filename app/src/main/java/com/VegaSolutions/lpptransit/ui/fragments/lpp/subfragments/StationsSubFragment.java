@@ -29,6 +29,8 @@ import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.VegaSolutions.lpptransit.ui.activities.MainActivity;
 import com.VegaSolutions.lpptransit.ui.activities.SearchActivity;
 import com.VegaSolutions.lpptransit.ui.activities.StationActivity;
+import com.VegaSolutions.lpptransit.ui.custommaps.LocationProvider;
+import com.VegaSolutions.lpptransit.ui.custommaps.LocationProviderListener;
 import com.VegaSolutions.lpptransit.ui.custommaps.TravanaLocationManager;
 import com.VegaSolutions.lpptransit.ui.customviews.NullSafeView;
 import com.VegaSolutions.lpptransit.ui.fragments.FragmentHeaderCallback;
@@ -47,7 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class StationsSubFragment extends Fragment implements TravanaLocationManager.TravanaLocationListener {
+public class StationsSubFragment extends Fragment implements LocationProviderListener {
 
     private static final String TYPE = "type";
 
@@ -246,12 +248,15 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
                 }
 
                 // Setup location for updates
-                locationManager = TravanaApp.getInstance().getLocationManager();
-                locationManager.removeListener(this);
-                locationManager.addListener(this);
+//                locationManager = TravanaApp.getInstance().getLocationManager();
+//                locationManager.(this);
+//                locationManager.addListener(this);
+                LocationProvider.INSTANCE.unsubscribe(this);
+                LocationProvider.INSTANCE.subscribe(context, this);
+
                 noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
-                if (locationManager.isLive())
-                    updateLocationList(locationManager.getLatest());
+                if (LocationProvider.INSTANCE.isLive())
+                    updateLocationList(MapUtility.getLatLngFromLocation(LocationProvider.INSTANCE.getPrevLocation()));
             }
         });
 
@@ -349,7 +354,7 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
     public void onPause() {
         super.onPause();
         if (type == TYPE_NEARBY && locationManager != null)
-            locationManager.removeListener(this);
+            LocationProvider.INSTANCE.subscribe(context, this);
     }
 
     @Override
@@ -373,11 +378,6 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
         updateLocationList(MapUtility.getLatLngFromLocation(location));
     }
 
-    @Override
-    public void onProviderAvailabilityChanged(boolean value) {
-        // Nothing
-    }
-
     private static final DiffUtil.ItemCallback<StationWrapper> DIFF_CALLBACK = new DiffUtil.ItemCallback<StationWrapper>() {
         @Override
         public boolean areItemsTheSame(@NonNull StationWrapper oldItem, @NonNull StationWrapper newItem) {
@@ -389,6 +389,11 @@ public class StationsSubFragment extends Fragment implements TravanaLocationMana
             return oldItem.distance == newItem.distance;
         }
     };
+
+    @Override
+    public void onAvailabilityChanged(boolean isLive) {
+        // Do nothing
+    }
 
     public class Adapter extends ListAdapter<StationWrapper, RecyclerView.ViewHolder> {
 
