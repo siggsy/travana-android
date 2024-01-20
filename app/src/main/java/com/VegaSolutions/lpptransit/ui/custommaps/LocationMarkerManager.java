@@ -62,8 +62,8 @@ public class LocationMarkerManager {
     public void setLive(boolean value) {
         if (marker != null)
             marker.setIcon(value ? live : offline);
-        if (accuracyCircle != null && !value)
-            accuracyCircle.setRadius(0);
+        if (accuracyCircle != null)
+            accuracyCircle.setVisible(value);
     }
 
 }

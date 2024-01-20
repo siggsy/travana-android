@@ -16,6 +16,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.text.DecimalFormat;
 
+import javax.annotation.Nullable;
+
 public class MapUtility {
 
     /**
@@ -116,7 +118,9 @@ public class MapUtility {
         else return 0;
     }
 
-    public static LatLng getLatLngFromLocation(Location location) {
+    public static LatLng getLatLngFromLocation(@Nullable Location location) {
+        if (location == null)
+            return null;
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
 

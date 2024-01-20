@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -63,7 +64,6 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
     private LatLng location;
 
     private Context context;
-    private TravanaLocationManager locationManager;
 
     // UI elements
     private final NullSafeView<RecyclerView> list = new NullSafeView<>();
@@ -234,6 +234,7 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
         activity.runOnUiThread(() -> {
             // Show favourite stations
             if (type == TYPE_FAVOURITE) {
+                noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
                 setFavouriteStations(app.getStations());
             }
 
@@ -243,20 +244,14 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (!MapUtility.checkIfAtLeastOnePermissionPermitted(context)) {
                         noLocationEnabledView.addTask(v -> v.setVisibility(View.VISIBLE));
+                        setupUi(ScreenState.DONE);
                         return;
                     }
                 }
 
                 // Setup location for updates
-//                locationManager = TravanaApp.getInstance().getLocationManager();
-//                locationManager.(this);
-//                locationManager.addListener(this);
-                LocationProvider.INSTANCE.unsubscribe(this);
                 LocationProvider.INSTANCE.subscribe(context, this);
-
-                noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
-                if (LocationProvider.INSTANCE.isLive())
-                    updateLocationList(MapUtility.getLatLngFromLocation(LocationProvider.INSTANCE.getPrevLocation()));
+                updateLocationList(MapUtility.getLatLngFromLocation(LocationProvider.INSTANCE.getPrevLocation()));
             }
         });
 
@@ -295,7 +290,6 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
             noFavoritesView.addTask(v -> v.setVisibility(View.GONE));
             noLocationEnabledView.addTask(v -> v.setVisibility(View.VISIBLE));
         } else {
-//            setupUi(ScreenState.LOADING);
             app.getThreadPool().execute(() -> {
                 // Add "favourite" flag and calculate distance
                 for (Station station : stations) {
@@ -305,7 +299,7 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
                 }
 
                 // Sort stations by current location
-                Collections.sort(stationWrappersFav, (o1, o2) -> Double.compare(o1.distance, o2.distance));
+                Collections.sort(stationWrappersFav, Comparator.comparingDouble(o -> o.distance));
 
                 // Show on recyclerView
                 mainActivity.runOnUiThread(() -> {
@@ -322,13 +316,15 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
         Activity activity = getActivity();
         if (activity == null) return;
         activity.runOnUiThread(() -> {
-            if (location != null) {
+            if (LocationProvider.INSTANCE.isLive() && location != null && app.getStations() != null) {
                 if (location.equals(this.location)) return;
                 this.location = location;
                 setNearbyStations(app.getStations());
                 noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
             } else {
                 noLocationEnabledView.addTask(v -> v.setVisibility(View.VISIBLE));
+                progressBar.addTask(view -> view.setVisibility(View.GONE));
+                list.addTask(view -> view.setVisibility(View.GONE));
             }
         });
     }
@@ -353,8 +349,8 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
     @Override
     public void onPause() {
         super.onPause();
-        if (type == TYPE_NEARBY && locationManager != null)
-            LocationProvider.INSTANCE.subscribe(context, this);
+        if (type == TYPE_NEARBY)
+            LocationProvider.INSTANCE.unsubscribe(this);
     }
 
     @Override
@@ -374,8 +370,26 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        updateLocationList(MapUtility.getLatLngFromLocation(location));
+    public void onLocationChanged(@NonNull Location location) {
+        if (type == TYPE_NEARBY)
+            updateLocationList(MapUtility.getLatLngFromLocation(location));
+    }
+
+    @Override
+    public void onAvailabilityChanged(boolean isLive) {
+        if (type != TYPE_NEARBY)
+            return;
+
+        if (isLive) {
+            setStations();
+            list.addTask(view -> view.setVisibility(View.VISIBLE));
+            progressBar.addTask(view -> view.setVisibility(View.GONE));
+            noLocationEnabledView.addTask(v -> v.setVisibility(View.GONE));
+        } else {
+            noLocationEnabledView.addTask(v -> v.setVisibility(View.VISIBLE));
+            progressBar.addTask(view -> view.setVisibility(View.GONE));
+            list.addTask(view -> view.setVisibility(View.GONE));
+        }
     }
 
     private static final DiffUtil.ItemCallback<StationWrapper> DIFF_CALLBACK = new DiffUtil.ItemCallback<StationWrapper>() {
@@ -389,11 +403,6 @@ public class StationsSubFragment extends Fragment implements LocationProviderLis
             return oldItem.distance == newItem.distance;
         }
     };
-
-    @Override
-    public void onAvailabilityChanged(boolean isLive) {
-        // Do nothing
-    }
 
     public class Adapter extends ListAdapter<StationWrapper, RecyclerView.ViewHolder> {
 

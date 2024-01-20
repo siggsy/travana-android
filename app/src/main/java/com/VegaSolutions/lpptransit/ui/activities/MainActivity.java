@@ -432,7 +432,7 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
             // If request is cancelled, the result arrays are empty.
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 boolean showRationale = shouldShowRequestPermissionRationale(permissions[0]);
-                if (!showRationale) {
+                if (showRationale) {
                     Toast.makeText(this, getResources().getString(R.string.please_enable_location_permission_in_the_settings), Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -442,7 +442,9 @@ public class MainActivity extends MapFragmentActivity implements StationsFragmen
                 if (mMap != null) {
                     onMapReady(mMap);
                 }
-                stationsFragment.setSubstationsFragments();         // reload list of nearby stations when users enables location in the app
+                // Update UI with location features
+                stationsFragment.setSubstationsFragments();
+                locationManager.subscribe(this, this);
             }
         }
     }

@@ -17,6 +17,8 @@ import androidx.fragment.app.FragmentActivity;
 import com.VegaSolutions.lpptransit.R;
 import com.VegaSolutions.lpptransit.TravanaApp;
 import com.VegaSolutions.lpptransit.ui.custommaps.LocationMarkerManager;
+import com.VegaSolutions.lpptransit.ui.custommaps.LocationProvider;
+import com.VegaSolutions.lpptransit.ui.custommaps.LocationProviderListener;
 import com.VegaSolutions.lpptransit.ui.custommaps.TravanaLocationManager;
 import com.VegaSolutions.lpptransit.utility.MapUtility;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
@@ -30,12 +32,12 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MapFragmentActivity extends AppCompatActivity implements OnMapReadyCallback, TravanaLocationManager.TravanaLocationListener {
+public abstract class MapFragmentActivity extends AppCompatActivity implements OnMapReadyCallback, LocationProviderListener {
 
     protected GoogleMap mMap;
 
     protected LatLng ljubljana = new LatLng(46.056319, 14.505381);
-    protected TravanaLocationManager locationManager;
+    protected LocationProvider locationManager;
     protected LocationMarkerManager markerManager;
 
     protected ImageView locationIcon;
@@ -52,14 +54,14 @@ public abstract class MapFragmentActivity extends AppCompatActivity implements O
     protected void onPause() {
         super.onPause();
         if (locationManager != null)
-            locationManager.removeListener(this);
+            locationManager.unsubscribe(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (locationManager != null)
-            locationManager.addListener(this);
+            locationManager.subscribe(this, this);
     }
 
     @Override
@@ -79,38 +81,27 @@ public abstract class MapFragmentActivity extends AppCompatActivity implements O
             mMap.setMapStyle(new MapStyleOptions(getString(R.string.dark)));
         }
 
+        // Setup location objects
+        locationManager = LocationProvider.INSTANCE;
+        markerManager = new LocationMarkerManager(this, mMap,
+                MapUtility.getLatLngFromLocation(locationManager.getPrevLocation()),
+                MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_live)),
+                MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_offline)));
+
+        markerManager.setLive(locationManager.isLive());
+
+        locationIcon.setVisibility(View.VISIBLE);
+        locationIcon.setOnClickListener(v -> {
+            LatLng location = MapUtility.getLatLngFromLocation(locationManager.getPrevLocation());
+            if (location != null)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
+        });
+
         // Set location button location callback.
         if (MapUtility.checkIfAtLeastOnePermissionPermitted(this)) {
-
-            // Setup location objects
-            locationManager = TravanaApp.getInstance().getLocationManager();
-            markerManager = new LocationMarkerManager(this, mMap,
-                    locationManager.getLatest(),
-                    MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_live)),
-                    MapUtility.getMarkerIconFromDrawable(ContextCompat.getDrawable(this, R.drawable.current_location_offline)));
-
-            markerManager.setLive(locationManager.isLive());
-            locationManager.addListener(this);
-
-            locationIcon.setVisibility(View.VISIBLE);
-            locationIcon.setOnClickListener(v -> {
-                LatLng location = locationManager.getLatest();
-                if (location != null)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
-            });
-
+            locationManager.subscribe(this, this);
         }
 
-        // remove this option.
-        //mMap.setOnMapClickListener(latLng -> setHide(!hidden));
-
-
-    }
-
-    private void setHide(boolean value) {
-        for (View v : toHide)
-            show(v, value);
-        hidden = !hidden;
     }
 
     private void show(View view, boolean value) {
@@ -175,15 +166,19 @@ public abstract class MapFragmentActivity extends AppCompatActivity implements O
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        if (markerManager != null)
-            markerManager.update(location);
+    public void onLocationChanged(@NonNull Location location) {
+        runOnUiThread(() -> {
+            if (markerManager != null)
+                markerManager.update(location);
+        });
     }
 
     @Override
-    public void onProviderAvailabilityChanged(boolean value) {
-        if (markerManager != null)
-            markerManager.setLive(value);
+    public void onAvailabilityChanged(boolean isLive) {
+        runOnUiThread(() -> {
+            if (markerManager != null)
+                markerManager.setLive(isLive);
+        });
     }
 
 }
