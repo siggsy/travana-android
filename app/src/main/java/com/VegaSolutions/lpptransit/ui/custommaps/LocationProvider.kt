@@ -23,13 +23,13 @@ object LocationProvider {
         if (old != new && new != null)
             listeners.forEach { it.onLocationChanged(new) }
     }
-        private set
+        @Synchronized private set
 
     var isLive by Delegates.observable(false) { _, old, new ->
         if (old != new)
             listeners.forEach { it.onAvailabilityChanged(new) }
     }
-        private set
+        @Synchronized private set
 
     private val registeredProviders = HashSet<String>()
     private var fuse = false

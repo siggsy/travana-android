@@ -82,6 +82,7 @@ public class StationsFragment extends Fragment implements FragmentHeaderCallback
         // ViewPager with TabLayout
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabRippleColor(null);
 
         // Set tab layout icon color switcher
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
