@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import com.VegaSolutions.lpptransit.lppapi.Api;
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
-import com.VegaSolutions.lpptransit.ui.custommaps.TravanaLocationManager;
 import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
@@ -21,7 +20,6 @@ public class TravanaApp extends Application {
 
     private Api api;
     private NetworkConnectivityManager networkConnectivityManager;
-    private TravanaLocationManager locationManager;
     private ArrayList<Station> stations = null;
     private final ExecutorService threadPool = Executors.newFixedThreadPool(2);
 
@@ -31,10 +29,6 @@ public class TravanaApp extends Application {
 
     public NetworkConnectivityManager getNetworkConnectivityManager() {
         return networkConnectivityManager;
-    }
-
-    public TravanaLocationManager getLocationManager() {
-        return locationManager;
     }
 
     public Api getApi() {
@@ -70,7 +64,6 @@ public class TravanaApp extends Application {
         // App singletons
         instance = this;
         networkConnectivityManager = new NetworkConnectivityManager(this);
-        locationManager = new TravanaLocationManager(this);
         api = new Api(this);
     }
 
