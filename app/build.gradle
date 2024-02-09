@@ -21,8 +21,8 @@ android {
         applicationId "com.VegaSolutions.lpptransit"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 53
-        versionName "2.3.3"
+        versionCode 54
+        versionName "2.3.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField 'String', 'LPP_API_KEY', lpp_api_key
     }
@@ -51,20 +51,20 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.gms:play-services-maps:18.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.6'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'com.github.andrefrsousa:SuperBottomSheet:1.3.0'
     implementation 'com.github.zagum:Android-ExpandIcon:1.2.1'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation 'com.google.firebase:firebase-analytics:21.5.0'
+    implementation 'com.google.firebase:firebase-analytics:21.5.1'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'biz.laenger.android:vpbs:0.0.5'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
-    implementation 'androidx.webkit:webkit:1.9.0'
+    implementation 'com.google.android.gms:play-services-location:21.1.0'
+    implementation 'androidx.webkit:webkit:1.10.0'
 
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation group: 'joda-time', name: 'joda-time', version: '2.10.5'
