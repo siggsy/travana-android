@@ -37,7 +37,7 @@ public class AboutActivity extends AppCompatActivity {
         try {
             PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0);
             String versionName = pInfo.versionName;
-            tvVersion.setText(getResources().getString(R.string.version) + " " + versionName);
+            tvVersion.setText(getString(R.string.version, versionName));
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             tvVersion.setVisibility(View.INVISIBLE);
