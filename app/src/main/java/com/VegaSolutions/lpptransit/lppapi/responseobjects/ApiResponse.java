@@ -4,29 +4,28 @@ public class ApiResponse<T> {
 
     private boolean success;
     private T data;
+    private String message;
+    private String type;
 
     /**
      * @return Queried API data.
      */
-    public ApiResponse(boolean success, T data) {
+    public ApiResponse(boolean success, T data, String message, String type) {
         this.success = success;
         this.data = data;
+        this.message = message;
+        this.type = type;
     }
 
     public T getData() {
         return data;
     }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public String getMessage() {
+        return message;
     }
-
-    public void setData(T data) {
-        this.data = data;
+    public String getType() {
+        return type;
     }
-    /**
-     * @return Boolean if API server succeeded.
-     */
     public boolean isSuccess() {
         return success;
     }

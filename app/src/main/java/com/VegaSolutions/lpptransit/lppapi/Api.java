@@ -83,8 +83,7 @@ public class Api {
     private static final Headers headers = Headers.of(
             "apikey", BuildConfig.LPP_API_KEY,
             "Accept", "Travana",
-            "Accept-Encoding", "gzip",
-            "Cache-Control", "no-cache"
+            "Accept-Encoding", "gzip"
     );
 
     public Api(Context context) {
@@ -227,7 +226,7 @@ public class Api {
                 if (response.isSuccessful()) {
                     try {
                         List<DetourInfo> data = getDetours(response.body().string());
-                        ApiResponse<List<DetourInfo>> apiResponse = new ApiResponse<>(true, data);
+                        ApiResponse<List<DetourInfo>> apiResponse = new ApiResponse<>(true, data, null, null);
                         callback.onComplete(apiResponse, response.code(), true);
                     } catch (Exception e) {
                         callback.onComplete(null, -4, false);

@@ -53,4 +53,5 @@
     <string name="there_are_currently_no_detours">Trenutno ni obvozov.</string>
     <string name="follow_system_theme">Sledi sistemski temi</string>
     <string name="version">Različica %s</string>
+    <string name="home">Začetek</string>
 </resources>

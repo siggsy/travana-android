@@ -31,8 +31,8 @@
         <item name="android:editTextColor">@color/color_text</item>
     </style>
 
-    <style name="WhiteTheme" parent="MyTheme">
-    </style>
+<!--    <style name="WhiteTheme" parent="MyTheme">-->
+<!--    </style>-->
 
 
     <style name="WhiteAlert" parent="Theme.AppCompat.Light.Dialog">
