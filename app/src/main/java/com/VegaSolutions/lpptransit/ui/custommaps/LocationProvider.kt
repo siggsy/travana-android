@@ -3,10 +3,9 @@ package com.VegaSolutions.lpptransit.ui.custommaps
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
-import android.location.LocationRequest
 import android.util.Log
+import androidx.core.location.LocationListenerCompat
 import com.VegaSolutions.lpptransit.utility.MapUtility
 import com.VegaSolutions.lpptransit.utility.TAG
 import kotlin.properties.Delegates
@@ -41,7 +40,7 @@ object LocationProvider {
     private var network = false
         get() = registeredProviders.contains(LocationManager.NETWORK_PROVIDER) && field
 
-    private val mainListener = object : LocationListener {
+    private val mainListener = object : LocationListenerCompat {
         override fun onLocationChanged(newLocation: Location) {
             Log.i(this@LocationProvider.TAG, "New location: $newLocation")
             if (!isLive) {
