@@ -21,8 +21,8 @@ android {
         applicationId "com.VegaSolutions.lpptransit"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 54
-        versionName "2.3.4"
+        versionCode 55
+        versionName "2.3.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField 'String', 'LPP_API_KEY', lpp_api_key
     }
