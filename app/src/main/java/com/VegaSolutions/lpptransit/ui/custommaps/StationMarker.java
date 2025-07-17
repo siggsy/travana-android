@@ -1,5 +1,7 @@
 package com.VegaSolutions.lpptransit.ui.custommaps;
 
+import androidx.annotation.Nullable;
+
 import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
@@ -37,5 +39,11 @@ public class StationMarker implements ClusterItem {
 
     public Station getStation() {
         return station;
+    }
+
+    @Nullable
+    @Override
+    public @org.jetbrains.annotations.Nullable Float getZIndex() {
+        return 1f;
     }
 }
