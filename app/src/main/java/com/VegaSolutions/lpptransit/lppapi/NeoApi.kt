@@ -1,18 +1,14 @@
 package com.VegaSolutions.lpptransit.lppapi
 
-import android.content.Context
-import arrow.core.Either
-import arrow.core.raise.either
-import arrow.core.raise.ensure
 import com.VegaSolutions.lpptransit.BuildConfig
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ApiResponse
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalOnRoute
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.ArrivalWrapper
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.BusOnRoute
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Route
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.RouteOnStation
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.TimetableWrapper
+import com.VegaSolutions.lpptransit.lppapi.data.ApiResponse
+import com.VegaSolutions.lpptransit.lppapi.data.ArrivalOnRoute
+import com.VegaSolutions.lpptransit.lppapi.data.ArrivalWrapper
+import com.VegaSolutions.lpptransit.lppapi.data.BusOnRoute
+import com.VegaSolutions.lpptransit.lppapi.data.Route
+import com.VegaSolutions.lpptransit.lppapi.data.RouteOnStation
+import com.VegaSolutions.lpptransit.lppapi.data.Station
+import com.VegaSolutions.lpptransit.lppapi.data.TimetableWrapper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
@@ -21,8 +17,6 @@ import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.http.parameters
 import io.ktor.serialization.gson.gson
-import okhttp3.Cache
-import java.io.File
 import java.util.concurrent.TimeUnit
 
 const val DATA_URL = "https://data.lpp.si/api"

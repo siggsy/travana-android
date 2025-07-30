@@ -1,7 +1,7 @@
 package com.VegaSolutions.lpptransit.lppapi
 
 import android.content.Context
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station
+import com.VegaSolutions.lpptransit.lppapi.data.Station
 import com.VegaSolutions.lpptransit.utility.LppHelper
 
 class TravanaRepository(

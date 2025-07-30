@@ -4,8 +4,7 @@ import android.app.Application;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.VegaSolutions.lpptransit.lppapi.Api;
-import com.VegaSolutions.lpptransit.lppapi.responseobjects.Station;
+import com.VegaSolutions.lpptransit.lppapi.data.Station;
 import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager;
 import com.VegaSolutions.lpptransit.utility.ViewGroupUtils;
 
