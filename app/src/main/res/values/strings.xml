@@ -56,7 +56,7 @@
     <string name="there_are_currently_no_detours">There are currently no detours.</string>
     <string name="version">Version %s</string>
     <string name="follow_system_theme">Follow system theme</string>
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_home">Home</string>
     <string name="home">Home</string>
 
 </resources>

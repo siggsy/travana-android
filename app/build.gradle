@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.application'
     id 'com.jakewharton.butterknife'
@@ -14,7 +16,9 @@ android {
     }
 
     kotlin {
-        jvmToolchain(17)
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
 
     defaultConfig {
@@ -44,19 +48,12 @@ android {
     }
 
     namespace 'com.VegaSolutions.lpptransit'
-    kotlinOptions {
-        jvmTarget = '17'
-    }
+
     buildFeatures {
         compose true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.1'
-    }
-    packaging {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
     }
 
 }
@@ -74,6 +71,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.2'
     implementation 'androidx.activity:activity-compose:1.9.0'
     implementation platform('androidx.compose:compose-bom:2024.06.00')
+
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
@@ -95,6 +93,7 @@ dependencies {
 
     implementation "androidx.navigation:navigation-compose:$nav_version"
     implementation "androidx.compose.material3:material3:1.2.1"
+    implementation "androidx.compose.material:material-icons-extended"
 
 
     def ktor_version = "2.3.12"
@@ -122,11 +121,6 @@ dependencies {
     // Arrow
     implementation 'io.arrow-kt:arrow-core:1.2.4'
     implementation 'io.arrow-kt:arrow-fx-coroutines:1.2.4'
-
-    // Crash
-    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics")
 }
 
 apply plugin: 'com.google.gms.google-services'

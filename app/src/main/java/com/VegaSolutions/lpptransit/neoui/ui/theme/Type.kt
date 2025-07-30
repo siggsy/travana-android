@@ -1,33 +1,45 @@
 package com.VegaSolutions.lpptransit.neoui.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.Font
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import com.VegaSolutions.lpptransit.R
 
-val provider = GoogleFont.Provider(
-    providerAuthority = "com.google.android.gms.fonts",
-    providerPackage = "com.google.android.gms",
-    certificates = R.array.com_google_android_gms_fonts_certs
+
+val montserratFamily = FontFamily(
+    Font(R.font.montserrat_regular, FontWeight.Normal),
+    Font(R.font.montserrat_italic, FontWeight.Normal, FontStyle.Italic),
+    Font(R.font.montserrat_medium, FontWeight.Medium),
+    Font(R.font.montserrat_mediumitalic, FontWeight.Medium, FontStyle.Italic),
+    Font(R.font.montserrat_semibold, FontWeight.SemiBold),
+    Font(R.font.montserrat_semibolditalic, FontWeight.SemiBold, FontStyle.Italic),
+    Font(R.font.montserrat_bold, FontWeight.Bold),
+    Font(R.font.montserrat_bolditalic, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.montserrat_extrabold, FontWeight.ExtraBold),
+    Font(R.font.montserrat_extrabolditalic, FontWeight.ExtraBold, FontStyle.Italic),
+    Font(R.font.montserrat_black, FontWeight.Black),
+    Font(R.font.montserrat_blackitalic, FontWeight.Black, FontStyle.Italic),
 )
 
-val montserratFamily = with(GoogleFont("Montserrat")) {
-    FontFamily(
-        Font(googleFont = this, fontProvider = provider),
-        Font(googleFont = this, fontProvider = provider, FontWeight.Bold),
-    )
-}
-
-val notoSansFamily = with(GoogleFont("Noto Sans")) {
-    FontFamily(
-        Font(googleFont = this, fontProvider = provider),
-        Font(googleFont = this, fontProvider = provider, FontWeight.Bold),
-    )
-}
+val notoSansFamily = FontFamily(
+    Font(R.font.notosans_regular, FontWeight.Normal),
+    Font(R.font.notosans_italic, FontWeight.Normal, FontStyle.Italic),
+    Font(R.font.notosans_medium, FontWeight.Medium),
+    Font(R.font.notosans_mediumitalic, FontWeight.Medium, FontStyle.Italic),
+    Font(R.font.notosans_semibold, FontWeight.SemiBold),
+    Font(R.font.notosans_semibolditalic, FontWeight.SemiBold, FontStyle.Italic),
+    Font(R.font.notosans_bold, FontWeight.Bold),
+    Font(R.font.notosans_bolditalic, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.notosans_extrabold, FontWeight.ExtraBold),
+    Font(R.font.notosans_extrabolditalic, FontWeight.ExtraBold, FontStyle.Italic),
+    Font(R.font.notosans_black, FontWeight.Black),
+    Font(R.font.notosans_blackitalic, FontWeight.Black, FontStyle.Italic),
+)
 
 val Typography = Typography(
     bodyLarge = TextStyle(
@@ -39,7 +51,7 @@ val Typography = Typography(
     ),
     titleLarge = TextStyle(
         fontFamily = montserratFamily,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Black,
         fontSize = 36.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp

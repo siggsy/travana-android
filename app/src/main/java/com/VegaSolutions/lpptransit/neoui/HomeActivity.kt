@@ -30,7 +30,6 @@ import com.VegaSolutions.lpptransit.neoui.screens.home.HomeScreen
 import com.VegaSolutions.lpptransit.neoui.screens.SettingsScreen
 import com.VegaSolutions.lpptransit.neoui.ui.theme.LppTransitTheme
 
-
 sealed class Place(
     val route: String,
     @StringRes val label: Int,
@@ -76,7 +75,7 @@ class HomeActivity : ComponentActivity() {
                             places.forEach { place ->
                                 NavigationBarItem(
                                     label = { Text(stringResource(id = place.label)) },
-                                    selected = currentDestination?.hierarchy?.any { it.route == place.route } == true,
+                                    selected = currentDestination?.hierarchy?.any { it.route == place.route } ?: false,
                                     onClick = {
                                         navController.navigate(place.route) {
                                             popUpTo(navController.graph.startDestinationId) {

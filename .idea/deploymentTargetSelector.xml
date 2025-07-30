@@ -8,10 +8,10 @@
       <SelectionState runConfigName="HomeActivity">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="GreetingPreview">
+      <SelectionState runConfigName="station">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="travana-android.LppTransit.app">
+      <SelectionState runConfigName="Station">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
