@@ -124,7 +124,7 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
     )
 )) {
     Column(Modifier.background(Color.White), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.Bottom) {
             Icon(
                 imageVector = Icons.Outlined.LocationOn,
                 contentDescription = "location",
@@ -138,20 +138,23 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
                 fontSize = 20.sp
             )
             Spacer(Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Default.DoubleArrow,
-                contentDescription = "Arrow",
-                tint = Color.Gray,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(Modifier.size(3.dp))
-            Text(
-                text = "Towards",
-                color = Color.Gray,
-                fontSize = 12.sp,
-                fontFamily = montserratFamily,
-                fontWeight = FontWeight.SemiBold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(0.dp)) {
+                Icon(
+                    imageVector = Icons.Default.DoubleArrow,
+                    contentDescription = "Arrow",
+                    tint = Color.Gray,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.size(3.dp))
+                Text(
+                    text = "Towards",
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    fontFamily = montserratFamily,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             for (route in routes) {
