@@ -7,16 +7,20 @@ import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager
 
 class TravanaApp : Application() {
 
-    lateinit var networkConnectivityManager: NetworkConnectivityManager
+    lateinit var repository: TravanaRepository
         private set
 
-    lateinit var repository: TravanaRepository
+    lateinit var networkConnectivityManager: NetworkConnectivityManager
         private set
 
     override fun onCreate() {
         super.onCreate()
+
+        repository = TravanaRepository(
+            context = this,
+            api = NeoApi()
+        )
         networkConnectivityManager = NetworkConnectivityManager(this)
-        repository = TravanaRepository(context = this, api = NeoApi())
     }
 
 }

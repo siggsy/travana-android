@@ -50,16 +50,16 @@ fun getMarkerIconFromDrawable(drawable: Drawable, width: Int, height: Int): Bitm
 /**
  * Calculate distance between two LatLng objects
  *
- * @param StartP start point
- * @param EndP   end point
+ * @param startP start point
+ * @param endP   end point
  * @return distance in KM.
  */
-fun calculationByDistance(StartP: LatLng, EndP: LatLng): Double {
+fun calculationByDistance(startP: LatLng, endP: LatLng): Double {
     return calculationByDistance(
-        StartP.latitude,
-        StartP.longitude,
-        EndP.latitude,
-        EndP.longitude
+        startP.latitude,
+        startP.longitude,
+        endP.latitude,
+        endP.longitude
     )
 }
 
