@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlin.math.sign
 
@@ -19,7 +20,7 @@ fun Grid(
         val rows = count / columns + (count % columns).sign
         var id = 0
         for (rowId in 0 ..< rows) {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
               for (colId in 0 ..< columns) {
                   Box(
                       modifier = Modifier

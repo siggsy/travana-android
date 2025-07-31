@@ -1,9 +1,12 @@
 package com.VegaSolutions.lpptransit.neoui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,15 +32,19 @@ import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.NearMe
 import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,6 +123,16 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
                 isGarage = false,
                 eta = 10
             ),
+            Arrival(
+                isLive = false,
+                isGarage = false,
+                eta = 55
+            ),
+            Arrival(
+                isLive = false,
+                isGarage = false,
+                eta = 60
+            ),
         )
     )
 )) {
@@ -157,6 +174,7 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Route(route: Route) {
     val containsArrival = route.arrivals.any { it.eta == 0 && it.isLive }
@@ -176,13 +194,8 @@ fun Route(route: Route) {
     ) {
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = Modifier.padding(16.dp).fillMaxWidth()
+            modifier = Modifier.padding(24.dp).fillMaxWidth()
         ) {
-            Icon(
-                imageVector = Icons.Default.ForkRight,
-                contentDescription = "Fork right"
-            )
-            Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
 
@@ -199,15 +212,17 @@ fun Route(route: Route) {
                         route.name,
                         fontFamily = montserratFamily,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 Spacer(Modifier.height(8.dp))
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column() {
+                    Column {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)
@@ -216,7 +231,7 @@ fun Route(route: Route) {
                                 imageVector = Icons.Outlined.NearMe,
                                 contentDescription = "On their way",
                                 modifier = Modifier
-                                    .fillMaxHeight(0.8f)
+                                    .fillMaxHeight(0.7f)
                                     .height(1.dp)
                                     .aspectRatio(1f)
                             )
@@ -224,20 +239,21 @@ fun Route(route: Route) {
                             Text(
                                 text = "On their way",
                                 fontFamily = notoSansFamily,
-                                fontSize = 12.sp
+                                fontSize = 10.sp
                             )
                         }
-                        Spacer(Modifier.size(6.dp))
-
-                        Grid(
-                            columns = 2,
-                            count = live.size
-                        ) { id ->
-                            val arrival = live[id]
-                            Arrival(arrival.eta, isLive = arrival.isLive)
+                        Spacer(Modifier.size(4.dp))
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.fillMaxWidth().clipToBounds()
+                        ) {
+                            for (arrival in live) {
+                                Arrival(arrival.eta, isLive = arrival.isLive)
+                            }
                         }
                     }
-                    Column() {
+
+                    Column {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)
@@ -246,24 +262,26 @@ fun Route(route: Route) {
                                 imageVector = Icons.Outlined.Schedule,
                                 contentDescription = "Scheduled",
                                 modifier = Modifier
-                                    .fillMaxHeight(0.8f)
+                                    .fillMaxHeight(0.7f)
                                     .height(1.dp)
                                     .aspectRatio(1f)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
+
                             Text(
                                 text = "Scheduled",
                                 fontFamily = notoSansFamily,
-                                fontSize = 12.sp
+                                fontSize = 10.sp
                             )
                         }
-                        Spacer(Modifier.size(6.dp))
-                        Grid(
-                            columns = 2,
-                            count = scheduled.size
-                        ) { id ->
-                            val arrival = scheduled[id]
-                            Arrival(arrival.eta, isLive = arrival.isLive)
+                        Spacer(Modifier.size(4.dp))
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.fillMaxWidth().clipToBounds()
+                        ) {
+                            for (arrival in scheduled) {
+                                Arrival(arrival.eta, isLive = arrival.isLive)
+                            }
                         }
                     }
                 }
