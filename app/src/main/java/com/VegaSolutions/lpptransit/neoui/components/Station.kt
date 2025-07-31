@@ -107,6 +107,11 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
                 eta = 2
             ),
             Arrival(
+                isLive = false,
+                isGarage = false,
+                eta = 5
+            ),
+            Arrival(
                 isLive = true,
                 isGarage = false,
                 eta = 10
@@ -155,6 +160,7 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
 @Composable
 fun Route(route: Route) {
     val containsArrival = route.arrivals.any { it.eta == 0 && it.isLive }
+    val (live, scheduled) = route.arrivals.sortedBy { it.eta }.partition { it.isLive }
     Surface(
         shape = RoundedCornerShape(8.dp),
         contentColor =
@@ -197,51 +203,67 @@ fun Route(route: Route) {
                     )
                 }
                 Spacer(Modifier.height(8.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(Modifier.weight(1f)) {
-                        Row(modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)) {
+                    Column() {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)
+                        ) {
                             Icon(
                                 imageVector = Icons.Outlined.NearMe,
                                 contentDescription = "On their way",
-                                modifier = Modifier.fillMaxHeight().height(1.dp).aspectRatio(1f)
+                                modifier = Modifier
+                                    .fillMaxHeight(0.8f)
+                                    .height(1.dp)
+                                    .aspectRatio(1f)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("On their way")
+                            Text(
+                                text = "On their way",
+                                fontFamily = notoSansFamily,
+                                fontSize = 12.sp
+                            )
                         }
                         Spacer(Modifier.size(6.dp))
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            userScrollEnabled = false
-                        ) {
-                            items(route.arrivals.filter { it.isLive }) { arrival ->
-                                Arrival(arrival.eta, isLive = arrival.isLive)
-                            }
+
+                        Grid(
+                            columns = 2,
+                            count = live.size
+                        ) { id ->
+                            val arrival = live[id]
+                            Arrival(arrival.eta, isLive = arrival.isLive)
                         }
                     }
-                    Column(Modifier.weight(1f)) {
-                        Row(modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)) {
+                    Column() {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)
+                        ) {
                             Icon(
                                 imageVector = Icons.Outlined.Schedule,
                                 contentDescription = "Scheduled",
-                                modifier = Modifier.fillMaxHeight().height(1.dp).aspectRatio(1f)
+                                modifier = Modifier
+                                    .fillMaxHeight(0.8f)
+                                    .height(1.dp)
+                                    .aspectRatio(1f)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Scheduled")
+                            Text(
+                                text = "Scheduled",
+                                fontFamily = notoSansFamily,
+                                fontSize = 12.sp
+                            )
                         }
                         Spacer(Modifier.size(6.dp))
-                        LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                            item {
-                                Arrival(33, isLive = false)
-                            }
-                            item {
-                                Arrival(40, isLive = false)
-                            }
-                            item {
-                                Arrival(50, isLive = false)
-                            }
+                        Grid(
+                            columns = 2,
+                            count = scheduled.size
+                        ) { id ->
+                            val arrival = scheduled[id]
+                            Arrival(arrival.eta, isLive = arrival.isLive)
                         }
                     }
                 }
@@ -261,14 +283,13 @@ fun Arrival(time: Int, isLive: Boolean = true) {
                     text = "Arrival",
                     fontWeight = FontWeight.Black,
                     fontFamily = notoSansFamily,
-                    fontSize = 12.sp
                 )
-                Spacer(Modifier.size(4.dp))
-                Icon(
-                    imageVector = Icons.Default.Hail,
-                    contentDescription = "Arrival",
-                    modifier = Modifier.fillMaxHeight().height(1.dp)
-                )
+//                Spacer(Modifier.size(4.dp))
+//                Icon(
+//                    imageVector = Icons.Default.Hail,
+//                    contentDescription = "Arrival",
+//                    modifier = Modifier.fillMaxHeight().height(1.dp)
+//                )
             }
         } else {
             Row {

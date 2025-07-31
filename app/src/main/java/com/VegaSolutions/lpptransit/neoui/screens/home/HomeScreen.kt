@@ -1,6 +1,8 @@
 package com.VegaSolutions.lpptransit.neoui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,16 +16,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.VegaSolutions.lpptransit.R
+import com.VegaSolutions.lpptransit.neoui.components.Station
 import com.VegaSolutions.lpptransit.neoui.ui.theme.Typography
 
 @Preview
 @Composable
 fun HomeScreen(navController: NavController = rememberNavController()) {
     LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        contentPadding = PaddingValues(16.dp),
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
-            .padding(32.dp)
     ) {
 
         // Header
@@ -35,8 +39,32 @@ fun HomeScreen(navController: NavController = rememberNavController()) {
         }
 
         // Hints
+        // TODO
 
         // Station info
-
+        item {
+            Station()
+        }
+        item {
+            Station()
+        }
+        item {
+            Station()
+        }
+        item {
+            Station()
+        }
+        item {
+            Station()
+        }
+        item {
+            Station()
+        }
+        item {
+            Station()
+        }
+        item {
+            Station()
+        }
     }
 }
