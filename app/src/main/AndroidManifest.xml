@@ -22,41 +22,12 @@
             android:name=".neoui.HomeActivity"
             android:exported="true"
             android:label="@string/title_activity_home"
-            android:theme="@style/WhiteTheme" />
-        <activity
-            android:name=".ui.activities.WebViewActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/WhiteTheme.NoActionBar" />
-        <activity android:name=".ui.activities.DetourActivity" />
-        <activity
-            android:name=".ui.activities.AboutActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.SettingsActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.DepartureActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.RouteActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.MainActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:theme="@style/WhiteTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activities.SearchActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.activities.StationActivity"
-            android:screenOrientation="portrait" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
