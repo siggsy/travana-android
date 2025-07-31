@@ -1,6 +1,5 @@
 package com.VegaSolutions.lpptransit.data.lppapi
 
-import arrow.core.Either
 import io.ktor.http.HttpStatusCode
 
 data class ApiError(
