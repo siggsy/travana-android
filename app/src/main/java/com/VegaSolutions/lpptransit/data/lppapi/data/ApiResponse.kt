@@ -1,7 +1,7 @@
 package com.VegaSolutions.lpptransit.data.lppapi.data
 
-class ApiResponse<T>(
-    val isSuccess: Boolean,
+data class ApiResponse<T>(
+    val success: Boolean?,
     val data: T,
     val message: String,
     val type: String
