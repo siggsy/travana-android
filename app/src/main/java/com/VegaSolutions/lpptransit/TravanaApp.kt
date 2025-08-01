@@ -4,6 +4,11 @@ import android.app.Application
 import com.VegaSolutions.lpptransit.data.TravanaRepository
 import com.VegaSolutions.lpptransit.data.lppapi.NeoApi
 import com.VegaSolutions.lpptransit.utility.NetworkConnectivityManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlin.coroutines.coroutineContext
 
 class TravanaApp : Application() {
 
@@ -18,7 +23,8 @@ class TravanaApp : Application() {
 
         repository = TravanaRepository(
             context = this,
-            api = NeoApi()
+            api = NeoApi(),
+            scope = CoroutineScope(Dispatchers.IO)
         )
         networkConnectivityManager = NetworkConnectivityManager(this)
     }

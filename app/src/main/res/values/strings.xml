@@ -58,5 +58,6 @@
     <string name="follow_system_theme">Follow system theme</string>
     <string name="title_activity_home">Home</string>
     <string name="home">Home</string>
+    <string name="search">Search</string>
 
 </resources>

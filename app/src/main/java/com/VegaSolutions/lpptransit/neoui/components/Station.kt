@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DoubleArrow
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.NearMe
 import androidx.compose.material.icons.outlined.Schedule
@@ -40,6 +40,14 @@ import com.VegaSolutions.lpptransit.neoui.ui.theme.Typography
 import com.VegaSolutions.lpptransit.neoui.ui.theme.montserratFamily
 import com.VegaSolutions.lpptransit.neoui.ui.theme.notoSansFamily
 
+
+data class Station(
+    val id: String,
+    val name: String,
+    val towards: Boolean,
+    val routes: List<Route>
+)
+
 data class Route(
     val number: String,
     val name: String,
@@ -52,77 +60,84 @@ data class Arrival(
     val eta: Int,
 )
 
-@Preview
-@Composable
-fun Station(name: String = "Pošta", routes: List<Route> = listOf(
-    Route(
-        number = "2",
-        name = "ZELENA JAMA",
-        arrivals = listOf(
-            Arrival(
-                isLive = true,
-                isGarage = false,
-                eta = 0
-            ),
-            Arrival(
-                isLive = false,
-                isGarage = false,
-                eta = 22
-            ),
-            Arrival(
-                isLive = false,
-                isGarage = false,
-                eta = 2
-            ),
-            Arrival(
-                isLive = true,
-                isGarage = false,
-                eta = 10
-            ),
-        )
-    ),
-    Route(
-        number = "19B",
-        name = "TOMAČEVO",
-        arrivals = listOf(
-            Arrival(
-                isLive = true,
-                isGarage = false,
-                eta = 1
-            ),
-            Arrival(
-                isLive = false,
-                isGarage = false,
-                eta = 22
-            ),
-            Arrival(
-                isLive = false,
-                isGarage = false,
-                eta = 2
-            ),
-            Arrival(
-                isLive = false,
-                isGarage = false,
-                eta = 5
-            ),
-            Arrival(
-                isLive = true,
-                isGarage = false,
-                eta = 10
-            ),
-            Arrival(
-                isLive = false,
-                isGarage = false,
-                eta = 55
-            ),
-            Arrival(
-                isLive = false,
-                isGarage = false,
-                eta = 60
-            ),
+private val example = Station(
+    id = "10000",
+    name = "Pošta",
+    towards = true,
+    routes = listOf(
+        Route(
+            number = "2",
+            name = "ZELENA JAMA",
+            arrivals = listOf(
+                Arrival(
+                    isLive = true,
+                    isGarage = false,
+                    eta = 0
+                ),
+                Arrival(
+                    isLive = false,
+                    isGarage = false,
+                    eta = 22
+                ),
+                Arrival(
+                    isLive = false,
+                    isGarage = false,
+                    eta = 2
+                ),
+                Arrival(
+                    isLive = true,
+                    isGarage = false,
+                    eta = 10
+                ),
+            )
+        ),
+        Route(
+            number = "19B",
+            name = "TOMAČEVO",
+            arrivals = listOf(
+                Arrival(
+                    isLive = true,
+                    isGarage = false,
+                    eta = 1
+                ),
+                Arrival(
+                    isLive = false,
+                    isGarage = false,
+                    eta = 22
+                ),
+                Arrival(
+                    isLive = false,
+                    isGarage = false,
+                    eta = 2
+                ),
+                Arrival(
+                    isLive = false,
+                    isGarage = false,
+                    eta = 5
+                ),
+                Arrival(
+                    isLive = true,
+                    isGarage = false,
+                    eta = 10
+                ),
+                Arrival(
+                    isLive = false,
+                    isGarage = false,
+                    eta = 55
+                ),
+                Arrival(
+                    isLive = false,
+                    isGarage = false,
+                    eta = 60
+                ),
+            )
         )
     )
-)) {
+)
+
+@Preview
+@Composable
+fun Station(station: Station = example) {
     Column(Modifier.background(Color.White), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.Bottom) {
             Icon(
@@ -133,14 +148,14 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                text = name,
+                text = station.name,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp
             )
             Spacer(Modifier.width(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(0.dp)) {
                 Icon(
-                    imageVector = Icons.Default.DoubleArrow,
+                    imageVector = Icons.Default.KeyboardDoubleArrowRight,
                     contentDescription = "Arrow",
                     tint = Color.Gray,
                     modifier = Modifier.size(18.dp)
@@ -157,7 +172,7 @@ fun Station(name: String = "Pošta", routes: List<Route> = listOf(
 
         }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            for (route in routes) {
+            for (route in station.routes) {
                 Route(route)
             }
         }
@@ -208,11 +223,13 @@ fun Route(route: Route) {
                     )
                 }
                 Spacer(Modifier.height(8.dp))
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column {
+                    Column(
+                        Modifier.weight(1f)
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)
@@ -235,7 +252,6 @@ fun Route(route: Route) {
                         Spacer(Modifier.size(4.dp))
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxWidth().clipToBounds()
                         ) {
                             for (arrival in live) {
                                 Arrival(arrival.eta, isLive = arrival.isLive)
@@ -243,7 +259,9 @@ fun Route(route: Route) {
                         }
                     }
 
-                    Column {
+                    Column(
+                        Modifier.weight(1f)
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.alpha(0.8f).height(IntrinsicSize.Min)
@@ -267,7 +285,6 @@ fun Route(route: Route) {
                         Spacer(Modifier.size(4.dp))
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.fillMaxWidth().clipToBounds()
                         ) {
                             for (arrival in scheduled) {
                                 Arrival(arrival.eta, isLive = arrival.isLive)

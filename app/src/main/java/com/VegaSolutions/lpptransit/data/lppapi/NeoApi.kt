@@ -1,21 +1,24 @@
 package com.VegaSolutions.lpptransit.data.lppapi
 
+import android.util.Log
 import com.VegaSolutions.lpptransit.BuildConfig
 import com.VegaSolutions.lpptransit.data.lppapi.data.ApiResponse
 import com.VegaSolutions.lpptransit.data.lppapi.data.ArrivalOnRoute
-import com.VegaSolutions.lpptransit.data.lppapi.data.ArrivalWrapper
+import com.VegaSolutions.lpptransit.data.lppapi.data.StationArrivals
 import com.VegaSolutions.lpptransit.data.lppapi.data.BusOnRoute
 import com.VegaSolutions.lpptransit.data.lppapi.data.Route
 import com.VegaSolutions.lpptransit.data.lppapi.data.RouteOnStation
 import com.VegaSolutions.lpptransit.data.lppapi.data.Station
 import com.VegaSolutions.lpptransit.data.lppapi.data.TimetableWrapper
+import com.VegaSolutions.lpptransit.utility.TAG
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
-import io.ktor.http.parameters
 import io.ktor.serialization.gson.gson
 import java.util.concurrent.TimeUnit
 
@@ -51,13 +54,15 @@ class NeoApi() {
     // --------------------------- [ OkHttp Client ] -------------------------------------------- //
 
     private val client = HttpClient(OkHttp) {
-
-        // JSON parser
-        install(ContentNegotiation) {
-            gson()
+        install(ContentNegotiation) { gson() }
+        install(Logging) {
+            logger = object : io.ktor.client.plugins.logging.Logger {
+                override fun log(message: String) {
+                    Log.println(Log.DEBUG, this@HttpClient.TAG, message)
+                }
+            }
+            level = LogLevel.BODY
         }
-
-        // OkHttp client configuration
         engine {
             config {
                 followRedirects(true)
@@ -80,18 +85,19 @@ class NeoApi() {
                 append("Accept-Encoding", "gzip")
                 append("Cache-Control",   "no-cache")
             }
-            parameters {
+            url {
                 params.forEach {
-                    append(it.first, it.second)
+                    parameters.append(it.first, it.second)
                 }
             }
         }
+
         if (response.status.value !in 200..299) {
             throw HttpError(response.status)
         }
 
         val result: ApiResponse<T> = response.body()
-        if (!result.isSuccess) {
+        if (result.success?.not() ?: false) {
             throw ApiError(result.type, result.message)
         }
         return result.data
@@ -123,7 +129,7 @@ class NeoApi() {
             "trip-id" to tripId
         )
 
-    suspend fun arrival(stationCode: String): ArrivalWrapper =
+    suspend fun arrival(stationCode: String): StationArrivals =
         client.lppGet(
             "$DATA_URL$ARRIVAL",
             "station-code" to stationCode

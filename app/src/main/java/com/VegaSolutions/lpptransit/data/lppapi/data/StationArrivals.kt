@@ -2,7 +2,7 @@ package com.VegaSolutions.lpptransit.data.lppapi.data
 
 import com.google.gson.annotations.SerializedName
 
-data class ArrivalWrapper(
+data class StationArrivals(
     @SerializedName("station")
     val station: Station,
 
@@ -18,7 +18,10 @@ data class ArrivalWrapper(
 
         @SerializedName("code_id")
         val codeId: Int,
-    )
+    ) {
+        val towards: Boolean
+            get() = refId.mod(2) == 0
+    }
 
     data class Arrival(
         @SerializedName("route_id")
